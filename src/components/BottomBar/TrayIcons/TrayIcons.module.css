@@ -1,0 +1,12 @@
+.TrayIcons {
+  width: 35px;
+  margin-bottom: 2px;
+}
+
+.TrayIconsButton {
+  transition: 0.15s ease;
+}
+
+.TrayIconsButton:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}

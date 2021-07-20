@@ -1,0 +1,17 @@
+.WindowButton {
+  width: 48px;
+  height: 40px;
+  display: inline-block;
+  padding: 0px 15px;
+  transition: 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.WindowButton:hover {
+  background-color: var(--accent);
+  cursor: pointer;
+}
+
+.close:hover {
+  background-color: red;
+}
