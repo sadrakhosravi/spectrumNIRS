@@ -1,0 +1,9 @@
+.MainContainer {
+  position: relative;
+  width: calc(100% - 4rem);
+  height: calc(100% - 70px);
+  max-height: calc(100% - 70px);
+  margin-left: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}

@@ -1,4 +1,6 @@
-// craco.config.js - Used for TailwindCSS
+const path = require('path');
+
+// craco.config.js - Used for TailwindCSS & customizing webpack config
 module.exports = {
   style: {
     postcss: {

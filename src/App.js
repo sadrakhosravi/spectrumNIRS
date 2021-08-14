@@ -1,8 +1,9 @@
-import './App.css';
 import './index.css';
+
 import TitleBar from './components/TitleBar/TitleBar.component';
 import BottomBar from './components/BottomBar/BottomBar.component';
 import MainNavigation from './components/MainNavigation/MainNavigation.component';
+import MainContainer from './components/Containers/MainContainer.component';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <TitleBar />
       <BottomBar />
       <MainNavigation />
+      <MainContainer />
     </>
   );
 }

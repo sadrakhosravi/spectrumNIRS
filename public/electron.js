@@ -1,11 +1,12 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
 
+let mainWindow;
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
     width: 1200,
@@ -13,6 +14,7 @@ function createWindow() {
     frame: false,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
     },
   });
 
@@ -38,4 +40,21 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+
+//NEEDS TO BE REFACTORED TO A SEPERATE FILE
+
+//Minimze window on minimize icon click
+ipcMain.on('window:minimize', () => {
+  mainWindow.minimize();
+});
+
+//Close/quit window on minimize icon click
+ipcMain.on('window:close', () => {
+  app.quit();
+});
+
+//Restore window on minimize icon click
+ipcMain.on('window:restore', () => {
+  mainWindow.isMaximized() ? mainWindow.restore() : mainWindow.maximize();
 });

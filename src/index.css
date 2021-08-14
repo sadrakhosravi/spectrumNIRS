@@ -3,17 +3,6 @@
   src: url('./assets/inter/inter.ttf') format('truetype');
 }
 
-body {
-  background-color: var(--dark);
-}
-
-:root {
-  --dark: #1e1e1e;
-  --grey2: #333333;
-  --accent: #007acd;
-  --blue: #00b;
-}
-
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 
 /* Document
@@ -38,6 +27,12 @@ html {
 
 body {
   margin: 0;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
 }
 
 /**

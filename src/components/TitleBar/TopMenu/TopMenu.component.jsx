@@ -6,10 +6,10 @@ import styles from './TopMenu.module.css';
 const TopMenu = () => {
   return (
     <nav className="inline-block">
-      <ul className={styles.TopMenu}>
-        <li>File</li>
-        <li>Help</li>
-        <li>DevTools</li>
+      <ul className={`${styles.TopMenu} ml-3`}>
+        <li className="hover:bg-accent">File</li>
+        <li className="hover:bg-accent">Help</li>
+        <li className="hover:bg-accent">DevTools</li>
       </ul>
     </nav>
   );
