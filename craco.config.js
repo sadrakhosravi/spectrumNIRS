@@ -6,6 +6,7 @@ module.exports = {
     alias: {
       '@icons': path.resolve(__dirname, 'src/assets/icons'),
       '@globalComponent': path.resolve(__dirname, 'src/components/Global'),
+      '@container': path.resolve(__dirname, 'src/components/Containers'),
     },
   },
   style: {

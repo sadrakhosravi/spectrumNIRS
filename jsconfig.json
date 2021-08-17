@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": "src"
+    "target": "ES6",
+    "baseUrl": "./src",
+    "paths": {
+      "@icons/*": ["./assets/icons/*"],
+      "@globalComponent/*": ["./components/Global/*"]
+    }
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "build"]
+  "include": ["src/**/**/**/*"]
 }

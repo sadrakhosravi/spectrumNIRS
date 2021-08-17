@@ -1,14 +1,28 @@
 import React from 'react';
 
 import styles from './MainContainer.module.css';
-import StartupContainer from './StartupScreen/StartupContainer.component';
 
-const MainContainer = () => {
-  return (
-    <main className={styles.MainContainer}>
-      <StartupContainer />
-    </main>
-  );
+//Containers
+import StartupContainer from '@container/StartupContainer.component';
+import RecordReviewContainer from '@container/RecordReviewContainer.component';
+
+const MainContainer = ({ container }) => {
+  let outputContainer;
+
+  //Switch to check which container to render
+  switch (container) {
+    case 'startContainer':
+      outputContainer = <StartupContainer />;
+      break;
+    case 'recordContainer':
+      outputContainer = <RecordReviewContainer />;
+      break;
+
+    default:
+      outputContainer = <StartupContainer />;
+  }
+
+  return <main className={styles.MainContainer}>{outputContainer}</main>;
 };
 
 export default MainContainer;

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import HeadingText from './HeadingText/HeadingText.component';
-import RecentProjectsContainer from './RecentProjects/RecentProjectsContainer.component';
-import IconButtons from './IconButtons/IconButtons.component';
+import HeadingText from './StartupScreen/HeadingText/HeadingText.component';
+import RecentProjectsContainer from './StartupScreen/RecentProjects/RecentProjectsContainer.component';
+import IconButtons from './StartupScreen/IconButtons/IconButtons.component';
 
 //Icons
 import NewFileIcon from '@icons/new-file.svg';
