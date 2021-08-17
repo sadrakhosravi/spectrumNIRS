@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import Logo from '../Global/Logo/Logo.component';
+import Logo from '@globalComponent/Logo/Logo.component';
 import TopMenu from './TopMenu/TopMenu.component';
 import WindowButtons from './WindowButtons/WindowButtons.component';
 

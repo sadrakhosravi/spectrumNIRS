@@ -1,9 +1,9 @@
 //Contains minimize, restore/maximize, and close button for the titlebar.
 
 import React from 'react';
-import Minimize from 'assets/icons/minimize.svg';
-import Restore from 'assets/icons/restore.svg';
-import Close from 'assets/icons/close.svg';
+import Minimize from '@icons/minimize.svg';
+import Restore from '@icons/restore.svg';
+import Close from '@icons/close.svg';
 
 import styles from './WindowButtons.module.css';
 

@@ -1,10 +1,10 @@
 import React from 'react';
 
-import SensorIcon from '../../../assets/icons/sensor.svg';
-import PatientIcon from '../../../assets/icons/user-checked.svg';
-import ExperimentIcon from '../../../assets/icons/experiment.svg';
+import SensorIcon from '@icons/sensor.svg';
+import PatientIcon from '@icons/user-checked.svg';
+import ExperimentIcon from '@icons/experiment.svg';
 
-import Seperator from '../../Global/Seperator/Seperator.component';
+import Seperator from '@globalComponent/Seperator/Seperator.component';
 
 import styles from './TrayIcons.module.css';
 

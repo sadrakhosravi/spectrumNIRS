@@ -3,7 +3,7 @@ import React from 'react';
 import ButtonTitleDescription from 'components/Global/ButtonTitleDescription/ButtonTitleDescription.component';
 
 //Data file icon
-import RecentFileIcon from 'assets/icons/recent-file.svg';
+import RecentFileIcon from '@icons/recent-file.svg';
 const RecentProject = () => {
   return (
     <div className="bg-grey2 grid grid-cols-5 px-3 py-5">

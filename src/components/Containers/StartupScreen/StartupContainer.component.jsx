@@ -5,8 +5,8 @@ import RecentProjectsContainer from './RecentProjects/RecentProjectsContainer.co
 import IconButtons from './IconButtons/IconButtons.component';
 
 //Icons
-import NewFileIcon from 'assets/icons/new-file.svg';
-import OpenFileIcon from 'assets/icons/open-file.svg';
+import NewFileIcon from '@icons/new-file.svg';
+import OpenFileIcon from '@icons/open-file.svg';
 
 const StartupContainer = () => {
   return (
