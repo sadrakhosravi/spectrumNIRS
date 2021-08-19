@@ -30,6 +30,7 @@ const Chart = () => {
       Themes,
       SolidLine,
       ColorPalettes,
+      ColorHEX,
     } = lcjs;
 
     // Import data-generator from 'xydata'-library.
@@ -114,13 +115,7 @@ const Chart = () => {
 
     const palette = ColorPalettes.flatUI(5);
 
-    const selectedFillStyle = new SolidFill().setColor(palette(1));
-
-    const lineChartColorArr = [];
-
-    for (let i = 1; i <= 4; i++) {
-      lineChartColorArr.push(new SolidFill().setColor(palette(i)));
-    }
+    const lineChartColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF'];
 
     // Add progressive line series to each chart.
     const seriesList = charts.map((chart, i) =>
@@ -131,7 +126,14 @@ const Chart = () => {
             pattern: 'ProgressiveX',
           },
         })
-        .setStrokeStyle(style => style.setFillStyle(lineChartColorArr[i])),
+        .setName('test')
+        .setStrokeStyle(style =>
+          style.setFillStyle(
+            new SolidFill({
+              color: ColorHEX(lineChartColorArr[i]),
+            }),
+          ),
+        ),
     );
 
     // Generate and push data to each line series.
