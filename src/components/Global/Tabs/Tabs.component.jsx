@@ -5,6 +5,7 @@ import TabItem from '@globalComponent/Tabs/TabItem.component';
 import GraphLinesIcon from '@icons/graph-lines.svg';
 import ReviewIcon from '@icons/review-white.svg';
 
+//Recording and review tabs
 const Tabs = () => {
   return (
     <div className="w-full bg-dark grid grid-flow-col auto-cols-max">

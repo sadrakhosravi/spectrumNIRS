@@ -8,7 +8,6 @@
 }
 
 .WindowButton:hover {
-  background-color: var(--accent);
   cursor: pointer;
 }
 

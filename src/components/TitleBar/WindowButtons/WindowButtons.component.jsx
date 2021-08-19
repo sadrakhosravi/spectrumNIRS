@@ -27,8 +27,18 @@ const WindowButtons = () => {
 
   return (
     <span className="text-right items-center">
-      <img src={Minimize} className={styles.WindowButton} alt="Minimize" onClick={minimizeWindow} />
-      <img src={Restore} className={styles.WindowButton} alt="Maximize/Restore" onClick={restoreWindow} />
+      <img
+        src={Minimize}
+        className={`${styles.WindowButton} hover:bg-accent`}
+        alt="Minimize"
+        onClick={minimizeWindow}
+      />
+      <img
+        src={Restore}
+        className={`${styles.WindowButton} hover:bg-accent`}
+        alt="Maximize/Restore"
+        onClick={restoreWindow}
+      />
       <img
         src={Close}
         className={`${styles.WindowButton} ${styles.close}`}

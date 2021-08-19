@@ -4,7 +4,8 @@
     "baseUrl": "./src",
     "paths": {
       "@icons/*": ["./assets/icons/*"],
-      "@globalComponent/*": ["./components/Global/*"]
+      "@globalComponent/*": ["./components/Global/*"],
+      "@chart/*": ["./components/Chart/*"]
     }
   },
   "include": ["src/**/**/**/*"]

@@ -7,6 +7,7 @@ module.exports = {
       light2: '#7F7F7F',
       grey1: '#3D3D3D',
       grey2: '#333333',
+      grey3: '#272727',
       dark: '#1E1E1E',
       white: '#FFFFFF',
       accent: '#007ACD',
@@ -34,7 +35,9 @@ module.exports = {
     extend: {},
   },
   variants: {
-    extend: {},
+    extend: {
+      backgroundColor: ['active'],
+    },
   },
   plugins: [],
 };

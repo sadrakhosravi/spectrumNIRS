@@ -6,7 +6,8 @@ import styles from './MainContainer.module.css';
 import StartupContainer from '@container/StartupContainer.component';
 import RecordReviewContainer from '@container/RecordReviewContainer.component';
 
-const MainContainer = ({ container }) => {
+const MainContainer = props => {
+  const { container } = props;
   let outputContainer;
 
   //Switch to check which container to render

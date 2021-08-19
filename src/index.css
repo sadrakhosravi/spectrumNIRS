@@ -27,6 +27,7 @@ html {
 
 body {
   margin: 0;
+  height: 100%;
 }
 
 input:focus,
@@ -361,7 +362,26 @@ template {
   display: none;
 }
 
-/** Defining Global Colors */
+/** Custom Styles */
+
+.fit-to-container {
+  height: calc(100% - 56px);
+}
+
+.custom-height {
+  height: calc(100% - 3rem);
+}
+
+.tab-item-height {
+  height: 3rem;
+}
+
+/** Custom media queries */
+@media only screen and (max-width: 1600px) {
+  html {
+    font-size: 90%;
+  }
+}
 
 /** Using tailwind css utilities */
 @tailwind base;

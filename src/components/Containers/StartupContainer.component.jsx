@@ -10,7 +10,7 @@ import OpenFileIcon from '@icons/open-file.svg';
 
 const StartupContainer = () => {
   return (
-    <div className="h-full w-3/4 mx-auto pt-12">
+    <div className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">
       <HeadingText />
       <div className="grid grid-cols-5 mt-10 h-full gap-10">
         <div className="col-span-3">

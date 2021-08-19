@@ -7,9 +7,9 @@ const TopMenu = () => {
   return (
     <nav className="inline-block">
       <ul className={`${styles.TopMenu} ml-3`}>
-        <li className="hover:bg-accent">File</li>
-        <li className="hover:bg-accent">Help</li>
-        <li className="hover:bg-accent">DevTools</li>
+        <li className="hover:bg-light2">File</li>
+        <li className="hover:bg-light2">Help</li>
+        <li className="hover:bg-light2">DevTools</li>
       </ul>
     </nav>
   );

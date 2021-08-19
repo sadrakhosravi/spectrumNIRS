@@ -1,5 +1,7 @@
 .MainContainer {
-  position: relative;
+  position: absolute;
+  top: 40px;
+  left: 4rem;
   width: calc(100% - 4rem);
   height: calc(100% - 70px);
   max-height: calc(100% - 70px);
