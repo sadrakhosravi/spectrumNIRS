@@ -177,7 +177,7 @@ export default class ChartClass {
     // Generate and push data to each line series.
     seriesList.forEach((series, i) =>
       createProgressiveTraceGenerator()
-        .setNumberOfPoints(100 * 1000)
+        .setNumberOfPoints(100 * 100)
         .generate()
         .toPromise()
         .then(data => {
