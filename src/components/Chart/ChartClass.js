@@ -4,7 +4,14 @@
 
 // Import LightningChartJS
 import lcjs from '@arction/lcjs';
-const { createProgressiveTraceGenerator } = require('@arction/xydata');
+import SocketIOClient from 'socket.io-client';
+
+const { createSampledDataGenerator } = require('@arction/xydata');
+
+var socket = SocketIOClient.connect('http://localhost:8080/');
+socket.on('handshake', data => {
+  console.log(data.message);
+});
 
 // Extract required parts from LightningChartJS.
 const {
@@ -21,15 +28,20 @@ const {
   UIOrigins,
   Themes,
   ColorHEX,
+  SolidLine,
+  AxisScrollStrategies,
 } = lcjs;
 
 export default class ChartClass {
   constructor(channelCount = 4, zoomBandActive = true) {
     this.channelCount = channelCount;
     this.zoomBandActive = zoomBandActive;
-    this.numberOfRows = channelCount * 2 + 1;
+    this.numberOfRows = channelCount * 2;
+
+    this.lineChartColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors: ['red','yellow','cyan', 'white']
 
     this.generateChart();
+    // this.restoreAxis();
   }
 
   generateChart() {
@@ -37,11 +49,14 @@ export default class ChartClass {
     this.channels = this.createChannels();
     this.dashboard = this.createLightningChartDashboard();
     this.charts = this.createChartForEachChannel();
-    this.zoomBandChart = this.createZoomBand();
-    this.changeZoomBandStyle();
     this.seriesList = this.createDataPoint();
     this.syncAxisXEventHandler = this.synchronizeXAxis();
     this.createUIElement();
+
+    //Zoom Band creation and styling
+    // this.zoomBandChart = this.createZoomBand();
+
+    // this.changeZoomBandStyle();
   }
 
   /**
@@ -60,7 +75,7 @@ export default class ChartClass {
 
   /**
    * Creates an array based on the channelsCount
-   * @returns channels array
+   * @returns {Array} - Array containing a string 'Ch' + channel number
    */
   createChannels() {
     const channels = [];
@@ -72,6 +87,7 @@ export default class ChartClass {
 
   /**
    * Create chart for each channel
+   * @returns {Array} Array containing indivisual chart objects.
    */
   createChartForEachChannel() {
     let chartRowIndex = 2;
@@ -84,6 +100,10 @@ export default class ChartClass {
         columnSpan: 1,
         rowSpan: 2,
       });
+
+      //Disable X and Y axis animations.
+      chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting).fit(true);
+
       // Disable default auto cursor.
       chart.setAutoCursorMode(AutoCursorModes.disabled);
 
@@ -95,9 +115,17 @@ export default class ChartClass {
         chartRowIndex += 2;
       }
 
+      chart
+        .getDefaultAxisX()
+        .setTitle('milliseconds')
+        .setInterval(0, 30000)
+        .setScrollStrategy(AxisScrollStrategies.progressive);
+
       // Only display X ticks for bottom chart.
       if (i !== this.channelCount - 1) {
         chart.getDefaultAxisX().setTickStrategy(AxisTickStrategies.Empty);
+      } else {
+        chart.getDefaultAxisX().setTitle('Milliseconds').setScrollStrategy(AxisScrollStrategies.progressive);
       }
 
       // Sync X axes of stacked charts by adding an invisible tick to each Y axis with preset length.
@@ -121,69 +149,95 @@ export default class ChartClass {
     return charts;
   }
 
-  /**
-   * Creates a zoom band based on each channel
-   */
-  createZoomBand() {
-    const zoomBandChart = this.charts.map(chart => {
-      return this.dashboard.createZoomBandChart({
-        columnIndex: 0,
-        columnSpan: 1,
-        rowIndex: 8,
-        rowSpan: 1,
-        axis: chart.getDefaultAxisX(),
-      });
-    });
-    return zoomBandChart;
-  }
+  // /**
+  //  * Creates a zoom band based on each channel
+  //  */
+  // createZoomBand() {
+  //   const zoomBandChart = this.charts.map(chart => {
+  //     return this.dashboard.createZoomBandChart({
+  //       columnIndex: 0,
+  //       columnSpan: 1,
+  //       rowIndex: 8,
+  //       rowSpan: 1,
+  //       axis: chart.getDefaultAxisX(),
+  //     });
+  //   });
+  //   return zoomBandChart;
+  // }
 
-  /**
-   * Changes the default style of the zoom band
-   */
-  changeZoomBandStyle() {
-    this.zoomBandChart.forEach(zoomBandChart => {
-      zoomBandChart.setTitle('');
-      zoomBandChart.setPadding(2);
-      zoomBandChart.getDefaultAxisX().setTickStrategy(AxisTickStrategies.Empty);
-      zoomBandChart.setTitleFillStyle(emptyFill);
-    });
-  }
+  // /**
+  //  * Changes the default style of the zoom band
+  //  */
+  // changeZoomBandStyle() {
+  //   this.zoomBandChart.forEach((zoomBand, i) => {
+  //     zoomBand
+  //       .setTitleFillStyle(emptyFill)
+  //       .setPadding(0)
+  //       .getDefaultAxisX()
+  //       .setTickStrategy(AxisTickStrategies.Empty);
+
+  //     zoomBand.getDefaultAxisY().setAnimationScroll(undefined);
+  //     zoomBand.band.setFillStyle(new SolidFill({ color: ColorRGBA(255, 255, 255).setA(25) }));
+  //   });
+
+  //   console.log(this.zoomBandChart.attachedAxis);
+  // }
 
   /**
    * Generates random data point for each channel
    */
   createDataPoint() {
-    const lineChartColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF'];
-
-    // Add progressive line series to each chart.
     const seriesList = this.charts.map((chart, i) =>
       chart
         .addLineSeries({
           dataPattern: {
             // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
             pattern: 'ProgressiveX',
+            // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
+            regularProgressiveStep: true,
           },
         })
-        .setName('test')
+        .setMaxPointCount(30000)
+
         .setStrokeStyle(style =>
           style.setFillStyle(
             new SolidFill({
-              color: ColorHEX(lineChartColorArr[i]),
+              color: ColorHEX(this.lineChartColorArr[i]),
             }),
           ),
         ),
     );
 
+    const point = [
+      { x: 2, y: 81 },
+      { x: 3, y: 83 },
+      { x: 4, y: 88 },
+      { x: 5, y: 98 },
+      { x: 6, y: 92 },
+      { x: 7, y: 85 },
+      { x: 8, y: 73 },
+      { x: 9, y: 71 },
+      { x: 10, y: 70 },
+      { x: 11, y: 83 },
+      { x: 12, y: 73 },
+      { x: 13, y: 79 },
+      { x: 14, y: 84 },
+      { x: 15, y: 78 },
+      { x: 16, y: 67 },
+      { x: 17, y: 71 },
+    ];
+    // Add progressive line series to each chart.
+
     // Generate and push data to each line series.
-    seriesList.forEach((series, i) =>
-      createProgressiveTraceGenerator()
-        .setNumberOfPoints(100 * 100)
-        .generate()
-        .toPromise()
-        .then(data => {
-          series.add(data);
-        }),
-    );
+    socket.on('data', data => {
+      seriesList[0].add({ x: data.data.TimeStamp, y: data.data.Probe0.O2Hb });
+      seriesList[1].add({ x: data.data.TimeStamp, y: data.data.Probe0.HHb });
+
+      seriesList[2].add({ x: data.data.TimeStamp, y: data.data.Probe0.tHb });
+
+      seriesList[3].add({ x: data.data.TimeStamp, y: data.data.Probe0.TOI });
+    });
+
     return seriesList;
   }
 
@@ -206,6 +260,13 @@ export default class ChartClass {
     };
 
     return syncAxisXEventHandler;
+  }
+
+  /**
+   * Zooming function for all charts
+   */
+  zoom() {
+    // chart.zoom({ x: 1, y: 1 }, { x: 1, y: 1 });
   }
 
   /**

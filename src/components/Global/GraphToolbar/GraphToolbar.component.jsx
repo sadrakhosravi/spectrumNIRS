@@ -7,6 +7,7 @@ import Seperator from '@globalComponent/Seperator/Seperator.component';
 //Icons
 import ZoomInIcon from '@icons/zoom-in.svg';
 import ZoomOutIcon from '@icons/zoom-out.svg';
+import ResetZoom from '@icons/reset-zoom.svg';
 import FocusModeIcon from '@icons/focus-mode.svg';
 import RecordIcon from '@icons/record.svg';
 import PauseIcon from '@icons/pause.svg';
@@ -17,6 +18,8 @@ const GraphToolbar = () => {
       <div className="grid grid-flow-col auto-cols-max items-center gap-3">
         <IconButton text="Zoom In" icon={ZoomInIcon} />
         <IconButton text="Zoom Out" icon={ZoomOutIcon} />
+        <IconButton text="Reset Zoom" icon={ResetZoom} />
+
         <Seperator />
         <IconButton text="Focus Mode" icon={FocusModeIcon} />
       </div>

@@ -1,4 +1,5 @@
 module.exports = {
+  mode: 'jit', //Just in time compiler
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: false, // or 'media' or 'class'
   theme: {
