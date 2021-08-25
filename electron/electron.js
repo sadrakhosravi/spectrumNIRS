@@ -1,6 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-
+const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const path = require('path');
+
+const readline = require('readline'); //Read from Test1.exe stdout
+const spawn = require('child_process').spawn; //Spawn a child process - Test1.exe
+
 const isDev = require('electron-is-dev');
 
 let mainWindow;

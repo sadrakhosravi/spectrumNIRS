@@ -3,10 +3,11 @@
     "target": "ES6",
     "baseUrl": "./src",
     "paths": {
-      "@icons/*": ["./assets/icons/*"],
-      "@globalComponent/*": ["./components/Global/*"],
-      "@chart/*": ["./components/Chart/*"]
+      "@icons/*": ["./src/assets/icons/*"],
+      "@globalComponent/*": ["./src/components/Global/*"],
+      "@chart/*": ["./src/components/Chart/*"]
     }
   },
-  "include": ["src/**/**/**/*"]
+  "include": ["src/**/**/**/", "electron"],
+  "exclude": ["node-modules"]
 }

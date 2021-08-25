@@ -1,5 +1,4 @@
 module.exports = {
-  mode: 'jit', //Just in time compiler
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: false, // or 'media' or 'class'
   theme: {
@@ -10,8 +9,13 @@ module.exports = {
       grey2: '#333333',
       grey3: '#272727',
       dark: '#1E1E1E',
+      black: '#000000',
       white: '#FFFFFF',
       accent: '#007ACD',
+      chart1: '#E3170A',
+      chart2: '#ABFF4F',
+      chart3: '#00FFFF',
+      chart4: '#FFFFFF',
     },
     fontFamily: {
       sans: ['Inter', 'system-ui'],
@@ -32,8 +36,21 @@ module.exports = {
       '6xl': '4rem',
       '7xl': '5rem',
     },
+    borderWidth: {
+      DEFAULT: '1px',
+      0: '0',
+      2: '2px',
+      3: '3px',
+      4: '4px',
+      6: '6.1px',
+      8: '8px',
+    },
 
-    extend: {},
+    extend: {
+      margin: {
+        0.1: '0.2rem',
+      },
+    },
   },
   variants: {
     extend: {
