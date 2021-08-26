@@ -20,8 +20,9 @@ function App() {
 
       {/* Dynamic Component */}
       <Switch>
-        <Route exact path="/" render={() => <MainContainer container="startContainer" />} />
+        <Route exact path="/home" render={() => <MainContainer container="startContainer" />} />
         <Route exact path="/record" render={() => <MainContainer container="recordContainer" />} />
+        <Route exact path="/review" render={() => <MainContainer container="recordContainer" />} />
       </Switch>
     </Router>
   );

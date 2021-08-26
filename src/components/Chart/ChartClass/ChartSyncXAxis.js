@@ -14,8 +14,6 @@ class ChartSyncXAxis {
     this.seriesList = seriesList;
     this.channelCount = channelCount;
 
-    console.log(this.seriesList);
-
     this.syncAxisXEventHandler = this.synchronizeXAxis();
     this.createUIElement();
   }

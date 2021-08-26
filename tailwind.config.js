@@ -8,6 +8,7 @@ module.exports = {
       grey1: '#3D3D3D',
       grey2: '#333333',
       grey3: '#272727',
+      grey4: '##7f7f7f',
       dark: '#1E1E1E',
       black: '#000000',
       white: '#FFFFFF',
@@ -44,6 +45,10 @@ module.exports = {
       4: '4px',
       6: '6.1px',
       8: '8px',
+    },
+    fill: {
+      grey4: '#7f7f7f',
+      white: '#ffffff',
     },
 
     extend: {

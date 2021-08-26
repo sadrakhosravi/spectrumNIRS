@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 
 import HeadingText from './StartupScreen/HeadingText/HeadingText.component';
 import RecentProjectsContainer from './StartupScreen/RecentProjects/RecentProjectsContainer.component';
@@ -7,8 +8,11 @@ import IconButtons from './StartupScreen/IconButtons/IconButtons.component';
 //Icons
 import NewFileIcon from '@icons/new-file.svg';
 import OpenFileIcon from '@icons/open-file.svg';
+import { changeAppState } from '../../redux/AppStateSlice';
 
 const StartupContainer = () => {
+  const dispatch = useDispatch();
+
   return (
     <div className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">
       <HeadingText />
@@ -17,7 +21,12 @@ const StartupContainer = () => {
           <RecentProjectsContainer />
         </div>
         <div className="col-span-2">
-          <IconButtons icon={NewFileIcon} title="New Recording" description="Create a new NIRS recording" />
+          <IconButtons
+            icon={NewFileIcon}
+            title="New Recording"
+            description="Create a new NIRS recording"
+            onClick={() => dispatch(changeAppState('record'))}
+          />
           <IconButtons
             icon={OpenFileIcon}
             title="Open Recording"
