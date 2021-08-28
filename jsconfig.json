@@ -8,6 +8,6 @@
       "@chart/*": ["./src/components/Chart/*"]
     }
   },
-  "include": ["src/**/**/**/", "electron"],
+  "include": ["src/**/**/**/", "src/electron"],
   "exclude": ["node-modules"]
 }

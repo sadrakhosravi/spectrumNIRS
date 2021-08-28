@@ -1,10 +1,11 @@
+'use-strict';
 /**
  * Chart Series created here along with their settings
  */
 
 import lcjs from '@arction/lcjs';
 
-const { SolidFill, ColorHEX } = lcjs;
+const { SolidFill, SolidLine, ColorHEX } = lcjs;
 
 class ChartSeries {
   constructor(charts, seriesLineColorArr) {
@@ -29,18 +30,18 @@ class ChartSeries {
             // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
             pattern: 'ProgressiveX',
             // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
-            regularProgressiveStep: true,
+            regularProgressiveStep: false,
           },
         })
-        .setMaxPointCount(20000) //Cleanup method
+        .setDataCleaning({ maxDataPointCount: 2000 })
+        .setMaxPointCount(2000) //Cleanup method
 
         //Styling
-        .setStrokeStyle(style =>
-          style.setFillStyle(
-            new SolidFill({
-              color: ColorHEX(this.seriesLineColorArr[i]),
-            }),
-          ),
+        .setStrokeStyle(
+          new SolidLine({
+            thickness: 2,
+            fillStyle: new SolidFill({ color: ColorHEX(this.seriesLineColorArr[i]) }),
+          }),
         );
 
       //Add the created series to the series array

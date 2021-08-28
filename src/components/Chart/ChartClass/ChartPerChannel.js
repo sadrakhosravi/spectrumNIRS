@@ -47,8 +47,8 @@ class ChartPerChannel {
       );
 
       //Disable X and Y axis animations.
-      chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting).fit(true);
-      chart.getDefaultAxisY().setAnimationZoom(undefined);
+      chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting);
+      chart.getDefaultAxisY().disableAnimations();
 
       chart.setMouseInteractions(undefined);
 
@@ -63,13 +63,13 @@ class ChartPerChannel {
         this.chartRowSize += 2;
       }
 
-      chart.getDefaultAxisX().setInterval(0, 20000).setScrollStrategy(AxisScrollStrategies.progressive);
+      chart.getDefaultAxisX().setInterval(0, 20.0).setScrollStrategy(AxisScrollStrategies.progressive);
 
       // Only display X ticks for bottom chart.
       if (i !== this.channelCount - 1) {
         chart.getDefaultAxisX().setTickStrategy(AxisTickStrategies.Empty);
       } else {
-        chart.getDefaultAxisX().setTitle('Milliseconds').setScrollStrategy(AxisScrollStrategies.progressive);
+        chart.getDefaultAxisX().setTitle('Seconds').setScrollStrategy(AxisScrollStrategies.progressive);
       }
 
       // Sync X axes of stacked charts by adding an invisible tick to each Y axis with preset length.

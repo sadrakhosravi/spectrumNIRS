@@ -22,8 +22,8 @@
     "socket.io-client": "^4.1.3",
     "web-vitals": "^1.0.1"
   },
-  "main": "electron/electron.js",
-  "homepage": "./",
+  "main": "src/electron/Electron.js",
+  "homepage": "./src",
   "scripts": {
     "start": "craco start",
     "build": "craco build",

@@ -15,14 +15,16 @@ const TitleBar = () => {
   const appState = useSelector(state => state.appState.value);
 
   return (
-    <header className={`${styles.TitleBar} header-container items-center grid grid-cols-3 bg-grey1`}>
-      <div className="grid grid-cols-12 items-center align-middle">
-        <span className="col-span-1">
-          <Logo />
-        </span>
-        <span className="col-span-11">
-          <TopMenu />
-        </span>
+    <header className={`${styles.TitleBar} header-container relative items-center grid grid-cols-3 bg-grey1`}>
+      <div className="h-full items-center align-middle">
+        <div className="grid items-center grid-flow-col auto-cols-max h-full ">
+          <div>
+            <Logo />
+          </div>
+          <div>
+            <TopMenu />
+          </div>
+        </div>
       </div>
       <div>{appState !== 'home' && <p className="text-center">File Name</p>}</div>
       <WindowButtons />

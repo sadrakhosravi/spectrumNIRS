@@ -4,7 +4,7 @@
 
 // Import LightningChartJS
 import lcjs from '@arction/lcjs';
-const { lightningChart, UIElementBuilders, Themes } = lcjs;
+const { lightningChart } = lcjs;
 
 class ChartDashboard {
   constructor(channelCount = 4) {
@@ -23,6 +23,7 @@ class ChartDashboard {
       numberOfRows: this.numberOfRows, //Total number of rows for the dashboard - default 8
       numberOfColumns: 1, //Full width
       container: 'chart', //div id to attach to
+      antialias: true,
     });
 
     return dashboard;
