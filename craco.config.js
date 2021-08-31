@@ -6,11 +6,11 @@ module.exports = {
     alias: {
       '@icons': path.resolve(__dirname, 'src/assets/icons'),
       '@globalComponent': path.resolve(__dirname, 'src/components/Global'),
+      '@other': path.resolve(__dirname, 'src/components/Other'),
       '@container': path.resolve(__dirname, 'src/components/Containers'),
       '@chart': path.resolve(__dirname, 'src/components/Chart'),
-      '@server': path.resolve(__dirname, 'server/nirs-reader'),
-      '@electron': path.resolve(__dirname, 'electron'),
-      '@redux': path.resolve(__dirname, 'redux'),
+      '@electron': path.resolve(__dirname, 'src/electron'),
+      '@redux': path.resolve(__dirname, 'src/redux'),
     },
   },
   style: {

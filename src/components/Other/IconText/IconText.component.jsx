@@ -9,7 +9,7 @@ const IconText = props => {
   return (
     <>
       <span className="mr-2">
-        <img width={iconSize} src={icon} alt="Icon" />
+        <img className="transition duration-200" width={iconSize} src={icon} alt="Icon" />
       </span>
       <span className={textSize}>{text}</span>
     </>

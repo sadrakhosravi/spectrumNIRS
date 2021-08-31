@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ButtonTitleDescription from '@globalComponent/ButtonTitleDescription/ButtonTitleDescription.component';
+import ButtonTitleDescription from 'components/Other/ButtonTitleDescription/ButtonTitleDescription.component';
 
 //Data file icon
 import RecentFileIcon from '@icons/recent-file.svg';

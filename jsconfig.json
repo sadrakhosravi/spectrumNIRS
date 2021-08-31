@@ -7,6 +7,7 @@
       "@icons/*": ["./assets/icons/*"],
       "@globalComponent/*": ["./components/Global/*"],
       "@container/*": ["./components/Containers/*"],
+      "@other/*": ["./components/Other/*"],
       "@chart/*": ["./components/Chart/*"],
       "@electron/*": ["./electron/*"],
       "@redux/*": ["./redux/*"]

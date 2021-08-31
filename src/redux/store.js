@@ -1,8 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import AppStateReducer from './AppStateSlice';
+
+//State slices
+import AppStateReducer from '@redux/AppStateSlice';
+import RecordStateReducer from '@redux/RecordStateSlice';
 
 export const store = configureStore({
   reducer: {
     appState: AppStateReducer,
+    recordState: RecordStateReducer,
   },
 });

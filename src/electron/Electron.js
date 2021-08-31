@@ -1,10 +1,7 @@
+require('v8-compile-cache');
 const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const path = require('path');
-
 const isDev = require('electron-is-dev');
-
-//Require Worker Threads
-const WorkerThreads = require('./WorkerThreads');
 
 let mainWindow;
 function createWindow() {
@@ -25,7 +22,11 @@ function createWindow() {
     isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`,
   );
   mainWindow.maximize();
-  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools(); //For dev environment only
+
+  //IPC Main Process
+  const ipc = require('./IPC');
+  ipc();
 }
 
 app.on('ready', createWindow);
@@ -44,23 +45,3 @@ app.on('activate', function () {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
-
-//NEEDS TO BE REFACTORED TO A SEPERATE FILE
-
-//Minimze window on minimize icon click
-ipcMain.on('window:minimize', () => {
-  mainWindow.minimize();
-  WorkerThreads(mainWindow);
-});
-
-//Close/quit window on minimize icon click
-ipcMain.on('window:close', () => {
-  app.quit();
-});
-
-//Restore window on minimize icon click
-ipcMain.on('window:restore', () => {
-  mainWindow.isMaximized() ? mainWindow.restore() : mainWindow.maximize();
-});
-
-module.exports = createWindow;

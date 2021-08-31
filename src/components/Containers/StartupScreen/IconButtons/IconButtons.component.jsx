@@ -1,8 +1,6 @@
 import React from 'react';
 
-import ButtonTitleDescription from '@globalComponent/ButtonTitleDescription/ButtonTitleDescription.component';
-
-import { Link } from 'react-router-dom';
+import ButtonTitleDescription from '@other/ButtonTitleDescription/ButtonTitleDescription.component';
 
 const IconButtons = ({ icon, title, description, onClick }) => {
   return (
