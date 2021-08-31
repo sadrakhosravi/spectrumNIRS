@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
     "target": "ES6",
-    "baseUrl": "./src",
     "paths": {
-      "@icons/*": ["./src/assets/icons/*"],
-      "@globalComponent/*": ["./src/components/Global/*"],
-      "@chart/*": ["./src/components/Chart/*"]
+      "@assets/*": ["./assets/*"],
+      "@icons/*": ["./assets/icons/*"],
+      "@globalComponent/*": ["./components/Global/*"],
+      "@container/*": ["./components/Containers/*"],
+      "@chart/*": ["./components/Chart/*"],
+      "@electron/*": ["./electron/*"],
+      "@redux/*": ["./redux/*"]
     }
   },
-  "include": ["src/**/**/**/", "src/electron"],
-  "exclude": ["node-modules"]
+  "exclude": ["node_modules", "build"],
+  "include": ["src/**/**/**/*"]
 }

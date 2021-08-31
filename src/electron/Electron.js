@@ -1,5 +1,3 @@
-'use-strict';
-
 const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const path = require('path');
 

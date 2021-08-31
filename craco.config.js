@@ -3,9 +3,6 @@ const path = require('path');
 // craco.config.js - Used for TailwindCSS & customizing webpack config
 module.exports = {
   webpack: {
-    resolve: {
-      modules: [path.resolve(__dirname, './')],
-    },
     alias: {
       '@icons': path.resolve(__dirname, 'src/assets/icons'),
       '@globalComponent': path.resolve(__dirname, 'src/components/Global'),

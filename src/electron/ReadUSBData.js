@@ -1,4 +1,3 @@
-'use-strict';
 /**
  * Opens Test1.exe and reads data from stdout - Test1.exe is referenced by USBData variable
  */

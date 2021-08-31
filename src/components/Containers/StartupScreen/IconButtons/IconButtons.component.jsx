@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ButtonTitleDescription from 'components/Global/ButtonTitleDescription/ButtonTitleDescription.component';
+import ButtonTitleDescription from '@globalComponent/ButtonTitleDescription/ButtonTitleDescription.component';
 
 import { Link } from 'react-router-dom';
 
