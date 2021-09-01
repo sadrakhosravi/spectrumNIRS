@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const AppStateSlice = createSlice({
   name: 'appState',
   initialState: {
-    value: 'record', //Can be 'home', 'record', 'review'
+    value: 'home', //Can be 'home', 'record', 'review'
   },
   reducers: {
     changeAppState: (state, action) => {

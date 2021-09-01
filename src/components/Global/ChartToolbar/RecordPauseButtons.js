@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeRecordState } from '@redux/RecordStateSlice';
 
@@ -10,13 +10,16 @@ import RecordIcon from '@icons/record.svg';
 import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
+//Electron
+const { ipcRenderer } = window.require('electron');
+
 const RecordPauseButtons = () => {
   //Record button state
   const recordState = useSelector(state => state.recordState.value);
   const dispatch = useDispatch();
 
   //Change the record state on click.
-  const recordBtnClickHandler = () => {
+  const recordBtnClickHandler = async () => {
     recordState === 'recording' || recordState === 'pause'
       ? dispatch(changeRecordState('idle'))
       : dispatch(changeRecordState('recording'));
@@ -27,7 +30,10 @@ const RecordPauseButtons = () => {
     recordState === 'pause' ? dispatch(changeRecordState('recording')) : dispatch(changeRecordState('pause'));
   };
 
-  let buttons;
+  //Send record state state to ipcMain
+  useEffect(() => {
+    ipcRenderer.send(`record:${recordState}`);
+  }, [recordState]);
 
   //Set button's styles based on the state value.
   switch (recordState) {
@@ -45,9 +51,10 @@ const RecordPauseButtons = () => {
             text="Pause"
             icon={PauseIcon}
             darker={false}
-            onClick={pauseBtnClickHandler}
             isActive={false}
             disabled={true}
+            tooltip={true}
+            tooltipText="Start a recording first"
           />
         </>
       );

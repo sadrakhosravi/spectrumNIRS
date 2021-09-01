@@ -1,28 +1,36 @@
 import React, { useEffect, useRef } from 'react';
-import ChartClass from '@chart/ChartClass/ChartClass';
-import ChartChannelTitle from '@chart/ChartChannelTitle/ChartChannelTitle.component';
 
-const { ipcRenderer } = window.require('electron');
+//Components
+import ChartChannelTitle from '@chart/ChartChannelTitle/ChartChannelTitle.component';
+import ChartClass from '@chart/ChartClass/ChartClass';
+
+//State
+import { useSelector } from 'react-redux';
 
 //Prepares and enders the chart
-const Chart = () => {
-  useEffect(() => {
-    const chart = new ChartClass();
-    chart.createDashboard();
 
-    ipcRenderer.on('record', () => {
-      if (chart.dashboard) {
-        chart.dashboard.dispose();
-        chart.createDashboard();
-      }
-    });
-    ipcRenderer.on('testdata', (event, data) => {
-      chart.ChartSeries.forEach(series => series.add({ x: data.TimeStamp / 1000, y: data.Probe0.O2Hb }));
-    });
+const Chart = props => {
+  const { data } = props;
+  const containerID = 'chart';
+  const chartRef = useRef(undefined);
+
+  useEffect(() => {
+    // Create chart, series and any other static components.
+    console.log('create chart');
+
+    // Store references to chart components.
+    let chart = new ChartClass();
+    chart.addData();
+
+    // Return function that will destroy the chart when component is unmounted.
     return () => {
       // Destroy chart.
       console.log('destroy chart');
-      chart.dashboard.dispose();
+      chart.cleanup();
+      delete window.chart;
+      delete window.ChartClass;
+
+      // chartRef.current = undefined;
     };
   }, []);
 
@@ -34,7 +42,7 @@ const Chart = () => {
         <ChartChannelTitle text="tHb" color="chart3" />
         <ChartChannelTitle text="TOI" color="chart4" isLast={true} />
       </div>
-      <div className="h-full col-span-11" id="chart"></div>
+      <div className="h-full col-span-11" id={containerID}></div>
     </div>
   );
 };

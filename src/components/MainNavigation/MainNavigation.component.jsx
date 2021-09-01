@@ -1,10 +1,14 @@
 import React from 'react';
 
+//Components
 import HomeIconButton from './IconButtons/HomeIconButton.component';
 import SignalIconButton from './IconButtons/SignalIconButton.component';
 import ReviewIconButton from './IconButtons/ReviewIconButton.component';
 
+//Styles
 import styles from './MainNavigation.module.css';
+
+//State
 import { useSelector, useDispatch } from 'react-redux';
 import { changeAppState } from '../../redux/AppStateSlice';
 import { useHistory } from 'react-router-dom';
@@ -16,9 +20,11 @@ const MainNavigation = () => {
 
   const history = useHistory();
 
+  //Check app state and redirect accordingly.
   useEffect(() => {
+    console.log('History');
     history.push(`${appState}`);
-  }, [appState]);
+  }, [appState, history]);
   let navIcons;
 
   //Check app state and set the active menu button accordingly.

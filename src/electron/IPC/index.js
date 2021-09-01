@@ -4,6 +4,10 @@
 
 const { ipcMain, BrowserWindow, app } = require('electron');
 
+//Other IPCs
+const chartIPC = require('./chartIPC');
+const recordIPC = require('./recordIPC');
+
 const ipc = () => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
 
@@ -21,6 +25,12 @@ const ipc = () => {
   ipcMain.on('window:restore', () => {
     mainWindow.isMaximized() ? mainWindow.restore() : mainWindow.maximize();
   });
+
+  //Record communications
+  recordIPC();
+
+  //Chart communications
+  chartIPC();
 };
 
 module.exports = ipc;

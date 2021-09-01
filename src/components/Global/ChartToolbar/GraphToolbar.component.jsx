@@ -2,11 +2,11 @@ import React from 'react';
 
 //Components
 import Seperator from '@globalComponent/Seperator/Seperator.component';
-import RecordPauseButtons from '@globalComponent/GraphToolbar/RecordPauseButtons';
-import ZoomButtons from '@globalComponent/GraphToolbar/ZoomButtons';
-import FocusButton from '@globalComponent/GraphToolbar/FocusButton';
+import RecordPauseButtons from '@globalComponent/ChartToolbar/RecordPauseButtons';
+import ZoomButtons from '@globalComponent/ChartToolbar/ZoomButtons';
+import FocusButton from '@globalComponent/ChartToolbar/FocusButton';
 
-const GraphToolbar = () => {
+const ChartToolbar = () => {
   return (
     <div className="w-full bg-grey1 px-2 h-14 grid gap-3 grid-flow-col grid-cols-2 items-center">
       <div className="grid grid-flow-col auto-cols-max items-center gap-3">
@@ -25,4 +25,4 @@ const GraphToolbar = () => {
   );
 };
 
-export default GraphToolbar;
+export default ChartToolbar;

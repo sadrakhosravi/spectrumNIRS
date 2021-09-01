@@ -1,4 +1,4 @@
-require('v8-compile-cache');
+// require('v8-compile-cache');
 const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
