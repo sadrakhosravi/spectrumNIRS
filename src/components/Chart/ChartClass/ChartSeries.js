@@ -30,11 +30,10 @@ class ChartSeries {
             // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
             pattern: 'ProgressiveX',
             // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
-            regularProgressiveStep: false,
+            regularProgressiveStep: true,
           },
         })
-        .setDataCleaning({ maxDataPointCount: 2000 })
-        .setMaxPointCount(2000) //Cleanup method
+        .setDataCleaning({ minDataPointCount: 1500 })
 
         //Styling
         .setStrokeStyle(

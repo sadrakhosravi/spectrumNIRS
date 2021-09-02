@@ -12,15 +12,7 @@ const nirsReader = require(`${modulePath}/nirsReader`);
 
 const recordIPC = () => {
   ipcMain.on('record:recording', () => {
-    nirsReader();
-  });
-
-  ipcMain.on('record:pause', () => {
-    console.log('Paused');
-  });
-
-  ipcMain.on('record:idle', () => {
-    console.log('No recording');
+    nirsReader(); //All neccessary functionality of reading NIRS sensor data.
   });
 };
 

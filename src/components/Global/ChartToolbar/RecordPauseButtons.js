@@ -19,15 +19,17 @@ const RecordPauseButtons = () => {
   const dispatch = useDispatch();
 
   //Change the record state on click.
-  const recordBtnClickHandler = async () => {
-    recordState === 'recording' || recordState === 'pause'
-      ? dispatch(changeRecordState('idle'))
-      : dispatch(changeRecordState('recording'));
+  const recordBtnClickHandler = () => {
+    if (recordState === 'recording' || recordState === 'pause') {
+      dispatch(changeRecordState('idle'));
+    } else {
+      dispatch(changeRecordState('recording'));
+    }
   };
 
   //Change the record state on click.
   const pauseBtnClickHandler = () => {
-    recordState === 'pause' ? dispatch(changeRecordState('recording')) : dispatch(changeRecordState('pause'));
+    recordState === 'pause' ? dispatch(changeRecordState('continue')) : dispatch(changeRecordState('pause'));
   };
 
   //Send record state state to ipcMain
@@ -59,6 +61,25 @@ const RecordPauseButtons = () => {
         </>
       );
 
+    case 'continue':
+      return (
+        <>
+          <IconButton
+            text="Stop"
+            icon={StopIcon}
+            darker={true}
+            onClick={recordBtnClickHandler}
+            isActive={true}
+          />
+          <IconButton
+            text="Pause"
+            icon={PauseIcon}
+            darker={true}
+            onClick={pauseBtnClickHandler}
+            isActive={false}
+          />
+        </>
+      );
     case 'recording':
       return (
         <>
@@ -84,7 +105,7 @@ const RecordPauseButtons = () => {
         <>
           <IconButton
             text="Stop"
-            icon={RecordIcon}
+            icon={StopIcon}
             darker={true}
             onClick={recordBtnClickHandler}
             isActive={true}

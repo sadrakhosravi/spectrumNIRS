@@ -46,11 +46,13 @@ class ChartPerChannel {
         }),
       );
 
+      //Customizations
+      chart.setMouseInteractionRectangleFit(false).setMouseInteractionRectangleZoom(false);
+
       //Disable X and Y axis animations.
       chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting);
       chart.getDefaultAxisY().disableAnimations();
-
-      chart.setMouseInteractions(undefined);
+      chart.getDefaultAxisY().getAxisInteractionReleaseByDoubleClicking();
 
       // Disable default auto cursor.
       chart.setAutoCursorMode(AutoCursorModes.disabled);

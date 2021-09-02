@@ -9,10 +9,8 @@ import { useSelector } from 'react-redux';
 
 //Prepares and enders the chart
 
-const Chart = props => {
-  const { data } = props;
+const Chart = () => {
   const containerID = 'chart';
-  const chartRef = useRef(undefined);
 
   useEffect(() => {
     // Create chart, series and any other static components.
@@ -20,7 +18,7 @@ const Chart = props => {
 
     // Store references to chart components.
     let chart = new ChartClass();
-    chart.addData();
+    chart.addNIRSData();
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {

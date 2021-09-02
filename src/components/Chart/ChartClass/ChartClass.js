@@ -17,33 +17,13 @@ class ChartClass {
 
     this.dashboard = new ChartDashboard(this.channelCount);
     this.charts = new ChartPerChannel(this.dashboard, this.channelCount);
-    this.ChartSeries = new ChartSeries(this.charts, this.seriesLineColorArr);
-    this.ChartSyncXAxis = new ChartSyncXAxis(
-      this.dashboard,
-      this.charts,
-      this.ChartSeries,
-      this.channelCount,
-    );
-    let ipc;
+    this.Series = new ChartSeries(this.charts, this.seriesLineColorArr);
+    this.ChartSyncXAxis = new ChartSyncXAxis(this.dashboard, this.charts, this.Series, this.channelCount);
+
+    this.seriesLength = this.Series.length;
 
     console.log('Class created');
   }
-
-  // /**
-  //  * Creates a dashboard chart with total number of channels = channelCount.
-  //  */
-  // createDashboard() {
-  //   this.dashboard = new ChartDashboard(this.channelCount);
-  //   this.charts = new ChartPerChannel(this.dashboard, this.channelCount);
-  //   this.ChartSeries = new ChartSeries(this.charts, this.seriesLineColorArr);
-  //   this.ChartSyncXAxis = new ChartSyncXAxis(
-  //     this.dashboard,
-  //     this.charts,
-  //     this.ChartSeries,
-  //     this.channelCount,
-  //   );
-  //   return this.ChartSeries;
-  // }
 
   cleanup() {
     this.dashboard.dispose();
@@ -58,14 +38,13 @@ class ChartClass {
     console.log(this.ChartSeries);
   }
 
-  addData(x, y) {
-    ipcRenderer.on('testdata', (event, data) => {
-      this.ChartSeries.forEach(_series => {
-        _series.add({ x: data.TimeStamp / 1000, y: data.Probe0.O2Hb });
-      });
+  addNIRSData() {
+    ipcRenderer.on('data:nirs-reader', (event, data) => {
+      //data format = 'TimeStamp,O2Hb,HHb,tHb,TOI'.
+      for (let i = 0; i < this.seriesLength; i++) {
+        this.Series[i].add({ x: data[0], y: data[i + 1] });
+      }
     });
-
-    console.log(ipcRenderer);
   }
 }
 
