@@ -5,7 +5,7 @@
 const { ipcMain } = require('electron');
 
 const chartIPC = () => {
-  //Minimze window on minimize icon click
+  //Minimize window on minimize icon click
   ipcMain.on('chart:record', () => {
     //Do something
   });

@@ -4,29 +4,27 @@
 const path = require('path');
 const readline = require('readline');
 const spawn = require('child_process').spawn; //Spawns a child process (reader.exe)
-
 const { BrowserWindow, ipcMain } = require('electron'); //Electron
 
-const { hrtime } = require('process');
+//FIXME: Turn the module into separate functions for calling from recordIPC.
+
+//Find all open windows (mainWindow only)
+const mainWindow = await BrowserWindow.getAllWindows()[0];
+
+//Stop and pause boolean.
+let stop = false;
+let pause = false;
+let oldTimeStamp = 0;
+let rl;
+
+//Spawned processes array to keep track.
+const spawnedProcesses = [];
 
 /**
  * Spawns a child process and runs reader.exe. Reads each line from reader.exe stdout.
  * Send the parsed data through IPC.
  */
-const nirsReader = () => {
-  //Find all open windows (mainWindow only)
-  const mainWindow = BrowserWindow.getAllWindows()[0];
-
-  //Stop and pause boolean.
-  let stop = false;
-  let pause = false;
-  let oldTimeStamp = 0;
-
-  let rl;
-
-  //Spawned processes array to keep track.
-  const spawnedProcesses = [];
-
+const run = async () => {
   let readUSBData;
   /**
    * Spawn reader.exe for NIRS sensor data.
@@ -37,6 +35,9 @@ const nirsReader = () => {
       'test',
       path.join('./src/electron/reader', 'DataFiles'),
     ]);
+    readUSBData.stderr.on('data', data => {
+      console.error(`stderr: ${data}`);
+    });
     readUSBData.on('exit', () => {
       console.log('Process Terminated');
     });
@@ -61,7 +62,11 @@ const nirsReader = () => {
   };
 
   //Check recording status.
-  ipcMain.on('record:idle', () => (stop = true));
+  ipcMain.on('record:idle', () => {
+    stop = true;
+    oldTimeStamp = 0;
+    process.exit();
+  });
   ipcMain.on('record:pause', () => (pause = true));
   ipcMain.on('record:continue', () => {
     pause = false;
@@ -119,4 +124,4 @@ const nirsReader = () => {
   readLine();
 };
 
-module.exports = nirsReader;
+module.exports = run;

@@ -8,8 +8,8 @@ const { ipcMain, BrowserWindow, app } = require('electron');
 const chartIPC = require('./chartIPC');
 const recordIPC = require('./recordIPC');
 
-const ipc = () => {
-  const mainWindow = BrowserWindow.getAllWindows()[0];
+const ipc = async () => {
+  const mainWindow = await BrowserWindow.getAllWindows()[0];
 
   //Minimze window on minimize icon click
   ipcMain.on('window:minimize', () => {

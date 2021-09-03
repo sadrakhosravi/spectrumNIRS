@@ -20,7 +20,7 @@ const RecordPauseButtons = () => {
 
   //Change the record state on click.
   const recordBtnClickHandler = () => {
-    if (recordState === 'recording' || recordState === 'pause') {
+    if (recordState !== 'idle') {
       dispatch(changeRecordState('idle'));
     } else {
       dispatch(changeRecordState('recording'));

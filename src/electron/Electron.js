@@ -4,9 +4,9 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 
 let mainWindow;
-function createWindow() {
+const createMainWindow = async () => {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  const mainWin = new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
     width: 1200,
@@ -18,18 +18,17 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadURL(
+  //Load React inside Electron.
+  await mainWin.loadURL(
     isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`,
   );
-  mainWindow.maximize();
-  mainWindow.webContents.openDevTools(); //For dev environment only
 
-  //IPC Main Process
-  const ipc = require('./IPC');
-  ipc();
-}
+  //Default app state is maximized
+  mainWin.maximize();
+  isDev && mainWin.webContents.openDevTools(); //For dev environment only
 
-app.on('ready', createWindow);
+  return mainWin;
+};
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -40,8 +39,16 @@ app.on('window-all-closed', function () {
   }
 });
 
-app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+app.on('activate', async () => {
+  if (!mainWindow) {
+    mainWindow = await createMainWindow();
+  }
 });
+
+(async () => {
+  await app.whenReady();
+  mainWindow = await createMainWindow();
+  //IPC Main Process
+  const ipc = require('./IPC');
+  ipc();
+})();

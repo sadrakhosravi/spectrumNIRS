@@ -22,7 +22,6 @@ const MainNavigation = () => {
 
   //Check app state and redirect accordingly.
   useEffect(() => {
-    console.log('History');
     history.push(`${appState}`);
   }, [appState, history]);
   let navIcons;

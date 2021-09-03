@@ -8,11 +8,11 @@ const { resolve } = require('path');
 const modulePath = resolve('./src/electron/Functions');
 
 //NIRS Data reader module
-const nirsReader = require(`${modulePath}/nirsReader`);
 
 const recordIPC = () => {
   ipcMain.on('record:recording', () => {
-    nirsReader(); //All neccessary functionality of reading NIRS sensor data.
+    const nirsReader = require(`${modulePath}/nirsReader`);
+    nirsReader(); //All necessary functionality of reading NIRS sensor data.
   });
 };
 
