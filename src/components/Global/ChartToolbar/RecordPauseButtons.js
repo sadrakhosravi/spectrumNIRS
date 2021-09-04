@@ -18,10 +18,19 @@ const RecordPauseButtons = () => {
   const recordState = useSelector(state => state.recordState.value);
   const dispatch = useDispatch();
 
-  //Change the record state on click.
-  const recordBtnClickHandler = () => {
+  useEffect(() => {
     if (recordState !== 'idle') {
       dispatch(changeRecordState('idle'));
+    }
+    return () => {
+      dispatch(changeRecordState('idle'));
+    };
+  }, []);
+
+  //Change the record state on click.
+  const recordBtnClickHandler = () => {
+    if (recordState !== 'idle' && recordState !== 'stop') {
+      dispatch(changeRecordState('stop'));
     } else {
       dispatch(changeRecordState('recording'));
     }
@@ -34,12 +43,14 @@ const RecordPauseButtons = () => {
 
   //Send record state state to ipcMain
   useEffect(() => {
-    ipcRenderer.send(`record:${recordState}`);
+    //Send ipc message if record state is not idle.
+    recordState !== 'idle' && ipcRenderer.send(`record:${recordState}`);
   }, [recordState]);
 
   //Set button's styles based on the state value.
   switch (recordState) {
     case 'idle':
+    case 'stop':
       return (
         <>
           <IconButton

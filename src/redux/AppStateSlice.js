@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+/**
+ * Determine the state of the app. Used to navigate to home, record, or review sections.
+ */
 export const AppStateSlice = createSlice({
   name: 'appState',
   initialState: {

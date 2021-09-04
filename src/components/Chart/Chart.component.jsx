@@ -10,15 +10,20 @@ import { useSelector } from 'react-redux';
 //Prepares and enders the chart
 
 const Chart = () => {
+  const recordState = useSelector(state => state.recordState.value);
   const containerID = 'chart';
+
+  let chartRef = useRef(undefined);
 
   useEffect(() => {
     // Create chart, series and any other static components.
     console.log('create chart');
 
     // Store references to chart components.
-    let chart = new ChartClass();
+    const chart = new ChartClass();
     chart.addNIRSData();
+
+    chartRef.current = chart;
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -31,6 +36,15 @@ const Chart = () => {
       // chartRef.current = undefined;
     };
   }, []);
+
+  useEffect(() => {
+    if (recordState === 'recording') {
+      const chart = chartRef.current;
+      chart.Series.forEach(series => {
+        series.clear();
+      });
+    }
+  }, [recordState]);
 
   return (
     <div className="fit-to-container grid grid-cols-12">

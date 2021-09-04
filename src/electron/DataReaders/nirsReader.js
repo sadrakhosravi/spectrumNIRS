@@ -1,127 +1,100 @@
 /**
- * Opens reader.exe and reads data from stdout - reader.exe is referenced by USBData variable
+ * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
 const path = require('path');
 const readline = require('readline');
-const spawn = require('child_process').spawn; //Spawns a child process (reader.exe)
-const { BrowserWindow, ipcMain } = require('electron'); //Electron
-
-//FIXME: Turn the module into separate functions for calling from recordIPC.
+const spawn = require('child_process').spawn; //Spawns a child process (NIRSReader.exe)
+const { BrowserWindow } = require('electron'); //Electron
 
 //Find all open windows (mainWindow only)
-const mainWindow = await BrowserWindow.getAllWindows()[0];
+const mainWindow = BrowserWindow.getAllWindows()[0];
 
-//Stop and pause boolean.
-let stop = false;
-let pause = false;
-let oldTimeStamp = 0;
+//Defining the variables here for memory cleanup later.
 let rl;
+let readUSBData;
+let lastTimeSequence = 0;
+let isPaused = false;
 
 //Spawned processes array to keep track.
 const spawnedProcesses = [];
 
 /**
- * Spawns a child process and runs reader.exe. Reads each line from reader.exe stdout.
+ * Spawns a child process and runs NIRSReader.exe. Reads each line from NIRSReader.exe stdout.
  * Send the parsed data through IPC.
+ * @param {Number} prevTime - Last timestamp (used for pause and continue functions only)
  */
-const run = async () => {
-  let readUSBData;
-  /**
-   * Spawn reader.exe for NIRS sensor data.
-   */
-  const spawnReader = () => {
-    //Spawn reader.exe
-    readUSBData = spawn(path.join('./src/electron/reader', 'reader.exe'), [
-      'test',
-      path.join('./src/electron/reader', 'DataFiles'),
-    ]);
-    readUSBData.stderr.on('data', data => {
-      console.error(`stderr: ${data}`);
-    });
-    readUSBData.on('exit', () => {
-      console.log('Process Terminated');
-    });
-
-    spawnedProcesses.push(readUSBData);
-  };
-
-  /**
-   * Memory cleanup on stop or pause.
-   */
-  const cleanup = (all = false) => {
-    rl.close();
-    rl.removeAllListeners();
-    rl = null;
-
-    //If all is true - kill any child processes
-    if (all) {
-      //Terminate all spawned processes.
-      spawnedProcesses.forEach(process => process.kill());
-      readUSBData = null;
-    }
-  };
-
-  //Check recording status.
-  ipcMain.on('record:idle', () => {
-    stop = true;
-    oldTimeStamp = 0;
-    process.exit();
+const start = (prevTime = 0) => {
+  //Spawn NIRSReader.exe
+  readUSBData = spawn(path.join('./src/electron/NIRSReader-EXE', 'NIRSReader.exe'), [
+    'run',
+    path.join('./src/electron/NIRSReader-EXE', 'DataFiles'),
+  ]);
+  readUSBData.stderr.on('data', data => {
+    console.error(`Error on loading NIRS Reader: ${data}`);
   });
-  ipcMain.on('record:pause', () => (pause = true));
-  ipcMain.on('record:continue', () => {
-    pause = false;
-    spawnReader();
-    readLine();
+  readUSBData.on('exit', () => {
+    console.log('Process Terminated');
   });
+
+  //Push the spawned process to the spawnedProcesses array to keep track of them.
+  spawnedProcesses.push(readUSBData);
 
   //Read each line from reader.exe stdout.
+  rl = readline
+    .createInterface({
+      input: readUSBData.stdout,
+      terminal: false,
+    })
+    .on('line', function (line) {
+      const data = JSON.parse(line);
 
-  //Readline STDOUT Template:
-  //TimeSequence,O2Hb,Hhb,tHb,TOI,GainVal,RawInt1,RawInt2,RawInt3,RawInt4,RawInt5,Baseline,LEDInt1,LEDInt2,LEDInt3,LEDInt4,LEDInt5,ExtraVal(0)
+      //Time Sequence
+      const ts = data.TimeStamp;
+      const timeSequence = ts + prevTime;
 
-  const readLine = () => {
-    rl = readline
-      .createInterface({
-        input: readUSBData.stdout,
-        terminal: false,
-      })
-      .on('line', function (line) {
-        //Split the values from each line and put it into an array
-        const dataArr = line.split(',');
+      const outputArr = [timeSequence, data.Probe0.O2Hb, data.Probe0.HHb, data.Probe0.tHb, data.Probe0.TOI]; //[timeSequence, O2hb, HHb, tHb, TOI]
 
-        const timeSequence = dataArr[0] / 1000 + oldTimeStamp;
+      // Send the data through IPC
+      mainWindow.webContents.send('data:nirs-reader', outputArr); //Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
 
-        const outputArr = [
-          timeSequence,
-          parseInt(dataArr[1]),
-          parseInt(dataArr[2]),
-          parseInt(dataArr[3]),
-          parseInt(dataArr[4]),
-        ]; //[timeSequence, O2hb, HHb, tHb, TOI]
+      //Save the last time sequence
+      lastTimeSequence = timeSequence;
+    });
 
-        // Send the data through IPC
-        mainWindow.webContents.send('data:nirs-reader', outputArr); //Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
-
-        //Check if the process has to stop.
-        if (stop) {
-          console.log('Stopping');
-          //Cleanup
-          cleanup(true);
-        }
-
-        //Check if recording is paused.
-        if (pause) {
-          oldTimeStamp = timeSequence; //Save the last timestamp
-          console.log(oldTimeStamp);
-          console.log('Paused Indeed');
-          cleanup(true);
-        }
-      });
-  };
-
-  //Spawn reader.exe reader
-  spawnReader();
-  readLine();
+  //Log if rl closes
+  rl.on('close', () => {
+    console.log('Readline closed!');
+  });
 };
 
-module.exports = run;
+/**
+ * Stops the spawned process, closes the readline module, and does some memory cleanup.
+ */
+const stop = () => {
+  //Stop the readline
+  rl.close();
+  rl.removeAllListeners();
+  rl = undefined;
+
+  //Kill all spawned processes
+  spawnedProcesses.forEach(process => process.kill());
+  readUSBData.kill();
+  readUSBData = undefined;
+
+  //Remove Electron event listener
+  mainWindow.webContents.removeListener('data:nirs-reader', () => {});
+};
+
+/**
+ * Pauses the recording by closing the readline, killing the child process, saving the last timestamp.
+ */
+const pause = () => {
+  stop();
+};
+
+const continueReading = () => {
+  console.log(lastTimeSequence);
+  start(lastTimeSequence);
+};
+
+module.exports = { start, pause, continueReading, stop };

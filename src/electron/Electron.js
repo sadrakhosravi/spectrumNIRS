@@ -1,3 +1,4 @@
+'use strict';
 // require('v8-compile-cache');
 const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const path = require('path');
@@ -17,6 +18,8 @@ const createMainWindow = async () => {
       contextIsolation: false,
     },
   });
+
+  mainWin.setBackgroundColor('#1E1E1E');
 
   //Load React inside Electron.
   await mainWin.loadURL(

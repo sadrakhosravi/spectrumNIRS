@@ -4,14 +4,14 @@ import SensorIcon from '@icons/sensor.svg';
 import PatientIcon from '@icons/user-checked.svg';
 import ExperimentIcon from '@icons/experiment.svg';
 
-import Seperator from '@globalComponent/Seperator/Seperator.component';
+import Separator from '@globalComponent/Separator/Separator.component';
 
 import styles from './TrayIcons.module.css';
 
 const TrayIcons = () => {
   return (
     <footer className="text-right col-span-9">
-      <Seperator />
+      <Separator />
       <button className={`${styles.TrayIconsButton} px-2`}>
         <img
           src={ExperimentIcon}
@@ -20,7 +20,7 @@ const TrayIcons = () => {
         />
         Experiment: Name
       </button>
-      <Seperator />
+      <Separator />
       <button className={`${styles.TrayIconsButton} px-2`}>
         <img
           src={PatientIcon}
@@ -29,7 +29,7 @@ const TrayIcons = () => {
         />
         Patient: Name
       </button>
-      <Seperator />
+      <Separator />
       <button className={`${styles.TrayIconsButton} px-2`}>
         <img src={SensorIcon} className={`${styles.TrayIcons} icon inline-block pr-2`} alt="Sensor Status" />
         Sensor: Connected
