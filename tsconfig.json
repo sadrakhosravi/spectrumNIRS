@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "baseUrl": "./src",
+    "paths": {
+      "@assets/*": ["../assets/*"],
+      "@img/*": ["../assets/img/*"],
+      "@icons/*": ["../assets/icons/*"],
+      "@globalComponent/*": ["./renderer/components/Global/*"],
+      "@container/*": ["./renderer/components/Containers/*"],
+      "@other/*": ["./renderer/components/Other/*"],
+      "@chart/*": ["./renderer/components/Chart/*"],
+      "@redux/*": ["./renderer/redux/*"],
+      "@electron/*": ["./main/electron/*"]
+    },
+    "lib": ["dom", "esnext"],
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react",
+    "strict": true,
+    "pretty": true,
+    "sourceMap": true,
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "outDir": "release/app/dist"
+  },
+
+  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
+}

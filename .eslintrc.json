@@ -1,0 +1,7 @@
+{
+  "extends": "erb",
+  "rules": {
+    "no-plusplus": "off",
+    "no-console": "off"
+  }
+}
