@@ -15,6 +15,7 @@ module.exports = {
       white: '#FFFFFF',
       accent: '#007ACD',
       'accent-hover': '#0084de',
+      red: 'red',
       chart1: '#E3170A',
       chart2: '#ABFF4F',
       chart3: '#00FFFF',

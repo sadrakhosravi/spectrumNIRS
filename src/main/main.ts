@@ -102,6 +102,6 @@ app.on('activate', async () => {
 (async () => {
   await app.whenReady();
   mainWindow = await createMainWindow();
-  // const ipc = require('./IPC/index');
-  // ipc();
+  const ipc = require('./IPC/index');
+  ipc();
 })();

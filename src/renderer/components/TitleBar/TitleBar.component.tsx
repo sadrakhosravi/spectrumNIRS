@@ -4,7 +4,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 // Components
-import Logo from '@globalComponent/Logo/Logo.component';
+import Logo from '@components/Logo/Logo.component';
 import TopMenu from './TopMenu/TopMenu.component';
 import WindowButtons from './WindowButtons/WindowButtons.component';
 

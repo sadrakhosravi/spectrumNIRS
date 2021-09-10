@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Components
-import Separator from '@globalComponent/Separator/Separator.component';
+import Separator from '@components/Separator/Separator.component';
 
 // Icons
 import SensorIcon from '@icons/sensor.svg';

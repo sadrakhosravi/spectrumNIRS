@@ -1,8 +1,0 @@
-.MainNavigation {
-  position: fixed;
-  top: 40px;
-  left: 0;
-  height: calc(100% - 70px);
-  width: 4rem;
-  background-color: #333;
-}

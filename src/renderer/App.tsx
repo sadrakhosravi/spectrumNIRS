@@ -1,14 +1,19 @@
 import React from 'react';
 
 import './App.global.css';
+
+// App state constants
+import { appStateEnum } from './ts/appStateEnum';
+
 // Module import
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
-// //Component import
+//Component import
 import TitleBar from './components/TitleBar/TitleBar.component';
 import BottomBar from './components/BottomBar/BottomBar.component';
 import MainNavigation from './components/MainNavigation/MainNavigation.component';
-import MainContainer from '@container/MainContainer.component';
+
+import PageRouter from '@pages/index';
 
 function App() {
   return (
@@ -22,15 +27,15 @@ function App() {
       <Switch>
         <Route
           exact
-          path="/home"
+          path={`/${appStateEnum.home}`}
           render={() => {
-            return <MainContainer container="startContainer" />;
+            return <PageRouter page={appStateEnum.home} />;
           }}
         />
         <Route
           exact
-          path="/record"
-          render={() => <MainContainer container="recordContainer" />}
+          path={`/${appStateEnum.record}`}
+          render={() => <PageRouter page={appStateEnum.record} />}
         />
       </Switch>
     </Router>

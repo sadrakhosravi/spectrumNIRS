@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Tooltip
-import Tooltip from '@globalComponent/Tooltip/Tooltip.component';
+import Tooltip from '@tooltip';
 
 const SignalIconButton = (props: any) => {
   const { isActive, onClick } = props;

@@ -4,15 +4,24 @@
     "module": "CommonJS",
     "baseUrl": "./src",
     "paths": {
+      //React Related Paths
       "@assets/*": ["../assets/*"],
       "@img/*": ["../assets/img/*"],
       "@icons/*": ["../assets/icons/*"],
-      "@globalComponent/*": ["./renderer/components/Global/*"],
-      "@container/*": ["./renderer/components/Containers/*"],
+      "@components/*": ["./renderer/components/*"],
+      "@pages/*": ["./renderer/pages/*"],
+      "@tooltip": ["./renderer/components/Tooltip/Tooltip.component"],
+      "@microComp/*": ["./renderer/components/MicroComponents/*"],
       "@other/*": ["./renderer/components/Other/*"],
       "@chart/*": ["./renderer/components/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
-      "@electron/*": ["./main/electron/*"]
+      //Electron Related Paths
+      "@electron/*": ["./main/electron/*"],
+      "@IPC/*": ["./main/IPC/*"],
+      "@dataReaders/*": ["./main/DataReaders/*"],
+      "@Workers/*": ["./main/Workers/*"],
+      //Typescript Extra
+      "@ts/*": ["./renderer/ts/*"]
     },
     "lib": ["dom", "esnext"],
     "declaration": true,

@@ -6,7 +6,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const AppStateSlice = createSlice({
   name: 'appState',
   initialState: {
-    value: 'record', // Can be 'home', 'record', 'review'
+    value: 'record', // Can be 'home', 'record', 'review' - Check app state enum
   },
   reducers: {
     changeAppState: (state, action) => {
