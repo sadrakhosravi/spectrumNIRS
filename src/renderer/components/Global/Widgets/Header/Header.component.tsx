@@ -1,7 +1,11 @@
 import React from 'react';
 
+interface IProps {
+  title: string;
+}
+
 //Widget header to display the title of each widget
-const Header = props => {
+const Header: React.FC<IProps> = (props) => {
   const { title } = props;
 
   return (

@@ -6,7 +6,7 @@ import ChartToolbar from '@globalComponent/ChartToolbar/GraphToolbar.component';
 import Chart from '@chart/Chart.component';
 
 // Sidebar components
-// import WidgetsContainer from '@globalComponent/Widgets/WidgetsContainer.component';
+import WidgetsContainer from '@globalComponent/Widgets/WidgetsContainer.component';
 
 const RecordReviewContainer = () => {
   return (
@@ -18,7 +18,7 @@ const RecordReviewContainer = () => {
           <Chart />
         </div>
         <div className="col-span-2 mr-3 row-span-3">
-          {/* <WidgetsContainer /> */}
+          <WidgetsContainer />
         </div>
       </div>
     </>

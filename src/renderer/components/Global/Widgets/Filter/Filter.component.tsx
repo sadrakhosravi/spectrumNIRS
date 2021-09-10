@@ -20,7 +20,11 @@ const Filter = () => {
           <option value="highpass">HighPass</option>
         </select>
 
-        <select className="p-2 bg-grey1 w-full mt-3" name="filter-type" id="filter-type">
+        <select
+          className="p-2 bg-grey1 w-full mt-3"
+          name="filter-type"
+          id="filter-type"
+        >
           <option value="lowpass">Filter value</option>
         </select>
 

@@ -30,7 +30,7 @@ const IconButton = (props: any) => {
         type="button"
         className={`${disabledStyle} ${disabled || buttonBackground} ${
           disabled || activeStyle
-        } px-4 w-full py-2 grid grid-flow-col auto-cols-max items-center transition relative duration-100  `}
+        } px-4 w-full py-2 grid grid-flow-col auto-cols-max items-center transition relative duration-100 active:bg-accent `}
         onClick={onClick}
       >
         <IconText text={text} icon={icon} />

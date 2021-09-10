@@ -1,6 +1,10 @@
 import React from 'react';
 
-const WidgetButton = props => {
+interface IProps {
+  text: string;
+}
+
+const WidgetButton: React.FC<IProps> = (props) => {
   const { text } = props;
 
   return (

@@ -30,10 +30,18 @@ const Source = () => {
         Listbox.Button is pressed.
       */}
           <Listbox.Options className="w-full mt-1 py-0.5 px-2 text-left bg-grey2 ">
-            {sources.map(source => (
-              <Listbox.Option className="py-1 pl-4 cursor-pointer" key={source.id} value={source}>
+            {sources.map((source) => (
+              <Listbox.Option
+                className="py-1 pl-4 cursor-pointer"
+                key={source.id}
+                value={source}
+              >
                 {({ active, selected }) => (
-                  <li className={`${active && 'text-accent'} ${selected && 'text-accent'}`}>
+                  <li
+                    className={`${active && 'text-accent'} ${
+                      selected && 'text-accent'
+                    }`}
+                  >
                     {selected && '✔  '}
                     {source.name}
                   </li>
