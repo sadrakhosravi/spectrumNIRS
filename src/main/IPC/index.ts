@@ -5,11 +5,11 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
 
 // Other IPCs
-const chartIPC = require('./chartIPC');
-const recordIPC = require('./recordIPC');
+import chartIPC from './chartIPC';
+import recordIPC from './recordIPC';
 
-const ipc = async () => {
-  const mainWindow = await BrowserWindow.getAllWindows()[0];
+const ipc = () => {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
 
   // Minimize window on minimize icon click
   ipcMain.on('window:minimize', () => {
@@ -31,8 +31,6 @@ const ipc = async () => {
 
   // Record communications
   recordIPC();
-
-  // // Chart communications
   chartIPC();
 };
 

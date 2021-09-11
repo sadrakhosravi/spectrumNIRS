@@ -1,14 +1,13 @@
 /**
  * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
+
+//@ts-nocheck
 import { BrowserWindow } from 'electron'; // Electron
 
 const path = require('path');
 const readline = require('readline');
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
-
-// Find all open windows (mainWindow only)
-const mainWindow = BrowserWindow.getAllWindows()[0];
 
 // Defining the variables here for memory cleanup later.
 let rl: any;
@@ -24,11 +23,14 @@ const spawnedProcesses: any[] = [];
  * @param {Number} prevTime - Last timestamp (used for pause and continue functions only)
  */
 const start = (prevTime = 0) => {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+
+  console.log(path.resolve(__dirname, '../Readers'));
   // Spawn NIRSReader.exe
-  readUSBData = spawn(
-    path.join('./electron/NIRSReader-EXE', 'NIRSReader.exe'),
-    ['run', path.join('./electron/NIRSReader-EXE', 'DataFiles')]
-  );
+  readUSBData = spawn(path.join(__dirname, '../Readers/Test1.exe'), [
+    'run',
+    path.join('./DataFiles'),
+  ]);
   readUSBData.stderr.on('data', (data: string) => {
     console.error(`Error on loading NIRS Reader: ${data}`);
   });
@@ -46,18 +48,18 @@ const start = (prevTime = 0) => {
       terminal: false,
     })
     .on('line', function (line: string) {
-      const data = JSON.parse(line);
+      const data = line.split(',');
 
       // Time Sequence
-      const ts = data.TimeStamp;
+      const ts = parseFloat(data[0]);
       const timeSequence = ts + prevTime;
 
       const outputArr = [
         timeSequence,
-        data.Probe0.O2Hb,
-        data.Probe0.HHb,
-        data.Probe0.tHb,
-        data.Probe0.TOI,
+        parseFloat(data[1]),
+        parseFloat(data[2]),
+        parseFloat(data[3]),
+        parseFloat(data[4]),
       ]; // [timeSequence, O2hb, HHb, tHb, TOI]
 
       // Send the data through IPC
@@ -88,7 +90,7 @@ const stop = () => {
   readUSBData = undefined;
 
   // Remove Electron event listener
-  // mainWindow.webContents.removeListener('data:nirs-reader', () => {});
+  mainWindow.webContents.removeListener('data:nirs-reader', () => {});
 };
 
 /**

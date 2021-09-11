@@ -16,9 +16,9 @@
       "@chart/*": ["./renderer/components/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
       //Electron Related Paths
-      "@electron/*": ["./main/electron/*"],
+      "@electron/*": ["./main/*"],
       "@IPC/*": ["./main/IPC/*"],
-      "@dataReaders/*": ["./main/DataReaders/*"],
+      "@readers/*": ["./main/Readers/*"],
       "@Workers/*": ["./main/Workers/*"],
       //Typescript Extra
       "@ts/*": ["./renderer/ts/*"]

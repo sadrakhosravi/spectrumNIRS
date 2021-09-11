@@ -4,7 +4,7 @@
 
 import { ipcMain } from 'electron';
 
-const nirsReader = require('../DataReaders/nirsReader');
+const nirsReader = require('../ReaderFunctions/nirsReader');
 
 let isPaused = false;
 

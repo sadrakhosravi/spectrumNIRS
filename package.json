@@ -15,6 +15,12 @@
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "jest"
   },
+  "imports": {
+    "@electron/*": "./src/main/*",
+    "@IPC/*": "./src/main/IPC/*",
+    "@dataReaders/*": "./src/main/DataReaders/*",
+    "@workers/*": "./src/main/Workers/*"
+  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "cross-env NODE_ENV=development eslint --cache"

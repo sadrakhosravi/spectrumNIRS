@@ -13,6 +13,7 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { resolveHtmlPath } from './util';
+import ipc from './IPC/index';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -28,27 +29,7 @@ if (isDevelopment) {
   require('electron-debug')();
 }
 
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
-
-  return installer
-    .default(
-      extensions.map((name) => installer[name]),
-      forceDownload
-    )
-    .catch(console.log);
-};
-
 const createMainWindow = async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
-    await installExtensions();
-  }
-
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -57,7 +38,7 @@ const createMainWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  mainWindow = new BrowserWindow({
+  mainWindow = await new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
     width: 1200,
@@ -80,10 +61,6 @@ const createMainWindow = async () => {
   return mainWindow;
 };
 
-/**
- * Add event listeners...
- */
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
@@ -95,13 +72,12 @@ app.on('window-all-closed', () => {
 
 app.on('activate', async () => {
   if (!mainWindow) {
-    mainWindow = await createMainWindow();
+    createMainWindow();
   }
 });
 
 (async () => {
   await app.whenReady();
-  mainWindow = await createMainWindow();
-  const ipc = require('./IPC/index');
+  await createMainWindow();
   ipc();
 })();
