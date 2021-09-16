@@ -8,18 +8,18 @@ import TopMenuButton from '../TopMenuButton/TopMenuButton.component';
 import SubMenuItem from '../SubMenuItem/SubMenuItem.component';
 
 // File Menu along with its submenus
-const FileMenu = () => {
+const NewMenu = () => {
   return (
     <Menu as="li" className="h-full inline-block">
       {/* Top Menu Button */}
-      <TopMenuButton text="File" />
+      <TopMenuButton text="New" />
       {/* Sub Menu Items */}
       <Menu.Items className="absolute w-64 mt-0 origin-bottom-left z-50 bg-grey3 shadow-xl py-2">
-        <SubMenuItem text="Open" />
-        <SubMenuItem text="Exit" />
+        <SubMenuItem text="Patient" />
+        <SubMenuItem text="Experiment" />
       </Menu.Items>
     </Menu>
   );
 };
 
-export default FileMenu;
+export default NewMenu;

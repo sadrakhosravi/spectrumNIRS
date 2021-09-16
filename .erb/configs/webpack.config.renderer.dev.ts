@@ -280,15 +280,16 @@ export default merge(baseConfig, {
       verbose: true,
       disableDotRule: false,
     },
-    onBeforeSetupMiddleware() {
-      console.log('Starting Main Process...');
-      spawn('npm', ['run', 'start:main'], {
-        shell: true,
-        env: process.env,
-        stdio: 'inherit',
-      })
-        .on('close', (code) => process.exit(code))
-        .on('error', (spawnError) => console.error(spawnError));
-    },
+    // Dont start electron
+    // onBeforeSetupMiddleware() {
+    //   console.log('Starting Main Process...');
+    //   spawn('npm', ['run', 'start:main'], {
+    //     shell: true,
+    //     env: process.env,
+    //     stdio: 'inherit',
+    //   })
+    //     .on('close', (code) => process.exit(code))
+    //     .on('error', (spawnError) => console.error(spawnError));
+    // },
   },
 });

@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 
 // Components
 import HomeIconButton from './IconButtons/HomeIconButton.component';
@@ -10,19 +9,16 @@ import ReviewIconButton from './IconButtons/ReviewIconButton.component';
 
 // State
 import { changeAppState } from '../../redux/AppStateSlice';
+import checkNavigation from '@hooks/checkNavigation.hook';
 
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
+
   const dispatch = useDispatch();
 
-  const history = useHistory();
+  checkNavigation();
 
-  // Check app state and redirect accordingly.
-  useEffect(() => {
-    history.push(`${appState}`);
-  }, [appState, history]);
   let navIcons;
-
   // Check app state and set the active menu button accordingly.
   switch (appState) {
     case 'home':

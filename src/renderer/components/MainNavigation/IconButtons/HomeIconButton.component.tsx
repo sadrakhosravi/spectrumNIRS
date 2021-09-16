@@ -2,9 +2,11 @@ import React from 'react';
 
 // Tooltip
 import Tooltip from '@tooltip';
+import { useSelector } from 'react-redux';
 
 const HomeIconButton = (props: any) => {
   const { isActive, onClick } = props;
+  let isDisabled = false;
   // Check if the button is active and set the styling accordingly
   let activeClass;
   if (isActive) {
@@ -13,12 +15,19 @@ const HomeIconButton = (props: any) => {
     activeClass = '';
   }
 
+  const experimentInfo = useSelector(
+    (state: any) => state.experimentInfo.value
+  );
+
+  experimentInfo ? (isDisabled = true) : (isDisabled = false);
+
   return (
     <Tooltip text="Home" placement="right">
       <button
         type="button"
         className={`icon-button ${activeClass}`}
         onClick={onClick}
+        disabled={isDisabled}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

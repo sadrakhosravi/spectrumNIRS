@@ -37,6 +37,11 @@ function App() {
           path={`/${appStateEnum.record}`}
           render={() => <PageRouter page={appStateEnum.record} />}
         />
+        <Route
+          exact
+          path={`/${appStateEnum.review}`}
+          render={() => <PageRouter page={appStateEnum.review} />}
+        />
       </Switch>
     </Router>
   );

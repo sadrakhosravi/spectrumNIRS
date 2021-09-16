@@ -15,11 +15,15 @@
       "@other/*": ["./renderer/components/Other/*"],
       "@chart/*": ["./renderer/components/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
+      "@hooks/*": ["./renderer/hooks/*"],
       //Electron Related Paths
       "@electron/*": ["./main/*"],
       "@IPC/*": ["./main/IPC/*"],
       "@readers/*": ["./main/Readers/*"],
       "@Workers/*": ["./main/Workers/*"],
+      //Database
+      "@db/*": ["./main/Database/*"],
+      "@dbModels": ["./main/Database/models/*"],
       //Typescript Extra
       "@ts/*": ["./renderer/ts/*"]
     },

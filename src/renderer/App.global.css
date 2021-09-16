@@ -449,7 +449,7 @@ template {
 .separator {
   border-left: 2px solid rgba(255, 255, 255, 0.5);
   height: 75%;
-  margin: 0 1rem;
+  margin: 0 0.5rem;
   padding: 0.2rem 0;
   vertical-align: middle;
   align-self: center;

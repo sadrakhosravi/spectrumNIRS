@@ -14,7 +14,10 @@ const TrayIconButtons: React.FunctionComponent<Props> = ({
   width = '34px',
 }: Props) => {
   return (
-    <button type="button" className="px-2">
+    <button
+      type="button"
+      className="px-3 hover:bg-white hover:bg-opacity-20 transition duration-200"
+    >
       <div className="grid grid-flow-col auto-cols-max items-center">
         <img
           src={icon}

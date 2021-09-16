@@ -13,8 +13,8 @@ const IconText: React.FC<IProps> = (props) => {
   const iconSize = large ? `32rem` : `26rem`;
 
   return (
-    <>
-      <span className="mr-2">
+    <div className="grid items-center grid-flow-col auto-cols-max">
+      <span className="mr-2 inline-block">
         <img
           className="transition duration-200"
           width={iconSize}
@@ -22,8 +22,8 @@ const IconText: React.FC<IProps> = (props) => {
           alt="Icon"
         />
       </span>
-      <span className={textSize}>{text}</span>
-    </>
+      <span className={`${textSize} inline-block`}>{text}</span>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ import { appStateEnum } from 'renderer/ts/appStateEnum';
 // Containers
 import HomePage from '@pages/Home/Home.page';
 import RecordPage from '@pages/Record/Record.page';
+import ReviewPage from '@pages/Review/Review.page';
 
 interface IProps {
   page: appStateEnum.home | appStateEnum.record | appStateEnum.review;
@@ -22,6 +23,10 @@ const PageRouter: React.FC<IProps> = ({ page }) => {
 
     case appStateEnum.record:
       outputPage = <RecordPage />;
+      break;
+
+    case appStateEnum.review:
+      outputPage = <ReviewPage />;
       break;
 
     default:

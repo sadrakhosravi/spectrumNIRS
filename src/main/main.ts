@@ -80,4 +80,26 @@ app.on('activate', async () => {
   await app.whenReady();
   await createMainWindow();
   ipc();
+  //Sequelize
+  const { sequelize } = require('./Database/models/index');
+
+  //Check DB Connection
+  sequelize
+    .authenticate()
+    .then(() => {
+      console.log('Connection successful!');
+    })
+    .catch(() => {
+      console.log('Error connecting');
+    });
+
+  //Sync Models
+  sequelize
+    .sync({ force: true })
+    .then(() => {
+      console.log('Sync Successful!');
+    })
+    .catch(() => {
+      console.log('Error in creating tables');
+    });
 })();
