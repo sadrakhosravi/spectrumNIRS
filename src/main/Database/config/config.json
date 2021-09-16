@@ -1,0 +1,14 @@
+{
+  "development": {
+    "storage": "./src/main/Database/photonlab.db",
+    "dialect": "sqlite"
+  },
+  "test": {
+    "storage": "./src/main/Database/photonlab.db",
+    "dialect": "sqlite"
+  },
+  "production": {
+    "storage": "./src/main/Database/photonlab.db",
+    "dialect": "sqlite"
+  }
+}
