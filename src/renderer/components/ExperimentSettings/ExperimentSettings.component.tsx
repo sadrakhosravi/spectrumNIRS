@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // Components
 import Modal from '@components/Modal/Modal.component';
@@ -13,7 +13,14 @@ import GeneralSettings from './Tabs/GeneralSettings/GeneralSettings.component';
 import { useForm, FormProvider } from 'react-hook-form';
 import SubmitButton from '@components/Form/SubmitButton.component';
 
+// Electron
+const { ipcRenderer } = window.require('electron');
+
 const ExperimentSettings = () => {
+  useEffect(() => {
+    ipcRenderer.send('db:get-experiment-settings', 1);
+    return () => {};
+  });
   // Used for deeply nested inputs
   const methods = useForm();
 

@@ -9,6 +9,8 @@ const path = require('path');
 const readline = require('readline');
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
 
+const { Recording } = require('../Database/models/index');
+
 // Defining the variables here for memory cleanup later.
 let rl: any;
 let readUSBData: any;
@@ -40,6 +42,13 @@ const start = (prevTime = 0) => {
 
   // Push the spawned process to the spawnedProcesses array to keep track of them.
   spawnedProcesses.push(readUSBData);
+  const DataArr = [];
+
+  const sendDataToDB = async (data) => {
+    await Recording.bulkCreate(DataArr, { returning: true });
+  };
+
+  let count = 0;
 
   // Read each line from reader.exe stdout.
   rl = readline
@@ -62,6 +71,16 @@ const start = (prevTime = 0) => {
         parseFloat(data[3]),
         parseFloat(data[4]),
       ]; // [timeSequence, O2hb, HHb, tHb, TOI]
+
+      const test = { value: outputArr.join(',') };
+
+      DataArr.push(test);
+
+      if (count === 500) {
+        sendDataToDB(DataArr);
+        count = 0;
+      }
+      count++;
 
       // Send the data through IPC
       mainWindow.webContents.send('data:nirs-reader', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
