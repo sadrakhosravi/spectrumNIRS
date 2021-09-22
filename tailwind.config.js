@@ -69,6 +69,12 @@ module.exports = {
         '4/5': '80vh',
         '5/6': '83.33333vh',
       },
+      gridTemplateColumns: {
+        3070: 'repeat 3fr 9fr',
+      },
+      gridAutoColumns: {
+        3070: 'minmax(max-content, 1fr)',
+      },
     },
   },
   variants: {

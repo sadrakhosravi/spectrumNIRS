@@ -11,6 +11,6 @@ export enum appStateConstants {
  * Available modals to open
  */
 export enum ModalConstants {
-  NEWEXPERIMENT = 'newExperiment',
-  EXPERIMENTSETTINGS = 'experimentSettings',
+  NEWEXPERIMENT = '1',
+  EXPERIMENTSETTINGS = '2',
 }

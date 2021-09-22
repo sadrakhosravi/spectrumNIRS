@@ -7,8 +7,20 @@ import TabsTitle from './Tabs/TabsTitle.component';
 
 // Constants
 import { ModalConstants } from 'renderer/constants/Constants';
+import GeneralSettings from './Tabs/GeneralSettings/GeneralSettings.component';
+
+// Hooks/Form
+import { useForm, FormProvider } from 'react-hook-form';
+import SubmitButton from '@components/Form/SubmitButton.component';
 
 const ExperimentSettings = () => {
+  // Used for deeply nested inputs
+  const methods = useForm();
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+  };
+
   return (
     <Modal
       id={ModalConstants.EXPERIMENTSETTINGS}
@@ -24,8 +36,16 @@ const ExperimentSettings = () => {
           <Tab.List className="col-span-3">
             <TabsTitle title="General Settings" />
           </Tab.List>
-          <Tab.Panels className="col-span-9">
-            <Tab.Panel>Test</Tab.Panel>
+
+          <Tab.Panels className="col-span-9 h-full w-full">
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit(onSubmit)}>
+                <Tab.Panel>
+                  <GeneralSettings />
+                </Tab.Panel>
+                <SubmitButton text={'Save'} />
+              </form>
+            </FormProvider>
           </Tab.Panels>
         </Tab.Group>
       </div>

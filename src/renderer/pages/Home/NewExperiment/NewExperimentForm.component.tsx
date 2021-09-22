@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import InputField from '@components/Form/InputField.component';
 import DateField from '@components/Form/DateField.component';
 import TextAreaField from '@components/Form/TextAreaField.component';
+import SubmitButton from '@components/Form/SubmitButton.component';
 
 // Redux
 import { useDispatch } from 'react-redux';
@@ -55,14 +56,7 @@ const NewExperimentForm = () => {
         <span className="block pb-1">Description:</span>
         <TextAreaField register={register('patientDescription')} />
       </label>
-      <div className="block text-center">
-        <button
-          type="submit"
-          className="inline-block justify-center mt-6 px-4 py-2 text-sm border border-transparent rounded-md border-white  hover:bg-accent hover:border-accent transition"
-        >
-          Create Experiment
-        </button>
-      </div>
+      <SubmitButton text={'Create a New Experiment'} />
     </form>
   );
 };
