@@ -1,4 +1,5 @@
 module.exports = {
+  mode: 'jit',
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: false, // or 'media' or 'class'
   theme: {
@@ -60,6 +61,13 @@ module.exports = {
       },
       height: {
         '30px': '30px',
+      },
+      maxHeight: {
+        '1/4': '25vh',
+        '1/2': '50vh',
+        '3/4': '75vh',
+        '4/5': '80vh',
+        '5/6': '83.33333vh',
       },
     },
   },

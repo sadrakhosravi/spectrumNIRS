@@ -6,17 +6,23 @@ import { useSelector, useDispatch } from 'react-redux';
 import HomeIconButton from './IconButtons/HomeIconButton.component';
 import SignalIconButton from './IconButtons/SignalIconButton.component';
 import ReviewIconButton from './IconButtons/ReviewIconButton.component';
+import SettingsIconButton from './IconButtons/SettingsIconButton.component';
+import ExperimentSettings from '@components/ExperimentSettings/ExperimentSettings.component';
 
 // State
-import { changeAppState } from '../../redux/AppStateSlice';
-import checkNavigation from '@hooks/checkNavigation.hook';
+import { changeAppState } from '@redux/AppStateSlice';
+import { openModal } from '@redux/ModalStateSlice';
+import { ModalConstants } from 'renderer/constants/Constants';
+
+// Hooks
+import useNavigation from '@hooks/useNavigation.hook';
 
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
 
   const dispatch = useDispatch();
 
-  checkNavigation();
+  useNavigation();
 
   let navIcons;
   // Check app state and set the active menu button accordingly.
@@ -72,7 +78,21 @@ const MainNavigation = () => {
       break;
   }
 
-  return <div className="main-navigation text-center">{navIcons}</div>;
+  return (
+    <div className="main-navigation text-center">
+      <div className="relative h-full">
+        {navIcons}
+        <div className="absolute bottom-0">
+          <SettingsIconButton
+            onClick={() =>
+              dispatch(openModal(ModalConstants.EXPERIMENTSETTINGS))
+            }
+          />
+          <ExperimentSettings />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default MainNavigation;

@@ -52,6 +52,7 @@ const start = (prevTime = 0) => {
 
       // Time Sequence
       const ts = parseFloat(data[0]);
+
       const timeSequence = ts + prevTime;
 
       const outputArr = [
@@ -79,6 +80,8 @@ const start = (prevTime = 0) => {
  * Stops the spawned process, closes the readline module, and does some memory cleanup.
  */
 const stop = () => {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+
   // Stop the readline
   rl.close();
   rl.removeAllListeners();

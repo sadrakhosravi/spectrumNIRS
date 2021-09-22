@@ -4,16 +4,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import AppStateReducer from '@redux/AppStateSlice';
 import RecordStateReducer from '@redux/RecordStateSlice';
 import SourceStateReducer from '@redux/SourceStateSlice';
-import NewExperimentReducer from '@redux/NewExperimentSlice';
-import ExperimentInfoReducer from '@redux/ExperimentInfoSlice';
+import ModalStateReducer from '@redux/ModalStateSlice';
 
 const store = configureStore({
   reducer: {
     appState: AppStateReducer,
     recordState: RecordStateReducer,
     sourceState: SourceStateReducer,
-    newExperimentState: NewExperimentReducer,
-    experimentInfo: ExperimentInfoReducer,
+    modalState: ModalStateReducer,
   },
 });
 

@@ -6,7 +6,7 @@ import { useHistory } from 'react-router';
  * Checks the app state and navigates based on the current state.
  * @returns {Hook} - checkNavigation
  */
-const checkNavigation = () => {
+const useNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
   const history = useHistory();
 
@@ -14,7 +14,7 @@ const checkNavigation = () => {
     history.push(`${appState}`);
   }, [appState]);
 
-  return checkNavigation;
+  return useNavigation;
 };
 
-export default checkNavigation;
+export default useNavigation;

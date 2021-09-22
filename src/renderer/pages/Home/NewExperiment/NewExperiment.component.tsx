@@ -4,9 +4,12 @@ import React from 'react';
 import Modal from '@components/Modal/Modal.component';
 import NewExperimentForm from './NewExperimentForm.component';
 
+// Constants
+import { ModalConstants } from 'renderer/constants/Constants';
+
 const NewExperiment: React.FC = () => {
   return (
-    <Modal isOpen={true} title="Create a New Experiment">
+    <Modal id={ModalConstants.NEWEXPERIMENT} title="Create a New Experiment">
       <div>
         <NewExperimentForm />
       </div>

@@ -3,7 +3,7 @@ import React from 'react';
 import './App.global.css';
 
 // App state constants
-import { appStateEnum } from './ts/appStateEnum';
+import { appStateConstants } from './constants/Constants';
 
 // Module import
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
@@ -27,20 +27,20 @@ function App() {
       <Switch>
         <Route
           exact
-          path={`/${appStateEnum.home}`}
+          path={`/${appStateConstants.home}`}
           render={() => {
-            return <PageRouter page={appStateEnum.home} />;
+            return <PageRouter page={appStateConstants.home} />;
           }}
         />
         <Route
           exact
-          path={`/${appStateEnum.record}`}
-          render={() => <PageRouter page={appStateEnum.record} />}
+          path={`/${appStateConstants.record}`}
+          render={() => <PageRouter page={appStateConstants.record} />}
         />
         <Route
           exact
-          path={`/${appStateEnum.review}`}
-          render={() => <PageRouter page={appStateEnum.review} />}
+          path={`/${appStateConstants.review}`}
+          render={() => <PageRouter page={appStateConstants.review} />}
         />
       </Switch>
     </Router>

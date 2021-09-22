@@ -7,6 +7,7 @@ import { ipcMain, BrowserWindow, app } from 'electron';
 // Other IPCs
 import chartIPC from './chartIPC';
 import recordIPC from './recordIPC';
+import dbIPC from './dbIPC';
 
 const ipc = () => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
@@ -32,6 +33,7 @@ const ipc = () => {
   // Record communications
   recordIPC();
   chartIPC();
+  dbIPC();
 };
 
 export default ipc;

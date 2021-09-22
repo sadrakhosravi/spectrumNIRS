@@ -8,8 +8,9 @@ import TextAreaField from '@components/Form/TextAreaField.component';
 
 // Redux
 import { useDispatch } from 'react-redux';
-import { setExperimentInfo } from '@redux/ExperimentInfoSlice';
 import { changeAppState } from '@redux/AppStateSlice';
+
+const { ipcRenderer } = window.require('electron');
 
 /**
  * Renders the new experiment form an allows user to create or cancel.
@@ -21,7 +22,7 @@ const NewExperimentForm = () => {
   const dispatch = useDispatch();
 
   const onSubmit = (data: any) => {
-    dispatch(setExperimentInfo(data));
+    ipcRenderer.send('db:new-experiment', data);
     dispatch(changeAppState('record'));
   };
 

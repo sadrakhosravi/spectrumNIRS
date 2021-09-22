@@ -1,41 +1,40 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // Icons
 import CloseIcon from '@icons/close.svg';
-import { setIsNewExperiment } from '@redux/NewExperimentSlice';
+import { closeModal } from '@redux/ModalStateSlice';
 
 interface IProps {
   title: string;
-  isOpen: boolean;
+  id: string;
+  size?: 'large' | undefined;
 }
 
 const Modal: React.FC<IProps> = (props) => {
-  const { title } = props;
-  let isModalOpen = false;
-
+  const { title, size, id } = props;
   const dispatch = useDispatch();
 
-  const isNewExperiment = useSelector(
-    (state: any) => state.newExperimentState.value
-  );
-  isModalOpen = isNewExperiment;
+  const [isOpen, setIsOpen] = useState(false);
+  const whichModal = useSelector((state: any) => state.modalState.value);
 
-  /**
-   * Closes the modal
-   */
-  function closeModal() {
-    dispatch(setIsNewExperiment(false));
-  }
+  const largeStyles =
+    size === 'large'
+      ? 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto'
+      : 'w-1/2 max-h-3/4 overflow-y-auto';
+
+  useEffect(() => {
+    whichModal === id ? setIsOpen(true) : setIsOpen(false);
+  }, [whichModal]);
 
   return (
     <>
-      <Transition appear show={isModalOpen} as={Fragment}>
+      <Transition appear show={isOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="fixed inset-0 z-10 overflow-y-auto bg-dark bg-opacity-60"
-          onClose={closeModal}
+          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-60"
+          onClose={() => dispatch(closeModal())}
         >
           <div className="min-h-screen px-4 text-center">
             <Transition.Child
@@ -66,14 +65,16 @@ const Modal: React.FC<IProps> = (props) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="inline-block relative w-1/2 py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 shadow-xl">
+              <div
+                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 shadow-xl ${largeStyles}`}
+              >
                 <Dialog.Title as="h1" className="text-3xl font-bold">
                   {title}
                 </Dialog.Title>
 
                 <button
                   className="absolute right-4 top-4 p-2"
-                  onClick={closeModal}
+                  onClick={() => dispatch(closeModal())}
                 >
                   <img src={CloseIcon} width="44px" alt="CloseIcon" />
                 </button>

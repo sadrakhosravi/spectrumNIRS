@@ -1,13 +1,20 @@
 import React from 'react';
 
+// Icons
 import RecentFileIcon from '@icons/recent-file.svg';
 
+// Components
 import ButtonTitleDescription from '@microComp/ButtonTitleDescription/ButtonTitleDescription.component';
 
-// Data file icon
-const RecentProject = () => {
+interface IProps {
+  title: string;
+  description: string;
+}
+
+const RecentProject: React.FC<IProps> = (props) => {
+  const { title, description } = props;
   return (
-    <div className="bg-grey2 grid grid-cols-5 px-3 py-5">
+    <div className="bg-grey2 grid grid-cols-5 px-3 py-5 mb-3">
       <div className="col-span-3 flex items-center">
         <span className="inline-block mr-5">
           <img
@@ -18,10 +25,7 @@ const RecentProject = () => {
           />
         </span>
         <span className="inline-block">
-          <ButtonTitleDescription
-            title="Project Name"
-            description="Project Description"
-          />
+          <ButtonTitleDescription title={title} description={description} />
         </span>
       </div>
       <div className="col-span-2 flex items-center justify-end mr-1">

@@ -2,7 +2,6 @@ import React from 'react';
 
 // Tooltip
 import Tooltip from '@tooltip';
-import { useSelector } from 'react-redux';
 
 const HomeIconButton = (props: any) => {
   const { isActive, onClick } = props;
@@ -14,12 +13,6 @@ const HomeIconButton = (props: any) => {
   } else {
     activeClass = '';
   }
-
-  const experimentInfo = useSelector(
-    (state: any) => state.experimentInfo.value
-  );
-
-  experimentInfo ? (isDisabled = true) : (isDisabled = false);
 
   return (
     <Tooltip text="Home" placement="right">

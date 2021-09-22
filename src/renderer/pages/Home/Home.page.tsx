@@ -1,8 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-import { setIsNewExperiment } from '@redux/NewExperimentSlice';
-
 // Icons
 import NewFileIcon from '@icons/new-file.svg';
 import OpenFileIcon from '@icons/open-file.svg';
@@ -12,6 +10,12 @@ import HeadingText from './HeadingText/HeadingText.component';
 import RecentProjectsContainer from './RecentProjects/RecentProjectsContainer.component';
 import IconButtons from './IconButtons/IconButtons.component';
 import NewExperiment from './NewExperiment/NewExperiment.component';
+
+// Redux
+import { openModal } from '@redux/ModalStateSlice';
+
+// Constants
+import { ModalConstants } from 'renderer/constants/Constants';
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -30,7 +34,7 @@ const HomePage = () => {
             title="New Recording"
             description="Create a new NIRS recording"
             onClick={() => {
-              dispatch(setIsNewExperiment(true));
+              dispatch(openModal(ModalConstants.NEWEXPERIMENT));
             }}
           />
           <IconButtons

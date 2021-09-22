@@ -12,9 +12,6 @@ import WindowButtons from './WindowButtons/WindowButtons.component';
 
 const TitleBar = () => {
   const appState = useSelector((state: any) => state.appState.value);
-  const experimentInfo = useSelector(
-    (state: any) => state.experimentInfo.value
-  );
 
   return (
     <header className="header w-full header-container relative items-center grid grid-cols-3 bg-grey1 z-50">
@@ -29,9 +26,7 @@ const TitleBar = () => {
         </div>
       </div>
       <div>
-        {appState !== 'home' && (
-          <p className="text-center">{experimentInfo.experimentName}</p>
-        )}
+        {appState !== 'home' && <p className="text-center">File Name</p>}
       </div>
       <WindowButtons />
     </header>
