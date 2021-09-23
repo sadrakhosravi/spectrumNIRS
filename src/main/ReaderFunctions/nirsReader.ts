@@ -42,7 +42,7 @@ const start = (prevTime = 0) => {
 
   // Push the spawned process to the spawnedProcesses array to keep track of them.
   spawnedProcesses.push(readUSBData);
-  const DataArr = [];
+  let DataArr = [];
 
   const sendDataToDB = async (data) => {
     await Recording.bulkCreate(DataArr, { returning: true });
@@ -65,7 +65,7 @@ const start = (prevTime = 0) => {
       const timeSequence = ts + prevTime;
 
       const outputArr = [
-        timeSequence,
+        timeSequence / 1000,
         parseFloat(data[1]),
         parseFloat(data[2]),
         parseFloat(data[3]),
@@ -78,6 +78,7 @@ const start = (prevTime = 0) => {
 
       if (count === 500) {
         sendDataToDB(DataArr);
+        DataArr = [];
         count = 0;
       }
       count++;

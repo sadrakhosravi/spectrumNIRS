@@ -5,6 +5,8 @@
 import { ipcMain } from 'electron';
 const { Experiment } = require('../Database/models/index');
 
+const createDatabase = require('../Database/Recording/recording');
+
 /**
  * All DB related IPCs
  */
@@ -30,6 +32,7 @@ const dbIPC = () => {
   ipcMain.on(
     'db:get-recent-experiments',
     async (event, numOfRecentExperiments) => {
+      createDatabase();
       console.log(numOfRecentExperiments);
       const experiments = await Experiment.findAll({
         limit: numOfRecentExperiments,
