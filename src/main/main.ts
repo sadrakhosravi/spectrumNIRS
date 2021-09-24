@@ -102,4 +102,18 @@ app.on('activate', async () => {
   //   .catch(() => {
   //     console.log('Error in creating tables');
   //   });
+
+  const sqlitedb = require('better-sqlite3');
+  const createTable =
+    "CREATE TABLE IF NOT EXISTS users('name' varchar, 'surname' varchar, 'date_of_birth' DATE DEFAULT, 'email' varchar, 'username' varchar PRIMARY KEY, 'password' varchar );";
+
+  const dbusers = './databaseUsers.sqlite3';
+  let db = new sqlitedb(dbusers, sqlitedb.OPEN_READWRITE, (err: any) => {
+    if (err) {
+      console.error(err.message);
+    }
+    verbose: console.log;
+  });
+
+  db.exec(createTable);
 })();
