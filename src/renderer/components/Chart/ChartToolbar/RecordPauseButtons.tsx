@@ -11,7 +11,7 @@ import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
 // Electron
-const { ipcRenderer } = window.require('electron');
+const send = window.api.send;
 
 const RecordPauseButtons = () => {
   // Record button state
@@ -49,7 +49,7 @@ const RecordPauseButtons = () => {
   useEffect(() => {
     // Send ipc message if record state is not idle.
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    recordState !== 'idle' && ipcRenderer.send(`record:${recordState}`);
+    recordState !== 'idle' && send(`record:${recordState}`);
   }, [recordState]);
 
   // Set button's styles based on the state value.

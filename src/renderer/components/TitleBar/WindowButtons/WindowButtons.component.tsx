@@ -5,22 +5,22 @@ import Minimize from '@icons/minimize.svg';
 import Restore from '@icons/restore.svg';
 import Close from '@icons/close.svg';
 
-const { ipcRenderer } = window.require('electron');
+const send = window.api.send;
 
 const WindowButtons = () => {
   //Electron: minimize Window ipc
   const minimizeWindow = () => {
-    ipcRenderer.send('window:minimize');
+    send('window:minimize');
   };
 
   //Electron: close Window ipc
   const closeWindow = () => {
-    ipcRenderer.send('window:close');
+    send('window:close');
   };
 
   //Electron: restore Window ipc
   const restoreWindow = () => {
-    ipcRenderer.send('window:restore');
+    send('window:restore');
   };
 
   return (

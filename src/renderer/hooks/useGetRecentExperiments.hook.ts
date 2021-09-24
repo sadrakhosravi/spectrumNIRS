@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-const { ipcRenderer } = window.require('electron');
+const on = window.api.on;
+const send = window.api.send;
+const removeListener = window.api.removeListener;
 
 /**
  * Get the x most recent experiments
@@ -15,16 +17,16 @@ const useGetRecentExperiments: (
 
   // Only get the recent experiments on first render
   useEffect(() => {
-    ipcRenderer.send('db:get-recent-experiments', numOfRecentExperiments); // Request recent-experiments
-    ipcRenderer.on('db:recent-experiments', (_event, data) => {
+    send('db:get-recent-experiments', numOfRecentExperiments); // Request recent-experiments
+    on('db:recent-experiments', (_event: any, data: any) => {
       setRecentExperimentData(data);
       console.log(data);
     });
 
     return () => {
       // Cleanup - remove listeners
-      ipcRenderer.removeListener('db:get-recent-experiments', () => {});
-      ipcRenderer.removeListener('db:recent-experiments', () => {});
+      removeListener('db:get-recent-experiments', () => {});
+      removeListener('db:recent-experiments', () => {});
     };
   }, []);
 

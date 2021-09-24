@@ -45,8 +45,8 @@ const createMainWindow = async () => {
     height: 800,
     frame: false,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
     },
     icon: getAssetPath('icon.png'),
   });
@@ -81,25 +81,25 @@ app.on('activate', async () => {
   await createMainWindow();
   ipc();
   //Sequelize
-  const { sequelize } = require('./Database/models/index');
+  // const { sequelize } = require('./Database/models/index');
 
-  //Check DB Connection
-  sequelize
-    .authenticate()
-    .then(() => {
-      console.log('Connection successful!');
-    })
-    .catch(() => {
-      console.log('Error connecting');
-    });
+  // //Check DB Connection
+  // sequelize
+  //   .authenticate()
+  //   .then(() => {
+  //     console.log('Connection successful!');
+  //   })
+  //   .catch(() => {
+  //     console.log('Error connecting');
+  //   });
 
-  //Sync Models
-  sequelize
-    .sync({ force: true })
-    .then(() => {
-      console.log('Sync Successful!');
-    })
-    .catch(() => {
-      console.log('Error in creating tables');
-    });
+  // //Sync Models
+  // sequelize
+  //   .sync({ force: true })
+  //   .then(() => {
+  //     console.log('Sync Successful!');
+  //   })
+  //   .catch(() => {
+  //     console.log('Error in creating tables');
+  //   });
 })();

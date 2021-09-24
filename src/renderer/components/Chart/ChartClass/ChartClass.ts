@@ -8,7 +8,7 @@ import ChartPerChannel from '@chart/ChartClass/ChartPerChannel';
 import ChartSeries from '@chart/ChartClass/ChartSeries';
 import ChartSyncXAxis from '@chart/ChartClass/ChartSyncXAxis';
 
-const { ipcRenderer }: any = window.require('electron');
+const on = window.api.on;
 
 class ChartClass {
   channelCount: number;
@@ -60,11 +60,10 @@ class ChartClass {
     this.Series = null;
     this.ChartSyncXAxis = null;
     // eslint-disable-next-line no-underscore-dangle
-    ipcRenderer._events = {};
   }
 
   addNIRSData() {
-    ipcRenderer.on('data:nirs-reader', (_: any, data: any) => {
+    on('data:nirs-reader', (_: any, data: any) => {
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI'
 
       for (let i = 0; i < this.seriesLength; i++) {

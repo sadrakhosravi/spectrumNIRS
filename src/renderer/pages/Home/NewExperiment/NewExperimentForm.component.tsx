@@ -11,7 +11,7 @@ import SubmitButton from '@components/Form/SubmitButton.component';
 import { useDispatch } from 'react-redux';
 import { changeAppState } from '@redux/AppStateSlice';
 
-const { ipcRenderer } = window.require('electron');
+const send = window.api.send;
 
 /**
  * Renders the new experiment form an allows user to create or cancel.
@@ -23,7 +23,7 @@ const NewExperimentForm = () => {
   const dispatch = useDispatch();
 
   const onSubmit = (data: any) => {
-    ipcRenderer.send('db:new-experiment', data);
+    send('db:new-experiment', data);
     dispatch(changeAppState('record'));
   };
 
