@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 /**
  * Build config for electron renderer process
  */
@@ -62,7 +60,6 @@ export default merge(baseConfig, {
               publicPath: './',
             },
           },
-
           'css-loader',
           'sass-loader',
           {

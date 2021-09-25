@@ -14,15 +14,10 @@ import { changeAppState } from '@redux/AppStateSlice';
 import { openModal } from '@redux/ModalStateSlice';
 import { ModalConstants } from 'renderer/constants/Constants';
 
-// Hooks
-import useNavigation from '@hooks/useNavigation.hook';
-
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
 
   const dispatch = useDispatch();
-
-  useNavigation();
 
   let navIcons;
   // Check app state and set the active menu button accordingly.
