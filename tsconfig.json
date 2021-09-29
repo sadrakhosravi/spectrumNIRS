@@ -24,7 +24,7 @@
       "@Workers/*": ["./main/Workers/*"],
       //Database
       //Typescript Extra
-      "@ts/*": ["./renderer/ts/*"]
+      "@constants/*": ["./renderer/constants/*"]
     },
     "lib": ["dom", "esnext"],
     "declaration": true,

@@ -9,9 +9,11 @@ import SubmitButton from '@components/Form/SubmitButton.component';
 
 // Redux
 import { useDispatch } from 'react-redux';
+import { loading } from '@redux/IsLoadingSlice';
 import { changeAppState } from '@redux/AppStateSlice';
 
-const send = window.api.send;
+// Constants
+import { AppState } from '@constants/Constants';
 
 /**
  * Renders the new experiment form an allows user to create or cancel.
@@ -22,9 +24,11 @@ const NewExperimentForm = () => {
 
   const dispatch = useDispatch();
 
-  const onSubmit = (data: any) => {
-    send('db:new-experiment', data);
-    dispatch(changeAppState('record'));
+  const onSubmit = async (data: any) => {
+    dispatch(loading());
+    dispatch(changeAppState(AppState.RECORD));
+    const newExperiment = await window.api.createNewExperiment(data);
+    console.log(newExperiment);
   };
 
   return (

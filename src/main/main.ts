@@ -13,8 +13,30 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { resolveHtmlPath } from './util';
-import ipc from './IPC/index';
+import { sequelize } from '@DB/models/index';
+import ipc from '@IPC/index';
 
+// Check DB Connection
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection successful!');
+  })
+  .catch(() => {
+    console.log('Error connecting');
+  });
+
+//Sync Models
+sequelize
+  .sync({ force: true })
+  .then(() => {
+    console.log('Sync Successful!');
+  })
+  .catch(() => {
+    console.log('Error in creating tables');
+  });
+
+// Define mainWindow
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -25,10 +47,12 @@ if (process.env.NODE_ENV === 'production') {
 const isDevelopment =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-if (true || isDevelopment) {
+// Load debugger if app is in development
+if (isDevelopment) {
   require('electron-debug')();
 }
 
+// Create the main window
 const createMainWindow = async () => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -45,9 +69,8 @@ const createMainWindow = async () => {
     height: 800,
     frame: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nativeWindowOpen: false,
+      preload: path.join(__dirname, 'preload.js'),
     },
     icon: getAssetPath('icon.png'),
   });
@@ -79,28 +102,9 @@ app.on('activate', async () => {
 });
 
 (async () => {
+  // Create main window
   await app.whenReady();
   await createMainWindow();
+  // Attach IPC listeners
   ipc();
-  const { sequelize } = require('./Database/models/index');
-
-  //Check DB Connection
-  sequelize
-    .authenticate()
-    .then(() => {
-      console.log('Connection successful!');
-    })
-    .catch(() => {
-      console.log('Error connecting');
-    });
-
-  //Sync Models
-  sequelize
-    .sync({ force: true })
-    .then(() => {
-      console.log('Sync Successful!');
-    })
-    .catch(() => {
-      console.log('Error in creating tables');
-    });
 })();

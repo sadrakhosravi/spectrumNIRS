@@ -14,6 +14,9 @@ import { changeAppState } from '@redux/AppStateSlice';
 import { openModal } from '@redux/ModalStateSlice';
 import { ModalConstants } from 'renderer/constants/Constants';
 
+// Constants
+import { AppState } from 'renderer/constants/Constants';
+
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
 
@@ -22,46 +25,50 @@ const MainNavigation = () => {
   let navIcons;
   // Check app state and set the active menu button accordingly.
   switch (appState) {
-    case 'home':
+    case AppState.HOME:
       navIcons = (
         <>
           <HomeIconButton
-            onClick={() => dispatch(changeAppState('home'))}
+            onClick={() => dispatch(changeAppState(AppState.HOME))}
             isActive
           />
           <SignalIconButton
-            onClick={() => dispatch(changeAppState('record'))}
+            onClick={() => dispatch(changeAppState(AppState.RECORD))}
           />
           <ReviewIconButton
-            onClick={() => dispatch(changeAppState('review'))}
+            onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />
         </>
       );
       break;
-    case 'record':
+    case AppState.RECORD:
       navIcons = (
         <>
-          <HomeIconButton onClick={() => dispatch(changeAppState('home'))} />
+          <HomeIconButton
+            onClick={() => dispatch(changeAppState(AppState.HOME))}
+          />
           <SignalIconButton
-            onClick={() => dispatch(changeAppState('record'))}
+            onClick={() => dispatch(changeAppState(AppState.RECORD))}
             isActive
           />
           <ReviewIconButton
-            onClick={() => dispatch(changeAppState('review'))}
+            onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />
         </>
       );
       break;
 
-    case 'review':
+    case AppState.REVIEW:
       navIcons = (
         <>
-          <HomeIconButton onClick={() => dispatch(changeAppState('home'))} />
+          <HomeIconButton
+            onClick={() => dispatch(changeAppState(AppState.HOME))}
+          />
           <SignalIconButton
-            onClick={() => dispatch(changeAppState('record'))}
+            onClick={() => dispatch(changeAppState(AppState.RECORD))}
           />
           <ReviewIconButton
-            onClick={() => dispatch(changeAppState('review'))}
+            onClick={() => dispatch(changeAppState(AppState.REVIEW))}
             isActive
           />
         </>

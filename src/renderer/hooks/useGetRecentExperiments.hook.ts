@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-const on = window.api.on;
-const send = window.api.send;
 const removeListener = window.api.removeListener;
 
 /**
@@ -17,11 +15,13 @@ const useGetRecentExperiments: (
 
   // Only get the recent experiments on first render
   useEffect(() => {
-    send('db:get-recent-experiments', numOfRecentExperiments); // Request recent-experiments
-    on('db:recent-experiments', (data: any) => {
-      setRecentExperimentData(data);
-      console.log(data);
-    });
+    (async () => {
+      const experiments = await window.api.getRecentExperiments(
+        numOfRecentExperiments
+      );
+      console.log(experiments);
+      setRecentExperimentData(experiments);
+    })();
 
     return () => {
       // Cleanup - remove listeners

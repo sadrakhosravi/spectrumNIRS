@@ -47,4 +47,4 @@ module.exports = db;
 
 const { Experiment, Recording } = db;
 
-export { Experiment, Recording };
+export { Experiment, Recording, sequelize, Sequelize };

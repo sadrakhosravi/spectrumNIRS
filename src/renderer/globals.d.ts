@@ -3,4 +3,16 @@ declare namespace api {
   function send(channel: any, ...args: any): any;
   function invoke(channel: any, ...args: any): any;
   function removeListener(channel: any, customFunction: any): any;
+
+  // Window functions
+  function minimize(): void;
+  function restore(): void;
+  function close(): void;
+
+  // Record functions
+  function sendRecordState(state: string): void;
+
+  // DB functions
+  function getRecentExperiments(numOfExp: number): Promise<Array<Object>>;
+  function createNewExperiment(data: Object): Promise<Boolean>;
 }

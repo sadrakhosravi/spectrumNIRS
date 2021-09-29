@@ -5,43 +5,26 @@ import Minimize from '@icons/minimize.svg';
 import Restore from '@icons/restore.svg';
 import Close from '@icons/close.svg';
 
-const send = window.api.send;
-
 const WindowButtons = () => {
-  //Electron: minimize Window ipc
-  const minimizeWindow = () => {
-    send('window:minimize');
-  };
-
-  //Electron: close Window ipc
-  const closeWindow = () => {
-    send('window:close');
-  };
-
-  //Electron: restore Window ipc
-  const restoreWindow = () => {
-    send('window:restore');
-  };
-
   return (
     <span className="text-right items-center">
       <img
         src={Minimize}
         className="window-button hover:bg-accent"
         alt="Minimize"
-        onClick={minimizeWindow}
+        onClick={window.api.minimize}
       />
       <img
         src={Restore}
         className="window-button hover:bg-accent"
         alt="Maximize/Restore"
-        onClick={restoreWindow}
+        onClick={window.api.restore}
       />
       <img
         src={Close}
         className="window-button hover:bg-red"
         alt="Close"
-        onClick={closeWindow}
+        onClick={window.api.close}
       />
     </span>
   );

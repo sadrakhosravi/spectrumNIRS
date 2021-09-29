@@ -1,4 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { AppState } from '@constants/Constants';
+
+interface IAction {
+  payload: AppState.HOME | AppState.RECORD | AppState.REVIEW;
+}
 
 /**
  * Determine the state of the app. Used to navigate to home, record, or review sections.
@@ -9,7 +14,7 @@ export const AppStateSlice = createSlice({
     value: 'home', // Can be 'home', 'record', 'review' - Check app state enum
   },
   reducers: {
-    changeAppState: (state, action) => {
+    changeAppState: (state, action: IAction) => {
       state.value = action.payload;
     },
   },

@@ -8,4 +8,28 @@ contextBridge.exposeInMainWorld('api', {
   },
   invoke: ipcRenderer.invoke,
   removeListener: ipcRenderer.removeListener,
+
+  // Window functions
+  minimize: () => ipcRenderer.send('window:minimize'),
+  restore: () => ipcRenderer.send('window:restore'),
+  close: () => ipcRenderer.send('window:close'),
+
+  // Record functions
+  sendRecordState: (state) => {
+    ipcRenderer.send(`record:${state}`);
+  },
+
+  /* DB functions */
+  // create a new experiment in the database
+  createNewExperiment: async (data) => {
+    return await ipcRenderer.invoke('db:new-experiment', data);
+  },
+
+  // get recent some number of recent experiments
+  getRecentExperiments: async (numOfExperiments) => {
+    return await ipcRenderer.invoke(
+      'db:get-recent-experiments',
+      numOfExperiments
+    );
+  },
 });

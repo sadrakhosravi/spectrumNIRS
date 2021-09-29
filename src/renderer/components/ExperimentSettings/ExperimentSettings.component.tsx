@@ -13,12 +13,8 @@ import GeneralSettings from './Tabs/GeneralSettings/GeneralSettings.component';
 import { useForm, FormProvider } from 'react-hook-form';
 import SubmitButton from '@components/Form/SubmitButton.component';
 
-// Electron
-const send = window.api.send;
-
 const ExperimentSettings = () => {
   useEffect(() => {
-    send('db:get-experiment-settings', 1);
     return () => {};
   });
   // Used for deeply nested inputs

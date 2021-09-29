@@ -7,9 +7,10 @@ import { ipcMain, BrowserWindow, app } from 'electron';
 // Other IPCs
 import chartIPC from './chartIPC';
 import recordIPC from './recordIPC';
-import dbIPC from './dbIPC';
+import '@IPC/dbIPC';
 
 const ipc = () => {
+  // Get the main window open
   const mainWindow = BrowserWindow.getAllWindows()[0];
 
   // Minimize window on minimize icon click
@@ -33,7 +34,6 @@ const ipc = () => {
   // Record communications
   recordIPC();
   chartIPC();
-  dbIPC();
 };
 
 export default ipc;
