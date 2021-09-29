@@ -3,9 +3,8 @@
  */
 
 import { ipcMain } from 'electron';
-const { Experiment } = require('../Database/models/index');
-
-const createDatabase = require('../Database/Recording/recording');
+import { Experiment, Recording } from '@electron/Database/models/index';
+import { hrtime } from 'process';
 
 /**
  * All DB related IPCs
@@ -28,11 +27,20 @@ const dbIPC = () => {
     });
   });
 
+  // Get all the recording data
+  ipcMain.handle('db:get-recordings', async (_event, data) => {
+    console.log(data);
+    const start = hrtime.bigint();
+    const myData = await Recording.findAll({ raw: true, limit: 5000 });
+    const stop = hrtime.bigint();
+    console.log(stop - start);
+    console.log('Out data', myData);
+  });
+
   // Retrieve the numOfRecentExperiment most recent experiments from DB
   ipcMain.on(
     'db:get-recent-experiments',
     async (event, numOfRecentExperiments) => {
-      createDatabase();
       console.log(numOfRecentExperiments);
       const experiments = await Experiment.findAll({
         limit: numOfRecentExperiments,

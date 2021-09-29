@@ -63,9 +63,9 @@ class ChartClass {
   }
 
   addNIRSData() {
-    on('data:nirs-reader', (_: any, data: any) => {
+    on('data:nirs-reader', (data: any) => {
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI'
-
+      console.log('Test');
       for (let i = 0; i < this.seriesLength; i++) {
         this.Series[i].add({ x: data[0], y: data[i + 1] });
       }

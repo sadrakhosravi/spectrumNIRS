@@ -1,16 +1,16 @@
 {
   "development": {
-    "storage": "./src/main/Database/photonlab.db",
+    "storage": "./src/main/Database/main.db",
     "dialect": "sqlite",
     "logging": false
   },
   "test": {
-    "storage": "./src/main/Database/photonlab.db",
+    "storage": "../main.db",
     "dialect": "sqlite",
     "logging": false
   },
   "production": {
-    "storage": "./src/main/Database/photonlab.db",
+    "storage": "../main.db",
     "dialect": "sqlite",
     "logging": false
   }

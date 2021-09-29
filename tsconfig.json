@@ -17,13 +17,12 @@
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
       //Electron Related Paths
+      "@DB/*": ["./main/Database/*"],
       "@electron/*": ["./main/*"],
       "@IPC/*": ["./main/IPC/*"],
       "@readers/*": ["./main/Readers/*"],
       "@Workers/*": ["./main/Workers/*"],
       //Database
-      "@db/*": ["./main/Database/*"],
-      "@dbModels": ["./main/Database/models/*"],
       //Typescript Extra
       "@ts/*": ["./renderer/ts/*"]
     },

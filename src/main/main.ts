@@ -82,41 +82,25 @@ app.on('activate', async () => {
   await app.whenReady();
   await createMainWindow();
   ipc();
-  //Sequelize
-  // const { sequelize } = require('./Database/models/index');
+  const { sequelize } = require('./Database/models/index');
 
-  // //Check DB Connection
-  // sequelize
-  //   .authenticate()
-  //   .then(() => {
-  //     console.log('Connection successful!');
-  //   })
-  //   .catch(() => {
-  //     console.log('Error connecting');
-  //   });
+  //Check DB Connection
+  sequelize
+    .authenticate()
+    .then(() => {
+      console.log('Connection successful!');
+    })
+    .catch(() => {
+      console.log('Error connecting');
+    });
 
-  // //Sync Models
-  // sequelize
-  //   .sync({ force: true })
-  //   .then(() => {
-  //     console.log('Sync Successful!');
-  //   })
-  //   .catch(() => {
-  //     console.log('Error in creating tables');
-  //   });
-
-  const sqlitedb = require('better-sqlite3');
-  const createTable = 'CREATE TABLE table_name (column1 varchar);';
-
-  const dbusers = './databaseUsers.sqlite3';
-  let db = new sqlitedb(dbusers, sqlitedb.OPEN_READWRITE, (err: any) => {
-    if (err) {
-      console.error(err.message);
-    }
-    verbose: console.log;
-  });
-
-  db.exec(createTable);
-
-  console.log(sqlitedb);
+  //Sync Models
+  sequelize
+    .sync({ force: true })
+    .then(() => {
+      console.log('Sync Successful!');
+    })
+    .catch(() => {
+      console.log('Error in creating tables');
+    });
 })();

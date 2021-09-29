@@ -18,7 +18,7 @@ const useGetRecentExperiments: (
   // Only get the recent experiments on first render
   useEffect(() => {
     send('db:get-recent-experiments', numOfRecentExperiments); // Request recent-experiments
-    on('db:recent-experiments', (_event: any, data: any) => {
+    on('db:recent-experiments', (data: any) => {
       setRecentExperimentData(data);
       console.log(data);
     });

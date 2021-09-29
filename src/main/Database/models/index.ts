@@ -44,3 +44,7 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+const { Experiment, Recording } = db;
+
+export { Experiment, Recording };

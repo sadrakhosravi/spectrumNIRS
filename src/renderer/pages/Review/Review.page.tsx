@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // Main area components
 import Tabs from '@components/Tabs/Tabs.component';
@@ -8,7 +8,13 @@ import Chart from '@chart/Chart.component';
 // Sidebar components
 import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.component';
 
+const invoke = window.api.invoke;
+
 const Review = () => {
+  useEffect(() => {
+    invoke('db:get-recordings');
+  });
+
   return (
     <>
       <Tabs />

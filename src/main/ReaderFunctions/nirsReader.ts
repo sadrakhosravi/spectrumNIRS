@@ -4,12 +4,11 @@
 
 //@ts-nocheck
 import { BrowserWindow } from 'electron'; // Electron
+import { Recording } from '@DB/models/index';
 
 const path = require('path');
 const readline = require('readline');
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
-
-// const { Recording } = require('../Database/models/index');
 
 // Defining the variables here for memory cleanup later.
 let rl: any;
@@ -44,9 +43,9 @@ const start = (prevTime = 0) => {
   spawnedProcesses.push(readUSBData);
   let DataArr = [];
 
-  // const sendDataToDB = async (data) => {
-  //   await Recording.bulkCreate(DataArr, { returning: true });
-  // };
+  const sendDataToDB = async (data) => {
+    await Recording.create(data);
+  };
 
   let count = 0;
 
@@ -73,6 +72,8 @@ const start = (prevTime = 0) => {
       ]; // [timeSequence, O2hb, HHb, tHb, TOI]
 
       const test = { value: outputArr.join(',') };
+
+      sendDataToDB(test);
 
       DataArr.push(test);
 
