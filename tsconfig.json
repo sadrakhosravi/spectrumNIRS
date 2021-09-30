@@ -17,10 +17,11 @@
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
       //Electron Related Paths
-      "@DB/*": ["./main/Database/*"],
+      "@db/*": ["./main/db/*"],
       "@electron/*": ["./main/*"],
-      "@IPC/*": ["./main/IPC/*"],
-      "@readers/*": ["./main/Readers/*"],
+      "@ipc/*": ["./main/IPC/*"],
+      "@readerFunctions/*": ["./main/readerFunctions/*"],
+      "@readers/*": ["./main/readers/*"],
       "@Workers/*": ["./main/Workers/*"],
       //Database
       //Typescript Extra

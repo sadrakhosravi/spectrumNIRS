@@ -4,34 +4,34 @@
 
 import { ipcMain } from 'electron';
 
-const nirsReader = require('../ReaderFunctions/nirsReader');
+import {
+  start,
+  stop,
+  continueReading,
+  pause,
+} from '@readerFunctions/nirsReader';
 
 let isPaused = false;
 
-// NIRS Data reader module
-const recordIPC = () => {
-  // Recording state
-  ipcMain.on('record:recording', () => {
-    nirsReader.start(); // All necessary functionality of reading NIRS sensor data.
-  });
+// Recording state
+ipcMain.on('record:recording', () => {
+  start(); // All necessary functionality of reading NIRS sensor data.
+});
 
-  // No recording/idle state
-  ipcMain.on('record:stop', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    !isPaused === true && nirsReader.stop(); // Stop recording
-  });
+// No recording/idle state
+ipcMain.on('record:stop', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  !isPaused === true && stop(); // Stop recording
+});
 
-  // Pause recording
-  ipcMain.on('record:pause', () => {
-    nirsReader.pause();
-    isPaused = true;
-  });
+// Pause recording
+ipcMain.on('record:pause', () => {
+  pause();
+  isPaused = true;
+});
 
-  // Pause recording
-  ipcMain.on('record:continue', () => {
-    nirsReader.continueReading();
-    isPaused = false;
-  });
-};
-
-export default recordIPC;
+// Pause recording
+ipcMain.on('record:continue', () => {
+  continueReading();
+  isPaused = false;
+});

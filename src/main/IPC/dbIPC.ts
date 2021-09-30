@@ -3,7 +3,7 @@
  */
 
 import { ipcMain } from 'electron';
-import { Experiment, Recording } from '@electron/Database/models/index';
+import { Experiment, Recording } from '@electron/db/models/index';
 import { hrtime } from 'process';
 
 // Retrieve the numOfRecentExperiment most recent experiments from DB

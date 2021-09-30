@@ -13,8 +13,8 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { resolveHtmlPath } from './util';
-import { sequelize } from '@DB/models/index';
-import ipc from '@IPC/index';
+import { sequelize } from '@electron/db/models/index';
+import ipc from '@ipc/index';
 
 // Check DB Connection
 sequelize

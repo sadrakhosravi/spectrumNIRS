@@ -7,14 +7,13 @@ import SourceStateReducer from '@redux/SourceStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
 import IsLoadingReducer from '@redux/IsLoadingSlice';
 
-
 const store = configureStore({
   reducer: {
     appState: AppStateReducer,
     recordState: RecordStateReducer,
     sourceState: SourceStateReducer,
     modalState: ModalStateReducer,
-    IsLoadingState: IsLoadingReducer,
+    isLoadingState: IsLoadingReducer,
   },
 });
 

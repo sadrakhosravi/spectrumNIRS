@@ -9,11 +9,11 @@ import SubmitButton from '@components/Form/SubmitButton.component';
 
 // Redux
 import { useDispatch } from 'react-redux';
-import { loading } from '@redux/IsLoadingSlice';
 import { changeAppState } from '@redux/AppStateSlice';
 
 // Constants
 import { AppState } from '@constants/Constants';
+import { isLoading } from '@redux/IsLoadingSlice';
 
 /**
  * Renders the new experiment form an allows user to create or cancel.
@@ -25,9 +25,15 @@ const NewExperimentForm = () => {
   const dispatch = useDispatch();
 
   const onSubmit = async (data: any) => {
-    dispatch(loading());
-    dispatch(changeAppState(AppState.RECORD));
+    // Enable global loading state
+    dispatch(isLoading(true));
+
+    // Create a new experiment and await the result
     const newExperiment = await window.api.createNewExperiment(data);
+
+    // Change app state if experiment is created
+    newExperiment && dispatch(changeAppState(AppState.RECORD));
+
     console.log(newExperiment);
   };
 

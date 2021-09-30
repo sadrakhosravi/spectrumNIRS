@@ -7,8 +7,11 @@ import Chart from '@chart/Chart.component';
 
 // Sidebar components
 import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.component';
+import useLoadingState from '@hooks/useLoadingState.hook';
 
 const RecordPage = () => {
+  useLoadingState(false);
+
   return (
     <>
       <Tabs />

@@ -1,5 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+interface IActions {
+  payload: true | false;
+}
+
 /**
  * State to determine whether the app is recording data, paused, continued recording, or idle(not recording)
  */
@@ -9,15 +13,12 @@ export const IsLoadingState = createSlice({
     value: false, // Which modal to open
   },
   reducers: {
-    loading: (state) => {
-      state.value = true;
-    },
-    notLoading: (state) => {
-      state.value = false;
+    isLoading: (state, action: IActions) => {
+      state.value = action.payload;
     },
   },
 });
 
-export const { loading, notLoading } = IsLoadingState.actions;
+export const { isLoading } = IsLoadingState.actions;
 
 export default IsLoadingState.reducer;

@@ -4,7 +4,7 @@
 
 //@ts-nocheck
 import { BrowserWindow } from 'electron'; // Electron
-import { Recording } from '@DB/models/index';
+import { Recording } from '@db/models/index';
 
 const path = require('path');
 const readline = require('readline');
@@ -129,5 +129,11 @@ const continueReading = () => {
   start(lastTimeSequence);
 };
 
-export default '';
+const nirsReader = {};
+nirsReader.start = start;
+nirsReader.pause = pause;
+nirsReader.continueReading = continueReading;
+nirsReader.stop = stop;
+
+export default nirsReader;
 export { start, pause, continueReading, stop };

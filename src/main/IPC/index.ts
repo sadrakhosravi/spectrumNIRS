@@ -5,9 +5,9 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
 
 // Other IPCs
-import chartIPC from './chartIPC';
-import recordIPC from './recordIPC';
-import '@IPC/dbIPC';
+import '@ipc/chartIPC';
+import '@ipc/recordIPC';
+import '@ipc/dbIPC';
 
 const ipc = () => {
   // Get the main window open
@@ -30,10 +30,6 @@ const ipc = () => {
       ? mainWindow.restore()
       : mainWindow.maximize();
   });
-
-  // Record communications
-  recordIPC();
-  chartIPC();
 };
 
 export default ipc;
