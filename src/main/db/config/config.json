@@ -1,11 +1,11 @@
 {
   "development": {
-    "storage": "./src/main/Database/main.db",
+    "storage": "./src/main/db/main.db",
     "dialect": "sqlite",
     "logging": false
   },
   "test": {
-    "storage": "../main.db",
+    "storage": "./src/main/db/main.db",
     "dialect": "sqlite",
     "logging": false
   },

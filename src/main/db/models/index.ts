@@ -45,6 +45,10 @@ db.Sequelize = Sequelize;
 
 module.exports = db;
 
-const { Experiment, Recording } = db;
+const {
+  Experiment,
+  Recording,
+  Patient,
+}: { Experiment: any; Recording: any; Patient: any } = db;
 
-export { Experiment, Recording, sequelize, Sequelize };
+export { Experiment, Patient, Recording, sequelize, Sequelize };

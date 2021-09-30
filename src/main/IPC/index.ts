@@ -5,9 +5,10 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
 
 // Other IPCs
-import '@ipc/chartIPC';
-import '@ipc/recordIPC';
-import '@ipc/dbIPC';
+import '@ipc/chart';
+import '@ipc/record';
+import '@ipc/writeDB';
+import '@ipc/readDB';
 
 const ipc = () => {
   // Get the main window open

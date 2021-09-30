@@ -42,29 +42,31 @@ const NewExperimentForm = () => {
       <h3 className="text-xl text-medium pb-3">Experiment Information</h3>
       <label className="text-sm inline-block w-1/2 pr-2">
         <span className="block pb-1">Experiment Name:</span>
-        <InputField register={register('experimentName')} />
+        <InputField
+          register={register('experiment.name', { required: true })}
+        />
       </label>
       <label className="text-sm inline-block w-1/2 pl-2 ">
         <span className="block pb-1">Date:</span>
-        <DateField register={register('experimentDate')} />
+        <DateField register={register('experiment.date', { required: true })} />
       </label>
       <label className="text-sm inline-block w-full mt-2">
         <span className="block pb-1">Description:</span>
-        <TextAreaField register={register('experimentDescription')} />
+        <TextAreaField register={register('experiment.description')} />
       </label>
 
       <h3 className="text-xl text-medium pb-3 mt-6">Patient Information</h3>
       <label className="text-sm inline-block w-1/2 pr-2">
         <span className="block pb-1">Patient Name:</span>
-        <InputField register={register('patientName')} />
+        <InputField register={register('patient.name', { required: true })} />
       </label>
       <label className="text-sm inline-block w-1/2 pl-2 ">
         <span className="block pb-1">DOB:</span>
-        <DateField register={register('dob')} />
+        <DateField register={register('patient.dob', { required: true })} />
       </label>
       <label className="text-sm inline-block w-full mt-2">
         <span className="block pb-1">Description:</span>
-        <TextAreaField register={register('patientDescription')} />
+        <TextAreaField register={register('patient.description')} />
       </label>
       <SubmitButton text={'Create a New Experiment'} />
     </form>
