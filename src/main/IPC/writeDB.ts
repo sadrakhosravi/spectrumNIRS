@@ -17,6 +17,8 @@ ipcMain.handle('db:new-experiment', async (_event, data) => {
     NumOfChannels: '4',
   };
 
+  console.log(experimentSettings);
+
   const { experiment, patient } = data;
 
   console.log(data);

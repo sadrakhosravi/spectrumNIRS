@@ -64,7 +64,7 @@ const start = (prevTime = 0) => {
       const timeSequence = ts + prevTime;
 
       const outputArr = [
-        timeSequence / 1000,
+        timeSequence,
         parseFloat(data[1]),
         parseFloat(data[2]),
         parseFloat(data[3]),
