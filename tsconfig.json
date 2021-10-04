@@ -22,7 +22,9 @@
       "@ipc/*": ["./main/IPC/*"],
       "@readerFunctions/*": ["./main/readerFunctions/*"],
       "@readers/*": ["./main/readers/*"],
-      "@Workers/*": ["./main/Workers/*"],
+      "@controllers/*": ["./main/controllers/*"],
+      "@helpers/*": ["./main/helpers/*"],
+      "@workers/*": ["./main/Workers/*"],
       //Database
       //Typescript Extra
       "@constants/*": ["./renderer/constants/*"]

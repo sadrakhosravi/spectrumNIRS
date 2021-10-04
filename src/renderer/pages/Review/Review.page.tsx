@@ -8,11 +8,9 @@ import Chart from '@chart/Chart.component';
 // Sidebar components
 import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.component';
 
-const invoke = window.api.invoke;
-
 const Review = () => {
   useEffect(() => {
-    invoke('db:get-recordings');
+    window.api.getRecording();
   });
 
   return (

@@ -60,15 +60,30 @@ class ChartClass {
     this.Series = null;
     this.ChartSyncXAxis = null;
     // eslint-disable-next-line no-underscore-dangle
+    window.api.removeNIRSDataListener();
   }
 
   addNIRSData() {
     on('data:nirs-reader', (data: any) => {
+      // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 10 reading lines
+      data.forEach((line: any) => {
+        for (let i = 0; i < this.seriesLength; i++) {
+          this.Series[i].add({ x: line[0], y: line[i + 1] });
+        }
+      });
+    });
+
+    on('data:nirs-reader-review', (data: any) => {
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI'
-      console.log('Test');
-      for (let i = 0; i < this.seriesLength; i++) {
-        this.Series[i].add({ x: data[0], y: data[i + 1] });
-      }
+      data.forEach((line: any) => {
+        for (let i = 0; i < this.seriesLength; i++) {
+          const data = line.value.split(',');
+          this.Series[i].add({
+            x: parseFloat(data[0]),
+            y: parseFloat(data[i + 1]),
+          });
+        }
+      });
     });
   }
 }

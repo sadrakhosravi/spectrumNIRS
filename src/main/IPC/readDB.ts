@@ -1,8 +1,13 @@
-import { BrowserWindow, ipcMain } from 'electron';
-import { Experiment, Recording } from '@electron/db/models/index';
-/**
- * All DB read related IPCs
- */
+import { ipcMain } from 'electron';
+import { Experiment } from '@electron/db/models/index';
+
+// Helpers
+import AccurateTimer from '@electron/helpers/accurateTimer';
+
+// Import DB Controllers
+import { getBatchRecordingData } from '@controllers/recordingDBController';
+
+/// DB Related IPCs ///
 
 // Retrieve the numOfRecentExperiment most recent experiments from DB
 ipcMain.handle(
@@ -30,23 +35,19 @@ ipcMain.on('db:get-experiment-settings', async (_event, id) => {
 });
 
 // Get all the recording data
-ipcMain.handle('db:get-recordings', async (_event, data) => {
-  const mainWindow = BrowserWindow.getAllWindows()[0];
+ipcMain.on('db:get-recordings', async (event) => {
+  // Stream data from database function
+  let offset = 0;
+  const timer = new AccurateTimer(async () => {
+    const data = await getBatchRecordingData(20, offset);
+    console.log(data);
 
-  console.log(data);
-  const myData = await Recording.findAll({ raw: true, limit: 5000 });
-  if (myData) {
-    myData.forEach((record: any) => {
-      const data = record.value.split(',');
-      const outputArr = [
-        parseFloat(data[0]),
-        parseFloat(data[1]),
-        parseFloat(data[2]),
-        parseFloat(data[3]),
-        parseFloat(data[4]),
-      ];
-      mainWindow.webContents.send('data:nirs-reader', outputArr);
-      console.log(outputArr);
-    });
-  }
+    if (data.length === 0) {
+      timer.stop();
+    }
+    console.log(Date.now());
+    event.reply('data:nirs-reader-review', data);
+    offset += 100;
+  }, 200);
+  timer.start();
 });

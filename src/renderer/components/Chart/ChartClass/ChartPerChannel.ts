@@ -76,7 +76,7 @@ class ChartPerChannel {
 
       chart
         .getDefaultAxisX()
-        .setInterval(0, 20000.0)
+        .setInterval(0, 20.0)
         .setScrollStrategy(AxisScrollStrategies.progressive);
 
       // Only display X ticks for bottom chart.

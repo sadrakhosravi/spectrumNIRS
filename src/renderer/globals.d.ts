@@ -15,4 +15,8 @@ declare namespace api {
   // DB functions
   function getRecentExperiments(numOfExp: number): Promise<Array<Object>>;
   function createNewExperiment(data: Object): Promise<Boolean>;
+  function getRecording(): void;
+
+  // IPC Renderer Functions
+  function removeNIRSDataListener(): void;
 }

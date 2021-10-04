@@ -1,4 +1,5 @@
 const { ipcRenderer, contextBridge } = require('electron');
+const electron = require('electron');
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {
@@ -9,12 +10,12 @@ contextBridge.exposeInMainWorld('api', {
   invoke: ipcRenderer.invoke,
   removeListener: ipcRenderer.removeListener,
 
-  // Window functions
+  /* Window functions */
   minimize: () => ipcRenderer.send('window:minimize'),
   restore: () => ipcRenderer.send('window:restore'),
   close: () => ipcRenderer.send('window:close'),
 
-  // Record functions
+  /* Record functions */
   sendRecordState: (state) => {
     ipcRenderer.send(`record:${state}`);
   },
@@ -31,5 +32,16 @@ contextBridge.exposeInMainWorld('api', {
       'db:get-recent-experiments',
       numOfExperiments
     );
+  },
+
+  // get recording data from the database
+  getRecording: () => {
+    ipcRenderer.send('db:get-recordings');
+  },
+
+  /* IPC Renderer functions */
+  removeNIRSDataListener: () => {
+    ipcRenderer.removeAllListeners('data:nirs-reader');
+    ipcRenderer.removeAllListeners('data:nirs-reader-review');
   },
 });

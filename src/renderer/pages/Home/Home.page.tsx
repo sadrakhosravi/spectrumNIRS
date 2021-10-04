@@ -11,6 +11,9 @@ import RecentProjectsContainer from './RecentProjects/RecentProjectsContainer.co
 import IconButtons from './IconButtons/IconButtons.component';
 import NewExperiment from './NewExperiment/NewExperiment.component';
 
+// Hooks
+import useLoadingState from '@hooks/useLoadingState.hook';
+
 // Redux
 import { openModal } from '@redux/ModalStateSlice';
 
@@ -19,6 +22,9 @@ import { ModalConstants } from 'renderer/constants/Constants';
 
 const HomePage = () => {
   const dispatch = useDispatch();
+
+  // Set the loading state to false on component load
+  useLoadingState(false);
 
   return (
     <div className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">

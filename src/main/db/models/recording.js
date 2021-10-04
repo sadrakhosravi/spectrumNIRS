@@ -1,4 +1,5 @@
 'use strict';
+const { timeStamp } = require('console');
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Recording extends Model {
@@ -18,8 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       value: DataTypes.STRING,
     },
+
     {
       sequelize,
+      timestamps: false,
       modelName: 'Recording',
     }
   );
