@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-const removeListener = window.api.removeListener;
 
 /**
  * Get the x most recent experiments
@@ -25,8 +24,7 @@ const useGetRecentExperiments: (
 
     return () => {
       // Cleanup - remove listeners
-      removeListener('db:get-recent-experiments', () => {});
-      removeListener('db:recent-experiments', () => {});
+      window.api.removeRecentExperimentEventListeners();
     };
   }, []);
 

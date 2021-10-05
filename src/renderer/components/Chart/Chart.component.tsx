@@ -2,28 +2,37 @@ import React, { useEffect, useRef } from 'react';
 
 // Components
 import ChartChannelTitle from '@chart/ChartChannelTitle/ChartChannelTitle.component';
-import ChartClass from '@chart/ChartClass/ChartClass';
+import LCJSChart from '@chart/ChartClass/Chart';
+
+// Constants
+import { ChartType } from '@constants/Constants';
 
 // State
 import { useSelector } from 'react-redux';
 
+interface IProps {
+  type: ChartType.RECORD | ChartType.REVIEW;
+}
+
 declare const window: any;
 
 // Prepares and enders the chart
-const Chart: React.FC<{ isReview: boolean }> = ({ isReview = false }) => {
+const Chart: React.FC<IProps> = ({ type }) => {
   const recordState = useSelector((state: any) => state.recordState.value);
   const containerID = 'chart';
-
   const chartRef = useRef(undefined);
 
   useEffect(() => {
     // Create chart, series and any other static components.
     console.log('create chart');
-
+    const channels = ['O2Hb', 'HHb', 'THb', 'TOI'];
     // Store references to chart components.
-    const chart: any = new ChartClass(4, isReview);
-    !isReview && chart.recordNIRSData();
+    const chart: any = new LCJSChart(channels, type);
 
+    // Attach event listeners
+    type === ChartType.RECORD && chart.recordData();
+
+    // Keep a ref to the chart
     chartRef.current = chart;
 
     // Return function that will destroy the chart when component is unmounted.
@@ -35,29 +44,32 @@ const Chart: React.FC<{ isReview: boolean }> = ({ isReview = false }) => {
       delete window.chart;
       delete window.ChartClass;
 
-      // chartRef.current = undefined;
+      chartRef.current = undefined;
     };
   }, []);
 
+  // Clear series if recording has restarted
   useEffect(() => {
     if (recordState === 'recording') {
       const chart: any = chartRef.current;
 
-      chart.Series.forEach((series: any) => {
+      // Clear all series
+      chart.series.forEach((series: any) => {
         series.clear();
       });
     }
   }, [recordState]);
 
   // If its the review tab
-  if (isReview) {
+  if (type === ChartType.REVIEW) {
     const handleKeyDown = async (event: any) => {
       const chart: any = chartRef.current;
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         const currentInterval = chart.charts[0].getDefaultAxisX().getInterval();
         const test = await window.api.getRecordingOnKeyDown(currentInterval);
-        chart.reviewNIRSData(test);
+        chart.reviewData(test);
 
+        console.log(test);
         console.log(currentInterval);
       }
     };

@@ -3,12 +3,8 @@ const electron = require('electron');
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {
-  send: ipcRenderer.send,
-  on: (channel, func) => {
-    ipcRenderer.on(channel, (event, ...args) => func(...args));
-  },
-  invoke: ipcRenderer.invoke,
-  removeListener: ipcRenderer.removeListener,
+  // Method for removing listeners if needed
+  removeAllListener: ipcRenderer.removeAllListeners,
 
   /* Window functions */
   minimize: () => ipcRenderer.send('window:minimize'),
@@ -16,6 +12,10 @@ contextBridge.exposeInMainWorld('api', {
   close: () => ipcRenderer.send('window:close'),
 
   /* Record functions */
+  getRecordingData: (func) => {
+    ipcRenderer.on('data:reader-record', (event, ...args) => func(...args));
+  },
+
   sendRecordState: (state) => {
     ipcRenderer.send(`record:${state}`);
   },
@@ -35,7 +35,7 @@ contextBridge.exposeInMainWorld('api', {
   },
 
   // get all recording data from the database
-  getRecording: () => {
+  getRecordingDataFromDB: () => {
     ipcRenderer.send('db:get-recordings');
   },
 
@@ -44,9 +44,17 @@ contextBridge.exposeInMainWorld('api', {
     return await ipcRenderer.invoke('db:get-recording-interval', interval);
   },
 
-  /* IPC Renderer functions */
-  removeNIRSDataListener: () => {
-    ipcRenderer.removeAllListeners('data:nirs-reader');
-    ipcRenderer.removeAllListeners('data:nirs-reader-review');
+  /* IPC renderer functions */
+  removeChartEventListeners: () => {
+    ipcRenderer.removeAllListeners('data:reader-record');
+    ipcRenderer.removeAllListeners('db:get-recording-interval');
+  },
+
+  /* Home page event listener cleanup */
+  removeHomePageEventListeners: () => {},
+
+  /* Other event cleanup */
+  removeRecentExperimentEventListeners: () => {
+    ipcRenderer.removeAllListeners('db:get-recent-experiments');
   },
 });

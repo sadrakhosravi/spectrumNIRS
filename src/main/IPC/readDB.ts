@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { Experiment, Recording } from '@electron/db/models/index';
 
-const { Op } = require('sequelize');
+// const { Op } = require('sequelize');
 
 // Helpers
 import AccurateTimer from '@electron/helpers/accurateTimer';
@@ -61,5 +61,5 @@ ipcMain.handle('db:get-recording-interval', async (_event, interval) => {
   console.log('Got the request');
   console.log(interval);
 
-  return await Recording.findAll({ raw: true });
+  return await Recording.findAll({ raw: true, limit: 500 });
 });

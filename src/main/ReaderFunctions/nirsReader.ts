@@ -13,6 +13,8 @@ const { spawn } = require('child_process'); // Spawns a child process (NIRSReade
 let rl: any;
 let readUSBData: any;
 let lastTimeSequence = 0;
+let timeSequence = 0; // timeSequence in centiseconds
+let outputArr: Array<any> = []; // Variable before starting to read data
 
 // Spawned processes array to keep track.
 const spawnedProcesses: any[] = [];
@@ -40,9 +42,8 @@ const start = (prevTime = 0) => {
   // Push the spawned process to the spawnedProcesses array to keep track of them.
   spawnedProcesses.push(readUSBData);
 
-  // Variable before starting to read data
-  let timeSequence = 0; // timeSequence in centiseconds
-  let outputArr: Array<any> = [];
+  // Count variable to keep track of the readline loop
+  let count = 0;
 
   // Read each line from reader.exe stdout.
   rl = readline
@@ -57,6 +58,12 @@ const start = (prevTime = 0) => {
       // Time Sequence - starts from 0ms
       timeSequence += prevTime;
 
+      // Reset the previous time
+      if (count === 0) {
+        prevTime = 0;
+        count = 2;
+      }
+
       // Prepare an array of data
       const _outputArr = [
         timeSequence / 100,
@@ -68,9 +75,9 @@ const start = (prevTime = 0) => {
 
       outputArr.push(_outputArr);
 
-      if (outputArr.length === 10) {
+      if (outputArr.length === 5) {
         // Send the data to be graphed to the renderer
-        mainWindow.webContents.send('data:nirs-reader', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
+        mainWindow.webContents.send('data:reader-record', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
         outputArr = [];
       }
 
@@ -80,11 +87,11 @@ const start = (prevTime = 0) => {
       // Insert the all data to the database
       insertRecordingData(data.join(','));
 
-      // Save the last time sequence
-      lastTimeSequence = timeSequence;
-
       // Last Step: increment the time sequence +10ms = 1unit (Centiseconds)
       timeSequence += 1;
+
+      // Save the last time sequence
+      lastTimeSequence = timeSequence;
     });
 
   // Log if rl closes
@@ -101,6 +108,10 @@ const stop = () => {
   rl.close();
   rl.removeAllListeners();
   rl = undefined;
+
+  // Reset the timeSequence
+  timeSequence = 0;
+  outputArr = [];
 
   // Kill all spawned processes
   spawnedProcesses.forEach((process) => process.kill());
@@ -119,6 +130,7 @@ const pause = (): void => {
  * Restarts reading from the sensor. Calls the start function.
  */
 const continueReading = (): void => {
+  console.log(lastTimeSequence);
   start(lastTimeSequence);
 };
 

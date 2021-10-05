@@ -14,6 +14,7 @@ import { changeAppState } from '@redux/AppStateSlice';
 // Constants
 import { AppState } from '@constants/Constants';
 import { isLoading } from '@redux/IsLoadingSlice';
+import { closeModal } from '@redux/ModalStateSlice';
 
 /**
  * Renders the new experiment form an allows user to create or cancel.
@@ -30,6 +31,8 @@ const NewExperimentForm = () => {
 
     // Create a new experiment and await the result
     const newExperiment = await window.api.createNewExperiment(data);
+
+    dispatch(closeModal());
 
     // Change app state if experiment is created
     newExperiment && dispatch(changeAppState(AppState.RECORD));

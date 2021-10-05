@@ -20,7 +20,8 @@ const IconButton = (props: any) => {
   const buttonBackground = darker
     ? `bg-dark hover:bg-grey2`
     : `bg-grey2 hover:bg-dark`;
-  const activeStyle = isActive && 'bg-accent hover:bg-accent-hover';
+  const activeStyle =
+    isActive && 'bg-accent hover:bg-accent-hover active:bg-accent';
   const disabledStyle =
     disabled && 'bg-grey2 hover:bg-grey2 cursor-not-allowed';
 
@@ -30,7 +31,7 @@ const IconButton = (props: any) => {
         type="button"
         className={`${disabledStyle} ${disabled || buttonBackground} ${
           disabled || activeStyle
-        } px-4 w-full py-2 grid grid-flow-col auto-cols-max items-center transition relative duration-100 active:bg-accent `}
+        } px-4 w-full py-2 grid grid-flow-col auto-cols-max items-center transition relative duration-100`}
         onClick={onClick}
       >
         <IconText text={text} icon={icon} />

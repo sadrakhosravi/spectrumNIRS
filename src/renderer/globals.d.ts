@@ -11,13 +11,18 @@ declare namespace api {
 
   // Record functions
   function sendRecordState(state: string): void;
+  function getRecordingData(func: (data: any) => void): void;
 
   // DB functions
   function getRecentExperiments(numOfExp: number): Promise<Array<Object>>;
   function createNewExperiment(data: Object): Promise<Boolean>;
-  function getRecording(): void;
+  function getRecordingDataFromDB(): void;
   function getRecordingOnKeyDown(interval: object): Promise<Array<Object>>;
 
   // IPC Renderer Functions
-  function removeNIRSDataListener(): void;
+  function removeChartEventListeners(): void;
+
+  // Remove Event Listeners
+  function removeHomePageEventListeners(): void;
+  function removeRecentExperimentEventListeners(): void;
 }
