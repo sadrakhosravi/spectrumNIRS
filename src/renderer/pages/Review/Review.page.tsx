@@ -10,7 +10,7 @@ import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.compone
 
 const Review = () => {
   useEffect(() => {
-    window.api.getRecording();
+    // window.api.getRecording();
   });
 
   return (
@@ -19,7 +19,7 @@ const Review = () => {
       <div className="grid grid-cols-12 grid-rows-3 custom-height gap-4">
         <div className="col-span-10 h-full row-span-3">
           <ChartToolbar />
-          <Chart />
+          <Chart isReview={true} />
         </div>
         <div className="col-span-2 mr-3 row-span-3">
           <WidgetsContainer />

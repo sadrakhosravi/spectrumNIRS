@@ -21,10 +21,12 @@ class ChartPerChannel {
   channelCount: any;
   chartRowSize: number;
   charts: any[];
+  isReview: boolean;
 
-  constructor(dashboard: any, channelCount: any) {
+  constructor(dashboard: any, channelCount: any, isReview: boolean) {
     this.dashboard = dashboard;
     this.channelCount = channelCount;
+    this.isReview = isReview;
     this.chartRowSize = 2; //Change it later to dynamically adjust.
 
     this.charts = []; //An array containing each chart object.
@@ -32,10 +34,17 @@ class ChartPerChannel {
     this.createChartforEachChannel();
   }
 
+  // Return all charts that was created
   getCharts() {
     return this.charts;
   }
 
+  // Get the current interval
+  getInterval() {
+    return this.charts[0].getDefaultAxisX().getInterval();
+  }
+
+  // Create chart for each channel given
   createChartforEachChannel() {
     //Create chart for each channel
     for (let i = 0; i < this.channelCount; i++) {
@@ -74,19 +83,34 @@ class ChartPerChannel {
         this.chartRowSize += 2;
       }
 
-      chart
-        .getDefaultAxisX()
-        .setInterval(0, 20.0)
-        .setScrollStrategy(AxisScrollStrategies.progressive);
+      // Check if the chart is being initialized in the review tab
+      if (this.isReview) {
+        chart
+          .getDefaultAxisX()
+          .setInterval(0, 20.0)
+          .setScrollStrategy(AxisScrollStrategies.regressive);
+      } else {
+        chart
+          .getDefaultAxisX()
+          .setInterval(0, 20.0)
+          .setScrollStrategy(AxisScrollStrategies.progressive);
+      }
 
       // Only display X ticks for bottom chart.
       if (i !== this.channelCount - 1) {
         chart.getDefaultAxisX().setTickStrategy(AxisTickStrategies.Empty);
       } else {
-        chart
-          .getDefaultAxisX()
-          .setTitle('Seconds')
-          .setScrollStrategy(AxisScrollStrategies.progressive);
+        if (this.isReview) {
+          chart
+            .getDefaultAxisX()
+            .setTitle('Seconds')
+            .setScrollStrategy(AxisScrollStrategies.regressive);
+        } else {
+          chart
+            .getDefaultAxisX()
+            .setTitle('Seconds')
+            .setScrollStrategy(AxisScrollStrategies.progressive);
+        }
       }
 
       // Sync X axes of stacked charts by adding an invisible tick to each Y axis with preset length.

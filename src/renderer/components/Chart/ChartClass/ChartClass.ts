@@ -12,21 +12,17 @@ const on = window.api.on;
 
 class ChartClass {
   channelCount: number;
-
   seriesLineColorArr: string[];
-
   dashboard: any;
-
   charts: any;
-
   Series: any;
-
   ChartSyncXAxis: any;
-
   seriesLength: any;
+  isReview: boolean;
 
-  constructor(channelCount = 4) {
+  constructor(channelCount = 4, isReview = false) {
     this.channelCount = channelCount;
+    this.isReview = isReview;
     this.seriesLineColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors: ['red','yellow','cyan', 'white']
 
     // Create dashboard
@@ -34,7 +30,11 @@ class ChartClass {
     this.dashboard = this.dashboard.createDashboard();
 
     // Charts for each channel
-    this.charts = new ChartPerChannel(this.dashboard, this.channelCount);
+    this.charts = new ChartPerChannel(
+      this.dashboard,
+      this.channelCount,
+      this.isReview
+    );
     this.charts = this.charts.getCharts();
 
     // Series
@@ -48,6 +48,7 @@ class ChartClass {
       this.channelCount
     );
 
+    // Get series length
     this.seriesLength = this.Series.length;
 
     console.log('Class created');
@@ -63,7 +64,8 @@ class ChartClass {
     window.api.removeNIRSDataListener();
   }
 
-  addNIRSData() {
+  // Listens for data for the record page
+  recordNIRSData() {
     on('data:nirs-reader', (data: any) => {
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 10 reading lines
       data.forEach((line: any) => {
@@ -72,18 +74,18 @@ class ChartClass {
         }
       });
     });
+  }
 
-    on('data:nirs-reader-review', (data: any) => {
-      // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI'
-      data.forEach((line: any) => {
-        for (let i = 0; i < this.seriesLength; i++) {
-          const data = line.value.split(',');
-          this.Series[i].add({
-            x: parseFloat(data[0]),
-            y: parseFloat(data[i + 1]),
-          });
-        }
-      });
+  // Listens for events of the review page
+  reviewNIRSData(data: Array<Object>) {
+    console.log(data);
+    // Loads all the data
+    data.forEach((line: any) => {
+      const data = line.value.split(',');
+      this.Series[0].add({ x: data[0], y: parseFloat(data[1]) });
+      this.Series[1].add({ x: data[0], y: parseFloat(data[2]) });
+      this.Series[2].add({ x: data[0], y: parseFloat(data[3]) });
+      this.Series[3].add({ x: data[0], y: parseFloat(data[4]) });
     });
   }
 }

@@ -1,22 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const DateField = (props: any) => {
-  // Get today's Date
-  const date = new Date();
-  const month =
-    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+  const [date, setDate] = useState('2021-01-01');
 
-  let dateToday = `${date.getFullYear()}-${month}-${date.getDate()}`;
+  useEffect(() => {
+    // Get today's Date
+    const date = new Date();
+    const month =
+      date.getMonth() + 1 < 10
+        ? `0${date.getMonth() + 1}`
+        : date.getMonth() + 1;
+
+    const day = date.getDate() < 10 ? `0${date.getDate() + 1}` : date.getDate();
+
+    setDate(`${date.getFullYear()}-${month}-${day}`);
+  }, []);
 
   const handleDateChange = (event: any) => {
-    dateToday = event.target.value;
+    setDate(event.target.value);
   };
 
   return (
     <input
       type="date"
       min="2015-01-01"
-      value={dateToday}
+      value={date}
       {...props.register}
       onChange={(e) => {
         handleDateChange(e);

@@ -61,7 +61,7 @@ const NewExperimentForm = () => {
         <InputField register={register('patient.name', { required: true })} />
       </label>
       <label className="text-sm inline-block w-1/2 pl-2 ">
-        <span className="block pb-1">DOB:</span>
+        <span className="block pb-1">Date of Birth:</span>
         <DateField register={register('patient.dob', { required: true })} />
       </label>
       <label className="text-sm inline-block w-full mt-2">

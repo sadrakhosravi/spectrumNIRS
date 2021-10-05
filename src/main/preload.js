@@ -34,9 +34,14 @@ contextBridge.exposeInMainWorld('api', {
     );
   },
 
-  // get recording data from the database
+  // get all recording data from the database
   getRecording: () => {
     ipcRenderer.send('db:get-recordings');
+  },
+
+  // Get recording based on arrow keys
+  getRecordingOnKeyDown: async (interval) => {
+    return await ipcRenderer.invoke('db:get-recording-interval', interval);
   },
 
   /* IPC Renderer functions */

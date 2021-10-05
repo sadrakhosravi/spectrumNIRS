@@ -16,6 +16,7 @@ declare namespace api {
   function getRecentExperiments(numOfExp: number): Promise<Array<Object>>;
   function createNewExperiment(data: Object): Promise<Boolean>;
   function getRecording(): void;
+  function getRecordingOnKeyDown(interval: object): Promise<Array<Object>>;
 
   // IPC Renderer Functions
   function removeNIRSDataListener(): void;
