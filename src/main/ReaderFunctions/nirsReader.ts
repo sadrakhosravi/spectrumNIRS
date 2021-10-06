@@ -15,7 +15,7 @@ let readUSBData: any;
 let lastTimeSequence = 0;
 let timeSequence = 0; // timeSequence in centiseconds
 let outputArr: Array<any> = []; // Variable before starting to read data
-
+let patientId = 0;
 // Spawned processes array to keep track.
 const spawnedProcesses: any[] = [];
 
@@ -24,8 +24,9 @@ const spawnedProcesses: any[] = [];
  * Send the parsed data through IPC.
  * @param prevTime - Last timestamp (used for pause and continue functions only)
  */
-const start = (prevTime = 0) => {
+const start = (prevTime = 0, patientId: number) => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
+  patientId = patientId;
 
   // Spawn NIRSReader.exe
   readUSBData = spawn(path.join(__dirname, '../Readers/Test1.exe'), [
@@ -85,7 +86,7 @@ const start = (prevTime = 0) => {
       data[0] = (timeSequence / 100).toString();
 
       // Insert the all data to the database
-      insertRecordingData(data.join(','));
+      insertRecordingData(data.join(','), patientId);
 
       // Last Step: increment the time sequence +10ms = 1unit (Centiseconds)
       timeSequence += 1;
@@ -131,7 +132,7 @@ const pause = (): void => {
  */
 const continueReading = (): void => {
   console.log(lastTimeSequence);
-  start(lastTimeSequence);
+  start(lastTimeSequence, patientId);
 };
 
 // Final object to be exported

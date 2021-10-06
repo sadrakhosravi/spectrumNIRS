@@ -41,11 +41,7 @@ const RecordPauseButtons = () => {
   };
 
   // Send record state state to ipcMain
-  useEffect(() => {
-    // Send ipc message if record state is not idle.
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    recordState !== 'idle' && window.api.sendRecordState(recordState);
-  }, [recordState]);
+  useEffect(() => {}, [recordState]);
 
   // Set button's styles based on the state value.
   switch (recordState) {

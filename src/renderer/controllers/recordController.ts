@@ -10,7 +10,7 @@ export const newRecording = () => {
   // Check if there is an experiment
   if (experimentData.value.currentExperiment.name) {
     const { currentPatient } = experimentData.value;
-    console.log(currentPatient);
+    const patientId = currentPatient.id;
 
     // Check record state and decide accordingly
     if (recordState.value !== 'idle' && recordState.value !== 'stop') {
@@ -18,6 +18,7 @@ export const newRecording = () => {
     } else {
       dispatch(changeRecordState('recording'));
     }
+    startRecording(patientId);
   }
 };
 
@@ -29,4 +30,9 @@ export const pauseRecording = () => {
   recordState.value === 'pause'
     ? dispatch(changeRecordState('continue'))
     : dispatch(changeRecordState('pause'));
+};
+
+// Send the record state along with the patient id
+export const startRecording = (patientId: number) => {
+  window.api.sendRecordState(store.getState().recordState.value, patientId);
 };

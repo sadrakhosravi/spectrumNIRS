@@ -15,9 +15,9 @@ contextBridge.exposeInMainWorld('api', {
   getRecordingData: (func) => {
     ipcRenderer.on('data:reader-record', (event, ...args) => func(...args));
   },
-
-  sendRecordState: (state) => {
-    ipcRenderer.send(`record:${state}`);
+  // Send record state along with the patient Id to create an associated record
+  sendRecordState: (state, patientId) => {
+    ipcRenderer.send(`record:${state}`, patientId);
   },
 
   /* DB functions */

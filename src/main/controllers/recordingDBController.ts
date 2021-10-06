@@ -2,10 +2,12 @@ import { Recording } from '@db/models/';
 
 // Insert recording data
 export const insertRecordingData = async (
-  recordingData: Object
+  recordingData: Object,
+  patientId: number
 ): Promise<void> => {
   await Recording.create({
     value: recordingData,
+    patientId,
   });
 };
 

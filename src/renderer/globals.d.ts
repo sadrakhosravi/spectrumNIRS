@@ -10,7 +10,7 @@ declare namespace api {
   function close(): void;
 
   // Record functions
-  function sendRecordState(state: string): void;
+  function sendRecordState(state: string, patientId: number): void;
   function getRecordingData(func: (data: any) => void): void;
 
   // DB functions

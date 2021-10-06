@@ -14,8 +14,8 @@ import {
 let isPaused = false;
 
 // Recording state
-ipcMain.on('record:recording', () => {
-  start(); // All necessary functionality of reading NIRS sensor data.
+ipcMain.on('record:recording', (_event, patientId: number) => {
+  start(0, patientId); // All necessary functionality of reading NIRS sensor data.
 });
 
 // No recording/idle state
