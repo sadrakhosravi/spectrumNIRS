@@ -24,18 +24,29 @@ ipcMain.handle('db:new-experiment', async (_event, data) => {
   console.log(data);
 
   try {
-    // Create the experiment first
     const newExperiment = await Experiment.create(experiment);
 
     // If the experiment was created successfully, get its id for db relations
     patient.experiment_id = newExperiment.experiment_id;
 
-    // Create the patient next
-    await Patient.create(patient);
+    const newPatient = await Patient.create(patient);
 
-    return true;
+    // Extract only the useful information from the query
+    const currentPatient = {
+      id: newPatient.dataValues.patient_id,
+      name: newPatient.dataValues.name,
+      description: newPatient.dataValues.description,
+      dob: newPatient.dataValues.dob.toString(),
+    };
+    const currentExperiment = {
+      id: newExperiment.dataValues.experiment_id,
+      name: newExperiment.dataValues.name,
+      description: newExperiment.dataValues.description,
+      date: newExperiment.dataValues.date.toString(),
+    };
+
+    return { currentExperiment, currentPatient };
   } catch (err) {
     console.log(err);
-    return false;
   }
 });

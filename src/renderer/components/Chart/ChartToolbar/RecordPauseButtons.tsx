@@ -10,12 +10,15 @@ import RecordIcon from '@icons/record.svg';
 import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
-// Electron
+// Controller
+import { newRecording } from '@rendererController/recordController';
 
 const RecordPauseButtons = () => {
   // Record button state
   const recordState = useSelector((state: any) => state.recordState.value);
   const dispatch = useDispatch();
+
+  newRecording();
 
   useEffect(() => {
     if (recordState !== 'idle') {

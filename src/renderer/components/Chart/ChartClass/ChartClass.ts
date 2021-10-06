@@ -61,7 +61,7 @@ class ChartClass {
     this.Series = null;
     // this.ChartSyncXAxis = null;
     // eslint-disable-next-line no-underscore-dangle
-    window.api.removeNIRSDataListener();
+    window.api.removeChartEventListeners();
   }
 
   // Listens for data for the record page

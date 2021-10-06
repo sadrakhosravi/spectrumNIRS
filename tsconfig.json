@@ -16,6 +16,7 @@
       "@chart/*": ["./renderer/components/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
+      "@rendererController/*": ["./renderer/controllers/*"],
       //Electron Related Paths
       "@db/*": ["./main/db/*"],
       "@electron/*": ["./main/*"],

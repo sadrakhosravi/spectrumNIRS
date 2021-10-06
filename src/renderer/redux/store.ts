@@ -6,6 +6,7 @@ import RecordStateReducer from '@redux/RecordStateSlice';
 import SourceStateReducer from '@redux/SourceStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
 import IsLoadingReducer from '@redux/IsLoadingSlice';
+import ExperimentDataReducer from '@redux/ExperimentDataSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     sourceState: SourceStateReducer,
     modalState: ModalStateReducer,
     isLoadingState: IsLoadingReducer,
+    experimentData: ExperimentDataReducer,
   },
 });
 

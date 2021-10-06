@@ -7,15 +7,8 @@ import DateField from '@components/Form/DateField.component';
 import TextAreaField from '@components/Form/TextAreaField.component';
 import SubmitButton from '@components/Form/SubmitButton.component';
 
-// Redux
-import { useDispatch } from 'react-redux';
-import { changeAppState } from '@redux/AppStateSlice';
-
-// Constants
-import { AppState } from '@constants/Constants';
-import { isLoading } from '@redux/IsLoadingSlice';
-import { closeModal } from '@redux/ModalStateSlice';
-
+// Controllers
+import { newExperiment } from '@rendererController/experimentController';
 /**
  * Renders the new experiment form an allows user to create or cancel.
  * @returns Experiment form.
@@ -23,21 +16,8 @@ import { closeModal } from '@redux/ModalStateSlice';
 const NewExperimentForm = () => {
   const { register, handleSubmit } = useForm();
 
-  const dispatch = useDispatch();
-
   const onSubmit = async (data: any) => {
-    // Enable global loading state
-    dispatch(isLoading(true));
-
-    // Create a new experiment and await the result
-    const newExperiment = await window.api.createNewExperiment(data);
-
-    dispatch(closeModal());
-
-    // Change app state if experiment is created
-    newExperiment && dispatch(changeAppState(AppState.RECORD));
-
-    console.log(newExperiment);
+    newExperiment(data);
   };
 
   return (
