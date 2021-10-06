@@ -11,14 +11,15 @@ import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
 // Controller
-import { newRecording } from '@rendererController/recordController';
+import {
+  newRecording,
+  pauseRecording,
+} from '@rendererController/recordController';
 
 const RecordPauseButtons = () => {
   // Record button state
   const recordState = useSelector((state: any) => state.recordState.value);
   const dispatch = useDispatch();
-
-  newRecording();
 
   useEffect(() => {
     if (recordState !== 'idle') {
@@ -27,24 +28,16 @@ const RecordPauseButtons = () => {
     return () => {
       dispatch(changeRecordState('idle'));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Change the record state on click.
   const recordBtnClickHandler = () => {
-    if (recordState !== 'idle' && recordState !== 'stop') {
-      dispatch(changeRecordState('stop'));
-    } else {
-      dispatch(changeRecordState('recording'));
-    }
+    newRecording();
   };
 
   // Change the record state on click.
   const pauseBtnClickHandler = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    recordState === 'pause'
-      ? dispatch(changeRecordState('continue'))
-      : dispatch(changeRecordState('pause'));
+    pauseRecording();
   };
 
   // Send record state state to ipcMain

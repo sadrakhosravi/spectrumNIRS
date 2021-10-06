@@ -17,6 +17,7 @@
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
       "@rendererController/*": ["./renderer/controllers/*"],
+      "@interfaces/*": ["./renderer/interfaces/*"],
       //Electron Related Paths
       "@db/*": ["./main/db/*"],
       "@electron/*": ["./main/*"],

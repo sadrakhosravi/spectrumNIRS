@@ -11,7 +11,6 @@ import WindowButtons from './WindowButtons/WindowButtons.component';
 // Styles
 
 const TitleBar = () => {
-  const appState = useSelector((state: any) => state.appState.value);
   const experimentData = useSelector(
     (state: any) => state.experimentData.value
   );
@@ -29,9 +28,7 @@ const TitleBar = () => {
         </div>
       </div>
       <div>
-        {appState !== 'home' && (
-          <p className="text-center">{experimentData.currentExperiment.name}</p>
-        )}
+        <p className="text-center">{experimentData.currentExperiment.name}</p>
       </div>
       <WindowButtons />
     </header>

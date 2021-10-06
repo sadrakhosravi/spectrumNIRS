@@ -20,7 +20,7 @@ const TrayIcons = () => {
   let experimentButton = null,
     patientButton = null;
 
-  if (Object.keys(experimentData).length !== 0) {
+  if (experimentData.currentExperiment.name) {
     experimentButton = (
       <>
         <TrayIconButtons

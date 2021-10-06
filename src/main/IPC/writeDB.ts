@@ -49,4 +49,6 @@ ipcMain.handle('db:new-experiment', async (_event, data) => {
   } catch (err) {
     console.log(err);
   }
+
+  return false;
 });
