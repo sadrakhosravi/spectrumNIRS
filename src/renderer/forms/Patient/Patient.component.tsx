@@ -2,19 +2,19 @@ import React from 'react';
 
 // Components
 import Modal from '@components/Modals/Modal.component';
-import NewExperimentForm from './Experiment.form';
+import PatientForm from './Patient.form';
 
 // Constants
 import { ModalConstants } from 'renderer/constants/Constants';
 
-const NewExperiment: React.FC = () => {
+const NewPatient: React.FC = () => {
   return (
-    <Modal id={ModalConstants.NEWEXPERIMENT} title="Create a New Experiment">
+    <Modal id={ModalConstants.NEWPATIENT} title="Create a New Patient">
       <div>
-        <NewExperimentForm />
+        <PatientForm />
       </div>
     </Modal>
   );
 };
 
-export default NewExperiment;
+export default NewPatient;

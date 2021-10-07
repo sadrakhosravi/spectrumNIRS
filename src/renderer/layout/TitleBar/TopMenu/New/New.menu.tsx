@@ -1,7 +1,10 @@
 import React from 'react';
 
 // Adapter
-import { openNewExperimentForm } from '@adapters/dispatchAdapter';
+import {
+  openNewExperimentForm,
+  openNewPatientForm,
+} from '@adapters/dispatchAdapter';
 
 // Headless UI menu dropdown
 import { Menu } from '@headlessui/react';
@@ -19,7 +22,7 @@ const NewMenu = () => {
       {/* Sub Menu Items */}
       <Menu.Items className="absolute w-64 mt-0 origin-bottom-left z-50 bg-grey3 shadow-xl py-2">
         <SubMenuItem text="Experiment" onClick={openNewExperimentForm} />
-        <SubMenuItem text="Patient" />
+        <SubMenuItem text="Patient" onClick={openNewPatientForm} />
         <SubMenuItem text="Recording" />
       </Menu.Items>
     </Menu>

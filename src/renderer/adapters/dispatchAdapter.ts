@@ -10,3 +10,7 @@ const dispatch = store.dispatch;
 export const openNewExperimentForm = () => {
   dispatch(openModal(ModalConstants.NEWEXPERIMENT));
 };
+
+export const openNewPatientForm = () => {
+  dispatch(openModal(ModalConstants.NEWPATIENT));
+};

@@ -8,6 +8,7 @@ export enum AppState {
 // Available modals to open
 export enum ModalConstants {
   NEWEXPERIMENT = 'new-experiment',
+  NEWPATIENT = 'new-patient',
   EXPERIMENTSETTINGS = 'experiment-settings',
 }
 
