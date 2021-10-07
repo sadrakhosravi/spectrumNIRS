@@ -9,6 +9,7 @@ export enum AppState {
 export enum ModalConstants {
   NEWEXPERIMENT = 'new-experiment',
   NEWPATIENT = 'new-patient',
+  NEWRECORDING = 'new-recording',
   EXPERIMENTSETTINGS = 'experiment-settings',
 }
 

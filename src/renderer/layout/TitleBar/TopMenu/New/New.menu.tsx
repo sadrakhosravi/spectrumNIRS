@@ -4,6 +4,7 @@ import React from 'react';
 import {
   openNewExperimentForm,
   openNewPatientForm,
+  openNewRecordingForm,
 } from '@adapters/dispatchAdapter';
 
 // Headless UI menu dropdown
@@ -23,7 +24,7 @@ const NewMenu = () => {
       <Menu.Items className="absolute w-64 mt-0 origin-bottom-left z-50 bg-grey3 shadow-xl py-2">
         <SubMenuItem text="Experiment" onClick={openNewExperimentForm} />
         <SubMenuItem text="Patient" onClick={openNewPatientForm} />
-        <SubMenuItem text="Recording" />
+        <SubMenuItem text="Recording" onClick={openNewRecordingForm} />
       </Menu.Items>
     </Menu>
   );
