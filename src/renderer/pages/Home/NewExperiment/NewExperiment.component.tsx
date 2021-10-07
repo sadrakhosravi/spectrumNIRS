@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Components
-import Modal from '@components/Modal/Modal.component';
+import Modal from '@components/Modals/Modal.component';
 import NewExperimentForm from './NewExperimentForm.component';
 
 // Constants

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 // Components
-import Modal from '@components/Modal/Modal.component';
+import Modal from '@components/Modals/Modal.component';
 import { Tab } from '@headlessui/react';
 import TabsTitle from './Tabs/TabsTitle.component';
 

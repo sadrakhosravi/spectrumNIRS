@@ -2,7 +2,7 @@ import React from 'react';
 
 interface IProps {
   icon: string;
-  text: string;
+  text?: string;
   large?: boolean;
 }
 
@@ -14,15 +14,15 @@ const IconText: React.FC<IProps> = (props) => {
 
   return (
     <div className="grid items-center grid-flow-col auto-cols-max">
-      <span className="mr-2 inline-block">
+      <span className={`${text && 'mr-2'} inline-block"`}>
         <img
           className="transition duration-200"
-          width={iconSize}
+          width={text ? iconSize : '32rem'}
           src={icon}
           alt="Icon"
         />
       </span>
-      <span className={`${textSize} inline-block`}>{text}</span>
+      {text && <span className={`${textSize} inline-block`}>{text}</span>}
     </div>
   );
 };

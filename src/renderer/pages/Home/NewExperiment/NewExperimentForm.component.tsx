@@ -8,7 +8,7 @@ import TextAreaField from '@components/Form/TextAreaField.component';
 import SubmitButton from '@components/Form/SubmitButton.component';
 
 // Controllers
-import { newExperiment } from '@rendererController/experimentController';
+import { newExperiment } from '@adapters/experimentAdapter';
 /**
  * Renders the new experiment form an allows user to create or cancel.
  * @returns Experiment form.

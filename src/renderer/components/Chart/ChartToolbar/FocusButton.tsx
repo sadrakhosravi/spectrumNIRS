@@ -1,13 +1,15 @@
 import React from 'react';
 
 // Components
-import IconButton from '@components/IconButton/IconButton.component';
+import IconButton from '@components/Buttons/IconButton.component';
 
 // Icons
 import FocusModeIcon from '@icons/focus-mode.svg';
+import withTooltip from '@components/hoc/withTooltip.hoc';
+const FocusButtonComp = withTooltip(IconButton, 'Focus Mode');
 
 const FocusButton = () => {
-  return <IconButton text="Focus Mode" icon={FocusModeIcon} />;
+  return <FocusButtonComp icon={FocusModeIcon} />;
 };
 
 export default FocusButton;

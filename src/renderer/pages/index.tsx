@@ -11,7 +11,7 @@ import HomePage from '@pages/Home/Home.page';
 import RecordPage from '@pages/Record/Record.page';
 import ReviewPage from '@pages/Review/Review.page';
 import RouteHandler from './RouteHandler';
-import IsLoadingModal from '@components/Modal/LoadingModal.component';
+import IsLoadingModal from '@components/Modals/LoadingModal.component';
 
 const PageRouter: React.FC = () => {
   return (

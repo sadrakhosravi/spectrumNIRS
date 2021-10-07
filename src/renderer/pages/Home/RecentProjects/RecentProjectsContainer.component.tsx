@@ -15,9 +15,9 @@ const RecentProjectsContainer = () => {
   ));
 
   return (
-    <div className="bg-grey1 max-h-4/6 h-4/6 p-6 ">
+    <div className="bg-grey1 max-h-4/6 h-4/6 p-6 rounded-md">
       <input
-        className="bg-light text-dark px-3 py-1 w-full placeholder-grey1 mb-5"
+        className="bg-light text-dark px-3 py-1 w-full placeholder-grey1 mb-5 rounded-sm"
         placeholder="Search for a recent project ..."
       />
       {recentExpOutput}

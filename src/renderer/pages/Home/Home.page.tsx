@@ -8,7 +8,7 @@ import OpenFileIcon from '@icons/open-file.svg';
 // Components
 import HeadingText from './HeadingText/HeadingText.component';
 import RecentProjectsContainer from './RecentProjects/RecentProjectsContainer.component';
-import IconButtons from './IconButtons/IconButtons.component';
+import LargeIconTextButton from '@components/Buttons/LargeIconTextButton.component';
 import NewExperiment from './NewExperiment/NewExperiment.component';
 
 // Hooks
@@ -35,7 +35,7 @@ const HomePage = () => {
           <RecentProjectsContainer />
         </div>
         <div className="col-span-2">
-          <IconButtons
+          <LargeIconTextButton
             icon={NewFileIcon}
             title="New Recording"
             description="Create a new NIRS recording"
@@ -43,7 +43,7 @@ const HomePage = () => {
               dispatch(openModal(ModalConstants.NEWEXPERIMENT));
             }}
           />
-          <IconButtons
+          <LargeIconTextButton
             icon={OpenFileIcon}
             title="Open Recording"
             description="Open a recording file or project"

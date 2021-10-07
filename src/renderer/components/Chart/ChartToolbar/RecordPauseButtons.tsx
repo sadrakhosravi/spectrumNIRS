@@ -3,18 +3,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Components
-import IconButton from '@components/IconButton/IconButton.component';
+import IconTextButton from '@components/Buttons/IconTextButton.component';
 
 // Icons
 import RecordIcon from '@icons/record.svg';
 import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
-// Controller
-import {
-  newRecording,
-  pauseRecording,
-} from '@rendererController/recordController';
+// HOC
+import withTooltip from '@hoc/withTooltip.hoc';
+const PauseButton = withTooltip(IconTextButton, 'Start a recording first');
+
+// Adapter
+import { newRecording, pauseRecording } from '@adapters/recordAdapter';
 
 const RecordPauseButtons = () => {
   // Record button state
@@ -50,21 +51,19 @@ const RecordPauseButtons = () => {
     case 'stop':
       return (
         <>
-          <IconButton
+          <IconTextButton
             text="Record"
             icon={RecordIcon}
             darker
             onClick={recordBtnClickHandler}
             isActive={false}
           />
-          <IconButton
+          <PauseButton
             text="Pause"
             icon={PauseIcon}
             darker={false}
             isActive={false}
             disabled
-            tooltip
-            tooltipText="Start a recording first"
           />
         </>
       );
@@ -72,14 +71,14 @@ const RecordPauseButtons = () => {
     case 'continue':
       return (
         <>
-          <IconButton
+          <IconTextButton
             text="Stop"
             icon={StopIcon}
             darker
             onClick={recordBtnClickHandler}
             isActive
           />
-          <IconButton
+          <IconTextButton
             text="Pause"
             icon={PauseIcon}
             darker
@@ -91,14 +90,14 @@ const RecordPauseButtons = () => {
     case 'recording':
       return (
         <>
-          <IconButton
+          <IconTextButton
             text="Stop"
             icon={StopIcon}
             darker
             onClick={recordBtnClickHandler}
             isActive
           />
-          <IconButton
+          <IconTextButton
             text="Pause"
             icon={PauseIcon}
             darker
@@ -111,14 +110,14 @@ const RecordPauseButtons = () => {
     case 'pause':
       return (
         <>
-          <IconButton
+          <IconTextButton
             text="Stop"
             icon={StopIcon}
             darker
             onClick={recordBtnClickHandler}
             isActive
           />
-          <IconButton
+          <IconTextButton
             text="Paused"
             icon={PauseIcon}
             darker

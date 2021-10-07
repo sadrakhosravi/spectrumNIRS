@@ -12,7 +12,7 @@ interface IProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }
 
-const IconButton: React.FC<IProps> = (props) => {
+const IconTextButton: React.FC<IProps> = (props) => {
   const {
     icon,
     text,
@@ -45,4 +45,4 @@ const IconButton: React.FC<IProps> = (props) => {
   );
 };
 
-export default IconButton;
+export default IconTextButton;

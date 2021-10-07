@@ -11,7 +11,7 @@ const DateField = (props: any) => {
         ? `0${date.getMonth() + 1}`
         : date.getMonth() + 1;
 
-    const day = date.getDate() < 10 ? `0${date.getDate() + 1}` : date.getDate();
+    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
 
     setDate(`${date.getFullYear()}-${month}-${day}`);
   }, []);
@@ -23,13 +23,13 @@ const DateField = (props: any) => {
   return (
     <input
       type="date"
-      min="2015-01-01"
+      min="1900-01-01"
       value={date}
       {...props.register}
       onChange={(e) => {
         handleDateChange(e);
       }}
-      className="px-3 py-2 w-full bg-light text-dark focus:ring-2 ring-accent"
+      className="px-3 py-2 w-full bg-light text-dark focus:ring-2 ring-accent rounded-sm"
     />
   );
 };

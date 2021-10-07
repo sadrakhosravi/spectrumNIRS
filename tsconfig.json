@@ -5,6 +5,7 @@
     "baseUrl": "./src",
     "paths": {
       //React Related Paths
+      "~/*": ["../*"],
       "@assets/*": ["../assets/*"],
       "@img/*": ["../assets/img/*"],
       "@icons/*": ["../assets/icons/*"],
@@ -16,7 +17,8 @@
       "@chart/*": ["./renderer/components/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
-      "@rendererController/*": ["./renderer/controllers/*"],
+      "@hoc/*": ["./renderer/components/hoc/*"],
+      "@adapters/*": ["./renderer/adapters/*"],
       "@interfaces/*": ["./renderer/interfaces/*"],
       //Electron Related Paths
       "@db/*": ["./main/db/*"],

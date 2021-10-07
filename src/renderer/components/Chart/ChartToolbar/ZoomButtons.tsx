@@ -1,19 +1,26 @@
 import React from 'react';
 
 //Components
-import IconButton from '@components/IconButton/IconButton.component';
+import IconButton from '@components/Buttons/IconButton.component';
+
+// HOC
+import withTooltip from '@components/hoc/withTooltip.hoc';
 
 //Icons
 import ZoomInIcon from '@icons/zoom-in.svg';
 import ZoomOutIcon from '@icons/zoom-out.svg';
 import ResetZoom from '@icons/reset-zoom.svg';
 
+const ZoomInButton = withTooltip(IconButton, 'Zoom In');
+const ZoomOutButton = withTooltip(IconButton, 'Zoom Out');
+const ResetZoomButton = withTooltip(IconButton, 'Rest Zoom');
+
 const ZoomButtons = () => {
   return (
     <>
-      <IconButton text="Zoom In" icon={ZoomInIcon} />
-      <IconButton text="Zoom Out" icon={ZoomOutIcon} />
-      <IconButton text="Reset Zoom" icon={ResetZoom} />
+      <ZoomInButton icon={ZoomInIcon} />
+      <ZoomOutButton icon={ZoomOutIcon} />
+      <ResetZoomButton icon={ResetZoom} />
     </>
   );
 };
