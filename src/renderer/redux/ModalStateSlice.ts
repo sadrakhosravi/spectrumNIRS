@@ -6,14 +6,14 @@ import { createSlice } from '@reduxjs/toolkit';
 export const ModalStateSlice = createSlice({
   name: 'modalState',
   initialState: {
-    value: 0, // Which modal to open
+    value: '', // Which modal to open
   },
   reducers: {
     openModal: (state, action) => {
       state.value = action.payload;
     },
     closeModal: (state) => {
-      state.value = 0;
+      state.value = '';
     },
   },
 });

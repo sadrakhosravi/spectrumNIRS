@@ -3,10 +3,13 @@ import React from 'react';
 // Menu from headless UI
 import { Menu } from '@headlessui/react';
 
-// Renders Headless UI sub menu item
-const SubMenuItem = (props: any) => {
-  const { text, onClick } = props;
+interface IProps {
+  text: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+}
 
+// Renders Headless UI sub menu item
+const SubMenuItem = ({ text, onClick }: IProps): JSX.Element => {
   return (
     <Menu.Item>
       {({ active }) => (

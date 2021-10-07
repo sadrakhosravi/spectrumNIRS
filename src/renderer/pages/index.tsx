@@ -11,15 +11,14 @@ import HomePage from '@pages/Home/Home.page';
 import RecordPage from '@pages/Record/Record.page';
 import ReviewPage from '@pages/Review/Review.page';
 import RouteHandler from './RouteHandler';
-import IsLoadingModal from '@components/Modals/LoadingModal.component';
+import ModalsContainer from '@layout/ModalsContainer/ModalsContainer.component';
 
 const PageRouter: React.FC = () => {
   return (
     <main className="main-container">
       <div className="relative h-full">
         <Router>
-          <IsLoadingModal />
-
+          <ModalsContainer />
           <Switch>
             <Route exact path={`/${AppState.HOME}`} component={HomePage} />
             <Route exact path={`/${AppState.RECORD}`} component={RecordPage} />

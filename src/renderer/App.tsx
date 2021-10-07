@@ -3,9 +3,9 @@ import React from 'react';
 import './App.global.css';
 
 //Component import
-import TitleBar from './components/TitleBar/TitleBar.component';
-import BottomBar from './components/BottomBar/BottomBar.component';
-import MainNavigation from './components/MainNavigation/MainNavigation.component';
+import TitleBar from './layout/TitleBar/TitleBar.component';
+import BottomBar from './layout/BottomBar/BottomBar.component';
+import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 
 import PageRouter from '@pages/index';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Tooltip
-import Tooltip from '@tooltip';
+import Tooltip from '@components/Tooltip/Tooltip.component';
 
 const SettingsIconButton = (props: any) => {
   const { isActive, onClick } = props;

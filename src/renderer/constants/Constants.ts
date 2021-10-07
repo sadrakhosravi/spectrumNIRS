@@ -7,8 +7,8 @@ export enum AppState {
 
 // Available modals to open
 export enum ModalConstants {
-  NEWEXPERIMENT = '1',
-  EXPERIMENTSETTINGS = '2',
+  NEWEXPERIMENT = 'new-experiment',
+  EXPERIMENTSETTINGS = 'experiment-settings',
 }
 
 // Chart types available

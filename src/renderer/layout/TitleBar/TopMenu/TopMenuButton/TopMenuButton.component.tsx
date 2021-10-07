@@ -8,9 +8,9 @@ const TopMenuButton = (props: any) => {
   return (
     <Menu.Button className="h-full z-0 hover:bg-grey3 ">
       {({ open }) => (
-        <button type="button" className={`${open && 'bg-grey3'} px-3 h-full`}>
+        <div className={`${open && 'bg-grey3'} px-3 h-full flex items-center`}>
           {text}
-        </button>
+        </div>
       )}
     </Menu.Button>
   );
