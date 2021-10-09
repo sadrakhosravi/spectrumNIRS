@@ -7,6 +7,7 @@ import SourceStateReducer from '@redux/SourceStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
 import IsLoadingReducer from '@redux/IsLoadingSlice';
 import ExperimentDataReducer from '@redux/ExperimentDataSlice';
+import { experimentsApi } from './api/experimentsApi';
 
 const store = configureStore({
   reducer: {
@@ -16,7 +17,10 @@ const store = configureStore({
     modalState: ModalStateReducer,
     isLoadingState: IsLoadingReducer,
     experimentData: ExperimentDataReducer,
+    [experimentsApi.reducerPath]: experimentsApi.reducer,
   },
+  middleware: (getGetDefaultMiddleware) =>
+    getGetDefaultMiddleware().concat(experimentsApi.middleware),
 });
 
 export default store;

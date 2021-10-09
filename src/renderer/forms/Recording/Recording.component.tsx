@@ -5,7 +5,7 @@ import Modal from '@components/Modals/Modal.component';
 import RecordingForm from './Recording.form';
 
 // Constants
-import { ModalConstants } from 'renderer/constants/Constants';
+import { ModalConstants } from '@constants/constants';
 
 const NewRecording: React.FC = () => {
   return (

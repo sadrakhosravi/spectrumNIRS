@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { AppState } from '@constants/Constants';
+import { AppState } from '@constants/constants';
 
 interface IAction {
   payload: AppState.HOME | AppState.RECORD | AppState.REVIEW;

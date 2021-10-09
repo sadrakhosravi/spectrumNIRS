@@ -1,9 +1,10 @@
 import store from '@redux/store';
-import { AppState } from '@constants/Constants';
+import { AppState } from '@constants/constants';
 import { isLoading } from '@redux/IsLoadingSlice';
-import { closeModal } from '@redux/ModalStateSlice';
+
 import { changeAppState } from '@redux/AppStateSlice';
 import { setExperimentData } from '@redux/ExperimentDataSlice';
+import { closeModal } from '@redux/ModalStateSlice';
 
 const dispatch = store.dispatch;
 

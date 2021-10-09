@@ -17,6 +17,7 @@ ipcMain.handle(
   async (_event, numOfRecentExperiments) => {
     const experiments = await Experiment.findAll({
       limit: numOfRecentExperiments,
+      order: [['createdAt', 'DESC']],
       attributes: { exclude: ['createdAt'] },
       raw: true,
     });

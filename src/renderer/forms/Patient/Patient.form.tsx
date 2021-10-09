@@ -13,7 +13,7 @@ const PatientForm = () => {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data: any) => {
-    console.log(data);
+    console.log(data.patient.name);
   };
 
   return (

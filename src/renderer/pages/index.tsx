@@ -4,7 +4,7 @@ import React from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 // AppState Enum
-import { AppState } from 'renderer/constants/Constants';
+import { AppState } from '@constants/constants';
 
 // Containers
 import HomePage from '@pages/Home/Home.page';

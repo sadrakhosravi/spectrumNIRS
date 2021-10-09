@@ -55,6 +55,14 @@ const start = (prevTime = 0, patientId: number) => {
     .on('line', function (line: string) {
       // Split data by , into an array
       const data = line.split(',');
+      // const rawValues = [
+      //   parseFloat(data[6]), // RI 1
+      //   parseFloat(data[7]), // RI 2
+      //   parseFloat(data[8]), // RI 3
+      //   parseFloat(data[9]), // RI 4
+      //   parseFloat(data[10]), // RI 5
+      //   parseFloat(data[11]), // Baseline
+      // ];
 
       // Time Sequence - starts from 0ms
       timeSequence += prevTime;
@@ -68,10 +76,10 @@ const start = (prevTime = 0, patientId: number) => {
       // Prepare an array of data
       const _outputArr = [
         timeSequence / 100,
-        parseFloat(data[1]),
-        parseFloat(data[2]),
-        parseFloat(data[3]),
-        parseFloat(data[4]),
+        parseFloat(data[6]),
+        parseFloat(data[7]),
+        parseFloat(data[8]),
+        parseFloat(data[9]),
       ]; // [timeSequence, O2hb, HHb, tHb, TOI]
 
       outputArr.push(_outputArr);

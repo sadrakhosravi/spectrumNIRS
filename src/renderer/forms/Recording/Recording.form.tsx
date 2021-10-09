@@ -1,38 +1,52 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState } from 'react';
 
-// Components
-import InputField from '@components/Form/InputField.component';
-import DateField from '@components/Form/DateField.component';
-import TextAreaField from '@components/Form/TextAreaField.component';
-import SubmitButton from '@components/Form/SubmitButton.component';
+// Headless UI
+import { RadioGroup } from '@headlessui/react';
 
-// Controllers
+// Config file
+import deviceConfigs from '@configs/devices.json';
+
+// Icon
+import SensorIcon from '@icons/sensor.svg';
 
 const RecordingForm = () => {
-  const { register, handleSubmit } = useForm();
+  let [sensor, setSensor] = useState('');
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
-  };
+  Object.entries(deviceConfigs).forEach((device: any) => {
+    console.log(device[1].deviceName);
+  });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <h3 className="text-xl text-medium pb-3 mt-6">Patient Information</h3>
-      <label className="text-sm inline-block w-1/2 pr-2">
-        <span className="block pb-1">Patient Name:</span>
-        <InputField register={register('patient.name', { required: true })} />
-      </label>
-      <label className="text-sm inline-block w-1/2 pl-2 ">
-        <span className="block pb-1">Date of Birth (MM-DD-YYY):</span>
-        <DateField register={register('patient.dob', { required: true })} />
-      </label>
-      <label className="text-sm inline-block w-full mt-2">
-        <span className="block pb-1">Description:</span>
-        <TextAreaField register={register('patient.description')} />
-      </label>
-      <SubmitButton text={'Create a New Patient'} />
-    </form>
+    <div className="w-full px-4 py-10">
+      <div className="w-full">
+        <RadioGroup value={sensor} onChange={setSensor}>
+          <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
+          <div className="space-y-2">
+            {Object.entries(deviceConfigs).map((device: any) => (
+              <RadioGroup.Option value={device[1].deviceName}>
+                {({ checked }) => (
+                  <>
+                    <div
+                      className={`${
+                        checked && 'ring-2 ring-accent'
+                      } w-32 h-32 bg-grey2  rounded-md flex flex-col items-center justify-center`}
+                    >
+                      <img
+                        src={SensorIcon}
+                        width="48px"
+                        height="48px"
+                        alt="Sensor"
+                      />
+                      <p className="mt-2">{device[1].deviceName}</p>
+                    </div>
+                  </>
+                )}
+              </RadioGroup.Option>
+            ))}
+          </div>
+        </RadioGroup>
+      </div>
+    </div>
   );
 };
 export default RecordingForm;

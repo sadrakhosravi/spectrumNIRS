@@ -10,7 +10,7 @@ import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.compone
 import useLoadingState from '@hooks/useLoadingState.hook';
 
 // Constants
-import { ChartType } from '@constants/Constants';
+import { ChartType } from '@constants/constants';
 
 const RecordPage = () => {
   useLoadingState(false);

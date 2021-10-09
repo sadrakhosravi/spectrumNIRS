@@ -6,7 +6,7 @@ import { Tab } from '@headlessui/react';
 import TabsTitle from './Tabs/TabsTitle.component';
 
 // Constants
-import { ModalConstants } from 'renderer/constants/Constants';
+import { ModalConstants } from '@constants/constants';
 import GeneralSettings from './Tabs/GeneralSettings/GeneralSettings.component';
 
 // Hooks/Form

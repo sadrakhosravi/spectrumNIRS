@@ -2,7 +2,7 @@ import store from '@redux/store';
 import { openModal } from '@redux/ModalStateSlice';
 
 // Constants
-import { ModalConstants } from '@constants/Constants';
+import { ModalConstants } from '@constants/constants';
 
 const dispatch = store.dispatch;
 

@@ -9,7 +9,7 @@ import Chart from '@components/Chart/Chart.component';
 import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.component';
 
 // Constants
-import { ChartType } from '@constants/Constants';
+import { ChartType } from '@constants/constants';
 
 const Review = () => {
   useEffect(() => {

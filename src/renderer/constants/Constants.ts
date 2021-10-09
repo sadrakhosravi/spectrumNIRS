@@ -10,6 +10,7 @@ export enum ModalConstants {
   NEWEXPERIMENT = 'new-experiment',
   NEWPATIENT = 'new-patient',
   NEWRECORDING = 'new-recording',
+  GENERALMODAL = 'general-modal',
   EXPERIMENTSETTINGS = 'experiment-settings',
 }
 
@@ -17,4 +18,11 @@ export enum ModalConstants {
 export enum ChartType {
   RECORD = 'record',
   REVIEW = 'review',
+}
+
+// Redux Thunk status
+export enum ThunkStatus {
+  LOADING = 'loading',
+  SUCCESS = 'success',
+  FAILED = 'failed',
 }

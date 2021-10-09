@@ -14,7 +14,7 @@
       "@layout/*": ["./renderer/layout/*"],
       "@forms/*": ["./renderer/forms/*"],
       "@microComp/*": ["./renderer/components/MicroComponents/*"],
-      "@hoc/*": ["./renderer/components/hoc/*"],
+      "@hoc/*": ["./renderer/hoc/*"],
       "@chart/*": ["./renderer/components/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
@@ -29,6 +29,7 @@
       "@controllers/*": ["./main/controllers/*"],
       "@helpers/*": ["./main/helpers/*"],
       "@workers/*": ["./main/Workers/*"],
+      "@configs/*": ["./main/configs/*"],
       //Database
       //Typescript Extra
       "@constants/*": ["./renderer/constants/*"]

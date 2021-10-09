@@ -17,7 +17,7 @@ import {
 } from '@arction/lcjs';
 
 // Constants
-import { ChartType } from '@constants/Constants';
+import { ChartType } from '@constants/constants';
 
 class ChartClass {
   channelCount: number;

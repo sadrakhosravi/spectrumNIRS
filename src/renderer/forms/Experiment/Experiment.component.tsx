@@ -5,7 +5,7 @@ import Modal from '@components/Modals/Modal.component';
 import NewExperimentForm from './Experiment.form';
 
 // Constants
-import { ModalConstants } from 'renderer/constants/Constants';
+import { ModalConstants } from '@constants/constants';
 
 const NewExperiment: React.FC = () => {
   return (

@@ -5,7 +5,7 @@ import ChartChannelTitle from '@chart/ChartChannelTitle/ChartChannelTitle.compon
 import LCJSChart from '@chart/ChartClass/Chart';
 
 // Constants
-import { ChartType } from '@constants/Constants';
+import { ChartType } from '@constants/constants';
 
 // State
 import { useSelector } from 'react-redux';

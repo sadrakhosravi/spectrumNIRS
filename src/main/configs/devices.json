@@ -1,0 +1,7 @@
+{
+  "device1": {
+    "deviceName": "NIRS V6",
+    "samplingRate": 100,
+    "channels": ["O2Hb", "HHb", "THb", "TOI"]
+  }
+}
