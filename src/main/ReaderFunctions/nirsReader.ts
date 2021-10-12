@@ -29,9 +29,9 @@ const start = (prevTime = 0, patientId: number) => {
   patientId = patientId;
 
   // Spawn NIRSReader.exe
-  readUSBData = spawn(path.join(__dirname, '../Readers/Test1.exe'), [
+  readUSBData = spawn(path.join(__dirname, './nirs1/Test1.exe'), [
     'run',
-    path.join('./DataFiles'),
+    path.join('./nirs1/DataFiles'),
   ]);
   readUSBData.stderr.on('data', (data: string) => {
     console.error(`Error on loading NIRS Reader: ${data}`);
@@ -76,10 +76,10 @@ const start = (prevTime = 0, patientId: number) => {
       // Prepare an array of data
       const _outputArr = [
         timeSequence / 100,
-        parseFloat(data[6]),
-        parseFloat(data[7]),
-        parseFloat(data[8]),
-        parseFloat(data[9]),
+        parseFloat(data[1]),
+        parseFloat(data[2]),
+        parseFloat(data[3]),
+        parseFloat(data[4]),
       ]; // [timeSequence, O2hb, HHb, tHb, TOI]
 
       outputArr.push(_outputArr);

@@ -8,17 +8,19 @@ import deviceConfigs from '@configs/devices.json';
 
 // Icon
 import SensorIcon from '@icons/sensor.svg';
+import SubmitButton from '@components/Form/SubmitButton.component';
 
 const RecordingForm = () => {
-  let [sensor, setSensor] = useState('');
+  let [sensor, setSensor] = useState('NIRS V6');
 
-  Object.entries(deviceConfigs).forEach((device: any) => {
-    console.log(device[1].deviceName);
-  });
+  const handleSave = () => {
+    console.log(sensor);
+  };
 
   return (
-    <div className="w-full px-4 py-10">
+    <div className="w-full px-4 pt-2 ">
       <div className="w-full">
+        <h3 className="py-4 text-xl">Select a sensor:</h3>
         <RadioGroup value={sensor} onChange={setSensor}>
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
           <div className="space-y-2">
@@ -45,6 +47,7 @@ const RecordingForm = () => {
             ))}
           </div>
         </RadioGroup>
+        <SubmitButton text="Save" onClick={handleSave} />
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 const { ipcRenderer, contextBridge } = require('electron');
-const electron = require('electron');
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {
@@ -7,9 +6,11 @@ contextBridge.exposeInMainWorld('api', {
   removeAllListener: ipcRenderer.removeAllListeners,
 
   /* Window functions */
-  minimize: () => ipcRenderer.send('window:minimize'),
-  restore: () => ipcRenderer.send('window:restore'),
-  close: () => ipcRenderer.send('window:close'),
+  window: {
+    minimize: () => ipcRenderer.send('window:minimize'),
+    restore: () => ipcRenderer.send('window:restore'),
+    close: () => ipcRenderer.send('window:close'),
+  },
 
   /* Record functions */
   getRecordingData: (func) => {
@@ -56,5 +57,12 @@ contextBridge.exposeInMainWorld('api', {
   /* Other event cleanup */
   removeRecentExperimentEventListeners: () => {
     ipcRenderer.removeAllListeners('db:get-recent-experiments');
+  },
+
+  experiment: {
+    newExp: async (expData) =>
+      await ipcRenderer.invoke(`experiment:newExp`, expData),
+    newPatient: async (expData) =>
+      await ipcRenderer.invoke(`experiment:new`, expData),
   },
 });

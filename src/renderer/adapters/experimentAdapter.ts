@@ -9,15 +9,15 @@ import { closeModal } from '@redux/ModalStateSlice';
 const dispatch = store.dispatch;
 
 // Check the new experiment data and send it to the database/state
-export const newExperiment = async (newExperimentData: object) => {
+export const newExperiment = async (newExpData: object) => {
   // Set isLoading to true
   dispatch(isLoading(true));
 
   // Create a new experiment and await the result
-  const newExperiment = await window.api.createNewExperiment(newExperimentData);
+  const newExperiment = await window.api.experiment.newExp(newExpData);
 
   if (newExperiment) {
-    newExperiment && dispatch(closeModal());
+    dispatch(closeModal());
 
     // Set the experiment data in the state
     dispatch(setExperimentData(newExperiment));

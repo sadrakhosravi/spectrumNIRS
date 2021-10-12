@@ -5,9 +5,8 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
 
 // Other IPCs
-import '@ipc/chart';
 import '@ipc/record';
-import '@ipc/writeDB';
+import '@ipc/experiment';
 import '@ipc/readDB';
 
 const ipc = () => {

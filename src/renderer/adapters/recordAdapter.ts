@@ -30,6 +30,8 @@ export const pauseRecording = () => {
   recordState.value === 'pause'
     ? dispatch(changeRecordState('continue'))
     : dispatch(changeRecordState('pause'));
+
+  window.api.sendRecordState(store.getState().recordState.value);
 };
 
 // Send the record state along with the patient id

@@ -12,19 +12,19 @@ const WindowButtons = () => {
         src={Minimize}
         className="window-button hover:bg-accent"
         alt="Minimize"
-        onClick={window.api.minimize}
+        onClick={window.api.window.minimize}
       />
       <img
         src={Restore}
         className="window-button hover:bg-accent"
         alt="Maximize/Restore"
-        onClick={window.api.restore}
+        onClick={window.api.window.restore}
       />
       <img
         src={Close}
         className="window-button hover:bg-red"
         alt="Close"
-        onClick={window.api.close}
+        onClick={window.api.window.close}
       />
     </span>
   );

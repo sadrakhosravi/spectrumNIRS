@@ -28,6 +28,9 @@ export const ExperimentDataSlice = createSlice({
     setExperimentData: (state, action) => {
       state.value = action.payload;
     },
+    setPatientData: (state, action) => {
+      state.value.currentPatient = action.payload;
+    },
   },
 });
 

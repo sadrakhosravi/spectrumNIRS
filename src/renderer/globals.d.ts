@@ -5,12 +5,14 @@ declare namespace api {
   function removeListener(channel: any, customFunction: any): any;
 
   // Window functions
-  function minimize(): void;
-  function restore(): void;
-  function close(): void;
+  const window: {
+    minimize: () => void;
+    close: () => void;
+    restore: () => void;
+  };
 
   // Record functions
-  function sendRecordState(state: string, patientId: number): void;
+  function sendRecordState(state: string, patientId?: number): void;
   function getRecordingData(func: (data: any) => void): void;
 
   // DB functions
@@ -25,4 +27,9 @@ declare namespace api {
   // Remove Event Listeners
   function removeHomePageEventListeners(): void;
   function removeRecentExperimentEventListeners(): void;
+
+  // Experiment
+  const experiment: {
+    newExp: (expData: Object) => Promise<any>;
+  };
 }
