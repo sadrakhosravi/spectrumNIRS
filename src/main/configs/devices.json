@@ -1,6 +1,13 @@
 {
   "device1": {
+    "id": 1,
     "deviceName": "NIRS V6",
+    "samplingRate": 100,
+    "channels": ["O2Hb", "HHb", "THb", "TOI"]
+  },
+  "device2": {
+    "id": 2,
+    "deviceName": "NIRS Beast",
     "samplingRate": 100,
     "channels": ["O2Hb", "HHb", "THb", "TOI"]
   }

@@ -9,10 +9,11 @@ import ButtonTitleDescription from '@microComp/ButtonTitleDescription/ButtonTitl
 interface IProps {
   title: string;
   description: string;
+  saved: string;
+  key?: any;
 }
 
-const RecentExperiment: React.FC<IProps> = (props) => {
-  const { title, description } = props;
+const RecentExperiment: React.FC<IProps> = ({ title, description, saved }) => {
   return (
     <div className="bg-grey2 grid grid-cols-5 px-3 py-5 mb-3 rounded-md">
       <div className="col-span-3 flex items-center">
@@ -29,7 +30,7 @@ const RecentExperiment: React.FC<IProps> = (props) => {
         </span>
       </div>
       <div className="col-span-2 flex items-center justify-end mr-1">
-        <p className="text-light text-base">Saved: July 10, 2021</p>
+        <p className="text-light text-base">Saved: {saved.toString()}</p>
       </div>
     </div>
   );

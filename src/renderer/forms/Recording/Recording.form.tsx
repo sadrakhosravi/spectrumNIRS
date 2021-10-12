@@ -11,7 +11,7 @@ import SensorIcon from '@icons/sensor.svg';
 import SubmitButton from '@components/Form/SubmitButton.component';
 
 const RecordingForm = () => {
-  let [sensor, setSensor] = useState('NIRS V6');
+  let [sensor, setSensor] = useState(1);
 
   const handleSave = () => {
     console.log(sensor);
@@ -23,15 +23,20 @@ const RecordingForm = () => {
         <h3 className="py-4 text-xl">Select a sensor:</h3>
         <RadioGroup value={sensor} onChange={setSensor}>
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-          <div className="space-y-2">
+          <div className="grid grid-cols-4 gap-6">
             {Object.entries(deviceConfigs).map((device: any) => (
-              <RadioGroup.Option value={device[1].deviceName}>
-                {({ checked }) => (
+              <RadioGroup.Option
+                value={device[1].id}
+                disabled={device[1].id > 1 && true}
+              >
+                {({ checked, disabled }) => (
                   <>
                     <div
                       className={`${
                         checked && 'ring-2 ring-accent'
-                      } w-32 h-32 bg-grey2  rounded-md flex flex-col items-center justify-center`}
+                      } w-full h-32 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
+                        disabled && 'bg-light bg-opacity-60 cursor-not-allowed'
+                      }`}
                     >
                       <img
                         src={SensorIcon}

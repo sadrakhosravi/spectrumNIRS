@@ -19,3 +19,10 @@ ipcMain.handle(
   async (_event, data: Object) =>
     await experimentController.createNewPatient(data)
 );
+
+// Prepare a new recording and selects the sensor to be used
+ipcMain.handle(
+  ExperimentChannels.NewRecording,
+  async (_event, data: Object) =>
+    await experimentController.createNewPatient(data)
+);
