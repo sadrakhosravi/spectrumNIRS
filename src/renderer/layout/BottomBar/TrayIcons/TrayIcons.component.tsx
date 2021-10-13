@@ -17,8 +17,11 @@ const TrayIcons = () => {
     (state: any) => state.experimentData.value
   );
 
+  console.log(experimentData);
+
   let experimentButton = null,
-    patientButton = null;
+    patientButton = null,
+    sensorButton = null;
 
   if (experimentData.currentExperiment.name) {
     experimentButton = (
@@ -41,12 +44,25 @@ const TrayIcons = () => {
     );
   }
 
+  if (experimentData.currentExperiment.name) {
+    sensorButton = (
+      <>
+        <Separator />
+        <TrayIconButtons
+          icon={SensorIcon}
+          text={`Sensor: ${
+            experimentData.currentSensor.name || 'No Sensor Selected'
+          }`}
+        />
+      </>
+    );
+  }
+
   return (
     <footer className="text-right col-span-9 h-full grid grid-flow-col auto-cols-max justify-end">
       {experimentButton}
       {patientButton}
-      <Separator />
-      <TrayIconButtons icon={SensorIcon} text="Sensor: Connected" />
+      {sensorButton}
     </footer>
   );
 };

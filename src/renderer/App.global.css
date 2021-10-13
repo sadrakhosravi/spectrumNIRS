@@ -490,6 +490,24 @@ template {
 .lds-ring div:nth-child(3) {
   animation-delay: -0.15s;
 }
+
+.lds-large {
+  width: 85px;
+  height: 85px;
+}
+
+.lds-large div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 68px;
+  height: 68px;
+  margin: 8px;
+  border: 8px solid #fff;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #fff transparent transparent transparent;
+}
 @keyframes lds-ring {
   0% {
     transform: rotate(0deg);

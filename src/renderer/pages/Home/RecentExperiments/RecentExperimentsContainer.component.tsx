@@ -35,6 +35,8 @@ const RecentExperimentsContainer = ({
       );
       setExperiments(searchedExperiments);
     }
+
+    if (event.target.value === '') setExperiments(data);
   };
 
   return (

@@ -4,17 +4,19 @@ import React, { useState } from 'react';
 import { RadioGroup } from '@headlessui/react';
 
 // Config file
-import deviceConfigs from '@configs/devices.json';
+import devices from '@configs/devices.json';
 
 // Icon
 import SensorIcon from '@icons/sensor.svg';
 import SubmitButton from '@components/Form/SubmitButton.component';
+import { setSensorStatus } from '@adapters/experimentAdapter';
 
 const RecordingForm = () => {
-  let [sensor, setSensor] = useState(1);
+  let [sensor, setSensor] = useState(0);
 
+  // Sets the current sensor state to the global experimentData current sensor state
   const handleSave = () => {
-    console.log(sensor);
+    setSensorStatus(devices.devices[sensor]);
   };
 
   return (
@@ -24,10 +26,11 @@ const RecordingForm = () => {
         <RadioGroup value={sensor} onChange={setSensor}>
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
           <div className="grid grid-cols-4 gap-6">
-            {Object.entries(deviceConfigs).map((device: any) => (
+            {devices.devices.map((device: any) => (
               <RadioGroup.Option
-                value={device[1].id}
-                disabled={device[1].id > 1 && true}
+                value={device.id}
+                disabled={device.id > 0 && true}
+                key={device.id}
               >
                 {({ checked, disabled }) => (
                   <>
@@ -35,7 +38,7 @@ const RecordingForm = () => {
                       className={`${
                         checked && 'ring-2 ring-accent'
                       } w-full h-32 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
-                        disabled && 'bg-light bg-opacity-60 cursor-not-allowed'
+                        disabled && 'bg-light bg-opacity-40 cursor-not-allowed'
                       }`}
                     >
                       <img
@@ -44,7 +47,7 @@ const RecordingForm = () => {
                         height="48px"
                         alt="Sensor"
                       />
-                      <p className="mt-2">{device[1].deviceName}</p>
+                      <p className="mt-2">{device.name}</p>
                     </div>
                   </>
                 )}

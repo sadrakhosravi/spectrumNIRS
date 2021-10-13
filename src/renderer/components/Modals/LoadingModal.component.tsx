@@ -23,7 +23,7 @@ const IsLoadingModal: React.FC = () => {
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="absolute inset-0 z-50 overflow-y-auto bg-dark bg-opacity-60"
+          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-60"
           onClose={() => ''}
         >
           <div className="min-h-screen px-4 text-center">
@@ -55,7 +55,7 @@ const IsLoadingModal: React.FC = () => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="lds-ring">
+              <div className="lds-ring lds-large">
                 <div></div>
                 <div></div>
                 <div></div>

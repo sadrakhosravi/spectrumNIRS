@@ -18,6 +18,10 @@ const initialState: IExperimentData = {
       description: '',
       dob: '',
     },
+    currentSensor: {
+      id: -1,
+      name: '',
+    },
   },
 };
 
@@ -26,14 +30,19 @@ export const ExperimentDataSlice = createSlice({
   initialState,
   reducers: {
     setExperimentData: (state, action) => {
-      state.value = action.payload;
+      state.value.currentExperiment = action.payload.currentExperiment;
+      state.value.currentPatient = action.payload.currentPatient;
     },
     setPatientData: (state, action) => {
       state.value.currentPatient = action.payload;
     },
+    setCurrentSensor: (state, action) => {
+      state.value.currentSensor = action.payload;
+    },
   },
 });
 
-export const { setExperimentData } = ExperimentDataSlice.actions;
+export const { setExperimentData, setPatientData, setCurrentSensor } =
+  ExperimentDataSlice.actions;
 
 export default ExperimentDataSlice.reducer;

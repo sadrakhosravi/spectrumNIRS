@@ -30,7 +30,9 @@ const RecentExperiment: React.FC<IProps> = ({ title, description, saved }) => {
         </span>
       </div>
       <div className="col-span-2 flex items-center justify-end mr-1">
-        <p className="text-light text-base">Saved: {saved.toString()}</p>
+        <p className="text-light text-base">
+          Saved: {saved.toString().split(' ')[0]}
+        </p>
       </div>
     </div>
   );
