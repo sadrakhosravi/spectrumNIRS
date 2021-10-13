@@ -1,5 +1,4 @@
 import { isLoading } from '@redux/IsLoadingSlice';
-import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 /**
@@ -9,9 +8,7 @@ import { useDispatch } from 'react-redux';
 const useLoadingState = (state: true | false) => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(isLoading(state));
-  }, []);
+  dispatch(isLoading(state));
 
   return useLoadingState;
 };

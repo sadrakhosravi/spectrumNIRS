@@ -1,6 +1,7 @@
 import store from '@redux/store';
-import { ModalConstants } from '@constants/constants';
+import { ModalConstants, AppState } from '@constants/constants';
 import { isLoading } from '@redux/IsLoadingSlice';
+import { changeAppState } from '@redux/AppStateSlice';
 
 // import { changeAppState } from '@redux/AppStateSlice';
 import {
@@ -36,7 +37,8 @@ export const newExperiment = async (newExpData: object) => {
  * @param data Sensor data object (id and name)
  */
 export const setSensorStatus = (data: Object) => {
-  dispatch(isLoading(true));
   dispatch(setCurrentSensor(data));
+  dispatch(isLoading(true));
   dispatch(closeModal());
+  dispatch(changeAppState(AppState.RECORD));
 };

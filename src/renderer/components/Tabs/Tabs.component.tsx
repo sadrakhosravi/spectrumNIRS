@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // Components
 import TabItem from '@components/Tabs/TabItem.component';
@@ -22,6 +22,18 @@ const Tabs = () => {
 
   const recordIsActive = appState === AppState.RECORD;
   const reviewIsActive = appState === AppState.REVIEW;
+
+  useEffect(() => {
+    const reviewTab = document.getElementById('Review');
+    const handleRightClick = () => {
+      console.log('RightClick');
+    };
+    reviewTab?.addEventListener('contextmenu', handleRightClick);
+
+    return () => {
+      reviewTab?.removeEventListener('contextmenu', handleRightClick);
+    };
+  }, []);
 
   return (
     <>

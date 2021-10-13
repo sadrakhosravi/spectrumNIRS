@@ -14,7 +14,7 @@ const ExperimentForm = () => {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data: any) => {
-    newExperiment(data);
+    await newExperiment(data);
   };
 
   return (

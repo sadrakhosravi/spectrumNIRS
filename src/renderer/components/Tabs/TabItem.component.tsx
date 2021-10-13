@@ -14,6 +14,7 @@ const TabItem = (props: any) => {
       type="button"
       className={`${tabColor} w-64 tab-item-height px-3 grid grid-flow-col auto-cols-max items-center transition duration-100`}
       onClick={onClick}
+      id={text}
     >
       <IconText text={text} icon={icon} large />
     </button>
