@@ -7,7 +7,7 @@ import HomeIconButton from './IconButtons/HomeIconButton.component';
 import SignalIconButton from './IconButtons/SignalIconButton.component';
 import ReviewIconButton from './IconButtons/ReviewIconButton.component';
 import SettingsIconButton from './IconButtons/SettingsIconButton.component';
-import ExperimentSettings from '@components/ExperimentSettings/ExperimentSettings.component';
+import ExperimentSettings from 'renderer/ExperimentSettings/ExperimentSettings.component';
 
 // State
 import { changeAppState } from '@redux/AppStateSlice';

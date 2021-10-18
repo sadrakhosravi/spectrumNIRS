@@ -12,7 +12,7 @@ export interface IExperimentData {
       description: string;
       dob: string;
     };
-    currentSensor?: {
+    currentSensor: {
       id: number;
       name: string;
     };

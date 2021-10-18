@@ -8,7 +8,7 @@ declare namespace api {
    * Send an asynchronous message to the main process via `channel`, along with
    * arguments
    */
-  function sendIPC(channel: string, args: any[]): void;
+  function sendIPC(channel: string, args?: any | any[]): void;
 
   /**
    * Send a message to the main process along with arguments via `channel` and expect a result

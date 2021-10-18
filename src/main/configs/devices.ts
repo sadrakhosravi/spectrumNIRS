@@ -2,7 +2,7 @@
 export const devices = [
   {
     id: 0,
-    name: 'NIRS V6',
+    name: 'NIRS V5',
     samplingRate: 100,
     channels: ['O2Hb', 'HHb', 'THb', 'TOI'],
   },

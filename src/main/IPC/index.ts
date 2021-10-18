@@ -5,10 +5,13 @@
 import { ipcMain, BrowserWindow, app, Menu } from 'electron';
 
 // Other IPCs
-import '@ipc/record';
-import '@ipc/experiment';
 import '@ipc/readDB';
 // import { openReviewTabInNewWindow } from '@electron/controllers/reviewTabController';
+
+// Controllers
+import '../controllers/experiment';
+import '../controllers/patient';
+import '../controllers/recording';
 
 const ipc = () => {
   // Get the main window open

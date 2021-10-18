@@ -80,7 +80,8 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./resources/**"
     ],
     "publish": {
       "provider": "github",

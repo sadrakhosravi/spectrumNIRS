@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 
 // Main area components
 import Tabs from '@components/Tabs/Tabs.component';
-import ChartToolbar from '@components/Chart/ChartToolbar/GraphToolbar.component';
-import Chart from '@components/Chart/Chart.component';
+import ChartToolbar from 'renderer/Chart/ChartToolbar/GraphToolbar.component';
+import Chart from 'renderer/Chart/Chart.component';
 
 // Sidebar components
-import WidgetsContainer from '@components/Chart/Widgets/WidgetsContainer.component';
+import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
 
 // Constants
 import { ChartType } from '@constants/constants';

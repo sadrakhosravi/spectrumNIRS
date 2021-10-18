@@ -1,8 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { IExperimentData } from '@interfaces/interfaces';
-/**
- * Determine the state of the app. Used to navigate to home, record, or review sections.
- */
+
+type SensorInitData = {
+  patientId: number;
+  sensorId: number;
+};
+
+const sendRecordingInit = (sensorInitData: SensorInitData) => {
+  window.api.sendIPC('record:init', sensorInitData);
+};
 
 const initialState: IExperimentData = {
   value: {
@@ -38,6 +44,10 @@ export const ExperimentDataSlice = createSlice({
     },
     setCurrentSensor: (state, action) => {
       state.value.currentSensor = action.payload;
+      // Send the selected sensor to the controller
+      const patientId = state.value.currentPatient.id;
+      const sensorId = state.value.currentSensor.id;
+      sendRecordingInit({ patientId, sensorId });
     },
   },
 });

@@ -1,4 +1,4 @@
-import { Recording } from 'db/models';
+import { Recording } from '../../db/models';
 
 // Insert recording data
 export const insertRecordingData = async (
