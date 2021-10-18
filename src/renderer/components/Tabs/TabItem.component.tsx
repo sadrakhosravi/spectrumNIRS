@@ -1,6 +1,6 @@
 import React from 'react';
 
-import IconText from '@microComp/IconText/IconText.component';
+import IconText from '@components/MicroComponents/IconText/IconText.component';
 
 const TabItem = (props: any) => {
   const { text, icon, isActive, onClick } = props;

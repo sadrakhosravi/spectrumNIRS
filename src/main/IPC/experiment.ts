@@ -3,7 +3,7 @@
  */
 
 import { ipcMain } from 'electron';
-import experimentController from '@controllers/experimentController';
+import experimentController from '@electron/controllers/experimentController';
 import { ExperimentChannels } from '@utils/constants';
 
 // Creates a new experiment record with one patient in the database

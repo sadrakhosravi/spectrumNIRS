@@ -4,7 +4,7 @@ import React from 'react';
 import RecentFileIcon from '@icons/recent-file.svg';
 
 // Components
-import ButtonTitleDescription from '@microComp/ButtonTitleDescription/ButtonTitleDescription.component';
+import ButtonTitleDescription from '@components/MicroComponents/ButtonTitleDescription/ButtonTitleDescription.component';
 
 interface IProps {
   title: string;

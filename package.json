@@ -13,14 +13,9 @@
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts && opencollective-postinstall",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development electron -r ts-node/register/transpile-only -r tsconfig-paths/register ./src/main/main.ts",
+    "start:mainprod": "cross-env NODE_ENV=development electron -r ts-node/register/transpile-only -r tsconfig-paths/register ./release/app/dist/main/main.js",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "jest"
-  },
-  "imports": {
-    "@electron/*": "./src/main/*",
-    "@IPC/*": "./src/main/IPC/*",
-    "@dataReaders/*": "./src/main/DataReaders/*",
-    "@workers/*": "./src/main/Workers/*"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -37,9 +32,9 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
+    "productName": "Photon Lab",
     "appId": "org.erb.ElectronReact",
-    "asar": true,
+    "asar": false,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
       "dist",
@@ -175,7 +170,8 @@
     "css-loader": "^6.2.0",
     "css-minimizer-webpack-plugin": "^3.0.2",
     "detect-port": "^1.3.0",
-    "electron-builder": "^22.11.7",
+    "electron": "^15.1.0",
+    "electron-builder": "^22.13.1",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.1.0",
     "electron-rebuild": "^3.2.0",
@@ -213,7 +209,7 @@
     "tsconfig-paths-webpack-plugin": "^3.5.1",
     "typescript": "^4.3.5",
     "url-loader": "^4.1.1",
-    "webpack": "^5.51.1",
+    "webpack": "^5.56.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.0.0",
@@ -226,7 +222,6 @@
     "@tippyjs/react": "^4.2.5",
     "accurate-timer": "^0.0.9",
     "crypto-browserify": "^3.12.0",
-    "electron": "^13.4.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.1",
     "electron-updater": "^4.3.9",

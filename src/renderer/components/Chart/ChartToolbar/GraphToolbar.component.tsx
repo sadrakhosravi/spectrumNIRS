@@ -2,9 +2,9 @@ import React from 'react';
 
 // Components
 import Separator from '@components/Separator/Separator.component';
-import RecordPauseButtons from '@chart/ChartToolbar/RecordPauseButtons';
-import ZoomButtons from '@chart/ChartToolbar/ZoomButtons';
-import FocusButton from '@chart/ChartToolbar/FocusButton';
+import RecordPauseButtons from '@components/Chart/ChartToolbar/RecordPauseButtons';
+import ZoomButtons from '@components/Chart/ChartToolbar/ZoomButtons';
+import FocusButton from '@components/Chart/ChartToolbar/FocusButton';
 
 const ChartToolbar = () => {
   return (

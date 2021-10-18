@@ -23,15 +23,13 @@
       //Electron Related Paths
       "@db/*": ["./main/db/*"],
       "@electron/*": ["./main/*"],
-      "@ipc/*": ["./main/IPC/*"],
+      "@ipc/*": ["./main/ipc/*"],
       "@readerFunctions/*": ["./main/readerFunctions/*"],
       "@readers/*": ["./main/readers/*"],
       "@controllers/*": ["./main/controllers/*"],
       "@dbControllers/*": ["./main/dbControllers/*"],
       "@helpers/*": ["./main/helpers/*"],
       "@utils/*": ["./main/utils/*"],
-      "@workers/*": ["./main/Workers/*"],
-      "@configs/*": ["./main/configs/*"],
       //Database
       //Typescript Extra
       "@constants/*": ["./renderer/constants/*"]

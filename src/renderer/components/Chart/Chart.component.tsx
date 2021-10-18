@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
 // Components
-import ChartChannelTitle from '@chart/ChartChannelTitle/ChartChannelTitle.component';
-import LCJSChart from '@chart/ChartClass/Chart';
+import ChartChannelTitle from '@components/Chart/ChartChannelTitle/ChartChannelTitle.component';
+import LCJSChart from '@components/Chart/ChartClass/Chart';
 
 // Constants
 import { ChartType } from '@constants/constants';

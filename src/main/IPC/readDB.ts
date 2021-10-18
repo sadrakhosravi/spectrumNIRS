@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { Experiment, Recording } from '@electron/db/models/index';
+import { Experiment, Recording } from 'db/models/index';
 
 // const { Op } = require('sequelize');
 

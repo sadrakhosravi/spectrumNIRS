@@ -4,7 +4,7 @@ import React from 'react';
 import IconButton from '@components/Buttons/IconButton.component';
 
 // HOC
-import withTooltip from 'renderer/hoc/withTooltip.hoc';
+import withTooltip from '@hoc/withTooltip.hoc';
 
 //Icons
 import ZoomInIcon from '@icons/zoom-in.svg';

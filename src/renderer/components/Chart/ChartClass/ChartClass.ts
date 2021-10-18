@@ -3,9 +3,9 @@
  */
 
 // Import other chart classes
-import ChartDashboard from '@chart/ChartClass/ChartDashboard';
-import ChartPerChannel from '@chart/ChartClass/ChartPerChannel';
-import ChartSeries from '@chart/ChartClass/ChartSeries';
+import ChartDashboard from '@components/Chart/ChartClass/ChartDashboard';
+import ChartPerChannel from '@components/Chart/ChartClass/ChartPerChannel';
+import ChartSeries from '@components/Chart/ChartClass/ChartSeries';
 // import ChartSyncXAxis from '@chart/ChartClass/ChartSyncXAxis';
 
 const on = window.api.on;

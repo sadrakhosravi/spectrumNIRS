@@ -2,8 +2,16 @@ const { ipcRenderer, contextBridge } = require('electron');
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {
-  // Method for removing listeners if needed
-  removeAllListener: ipcRenderer.removeAllListeners,
+  // Send channels
+  sendIPC: (channel, args) => ipcRenderer.send(channel, ...args),
+  invokeIPC: (channel, args) => ipcRenderer.invoke(channel, ...args),
+
+  // Receive channels
+  onIPCData: (channel, func) =>
+    ipcRenderer.on(channel, (event, ...args) => func(event, ...args)),
+
+  // Remove Listeners
+  removeAllListener: (channel) => ipcRenderer.removeAllListeners(channel),
 
   /* Window functions */
   window: {
@@ -59,6 +67,12 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.removeAllListeners('db:get-recent-experiments');
   },
 
+  // Context menu events
+  contextMenu: {
+    reviewTab: () => ipcRenderer.send('context-menu', 'review'),
+  },
+
+  // Experiment related events
   experiment: {
     newExp: async (expData) =>
       await ipcRenderer.invoke(`experiment:newExp`, expData),

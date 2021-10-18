@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Listbox } from '@headlessui/react';
 
 //Components
-import Header from '@chart/Widgets/Header/Header.component';
+import Header from '@components/Chart/Widgets/Header/Header.component';
 
 //Source Options
 const sources = [

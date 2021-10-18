@@ -26,7 +26,7 @@ const Tabs = () => {
   useEffect(() => {
     const reviewTab = document.getElementById('Review');
     const handleRightClick = () => {
-      console.log('RightClick');
+      window.api.contextMenu.reviewTab();
     };
     reviewTab?.addEventListener('contextmenu', handleRightClick);
 

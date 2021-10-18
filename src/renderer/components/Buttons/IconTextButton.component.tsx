@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Component
-import IconText from '@microComp/IconText/IconText.component';
+import IconText from '@components/MicroComponents/IconText/IconText.component';
 
 interface IProps {
   icon: string;

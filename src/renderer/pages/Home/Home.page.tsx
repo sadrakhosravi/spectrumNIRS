@@ -25,16 +25,16 @@ const HomePage = () => {
         <div className="col-span-2">
           <LargeIconTextButton
             icon={NewFileIcon}
-            title="New Recording"
-            description="Create a new NIRS recording"
+            title="New Experiment"
+            description="Create a new experiment"
             onClick={() => {
               openNewExperimentForm();
             }}
           />
           <LargeIconTextButton
             icon={OpenFileIcon}
-            title="Open Recording"
-            description="Open a recording file or project"
+            title="Open Experiment"
+            description="Open an experiment file or project"
           />
         </div>
       </div>

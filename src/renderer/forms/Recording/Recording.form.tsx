@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { RadioGroup } from '@headlessui/react';
 
 // Config file
-import devices from '@configs/devices.json';
+import { devices } from '@electron/configs/devices';
 
 // Components
 import InputField from '@components/Form/InputField.component';
@@ -34,7 +34,7 @@ const RecordingForm = () => {
   const onSubmit = (formData: FormData) => {
     const samplingRate = parseInt(formData.sensor.samplingRate);
     const channels = formData.sensor.channels.split(', ');
-    const currentSensor = devices.devices[sensor];
+    const currentSensor = devices[sensor];
     currentSensor.samplingRate = samplingRate;
     currentSensor.channels = channels;
     console.log(currentSensor);
@@ -48,7 +48,7 @@ const RecordingForm = () => {
         <RadioGroup value={sensor} onChange={setSensor}>
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
           <div className="grid grid-cols-4 gap-6">
-            {devices.devices.map((device: any) => (
+            {devices.map((device: any) => (
               <RadioGroup.Option
                 value={device.id}
                 disabled={device.id > 0 && true}
@@ -82,7 +82,7 @@ const RecordingForm = () => {
           <label className="text-sm inline-block w-full mt-2">
             <span className="block pb-1">Sampling Rate:</span>
             <InputField
-              defaultValue={devices.devices[sensor].samplingRate}
+              defaultValue={devices[sensor].samplingRate}
               type="number"
               register={register('sensor.samplingRate')}
             />
@@ -90,7 +90,7 @@ const RecordingForm = () => {
           <label className="text-sm inline-block w-full mt-2">
             <span className="block pb-1">Channels:</span>
             <InputField
-              defaultValue={devices.devices[sensor].channels.join(', ')}
+              defaultValue={devices[sensor].channels.join(', ')}
               type="text"
               register={register('sensor.channels')}
             />

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import RecentExperiment from './RecentExperiment.component';
 
 import withLoading from '@hoc/withLoading.hoc';
-import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
+// import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
 
 interface IRecentExperimentsContainer {
   recentExperiments?: Object[];
@@ -15,18 +15,26 @@ const RecentExperimentsContainer = ({
   children,
   setLoading,
 }: IRecentExperimentsContainer): JSX.Element => {
-  const [experiments, setExperiments] = useState([]);
+  const [experiments, setExperiments] = useState<any>([]);
 
-  const { data, isLoading } = useGetRecentExperimentsQuery(5, {
-    refetchOnMountOrArgChange: true,
-  });
-  setLoading(isLoading);
+  // const { data, isLoading } = useGetRecentExperimentsQuery(5, {
+  //   refetchOnMountOrArgChange: true,
+  // });
+  setLoading(true);
 
-  console.log(data);
+  const data = [
+    {
+      experiment: {
+        name: 'test',
+      },
+    },
+  ];
 
-  useEffect(() => {
-    !isLoading && setExperiments(data);
-  }, [isLoading]);
+  // console.log(data);
+
+  // useEffect(() => {
+  //   !isLoading && setExperiments(data);
+  // }, [isLoading]);
 
   const handleChange = (event: any) => {
     if (event.target.value !== '') {

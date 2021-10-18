@@ -3,7 +3,7 @@
  */
 
 import { BrowserWindow } from 'electron'; // Electron
-import { insertRecordingData } from '@controllers/recordingDBController';
+import { insertRecordingData } from '@electron/controllers/recordingDBController';
 
 const path = require('path');
 const readline = require('readline');

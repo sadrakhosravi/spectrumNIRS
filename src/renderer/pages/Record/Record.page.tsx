@@ -2,7 +2,7 @@ import React from 'react';
 
 // Main area components
 import Tabs from '@components/Tabs/Tabs.component';
-import ChartToolbar from '@chart/ChartToolbar/GraphToolbar.component';
+import ChartToolbar from '@components/Chart/ChartToolbar/GraphToolbar.component';
 import Chart from '@components/Chart/Chart.component';
 
 // Sidebar components

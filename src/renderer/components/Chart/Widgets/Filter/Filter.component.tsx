@@ -1,8 +1,8 @@
 import React from 'react';
 
 //Components
-import Header from '@chart/Widgets/Header/Header.component';
-import WidgetButton from '@chart/Widgets/WidgetButton/WidgetButton.component';
+import Header from '@components/Chart/Widgets/Header/Header.component';
+import WidgetButton from '@components/Chart/Widgets/WidgetButton/WidgetButton.component';
 
 //Renders the filter widget on the sidebar
 const Filter = () => {

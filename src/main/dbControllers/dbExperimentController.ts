@@ -1,4 +1,4 @@
-import { Experiment, Patient } from '@electron/db/models/index';
+import { Experiment, Patient } from 'db/models/index';
 
 /**
  * Inserts the new experiment data with one patient to the database

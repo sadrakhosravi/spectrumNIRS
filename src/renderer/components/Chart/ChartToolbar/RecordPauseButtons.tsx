@@ -11,7 +11,7 @@ import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
 // HOC
-import withTooltip from 'renderer/hoc/withTooltip.hoc';
+import withTooltip from '@hoc/withTooltip.hoc';
 const PauseButton = withTooltip(IconTextButton, 'Start a recording first');
 
 // Adapter

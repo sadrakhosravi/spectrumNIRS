@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Components
-import ButtonTitleDescription from '@microComp/ButtonTitleDescription/ButtonTitleDescription.component';
+import ButtonTitleDescription from '@components/MicroComponents/ButtonTitleDescription/ButtonTitleDescription.component';
 
 interface IProps {
   icon: string;

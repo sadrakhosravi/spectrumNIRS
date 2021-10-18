@@ -11,30 +11,12 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import { resolveHtmlPath } from './util';
-import { sequelize } from '@electron/db/models/index';
 import ipc from '@ipc/index';
+const { sequelize } = require('../db/models/index');
 
-// Check DB Connection
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Connection successful!');
-  })
-  .catch(() => {
-    console.log('Error connecting');
-  });
-
-//Sync Models
-sequelize
-  .sync({ force: true })
-  .then(() => {
-    console.log('Sync Successful!');
-  })
-  .catch(() => {
-    console.log('Error in creating tables');
-  });
+// import ipc from '@ipc/index';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -62,11 +44,15 @@ const createMainWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  // Create a window that fills the screen's available work area.
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
   mainWindow = await new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
-    width: 1200,
-    height: 800,
+    width: width,
+    height: height,
     frame: false,
     webPreferences: {
       contextIsolation: true,
@@ -86,15 +72,6 @@ const createMainWindow = async () => {
   return mainWindow;
 };
 
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
 app.on('activate', async () => {
   if (!mainWindow) {
     createMainWindow();
@@ -102,9 +79,31 @@ app.on('activate', async () => {
 });
 
 (async () => {
+  // Set dark theme by default - Light theme will be added in the next versions
+  nativeTheme.themeSource = 'dark';
+
   // Create main window
   await app.whenReady();
   await createMainWindow();
+
+  // Quit when all windows are closed.
+  app.on('window-all-closed', () => {
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+
+    await sequelize.sync({ force: true });
+    console.log('Sync Successful');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
   // Attach IPC listeners
   ipc();
 })();
