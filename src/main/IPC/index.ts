@@ -4,14 +4,11 @@
 
 import { ipcMain, BrowserWindow, app, Menu } from 'electron';
 
-// Other IPCs
-import '@ipc/readDB';
-// import { openReviewTabInNewWindow } from '@electron/controllers/reviewTabController';
-
 // Controllers
-import '../controllers/experiment';
-import '../controllers/patient';
-import '../controllers/recording';
+import '../../controllers/experiment';
+import '../../controllers/patient';
+import '../../controllers/recording';
+import '../../controllers/recordTab';
 
 const ipc = () => {
   // Get the main window open
@@ -53,7 +50,4 @@ const ipc = () => {
   });
 };
 
-ipcMain.handle('testing', () => {
-  console.log('Testing IPCHandle');
-});
 export default ipc;

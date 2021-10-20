@@ -47,6 +47,20 @@ export class Experiment implements IExperiment {
       return;
     }
   }
+
+  /**
+   * Fetches recent experiments from the db based on the `limit`
+   * @param limit - Number of recent experiments to get
+   */
+  public static getRecentExperiments = async (
+    limit: number
+  ): Promise<Object[]> =>
+    await db.Experiment.findAll({
+      limit,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: ['createdAt'] },
+      raw: true,
+    });
 }
 
 export default Experiment;

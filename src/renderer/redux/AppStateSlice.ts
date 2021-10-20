@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { AppState } from '@constants/constants';
+import { AppState } from 'utils/constants';
 
 interface IAction {
   payload: AppState.HOME | AppState.RECORD | AppState.REVIEW;
@@ -11,7 +11,7 @@ interface IAction {
 export const AppStateSlice = createSlice({
   name: 'appState',
   initialState: {
-    value: 'home', // Can be 'home', 'record', 'review' - Check app state enum
+    value: AppState.HOME, // Can be 'home', 'record', 'review' - Check app state enum
   },
   reducers: {
     changeAppState: (state, action: IAction) => {

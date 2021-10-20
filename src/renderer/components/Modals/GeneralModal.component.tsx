@@ -4,7 +4,7 @@ import React from 'react';
 import Modal from '@components/Modals/Modal.component';
 
 // Constants
-import { ModalConstants } from '@constants/constants';
+import { ModalConstants } from 'utils/constants';
 
 interface IGeneralModal {
   title: string;

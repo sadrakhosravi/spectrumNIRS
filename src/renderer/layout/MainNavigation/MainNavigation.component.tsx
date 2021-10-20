@@ -12,10 +12,10 @@ import ExperimentSettings from 'renderer/ExperimentSettings/ExperimentSettings.c
 // State
 import { changeAppState } from '@redux/AppStateSlice';
 import { openModal } from '@redux/ModalStateSlice';
-import { ModalConstants } from '@constants/constants';
+import { ModalConstants } from 'utils/constants';
 
 // Constants
-import { AppState } from '@constants/constants';
+import { AppState } from 'utils/constants';
 
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);

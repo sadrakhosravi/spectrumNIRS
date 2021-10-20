@@ -6,8 +6,12 @@ type SensorInitData = {
   sensorId: number;
 };
 
-const sendRecordingInit = (sensorInitData: SensorInitData) => {
-  window.api.sendIPC('record:init', sensorInitData);
+/**
+ * Send the initial data to the controller.
+ * @param initData - Initial data `{patientId, sensorId}`
+ */
+const sendRecordingInit = (initData: SensorInitData) => {
+  window.api.sendIPC('record:init', initData);
 };
 
 const initialState: IExperimentData = {
@@ -44,10 +48,16 @@ export const ExperimentDataSlice = createSlice({
     },
     setCurrentSensor: (state, action) => {
       state.value.currentSensor = action.payload;
-      // Send the selected sensor to the controller
+
       const patientId = state.value.currentPatient.id;
       const sensorId = state.value.currentSensor.id;
-      sendRecordingInit({ patientId, sensorId });
+
+      console.log(patientId, sensorId);
+
+      // Check if the data is available and send it to the controller
+      if (patientId !== -1 && sensorId !== -1) {
+        sendRecordingInit({ patientId, sensorId });
+      }
     },
   },
 });

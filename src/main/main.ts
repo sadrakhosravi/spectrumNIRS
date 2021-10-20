@@ -13,10 +13,10 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import { resolveHtmlPath } from './util';
-import ipc from '@ipc/index';
 const { sequelize } = require('../db/models/index');
 
-// import ipc from '@ipc/index';
+// Import controllers
+import '../controllers/';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -104,6 +104,4 @@ app.on('activate', async () => {
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
-  // Attach IPC listeners
-  ipc();
 })();

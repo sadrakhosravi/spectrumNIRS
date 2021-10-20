@@ -21,18 +21,9 @@
       "@adapters/*": ["./renderer/adapters/*"],
       "@interfaces/*": ["./renderer/interfaces/*"],
       //Electron Related Paths
-      "@db/*": ["./main/db/*"],
+
       "@electron/*": ["./main/*"],
-      "@ipc/*": ["./main/ipc/*"],
-      "@readerFunctions/*": ["./main/readerFunctions/*"],
-      "@readers/*": ["./main/readers/*"],
-      "@controllers/*": ["./main/controllers/*"],
-      "@dbControllers/*": ["./main/dbControllers/*"],
-      "@helpers/*": ["./main/helpers/*"],
-      "@utils/*": ["./main/utils/*"],
-      //Database
-      //Typescript Extra
-      "@constants/*": ["./renderer/constants/*"]
+      "@utils/*": ["./utils/*"]
     },
     "lib": ["dom", "esnext"],
     "declaration": true,

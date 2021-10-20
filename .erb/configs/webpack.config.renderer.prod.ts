@@ -41,7 +41,7 @@ export default merge(baseConfig, {
   output: {
     path: webpackPaths.distRendererPath,
     publicPath: './',
-    filename: 'renderer.js',
+    filename: 'ui.js',
     library: {
       type: 'umd',
     },

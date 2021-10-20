@@ -1,23 +1,24 @@
 import { createApi, BaseQueryFn } from '@reduxjs/toolkit/query/react';
+import { ExperimentChannels } from 'utils/channels';
 
-const recentExperimentsIPCQuery =
-  (): BaseQueryFn => async (numOfRecentExperiments: number) => {
-    try {
-      const recentExperiments = await window.api.getRecentExperiments(
-        numOfRecentExperiments
-      );
-      return { data: recentExperiments };
-    } catch (error) {
-      return { error };
-    }
-  };
+const experimentQuery = (): BaseQueryFn => async (limit: number) => {
+  try {
+    const recentExperiments = await window.api.invokeIPC(
+      ExperimentChannels.getRecentExperiments,
+      limit
+    );
+    return { data: recentExperiments };
+  } catch (error) {
+    return { error };
+  }
+};
 
 export const experimentsApi = createApi({
   reducerPath: 'recentExperiments',
-  baseQuery: recentExperimentsIPCQuery(),
+  baseQuery: experimentQuery(),
   endpoints: (build) => ({
     getRecentExperiments: build.query({
-      query: (numOfExp) => numOfExp,
+      query: (limit) => limit,
     }),
   }),
 });

@@ -14,7 +14,7 @@ declare namespace api {
    * Send a message to the main process along with arguments via `channel` and expect a result
    * asynchronously
    */
-  function invokeIPC(channel: string, args: any[]): Promise<any>;
+  function invokeIPC(channel: string, args: any | any[]): Promise<any>;
 
   /**
    * Listens to `channel`, when a new message arrives `listener` would be called with

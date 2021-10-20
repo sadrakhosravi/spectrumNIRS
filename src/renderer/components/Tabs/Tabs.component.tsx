@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { changeAppState } from '@redux/AppStateSlice';
 
 // Constants
-import { AppState } from '@constants/constants';
+import { AppState } from 'utils/constants';
 
 // Recording and review tabs
 const Tabs = () => {

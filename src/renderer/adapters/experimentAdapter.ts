@@ -1,5 +1,5 @@
 import store from '@redux/store';
-import { ModalConstants, AppState } from '@constants/constants';
+import { ModalConstants, AppState } from 'utils/constants';
 import { isLoading } from '@redux/IsLoadingSlice';
 import { changeAppState } from '@redux/AppStateSlice';
 

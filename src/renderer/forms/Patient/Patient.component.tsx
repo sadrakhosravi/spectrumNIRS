@@ -5,7 +5,7 @@ import Modal from '@components/Modals/Modal.component';
 import PatientForm from './Patient.form';
 
 // Constants
-import { ModalConstants } from '@constants/constants';
+import { ModalConstants } from 'utils/constants';
 
 const NewPatient: React.FC = () => {
   return (

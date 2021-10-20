@@ -11,7 +11,7 @@ const useNavigation = () => {
   const history = useHistory();
 
   useEffect(() => {
-    history.push(`${appState}`);
+    history.push(`/${appState}`);
   }, [appState]);
 
   return useNavigation;

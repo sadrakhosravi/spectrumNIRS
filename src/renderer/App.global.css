@@ -11,6 +11,12 @@ div {
   position: relative;
 }
 
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
 textarea:focus-visible,
 input[type]:focus-visible {
   @apply ring-2 ring-accent;

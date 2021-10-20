@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import RecentExperiment from './RecentExperiment.component';
 
 import withLoading from '@hoc/withLoading.hoc';
-// import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
+import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
 
 interface IRecentExperimentsContainer {
   recentExperiments?: Object[];
@@ -15,36 +15,25 @@ const RecentExperimentsContainer = ({
   children,
   setLoading,
 }: IRecentExperimentsContainer): JSX.Element => {
-  const [experiments, setExperiments] = useState<any>([]);
+  const [experiments, setExperiments] = useState<any[]>([]);
 
-  // const { data, isLoading } = useGetRecentExperimentsQuery(5, {
-  //   refetchOnMountOrArgChange: true,
-  // });
-  setLoading(true);
+  const { data, isLoading } = useGetRecentExperimentsQuery(5);
 
-  const data = [
-    {
-      experiment: {
-        name: 'test',
-      },
-    },
-  ];
-
-  // console.log(data);
-
-  // useEffect(() => {
-  //   !isLoading && setExperiments(data);
-  // }, [isLoading]);
+  // Handle side effects
+  useEffect(() => {
+    setLoading(isLoading);
+    !isLoading && setExperiments(data);
+  });
 
   const handleChange = (event: any) => {
     if (event.target.value !== '') {
-      const searchedExperiments = data.filter((experiment: any) =>
+      const searchedExperiments = experiments.filter((experiment: any) =>
         experiment.name.toLowerCase().includes(event.target.value.toLowerCase())
       );
       setExperiments(searchedExperiments);
     }
 
-    if (event.target.value === '') setExperiments(data);
+    if (event.target.value === '') setExperiments(experiments);
   };
 
   return (
@@ -63,6 +52,9 @@ const RecentExperimentsContainer = ({
             key={experiment.experiment_id}
           />
         ))}
+      {experiments.length === 0 && (
+        <p className="text-white opacity-30">No recent experiment found.</p>
+      )}
       {children}
     </div>
   );
