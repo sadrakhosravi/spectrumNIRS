@@ -1,31 +1,13 @@
-import { ipcMain, BrowserWindow, app, Menu, IpcMainEvent } from 'electron';
+import { ipcMain, BrowserWindow, Menu, IpcMainEvent } from 'electron';
 
 // Controllers
+import './window';
 import './experiment';
 import './patient';
 import './recording';
 import './recordTab';
 
-// Minimize window on minimize icon click
-ipcMain.on('window:minimize', (event: IpcMainEvent) => {
-  BrowserWindow.fromWebContents(event.sender)?.minimize();
-});
-
-// Close/quit window on minimize icon click
-ipcMain.on('window:close', () => {
-  app.quit();
-});
-
-// Restore window on minimize icon click
-ipcMain.on('window:restore', (event: IpcMainEvent) => {
-  const mainWindow = BrowserWindow.fromWebContents(event.sender);
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  mainWindow?.isMaximized() === true
-    ? mainWindow.restore()
-    : mainWindow?.maximize();
-});
-
-ipcMain.on('context-menu', (event) => {
+ipcMain.on('context-menu', (event: IpcMainEvent) => {
   const template: any = [
     {
       label: 'Open in a New Window',

@@ -25,9 +25,11 @@ const spawnedProcesses: any[] = [];
  */
 const start = (
   prevTime = 0,
-  insertRecordingData: (data: unknown) => Promise<any>
+  _insertRecordingData: (data: unknown) => Promise<any>
 ) => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
+  const BrowserView = mainWindow.getBrowserView();
+  console.log(BrowserView);
 
   // Spawn NIRSReader.exe
   readUSBData = spawn(
@@ -70,7 +72,6 @@ const start = (
         timeSequence += prevTime;
         count = 2;
       }
-      console.log(timeSequence);
 
       // Prepare an array of data
       const _outputArr = [
@@ -85,7 +86,8 @@ const start = (
 
       if (outputArr.length === 5) {
         // Send the data to be graphed to the renderer
-        mainWindow.webContents.send('data:reader-record', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
+        BrowserView?.webContents.send('data:reader-record', outputArr);
+        // mainWindow.webContents.send('data:reader-record', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
         outputArr = [];
       }
 
@@ -93,7 +95,7 @@ const start = (
       data[0] = (timeSequence / 100).toString();
 
       // Insert the all data to the database
-      insertRecordingData(data.join(','));
+      // insertRecordingData(data.join(','));
 
       // Last Step: increment the time sequence +10ms = 1unit (Centiseconds)
       timeSequence += 1;

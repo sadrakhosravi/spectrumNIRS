@@ -1,8 +1,8 @@
 // Possible states of the application / Used mostly for routing.
 export enum AppState {
-  HOME = 'home',
-  RECORD = 'recording/record',
-  REVIEW = 'recording/review',
+  HOME = '/main/home',
+  RECORD = '/main/recording/record',
+  REVIEW = '/main/recording/review',
 }
 
 // Available modals to open

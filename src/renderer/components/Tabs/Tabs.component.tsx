@@ -37,7 +37,7 @@ const Tabs = () => {
 
   return (
     <>
-      <div className="w-full bg-dark grid grid-flow-col auto-cols-max items-center relative">
+      <div className="w-full bg-dark h-40px grid grid-flow-col auto-cols-max items-center relative">
         <TabItem
           text="Record"
           icon={GraphLinesIcon}

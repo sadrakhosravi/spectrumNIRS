@@ -56,6 +56,7 @@ const createMainWindow = async () => {
     frame: false,
     webPreferences: {
       contextIsolation: true,
+      nodeIntegrationInSubFrames: true,
       preload: path.join(__dirname, 'preload.js'),
     },
     icon: getAssetPath('icon.png'),

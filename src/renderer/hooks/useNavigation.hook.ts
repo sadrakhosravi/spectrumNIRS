@@ -9,9 +9,10 @@ import { useHistory } from 'react-router';
 const useNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
   const history = useHistory();
+  console.log(history);
 
   useEffect(() => {
-    history.push(`/${appState}`);
+    // history.push(`/${appState}`);
   }, [appState]);
 
   return useNavigation;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -32,9 +33,11 @@ const MainNavigation = () => {
             onClick={() => dispatch(changeAppState(AppState.HOME))}
             isActive
           />
-          <SignalIconButton
-            onClick={() => dispatch(changeAppState(AppState.RECORD))}
-          />
+          <Link to="/main/recording">
+            <SignalIconButton
+              onClick={() => dispatch(changeAppState(AppState.RECORD))}
+            />
+          </Link>
           <ReviewIconButton
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />

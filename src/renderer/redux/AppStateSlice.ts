@@ -1,6 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from 'utils/constants';
 
+const sendAppStateToController = (appState: AppState) => {
+  appState === AppState.HOME && window.api.sendIPC('applicationState:home');
+
+  appState === AppState.RECORD && window.api.sendIPC('applicationState:record');
+
+  appState === AppState.REVIEW && window.api.sendIPC('applicationState:review');
+};
+
 interface IAction {
   payload: AppState.HOME | AppState.RECORD | AppState.REVIEW;
 }
@@ -16,6 +24,7 @@ export const AppStateSlice = createSlice({
   reducers: {
     changeAppState: (state, action: IAction) => {
       state.value = action.payload;
+      sendAppStateToController(state.value);
     },
   },
 });

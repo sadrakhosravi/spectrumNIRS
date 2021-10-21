@@ -6,6 +6,10 @@ import Restore from '@icons/restore.svg';
 import Close from '@icons/close.svg';
 
 const WindowButtons = () => {
+  window.api.onIPCData('window:unmaximize', () => {
+    console.log('Unmaximuoze');
+  });
+
   return (
     <span className="text-right items-center">
       <img

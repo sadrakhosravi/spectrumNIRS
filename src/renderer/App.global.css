@@ -48,15 +48,15 @@ input[type]:focus-visible {
   top: 40px;
   left: 0;
   height: calc(100% - 70px);
-  width: 4rem;
+  width: 60px;
   background-color: #333;
 }
 
 .main-container {
   position: absolute;
   top: 40px;
-  left: 4rem;
-  width: calc(100% - 4rem);
+  left: 60px;
+  width: calc(100% - 60px);
   height: calc(100% - 70px);
   max-height: calc(100% - 70px);
   margin-left: auto;

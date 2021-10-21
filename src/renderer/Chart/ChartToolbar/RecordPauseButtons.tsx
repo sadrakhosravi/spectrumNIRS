@@ -34,10 +34,13 @@ const RecordPauseButtons = () => {
   // Change the record state on click.
   const recordBtnClickHandler = () => {
     newRecording();
+    window.api.sendIPC('record:recording');
   };
 
   // Change the record state on click.
   const pauseBtnClickHandler = () => {
+    window.api.sendIPC('record:idle');
+
     pauseRecording();
   };
 
@@ -63,7 +66,7 @@ const RecordPauseButtons = () => {
             icon={PauseIcon}
             darker={false}
             isActive={false}
-            disabled
+            onClick={pauseBtnClickHandler}
           />
         </>
       );

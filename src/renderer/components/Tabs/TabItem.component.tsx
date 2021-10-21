@@ -12,11 +12,11 @@ const TabItem = (props: any) => {
   return (
     <button
       type="button"
-      className={`${tabColor} w-64 tab-item-height px-3 grid grid-flow-col auto-cols-max items-center transition duration-100`}
+      className={`${tabColor} w-64 px-3 h-40px grid grid-flow-col auto-cols-max items-center transition duration-100`}
       onClick={onClick}
       id={text}
     >
-      <IconText text={text} icon={icon} large />
+      <IconText text={text} icon={icon} />
     </button>
   );
 };
