@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
+import { ipcMain, IpcMainEvent } from 'electron';
 
 // Models
 import DataReader from '../main/models/DataReader';
@@ -20,9 +20,10 @@ ipcMain.on('record:init', (_, { sensorId, patientId }: RecordInit) => {
 // Start recording
 ipcMain.on('record:recording', (event: IpcMainEvent) => {
   reader = new DataReader(1, 0);
-  console.log(BrowserWindow.fromWebContents(event.sender));
+  console.log(event.sender);
+  // event.sender.send('testing:channel');
 
-  reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
+  reader.startRecording(event.sender); // All necessary functionality of reading NIRS sensor data.
 });
 
 // Stop recording

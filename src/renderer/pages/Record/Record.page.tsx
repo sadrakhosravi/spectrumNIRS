@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 // Main area components
-import Chart from 'renderer/Chart/Chart.component';
+const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
 
 // Sidebar components
 import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
@@ -23,7 +23,9 @@ const RecordPage = () => {
       <div className="grid grid-cols-12 grid-rows-3 gap-4 h-full w-full">
         <div className="col-span-10 h-full row-span-3">
           <ChartToolbar />
-          <Chart type={ChartType.RECORD} />
+          <React.Suspense fallback={<p>Loading ...</p>}>
+            <Chart type={ChartType.RECORD} />
+          </React.Suspense>
         </div>
         <div className="col-span-2 mr-3 row-span-3">
           <WidgetsContainer />

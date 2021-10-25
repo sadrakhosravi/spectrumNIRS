@@ -14,3 +14,16 @@ export const AppStateChannels = {
   Record: AppStateBase + 'recording/record',
   Review: AppStateBase + 'recording/review',
 };
+
+// Startup Channel
+const StartupBase = 'startup:';
+export const StartupChannels = {
+  Ready: StartupBase + 'ready',
+};
+
+// Review Tab
+const ReviewTabBase = 'review:';
+export const ReviewTabChannels = {
+  NewWindow: ReviewTabBase + 'new-window',
+  ContextMenu: ReviewTabBase + 'context-menu',
+};

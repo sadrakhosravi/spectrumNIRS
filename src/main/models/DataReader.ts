@@ -6,7 +6,7 @@ export interface IDataReaders {
   /**
    * Starts reading data from the sensor.
    */
-  startRecording(): void;
+  startRecording(arg: any): void;
   /**
    * Stops reading data and kills the process.
    */
@@ -24,7 +24,8 @@ export interface IDataReaders {
 type CurrentSensor = {
   start: (
     lastTimeSequence: number | undefined,
-    insertRecordingData: (data: unknown) => Promise<any>
+    insertRecordingData: (data: unknown) => Promise<any>,
+    sender: any
   ) => void;
   pause: () => void;
   continueRecording: () => void;
@@ -50,10 +51,12 @@ export class DataReader implements IDataReaders {
     this.lastTimeSequence = 0;
   }
 
-  startRecording() {
+  startRecording(sender: any) {
+    sender.send('testing:channel');
     this.currentSensor.start(
       this.lastTimeSequence,
-      this.Recording.insertRecordingData
+      this.Recording.insertRecordingData,
+      sender
     );
   }
 
@@ -69,7 +72,7 @@ export class DataReader implements IDataReaders {
   }
 
   continueRecording() {
-    this.startRecording();
+    // this.startRecording();
   }
 }
 

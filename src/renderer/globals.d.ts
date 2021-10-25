@@ -6,6 +6,11 @@ declare namespace api {
   function removeListener(channel: any, customFunction: any): any;
 
   /**
+   * Returns the directory name
+   */
+  function dirname(): string;
+
+  /**
    * Send an asynchronous message to the main process via `channel`, along with
    * arguments
    */

@@ -7,6 +7,9 @@ import Source from './Source/Source.component';
 
 //The container for each widget to be rendered in
 const WidgetsContainer = () => {
+  window.api.onIPCData('testing:channel', () => {
+    console.log('WEBVIEWWW!!!');
+  });
   return (
     <>
       <Filter />

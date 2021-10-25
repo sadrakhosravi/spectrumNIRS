@@ -67,4 +67,4 @@ const TrayIcons = () => {
   );
 };
 
-export default TrayIcons;
+export default React.memo(TrayIcons);

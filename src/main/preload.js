@@ -2,6 +2,7 @@ const { ipcRenderer, contextBridge } = require('electron');
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {
+  dirname: () => __dirname,
   // Send channels
   sendIPC: (channel, args) => ipcRenderer.send(channel, args),
   invokeIPC: (channel, args) => ipcRenderer.invoke(channel, args),

@@ -23,7 +23,7 @@ const RecentExperimentsContainer = ({
   useEffect(() => {
     setLoading(isLoading);
     !isLoading && setExperiments(data);
-  });
+  }, [isLoading]);
 
   const handleChange = (event: any) => {
     if (event.target.value !== '') {
@@ -49,7 +49,7 @@ const RecentExperimentsContainer = ({
             title={experiment.name}
             description={experiment.description}
             saved={experiment.updatedAt}
-            key={experiment.experiment_id}
+            key={experiment.id}
           />
         ))}
       {experiments.length === 0 && (

@@ -14,6 +14,7 @@ import { changeAppState } from '@redux/AppStateSlice';
 
 // Constants
 import { AppState } from 'utils/constants';
+import { ReviewTabChannels } from '@utils/channels';
 
 // Recording and review tabs
 const Tabs = () => {
@@ -26,7 +27,7 @@ const Tabs = () => {
   useEffect(() => {
     const reviewTab = document.getElementById('Review');
     const handleRightClick = () => {
-      window.api.contextMenu.reviewTab();
+      window.api.sendIPC(ReviewTabChannels.ContextMenu);
     };
     reviewTab?.addEventListener('contextmenu', handleRightClick);
 

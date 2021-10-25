@@ -34,13 +34,10 @@ const RecordPauseButtons = () => {
   // Change the record state on click.
   const recordBtnClickHandler = () => {
     newRecording();
-    window.api.sendIPC('record:recording');
   };
 
   // Change the record state on click.
   const pauseBtnClickHandler = () => {
-    window.api.sendIPC('record:idle');
-
     pauseRecording();
   };
 

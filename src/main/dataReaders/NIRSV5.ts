@@ -25,12 +25,10 @@ const spawnedProcesses: any[] = [];
  */
 const start = (
   prevTime = 0,
-  _insertRecordingData: (data: unknown) => Promise<any>
+  _insertRecordingData: (data: unknown) => Promise<any>,
+  sender: any
 ) => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
-  const BrowserView = mainWindow.getBrowserView();
-  console.log(BrowserView);
-
   // Spawn NIRSReader.exe
   readUSBData = spawn(
     path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),
@@ -86,7 +84,9 @@ const start = (
 
       if (outputArr.length === 5) {
         // Send the data to be graphed to the renderer
-        BrowserView?.webContents.send('data:reader-record', outputArr);
+        mainWindow.webContents.send('data:reader-record', outputArr);
+
+        sender.send('data:reader-record', outputArr);
         // mainWindow.webContents.send('data:reader-record', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
         outputArr = [];
       }

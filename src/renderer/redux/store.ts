@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+// import { persistReducer } from 'redux-persist';
+// import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 
 // State slices
@@ -22,15 +22,15 @@ const reducers = combineReducers({
   [experimentsApi.reducerPath]: experimentsApi.reducer,
 });
 
-const persistConfig = {
-  key: 'root',
-  storage,
-};
+// const persistConfig = {
+//   key: 'root',
+//   storage,
+// };
 
-const persistedReducer = persistReducer(persistConfig, reducers);
+// const persistedReducer = persistReducer(persistConfig, reducers);
 
 const store = configureStore({
-  reducer: persistedReducer,
+  reducer: reducers,
   middleware: (getGetDefaultMiddleware) =>
     getGetDefaultMiddleware().concat(experimentsApi.middleware),
 });

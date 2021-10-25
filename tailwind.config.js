@@ -3,6 +3,7 @@ module.exports = {
     './src/**/*.{js,jsx,ts,tsx,ejs}',
     './release/app/dist/renderer/index.html',
   ],
+  mode: 'jit',
   darkMode: false, // or 'media' or 'class'
   theme: {
     colors: {
@@ -19,10 +20,10 @@ module.exports = {
       accent: '#007ACD',
       'accent-hover': '#0084de',
       red: 'red',
-      chart1: '#E3170A',
-      chart2: '#ABFF4F',
-      chart3: '#00FFFF',
-      chart4: '#FFFFFF',
+      'chart-1': '#E3170A',
+      'chart-2': '#ABFF4F',
+      'chart-3': '#00FFFF',
+      'chart-4': '#FFFFFF',
     },
     fontFamily: {
       sans: ['Inter', 'system-ui'],

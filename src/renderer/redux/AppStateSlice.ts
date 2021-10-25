@@ -1,13 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from 'utils/constants';
 
-const sendAppStateToController = (appState: AppState) => {
-  appState === AppState.HOME && window.api.sendIPC('applicationState:home');
-
-  appState === AppState.RECORD && window.api.sendIPC('applicationState:record');
-
-  appState === AppState.REVIEW && window.api.sendIPC('applicationState:review');
-};
+const sendAppStateToController = (_appState: AppState) => {};
 
 interface IAction {
   payload: AppState.HOME | AppState.RECORD | AppState.REVIEW;

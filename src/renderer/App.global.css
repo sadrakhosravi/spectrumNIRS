@@ -6,6 +6,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  overflow-y: hidden;
+}
+
 /** Custom Styles */
 div {
   position: relative;
@@ -93,7 +97,7 @@ input[type]:focus-visible {
 }
 
 .fit-to-container {
-  height: calc(100% - 56px);
+  height: calc(100% - 45px);
 }
 
 .custom-height {

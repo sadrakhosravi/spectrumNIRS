@@ -12,11 +12,12 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
-import { resolveHtmlPath } from './util';
+// import { resolveHtmlPath } from './util';
 const { sequelize } = require('../db/models/index');
 
 // Import controllers
 import '../controllers/';
+import { resolveHtmlPath } from './util';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -53,19 +54,24 @@ const createMainWindow = async () => {
     minWidth: 1200,
     width: width,
     height: height,
+    darkTheme: true,
     frame: false,
+    roundedCorners: true,
     webPreferences: {
       contextIsolation: true,
-      nodeIntegrationInSubFrames: true,
+      webviewTag: true,
       preload: path.join(__dirname, 'preload.js'),
+      backgroundThrottling: false,
     },
     icon: getAssetPath('icon.png'),
   });
 
+  await mainWindow.loadURL(resolveHtmlPath('index.html'));
+
   mainWindow.setBackgroundColor('#1E1E1E');
   mainWindow.webContents.openDevTools();
 
-  await mainWindow.loadURL(resolveHtmlPath('index.html'));
+  // await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Default app state is maximized
   mainWindow.maximize();

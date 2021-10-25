@@ -3,7 +3,7 @@ import React from 'react';
 // Adapters
 import { openNewExperimentForm } from '@adapters/dispatchAdapter';
 
-// Hooks
+// Adapters
 
 // Icons
 import NewFileIcon from '@icons/new-file.svg';
@@ -16,7 +16,7 @@ import LargeIconTextButton from '@components/Buttons/LargeIconTextButton.compone
 
 const HomePage = () => {
   return (
-    <div className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">
+    <div id="testing123" className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">
       <HeadingText />
       <div className="grid grid-cols-5 mt-10 h-full gap-10">
         <div className="col-span-3 h-3/4">
