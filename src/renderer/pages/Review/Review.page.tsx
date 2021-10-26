@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 
 // Main area components
 const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
-import ChartToolbar from 'renderer/Chart/ChartToolbar/GraphToolbar.component';
 
 // Sidebar components
 import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
@@ -19,7 +18,6 @@ const Review = () => {
     <>
       <div className="grid grid-cols-12 grid-rows-3 gap-4 h-full w-full">
         <div className="col-span-10 h-full row-span-3">
-          <ChartToolbar />
           <React.Suspense fallback={<p>Loading ...</p>}>
             <Chart type={ChartType.REVIEW} />
           </React.Suspense>

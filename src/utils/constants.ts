@@ -8,6 +8,14 @@ export enum AppState {
   REVIEW_TAB = '/tabs/recording/review',
 }
 
+// Record state
+export enum RecordState {
+  IDLE = 'idle',
+  RECORD = 'record',
+  PAUSED = 'pause',
+  CONTINUE = 'continue',
+}
+
 // Available modals to open
 export enum ModalConstants {
   NEWEXPERIMENT = 'new-experiment',
@@ -28,4 +36,10 @@ export enum ThunkStatus {
   LOADING = 'loading',
   SUCCESS = 'success',
   FAILED = 'failed',
+}
+
+export enum Sensors {
+  NO_SENSOR = '',
+  NIRSV5 = 'NIRS V5',
+  NIRS_BEAST = 'NIRS Beast',
 }

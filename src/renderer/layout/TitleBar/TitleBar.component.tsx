@@ -22,7 +22,7 @@ const TitleBar = () => {
           <div>
             <Logo />
           </div>
-          <div>
+          <div className="ml-1">
             <TopMenu />
           </div>
         </div>

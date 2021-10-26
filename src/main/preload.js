@@ -1,4 +1,11 @@
-const { ipcRenderer, contextBridge } = require('electron');
+const {
+  ipcRenderer,
+  dialog,
+  BrowserWindow,
+  contextBridge,
+} = require('electron');
+
+console.log(dialog);
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {
@@ -19,6 +26,10 @@ contextBridge.exposeInMainWorld('api', {
     minimize: () => ipcRenderer.send('window:minimize'),
     restore: () => ipcRenderer.send('window:restore'),
     close: () => ipcRenderer.send('window:close'),
+  },
+
+  dialog: {
+    messageBox: (options) => dialog.showMessageBox(null, options),
   },
 
   /* Record functions */

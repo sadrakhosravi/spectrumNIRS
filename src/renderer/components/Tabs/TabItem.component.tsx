@@ -2,9 +2,14 @@ import React from 'react';
 
 import IconText from '@components/MicroComponents/IconText/IconText.component';
 
-const TabItem = (props: any) => {
-  const { text, icon, isActive, onClick } = props;
+type TabItems = {
+  name: string;
+  icon: string;
+  isActive?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+};
 
+const TabItem = ({ name, icon, isActive, onClick }: TabItems) => {
   const tabColor = isActive
     ? `bg-accent`
     : `bg-grey2 hover:bg-light2 active:bg-accent`;
@@ -14,9 +19,9 @@ const TabItem = (props: any) => {
       type="button"
       className={`${tabColor} w-64 px-3 h-40px grid grid-flow-col auto-cols-max items-center transition duration-100`}
       onClick={onClick}
-      id={text}
+      id={name}
     >
-      <IconText text={text} icon={icon} />
+      <IconText text={name} icon={icon} />
     </button>
   );
 };

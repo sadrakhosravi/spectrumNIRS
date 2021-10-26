@@ -6,7 +6,7 @@ import { combineReducers } from 'redux';
 // State slices
 import AppStateReducer from '@redux/AppStateSlice';
 import RecordStateReducer from '@redux/RecordStateSlice';
-import SourceStateReducer from '@redux/SourceStateSlice';
+import SensorStateReducer from '@redux/SensorStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
 import IsLoadingReducer from '@redux/IsLoadingSlice';
 import ExperimentDataReducer from '@redux/ExperimentDataSlice';
@@ -15,7 +15,7 @@ import { experimentsApi } from './api/experimentsApi';
 const reducers = combineReducers({
   appState: AppStateReducer,
   recordState: RecordStateReducer,
-  sourceState: SourceStateReducer,
+  sensorState: SensorStateReducer,
   modalState: ModalStateReducer,
   isLoadingState: IsLoadingReducer,
   experimentData: ExperimentDataReducer,

@@ -36,19 +36,17 @@ const App = () => {
           <Route path="/main" component={MainNavigation} />
           <Route path="/main" component={BottomBar} />
           <Route path="/main" component={TitleBar} />
-          <ModalsContainer />
+          <Route path="/main" component={ModalsContainer} />
 
           <main className="main-container">
             <Route path={AppState.RECORDING} component={Tabs} />
 
-            <Switch>
-              <Route exact path={AppState.HOME} component={HomePage} />
+            <Route exact path={AppState.HOME} component={HomePage} />
 
-              <div className="fit-to-container">
-                <Route exact path={AppState.RECORD} component={RecordPage} />
-                <Route exact path={AppState.REVIEW} component={ReviewPage} />
-              </div>
-            </Switch>
+            <div className="fit-to-container">
+              <Route exact path={AppState.RECORD} component={RecordPage} />
+              <Route exact path={AppState.REVIEW} component={ReviewPage} />
+            </div>
           </main>
 
           <Switch>

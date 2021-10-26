@@ -1,28 +1,23 @@
 import React, { useEffect } from 'react';
 
+// Tabs
+import { Tabs } from './Tabs';
+
 // Components
 import TabItem from '@components/Tabs/TabItem.component';
 import Clock from '@components/Clock/Clock.component';
-
-// Icons
-import GraphLinesIcon from '@icons/graph-lines.svg';
-import ReviewIcon from '@icons/review-white.svg';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
 import { changeAppState } from '@redux/AppStateSlice';
 
 // Constants
-import { AppState } from 'utils/constants';
 import { ReviewTabChannels } from '@utils/channels';
 
 // Recording and review tabs
-const Tabs = () => {
+const TabsContainer = () => {
   const appState = useSelector((state: any) => state.appState.value);
   const dispatch = useDispatch();
-
-  const recordIsActive = appState === AppState.RECORD;
-  const reviewIsActive = appState === AppState.REVIEW;
 
   useEffect(() => {
     const reviewTab = document.getElementById('Review');
@@ -39,18 +34,15 @@ const Tabs = () => {
   return (
     <>
       <div className="w-full bg-dark h-40px grid grid-flow-col auto-cols-max items-center relative">
-        <TabItem
-          text="Record"
-          icon={GraphLinesIcon}
-          isActive={recordIsActive}
-          onClick={() => dispatch(changeAppState(AppState.RECORD))}
-        />
-        <TabItem
-          text="Review"
-          icon={ReviewIcon}
-          isActive={reviewIsActive}
-          onClick={() => dispatch(changeAppState(AppState.REVIEW))}
-        />
+        {Tabs.map((tab) => (
+          <TabItem
+            name={tab.name}
+            icon={tab.icon}
+            isActive={tab.isActive(appState)}
+            onClick={() => dispatch(changeAppState(tab.path))}
+            key={tab.name}
+          />
+        ))}
         <div className="absolute right-8">
           <Clock />
         </div>
@@ -59,4 +51,4 @@ const Tabs = () => {
   );
 };
 
-export default Tabs;
+export default TabsContainer;

@@ -11,29 +11,42 @@ interface IRecentExperimentsContainer {
   setLoading?: any;
 }
 
+type ExperimentState = {
+  data: any[];
+  searchedExperiments: any[];
+};
+
 const RecentExperimentsContainer = ({
   children,
   setLoading,
 }: IRecentExperimentsContainer): JSX.Element => {
-  const [experiments, setExperiments] = useState<any[]>([]);
+  const [experiments, setExperiments] = useState<ExperimentState>({
+    data: [],
+    searchedExperiments: [],
+  });
 
   const { data, isLoading } = useGetRecentExperimentsQuery(5);
 
   // Handle side effects
   useEffect(() => {
     setLoading(isLoading);
-    !isLoading && setExperiments(data);
+    !isLoading && setExperiments({ data, searchedExperiments: data });
   }, [isLoading]);
 
   const handleChange = (event: any) => {
     if (event.target.value !== '') {
-      const searchedExperiments = experiments.filter((experiment: any) =>
+      const searchedExperiments = experiments.data.filter((experiment: any) =>
         experiment.name.toLowerCase().includes(event.target.value.toLowerCase())
       );
-      setExperiments(searchedExperiments);
+      setExperiments((prevState) => {
+        return { ...prevState, searchedExperiments };
+      });
     }
 
-    if (event.target.value === '') setExperiments(experiments);
+    if (event.target.value === '')
+      setExperiments((prevState) => {
+        return { ...prevState, searchedExperiments: data };
+      });
   };
 
   return (
@@ -43,8 +56,8 @@ const RecentExperimentsContainer = ({
         placeholder="Search recent experiments ..."
         onChange={handleChange}
       />
-      {experiments &&
-        experiments.map((experiment: any) => (
+      {experiments.searchedExperiments &&
+        experiments.searchedExperiments.map((experiment: any) => (
           <RecentExperiment
             title={experiment.name}
             description={experiment.description}
@@ -52,7 +65,7 @@ const RecentExperimentsContainer = ({
             key={experiment.id}
           />
         ))}
-      {experiments.length === 0 && (
+      {experiments.searchedExperiments.length === 0 && (
         <p className="text-white opacity-30">No recent experiment found.</p>
       )}
       {children}

@@ -3,13 +3,13 @@ import React from 'react';
 // Menu from headless UI
 import { Menu } from '@headlessui/react';
 
-interface IProps {
-  text: string;
+type SubMenuItemProps = {
+  label: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-}
+};
 
 // Renders Headless UI sub menu item
-const SubMenuItem = ({ text, onClick }: IProps): JSX.Element => {
+const SubMenuItem = ({ label, onClick }: SubMenuItemProps): JSX.Element => {
   return (
     <Menu.Item>
       {({ active }) => (
@@ -20,7 +20,7 @@ const SubMenuItem = ({ text, onClick }: IProps): JSX.Element => {
           } text-white py-0.5 mb-0.5 px-6 w-full text-left text-base`}
           onClick={onClick}
         >
-          {text}
+          {label}
         </button>
       )}
     </Menu.Item>

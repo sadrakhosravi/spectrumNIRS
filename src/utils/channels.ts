@@ -27,3 +27,16 @@ export const ReviewTabChannels = {
   NewWindow: ReviewTabBase + 'new-window',
   ContextMenu: ReviewTabBase + 'context-menu',
 };
+
+// Dialog box
+const dialogBoxBase = 'dialog:';
+export const DialogBoxChannels = {
+  MessageBox: dialogBoxBase + 'message-box',
+};
+
+// USB Detection
+const USBDetectionBase = 'USB-detection:';
+export const USBDetectionChannels = {
+  CHECK_USB: USBDetectionBase + 'check-usb',
+  NIRSV5: USBDetectionBase + 'nirs-v5',
+};

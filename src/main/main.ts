@@ -12,12 +12,12 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
-// import { resolveHtmlPath } from './util';
-const { sequelize } = require('../db/models/index');
+import { resolveHtmlPath } from './util';
 
 // Import controllers
 import '../controllers/';
-import { resolveHtmlPath } from './util';
+
+const { sequelize } = require('../db/models/index');
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -59,7 +59,7 @@ const createMainWindow = async () => {
     roundedCorners: true,
     webPreferences: {
       contextIsolation: true,
-      webviewTag: true,
+      nodeIntegration: false,
       preload: path.join(__dirname, 'preload.js'),
       backgroundThrottling: false,
     },

@@ -1,23 +1,46 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 // Components
 import Separator from '@components/Separator/Separator.component';
+import TrayIconButtons from '../TrayIconButton/TrayIconButton.component';
 
 // Icons
 import SensorIcon from '@icons/sensor.svg';
 import PatientIcon from '@icons/user-checked.svg';
 import ExperimentIcon from '@icons/experiment.svg';
 
-// Components
-import TrayIconButtons from '../TrayIconButton/TrayIconButton.component';
+// Constants
+import { USBDetectionChannels } from '@utils/channels';
+import { SensorState, setDetectedSensor } from '@redux/SensorStateSlice';
+import { Sensors } from '@utils/constants';
 
 const TrayIcons = () => {
+  const dispatch = useDispatch();
   const experimentData = useSelector(
     (state: any) => state.experimentData.value
   );
+  const sensorState: SensorState = useSelector(
+    (state: any) => state.sensorState
+  );
 
-  console.log(experimentData);
+  console.log(sensorState);
+
+  const checkUSBDevices = async () => {
+    const usbDevices = await window.api.invokeIPC(
+      USBDetectionChannels.CHECK_USB
+    );
+    usbDevices && dispatch(setDetectedSensor(Sensors.NIRSV5));
+  };
+
+  useEffect(() => {
+    window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
+      data && dispatch(setDetectedSensor(Sensors.NIRSV5));
+      !data && dispatch(setDetectedSensor(Sensors.NO_SENSOR));
+    });
+
+    checkUSBDevices();
+  }, []);
 
   let experimentButton = null,
     patientButton = null,
@@ -44,15 +67,13 @@ const TrayIcons = () => {
     );
   }
 
-  if (experimentData.currentExperiment.name) {
+  if (sensorState.detectedSensor) {
     sensorButton = (
       <>
         <Separator />
         <TrayIconButtons
           icon={SensorIcon}
-          text={`Sensor: ${
-            experimentData.currentSensor.name || 'No Sensor Selected'
-          }`}
+          text={`Sensor: ${sensorState.detectedSensor || 'No Sensor Selected'}`}
         />
       </>
     );

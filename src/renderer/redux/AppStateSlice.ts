@@ -4,7 +4,7 @@ import { AppState } from 'utils/constants';
 const sendAppStateToController = (_appState: AppState) => {};
 
 interface IAction {
-  payload: AppState.HOME | AppState.RECORD | AppState.REVIEW;
+  payload: AppState;
 }
 
 /**

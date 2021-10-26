@@ -20,7 +20,7 @@ declare namespace api {
    * Send a message to the main process along with arguments via `channel` and expect a result
    * asynchronously
    */
-  function invokeIPC(channel: string, args: any | any[]): Promise<any>;
+  function invokeIPC(channel: string, args?: any | any[]): Promise<any>;
 
   /**
    * Listens to `channel`, when a new message arrives `listener` would be called with
@@ -36,11 +36,17 @@ declare namespace api {
    */
   function removeAllListeners(channel: string): void;
 
-  // Window functions
+  /**
+   * Window functions
+   */
   const window: {
     minimize: () => void;
     close: () => void;
     restore: () => void;
+  };
+
+  const dialog: {
+    messageBox: (options: any) => Promise<any>;
   };
 
   // Record functions
