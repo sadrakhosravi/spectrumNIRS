@@ -12,7 +12,7 @@ const initialState: SensorState = {
 };
 
 export const SensorSlice = createSlice({
-  name: 'sourceState',
+  name: 'sensorState',
   initialState,
   reducers: {
     setDetectedSensor: (state, action) => {

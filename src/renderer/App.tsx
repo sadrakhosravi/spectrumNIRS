@@ -50,7 +50,7 @@ const App = () => {
           </main>
 
           <Switch>
-            <Route exact path={AppState.RECORD_TAB} component={RecordPage} />
+            <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
             <Route
               exact
               path="/"

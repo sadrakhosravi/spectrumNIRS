@@ -28,7 +28,7 @@ declare namespace api {
    */
   function onIPCData(
     channel: string,
-    listener: (event: Electron.IpcRendererEvent, args: any[]) => void
+    listener: (event: Electron.IpcRendererEvent, args: any[] | any) => void
   ): void;
 
   /**

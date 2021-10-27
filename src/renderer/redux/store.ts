@@ -10,6 +10,7 @@ import SensorStateReducer from '@redux/SensorStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
 import IsLoadingReducer from '@redux/IsLoadingSlice';
 import ExperimentDataReducer from '@redux/ExperimentDataSlice';
+import ReviewTabReducer from '@redux/ReviewTabStateSlice';
 import { experimentsApi } from './api/experimentsApi';
 
 const reducers = combineReducers({
@@ -19,6 +20,7 @@ const reducers = combineReducers({
   modalState: ModalStateReducer,
   isLoadingState: IsLoadingReducer,
   experimentData: ExperimentDataReducer,
+  reviewTabState: ReviewTabReducer,
   [experimentsApi.reducerPath]: experimentsApi.reducer,
 });
 

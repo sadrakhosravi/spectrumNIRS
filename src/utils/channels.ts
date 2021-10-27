@@ -26,6 +26,7 @@ const ReviewTabBase = 'review:';
 export const ReviewTabChannels = {
   NewWindow: ReviewTabBase + 'new-window',
   ContextMenu: ReviewTabBase + 'context-menu',
+  IsNewWindowOpened: ReviewTabBase + 'new-window-opened',
 };
 
 // Dialog box

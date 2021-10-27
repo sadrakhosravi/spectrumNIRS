@@ -66,6 +66,7 @@ const createMainWindow = async () => {
     icon: getAssetPath('icon.png'),
   });
 
+
   await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.setBackgroundColor('#1E1E1E');
