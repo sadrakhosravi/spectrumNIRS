@@ -1,10 +1,13 @@
-// import { ipcMain } from 'electron';
-// import { StartupChannels } from '../utils/channels';
+import fsPromises from 'fs/promises';
+import { appDataPath, databasePath, settingsPath } from '@electron/paths';
 
-// // Lib functions
-// import { createRecordTab } from './lib/tabManager';
+(async () => {
+  // Create the main application data folder
+  await fsPromises.mkdir(appDataPath, { recursive: true });
 
-// // ipcMain.handle(StartupChannels.Ready, () => {
-// //   console.log('Readyy!!');
-// //   createRecordTab();
-// // });
+  // Create the database folder
+  await fsPromises.mkdir(databasePath, { recursive: true });
+
+  // Create the settings folder
+  await fsPromises.mkdir(settingsPath, { recursive: true });
+})();

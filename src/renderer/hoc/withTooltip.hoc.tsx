@@ -21,6 +21,7 @@ const withTooltip = (
           placement={tooltipPosition || 'bottom'}
           delay={[0, 0]}
           content={tooltipText || props.tooltip}
+          interactive={props.interactive || false}
         >
           <span>
             <WrappedComponent {...props} />

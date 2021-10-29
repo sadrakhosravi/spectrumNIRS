@@ -7,7 +7,7 @@ import WidgetButton from 'renderer/Chart/Widgets/WidgetButton/WidgetButton.compo
 //Renders the filter widget on the sidebar
 const Gain = () => {
   return (
-    <div className="bg-grey3 h-1/3 relative mt-5">
+    <div className="bg-grey3 h-1/3 relative mt-5 rounded-md">
       <Header title="Gain" />
 
       {/** Filter Form */}

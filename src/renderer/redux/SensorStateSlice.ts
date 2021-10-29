@@ -1,14 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Sensors } from '@utils/constants';
 
-export type SensorState = {
-  detectedSensor: Sensors | '';
-  selectedSensor: Sensors | '';
-};
+export interface ISensor {
+  id: number;
+  name: string;
+  samplingRate: number;
+  channels: string[];
+  driverName: string;
+}
 
-const initialState: SensorState = {
-  detectedSensor: '',
-  selectedSensor: '',
+export interface ISensorState {
+  detectedSensor: ISensor | false;
+  selectedSensor: ISensor | false;
+}
+
+const initialState: ISensorState = {
+  detectedSensor: false,
+  selectedSensor: false,
 };
 
 export const SensorSlice = createSlice({

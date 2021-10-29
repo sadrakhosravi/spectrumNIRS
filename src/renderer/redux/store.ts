@@ -37,4 +37,6 @@ const store = configureStore({
     getGetDefaultMiddleware().concat(experimentsApi.middleware),
 });
 
+const { dispatch, getState } = store;
+export { dispatch, getState };
 export default store;

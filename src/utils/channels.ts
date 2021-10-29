@@ -21,6 +21,12 @@ export const StartupChannels = {
   Ready: StartupBase + 'ready',
 };
 
+// Record Channel
+const RecordBase = 'record:';
+export const RecordChannels = {
+  Init: RecordBase + 'init',
+};
+
 // Review Tab
 const ReviewTabBase = 'review:';
 export const ReviewTabChannels = {

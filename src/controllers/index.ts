@@ -1,4 +1,5 @@
 // Controllers
+import './startup';
 import './window';
 import './experiment';
 import './patient';

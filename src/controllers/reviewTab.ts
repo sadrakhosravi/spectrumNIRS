@@ -8,8 +8,6 @@ const reviewTabNewWindow = async () => {
   const { width, height } =
     displays.length > 1 ? displays[1].workAreaSize : displays[0].workAreaSize;
 
-  console.log(displays);
-
   const reviewTabWindow = new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,

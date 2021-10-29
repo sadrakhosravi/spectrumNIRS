@@ -1,16 +1,13 @@
-import store from '@redux/store';
-import { ModalConstants, AppState } from 'utils/constants';
+import { dispatch } from '@redux/store';
+import { ModalConstants } from 'utils/constants';
 import { isLoading } from '@redux/IsLoadingSlice';
-import { changeAppState } from '@redux/AppStateSlice';
+// import { changeAppState } from '@redux/AppStateSlice';
 
 // import { changeAppState } from '@redux/AppStateSlice';
-import {
-  setCurrentSensor,
-  setExperimentData,
-} from '@redux/ExperimentDataSlice';
+import { setExperimentData } from '@redux/ExperimentDataSlice';
+import { setSelectedSensor } from '@redux/SensorStateSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
-
-const dispatch = store.dispatch;
+// import { RecordChannels } from '@utils/channels';
 
 /**
  * Send the experiment data to the backend via ipc
@@ -22,11 +19,10 @@ export const newExperiment = async (newExpData: object) => {
 
   // Create a new experiment and await the result
   const newExperiment = await window.api.experiment.newExp(newExpData);
+  console.log(newExperiment);
 
   if (newExperiment) {
     dispatch(closeModal());
-
-    // Set the experiment data in the state
     dispatch(setExperimentData(newExperiment));
     dispatch(openModal(ModalConstants.NEWRECORDING));
   }
@@ -37,8 +33,6 @@ export const newExperiment = async (newExpData: object) => {
  * @param data Sensor data object (id and name)
  */
 export const setSensorStatus = (data: Object) => {
-  dispatch(setCurrentSensor(data));
-  dispatch(isLoading(true));
+  dispatch(setSelectedSensor(data));
   dispatch(closeModal());
-  dispatch(changeAppState(AppState.RECORD));
 };

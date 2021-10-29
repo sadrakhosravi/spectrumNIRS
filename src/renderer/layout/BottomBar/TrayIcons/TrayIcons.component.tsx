@@ -12,39 +12,33 @@ import ExperimentIcon from '@icons/experiment.svg';
 
 // Constants
 import { USBDetectionChannels } from '@utils/channels';
-import { SensorState, setDetectedSensor } from '@redux/SensorStateSlice';
-import { Sensors } from '@utils/constants';
+import { setDetectedSensor } from '@redux/SensorStateSlice';
 import withTooltip from '@hoc/withTooltip.hoc';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
 const TrayIcons = () => {
   const dispatch = useDispatch();
-  const experimentData = useSelector(
-    (state: any) => state.experimentData.value
-  );
-  const sensorState: SensorState = useSelector(
-    (state: any) => state.sensorState
-  );
+  const experimentData = useSelector((state: any) => state.experimentData);
+  const sensorState: any = useSelector((state: any) => state.sensorState);
 
   const checkUSBDevices = async () => {
-    const usbDevices = await window.api.invokeIPC(
+    const connectedSensor = await window.api.invokeIPC(
       USBDetectionChannels.CHECK_USB
     );
-    usbDevices && dispatch(setDetectedSensor(Sensors.NIRSV5));
+    dispatch(setDetectedSensor(connectedSensor));
   };
 
   useEffect(() => {
     window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
-      data && dispatch(setDetectedSensor(Sensors.NIRSV5));
-      !data && dispatch(setDetectedSensor(Sensors.NO_SENSOR));
+      dispatch(setDetectedSensor(data));
     });
 
     checkUSBDevices();
   }, []);
 
   const experimentTooltipText = (
-    <div className="px-2 py-2">
+    <div className="px-2 py-2 text-left">
       <h2 className="text-xl text-accent mb-1">Experiment</h2>
 
       <div className="ml-4">
@@ -71,6 +65,7 @@ const TrayIcons = () => {
           icon={ExperimentIcon}
           text={`Experiment: ${experimentData.currentExperiment.name}`}
           tooltip={experimentTooltipText}
+          interactive
         />
       </>
     );
@@ -82,6 +77,7 @@ const TrayIcons = () => {
           icon={PatientIcon}
           text={`Patient: ${experimentData.currentPatient.name}`}
           tooltip={experimentTooltipText}
+          interactive
         />
       </>
     );
@@ -95,13 +91,15 @@ const TrayIcons = () => {
       <TrayIconWithTooltip
         icon={SensorIcon}
         tooltip={
-          sensorState.detectedSensor === Sensors.NIRSV5 ? (
+          sensorState.detectedSensor.name ? (
             <p>Sensor Status: Connected</p>
           ) : (
             <p>Sensor Status: No Sensor Found</p>
           )
         }
-        text={`Sensor: ${sensorState.detectedSensor || 'Not Connected ❌'}`}
+        text={`Sensor: ${
+          sensorState.detectedSensor.name || 'Not Connected ❌'
+        }`}
       />
     </footer>
   );

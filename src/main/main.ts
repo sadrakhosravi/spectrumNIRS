@@ -17,8 +17,6 @@ import { resolveHtmlPath } from './util';
 // Import controllers
 import '../controllers/';
 
-const { sequelize } = require('../db/models/index');
-
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
 
@@ -66,7 +64,6 @@ const createMainWindow = async () => {
     icon: getAssetPath('icon.png'),
   });
 
-
   await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.setBackgroundColor('#1E1E1E');
@@ -87,6 +84,8 @@ app.on('activate', async () => {
 });
 
 (async () => {
+  const { sequelize } = require('../db/models/index');
+
   // Set dark theme by default - Light theme will be added in the next versions
   nativeTheme.themeSource = 'dark';
 

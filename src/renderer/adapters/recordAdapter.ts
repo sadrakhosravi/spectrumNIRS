@@ -8,8 +8,8 @@ export const newRecording = () => {
   const { experimentData } = store.getState();
   const { recordState } = store.getState();
   // Check if there is an experiment
-  if (experimentData.value.currentExperiment.name) {
-    const { currentPatient } = experimentData.value;
+  if (experimentData.currentExperiment.name) {
+    const { currentPatient } = experimentData;
     const patientId = currentPatient.id;
 
     // Check record state and decide accordingly

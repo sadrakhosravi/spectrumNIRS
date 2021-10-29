@@ -15,7 +15,6 @@ import { ReviewTabChannels } from '@utils/channels';
 const Review = () => {
   const dispatch = useDispatch();
   const isNewWindow = useSelector((state: any) => state.reviewTabState.value);
-  console.log(isNewWindow);
 
   useEffect(() => {
     window.api.onIPCData(

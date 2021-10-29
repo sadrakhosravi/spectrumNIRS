@@ -11,9 +11,7 @@ import WindowButtons from './WindowButtons/WindowButtons.component';
 // Styles
 
 const TitleBar = () => {
-  const experimentData = useSelector(
-    (state: any) => state.experimentData.value
-  );
+  const experimentData = useSelector((state: any) => state.experimentData);
 
   return (
     <header className="header w-full header-container relative items-center grid grid-cols-3 bg-grey1 z-50">

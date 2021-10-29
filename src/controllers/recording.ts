@@ -12,7 +12,7 @@ type RecordInit = {
 let reader: DataReader;
 
 // Select the sensor
-ipcMain.on('record:init', (_, { sensorId, patientId }: RecordInit) => {
+ipcMain.handle('record:init', (_, { sensorId, patientId }: RecordInit) => {
   console.log(sensorId, patientId);
   reader = new DataReader(patientId, sensorId);
 });
