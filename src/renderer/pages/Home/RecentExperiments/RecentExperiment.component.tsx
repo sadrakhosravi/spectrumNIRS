@@ -10,12 +10,22 @@ interface IProps {
   title: string;
   description: string;
   saved: string;
+  isActive?: boolean;
   key?: any;
 }
 
-const RecentExperiment: React.FC<IProps> = ({ title, description, saved }) => {
+const RecentExperiment: React.FC<IProps> = ({
+  title,
+  description,
+  saved,
+  isActive = false,
+}) => {
   return (
-    <div className="bg-grey2 grid grid-cols-5 px-3 py-5 mb-3 rounded-md">
+    <div
+      className={`${
+        isActive ? 'bg-accent' : 'bg-grey2'
+      } grid grid-cols-5 px-3 py-5 mb-3 rounded-md`}
+    >
       <div className="col-span-3 flex items-center">
         <span className="inline-block mr-5">
           <img

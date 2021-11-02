@@ -33,7 +33,6 @@ const initialState: ExperimentData = {
     description: '',
     dob: '',
   },
-
   isDataReady: false,
 };
 

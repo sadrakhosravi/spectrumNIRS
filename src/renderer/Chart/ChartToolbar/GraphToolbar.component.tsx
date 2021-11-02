@@ -26,7 +26,7 @@ const ChartToolbar = ({ type = ChartType.RECORD }: ChartToolbarProps) => {
   console.log(recordState);
 
   return (
-    <div className="w-full bg-grey1 px-2 h-14 grid gap-3 grid-flow-col grid-cols-2 items-center relative">
+    <div className="w-full bg-grey1 px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-2 items-center relative">
       <div className="grid grid-flow-col auto-cols-max items-center gap-3">
         {toolbarMenu.map((option, index) => {
           if (option.label === 'separator') return <Separator key={index} />;

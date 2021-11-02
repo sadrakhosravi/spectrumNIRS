@@ -37,7 +37,6 @@ const RecordingForm = () => {
     const currentSensor = devices[sensor];
     currentSensor.samplingRate = samplingRate;
     currentSensor.channels = channels;
-    console.log(currentSensor);
     setSensorStatus(currentSensor);
   };
 

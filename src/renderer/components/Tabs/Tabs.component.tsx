@@ -8,21 +8,30 @@ import TabItem from '@components/Tabs/TabItem.component';
 import Clock from '@components/Clock/Clock.component';
 
 // Redux
-import { useSelector, useDispatch } from 'react-redux';
-import { changeAppState } from '@redux/AppStateSlice';
+import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
+import { changeAppState, setReviewTabInNewWindow } from '@redux/AppStateSlice';
 
 // Constants
 import { ReviewTabChannels } from '@utils/channels';
 
 // Recording and review tabs
 const TabsContainer = () => {
-  const appState = useSelector((state: any) => state.appState.value);
-  const dispatch = useDispatch();
+  const appState = useAppSelector((state) => state.appState);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
+    window.api.onIPCData(
+      ReviewTabChannels.IsNewWindowOpened,
+      (_event, data: boolean) => {
+        dispatch(setReviewTabInNewWindow(data));
+      }
+    );
     const reviewTab = document.getElementById('Review');
     const handleRightClick = () => {
-      window.api.sendIPC(ReviewTabChannels.ContextMenu);
+      window.api.sendIPC(
+        ReviewTabChannels.ContextMenu,
+        appState.reviewTabInNewWindow
+      );
     };
     reviewTab?.addEventListener('contextmenu', handleRightClick);
 
@@ -38,7 +47,7 @@ const TabsContainer = () => {
           <TabItem
             name={tab.name}
             icon={tab.icon}
-            isActive={tab.isActive(appState)}
+            isActive={tab.isActive(appState.value)}
             onClick={() => dispatch(changeAppState(tab.path))}
             key={tab.name}
           />

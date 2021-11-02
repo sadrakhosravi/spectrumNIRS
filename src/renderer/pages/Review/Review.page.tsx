@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setIsNewWindow } from '@redux/ReviewTabStateSlice';
+import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
+import { setRecordSidebar } from '@redux/AppStateSlice';
 
 // Main area components
 const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
@@ -10,31 +10,40 @@ import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component'
 
 // Constants
 import { ChartType } from 'utils/constants';
-import { ReviewTabChannels } from '@utils/channels';
 
 const Review = () => {
-  const dispatch = useDispatch();
-  const isNewWindow = useSelector((state: any) => state.reviewTabState.value);
+  const isSidebarActive = useAppSelector(
+    (state) => state.appState.recordSidebar
+  );
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    window.api.onIPCData(
-      ReviewTabChannels.IsNewWindowOpened,
-      (_event, data: boolean) => {
-        dispatch(setIsNewWindow(data));
-      }
-    );
-  }, []);
+  const isNewWindow = useAppSelector(
+    (state) => state.appState.reviewTabInNewWindow
+  );
+
+  useEffect(() => {}, []);
 
   return (
     <>
       {!isNewWindow && (
-        <div className="grid grid-cols-12 grid-rows-3 gap-4 h-full w-full">
-          <div className="col-span-10 h-full row-span-3">
+        <div className="h-full w-full flex">
+          <div
+            className={`h-full transition-all duration-150 ${
+              isSidebarActive ? 'w-10/12' : 'w-full pr-4'
+            }`}
+          >
             <React.Suspense fallback={<p>Loading ...</p>}>
               <Chart type={ChartType.REVIEW} />
             </React.Suspense>
           </div>
-          <div className="col-span-2 mr-3 row-span-3">
+          <div
+            className={`h-full transition-all duration-150 ${
+              isSidebarActive
+                ? 'w-2/12 mx-3 pb-4'
+                : 'w-4 bg-grey1 hover:bg-accent hover:cursor-pointer'
+            }`}
+            onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
+          >
             <WidgetsContainer />
           </div>
         </div>

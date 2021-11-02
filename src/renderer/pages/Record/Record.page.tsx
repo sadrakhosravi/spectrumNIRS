@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Main area components
 const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
@@ -9,23 +10,35 @@ import useLoadingState from '@hooks/useLoadingState.hook';
 
 // Constants
 import { ChartType } from 'utils/constants';
+import { setRecordSidebar } from '@redux/AppStateSlice';
 
 const RecordPage = () => {
+  const isSidebarActive = useAppSelector(
+    (state) => state.appState.recordSidebar
+  );
+  const dispatch = useAppDispatch();
   useLoadingState(false);
-
-  useEffect(() => {
-    window.api.sendIPC('window:myexam');
-  });
 
   return (
     <>
-      <div className="grid grid-cols-12 grid-rows-3 gap-4 h-full w-full">
-        <div className="col-span-10 h-full row-span-3">
+      <div className="h-full w-full flex">
+        <div
+          className={`h-full transition-all duration-150 ${
+            isSidebarActive ? 'w-10/12' : 'w-full pr-4'
+          }`}
+        >
           <React.Suspense fallback={<p>Loading ...</p>}>
             <Chart type={ChartType.RECORD} />
           </React.Suspense>
         </div>
-        <div className="col-span-2 mr-3 row-span-3">
+        <div
+          className={`h-full transition-all duration-150 ${
+            isSidebarActive
+              ? 'w-2/12 mx-3 pb-4'
+              : 'w-4 bg-grey1 hover:bg-accent hover:cursor-pointer'
+          }`}
+          onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
+        >
           <WidgetsContainer />
         </div>
       </div>

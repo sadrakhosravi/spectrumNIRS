@@ -25,6 +25,10 @@ export const StartupChannels = {
 const RecordBase = 'record:';
 export const RecordChannels = {
   Init: RecordBase + 'init',
+  Recording: RecordBase + 'recording',
+  Stop: RecordBase + 'stop',
+  Pause: RecordBase + 'pause',
+  Continue: RecordBase + 'continue',
 };
 
 // Review Tab

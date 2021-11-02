@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 
 // Components
-import ChartChannelTitle from 'renderer/Chart/ChartChannelTitle/ChartChannelTitle.component';
 import LCJSChart from 'renderer/Chart/ChartClass/Chart';
 import ChartToolbar from './ChartToolbar/GraphToolbar.component';
 
 // Constants
-import { ChartType } from 'utils/constants';
+import { ChartType, RecordState } from 'utils/constants';
+import { useAppSelector } from '@redux/hooks/hooks';
 
 // State
-import { useSelector } from 'react-redux';
 
 interface IProps {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -19,16 +18,20 @@ declare const window: any;
 
 // Prepares and enders the chart
 const Chart: React.FC<IProps> = ({ type }) => {
-  const recordState = useSelector((state: any) => state.recordState.value);
+  const recordState = useAppSelector((state) => state.recordState.value);
+  const sensorState = useAppSelector(
+    (state) => state.sensorState.detectedSensor
+  );
+  const channels = (sensorState && sensorState.channels) || ['No Channels'];
+
   const containerID = 'chart';
   const chartRef = useRef(undefined);
 
   useEffect(() => {
     // Create chart, series and any other static components.
     console.log('create chart');
-    const channels = ['O2Hb', 'HHb', 'THb', 'TOI'];
     // Store references to chart components.
-    const chart: any = new LCJSChart(channels, type);
+    const chart: any = new LCJSChart(channels || ['No Channels Found'], type);
 
     // Attach event listeners
     type === ChartType.RECORD && chart.recordData();
@@ -51,7 +54,7 @@ const Chart: React.FC<IProps> = ({ type }) => {
 
   // Clear series if recording has restarted
   useEffect(() => {
-    if (recordState === 'recording') {
+    if (recordState === RecordState.RECORD) {
       const chart: any = chartRef.current;
 
       // Clear all series
@@ -87,15 +90,8 @@ const Chart: React.FC<IProps> = ({ type }) => {
   return (
     <>
       <ChartToolbar type={type} />
-      <div className="fit-to-container grid grid-cols-12">
-        <div className="h-full col-span-1 grid grid-rows-4 grid-flow-row">
-          <ChartChannelTitle text="O2Hb" color="chart-1" />
-          <ChartChannelTitle text="HHb" color="chart-2" />
-          <ChartChannelTitle text="tHb" color="chart-3" />
-          <ChartChannelTitle text="TOI" color="chart-4" isLast />
-        </div>
-        <div className="h-full col-span-11" id={containerID} />
-      </div>
+
+      <div className="h-[calc(100%-50px)]" id={containerID} />
     </>
   );
 };

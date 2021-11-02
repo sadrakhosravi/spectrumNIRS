@@ -4,12 +4,13 @@ import RecentExperiment from './RecentExperiment.component';
 
 import withLoading from '@hoc/withLoading.hoc';
 import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
+import { useAppSelector } from '@redux/hooks/hooks';
 
-interface IRecentExperimentsContainer {
+type ExperimentsContainer = {
   recentExperiments?: Object[];
   children?: React.ReactNode;
   setLoading?: any;
-}
+};
 
 type ExperimentState = {
   data: any[];
@@ -19,11 +20,14 @@ type ExperimentState = {
 const RecentExperimentsContainer = ({
   children,
   setLoading,
-}: IRecentExperimentsContainer): JSX.Element => {
+}: ExperimentsContainer): JSX.Element => {
   const [experiments, setExperiments] = useState<ExperimentState>({
     data: [],
     searchedExperiments: [],
   });
+  const currentExperimentId = useAppSelector(
+    (state) => state.experimentData.currentExperiment.id
+  );
 
   const { data, isLoading } = useGetRecentExperimentsQuery(5);
 
@@ -63,6 +67,7 @@ const RecentExperimentsContainer = ({
             description={experiment.description}
             saved={experiment.updatedAt}
             key={experiment.id}
+            isActive={experiment.id === currentExperimentId}
           />
         ))}
       {experiments.searchedExperiments.length === 0 && (

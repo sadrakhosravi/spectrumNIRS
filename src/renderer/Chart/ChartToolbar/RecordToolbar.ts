@@ -7,11 +7,16 @@ import ZoomOutIcon from '@icons/zoom-out.svg';
 import ResetZoom from '@icons/reset-zoom.svg';
 import FocusModeIcon from '@icons/focus-mode.svg';
 
+// Constants
 import { RecordState } from '@utils/constants';
 
+// Store
 import store from '@redux/store';
 import { changeRecordState } from '@redux/RecordStateSlice';
 const { dispatch } = store;
+
+// Adapters
+import { handleRecord } from '@adapters/recordAdapter';
 
 export const RecordToolbar = [
   {
@@ -59,18 +64,7 @@ export const RecordButtons = [
     dynamicIcon: (state: RecordState) =>
       state !== RecordState.IDLE ? StopIcon : RecordIcon,
     isActive: (state: RecordState) => state !== RecordState.IDLE,
-    click: (state: RecordState) => {
-      switch (state) {
-        case RecordState.IDLE:
-          dispatch(changeRecordState(RecordState.RECORD));
-          break;
-        case RecordState.RECORD:
-        case RecordState.PAUSED:
-        case RecordState.CONTINUE:
-          dispatch(changeRecordState(RecordState.IDLE));
-          break;
-      }
-    },
+    click: handleRecord,
   },
   {
     dynamicLabel: (state: RecordState) => {

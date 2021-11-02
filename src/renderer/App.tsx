@@ -50,14 +50,9 @@ const App = () => {
           </main>
 
           <Switch>
+            <Route exact path="/" render={() => <Redirect to="/main" />} />
+
             <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
-            <Route
-              exact
-              path="/"
-              render={() => {
-                return <Redirect to="/main/home" />;
-              }}
-            />
           </Switch>
         </React.Suspense>
       </Router>

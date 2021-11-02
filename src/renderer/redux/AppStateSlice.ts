@@ -1,28 +1,45 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from 'utils/constants';
 
-const sendAppStateToController = (_appState: AppState) => {};
+type AppStateSlice = {
+  value: AppState;
+  recordSidebar: boolean;
+  reviewTabInNewWindow: boolean;
+  isLoading: boolean;
+};
 
-interface IAction {
-  payload: AppState;
-}
+const initialState: AppStateSlice = {
+  value: AppState.HOME,
+  recordSidebar: true,
+  reviewTabInNewWindow: false,
+  isLoading: false,
+};
 
-/**
- * Determine the state of the app. Used to navigate to home, record, or review sections.
- */
 export const AppStateSlice = createSlice({
   name: 'appState',
-  initialState: {
-    value: AppState.HOME, // Can be 'home', 'record', 'review' - Check app state enum
-  },
+  initialState,
   reducers: {
-    changeAppState: (state, action: IAction) => {
+    changeAppState: (state, action) => {
       state.value = action.payload;
-      sendAppStateToController(state.value);
+    },
+    setRecordSidebar: (state, { payload }: { payload: boolean }) => {
+      state.recordSidebar = payload;
+    },
+    setReviewTabInNewWindow: (state, { payload }: { payload: boolean }) => {
+      state.reviewTabInNewWindow = payload;
+    },
+    setIsAppLoading: (state, { payload }: { payload: boolean }) => {
+      state.isLoading = payload;
     },
   },
 });
 
-export const { changeAppState } = AppStateSlice.actions;
+export const {
+  changeAppState,
+  setRecordSidebar,
+
+  setReviewTabInNewWindow,
+  setIsAppLoading,
+} = AppStateSlice.actions;
 
 export default AppStateSlice.reducer;

@@ -26,6 +26,7 @@ ipcMain.on('window:myexam', () => {
 app.on('browser-window-created', () => {
   const mainWindow = BrowserWindow.getFocusedWindow();
   mainWindow?.on('unmaximize', () => {
+    console.log('Unmaximized');
     mainWindow?.webContents.send('window:unmaximize');
   });
   mainWindow?.on('maximize', () => {

@@ -1,14 +1,22 @@
 //Contains minimize, restore/maximize, and close button for the titlebar.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Minimize from '@icons/minimize.svg';
 import Restore from '@icons/restore.svg';
 import Close from '@icons/close.svg';
+import Maximize from '@icons/maximize.svg';
 
 const WindowButtons = () => {
-  window.api.onIPCData('window:unmaximize', () => {
-    console.log('Unmaximuoze');
-  });
+  const [isMaximized, setIsMaximized] = useState(true);
+
+  useEffect(() => {
+    window.api.onIPCData('window:unmaximize', () => {
+      isMaximized && setIsMaximized(false);
+    });
+    window.api.onIPCData('window:maximize', () => {
+      !isMaximized && setIsMaximized(true);
+    });
+  }, []);
 
   return (
     <span className="text-right items-center">
@@ -20,7 +28,7 @@ const WindowButtons = () => {
         onClick={() => window.api.sendIPC('window:minimize')}
       />
       <img
-        src={Restore}
+        src={isMaximized ? Restore : Maximize}
         title="Restore"
         className="window-button hover:bg-accent"
         alt="Maximize/Restore"
@@ -37,4 +45,4 @@ const WindowButtons = () => {
   );
 };
 
-export default WindowButtons;
+export default React.memo(WindowButtons);

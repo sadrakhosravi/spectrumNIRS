@@ -97,7 +97,7 @@ input[type]:focus-visible {
 }
 
 .fit-to-container {
-  height: calc(100% - 45px);
+  height: calc(100% - 40px);
 }
 
 .custom-height {

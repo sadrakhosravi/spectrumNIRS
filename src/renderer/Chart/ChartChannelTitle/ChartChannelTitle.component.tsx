@@ -1,8 +1,12 @@
 import React from 'react';
 
-const ChartChannelTitle = (props: any) => {
-  const { text, color, isLast } = props;
+type ChartChannelTitleProps = {
+  text: string;
+  color: string;
+  isLast?: boolean;
+};
 
+const ChartChannelTitle = ({ text, color, isLast }: ChartChannelTitleProps): JSX.Element => {
   const border = isLast ? 'border-b-0' : 'border-b-6';
   const frequencyPosition = isLast ? 'bottom-4' : 'bottom-2';
 
