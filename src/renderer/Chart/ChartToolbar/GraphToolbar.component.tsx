@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { RecordToolbar, RecordButtons } from './RecordToolbar';
 import { ReviewToolbar } from './ReviewToolbar';
+
+import ChartOptions from '../ChartClass/ChartOptions';
 
 // Components
 import Separator from '@components/Separator/Separator.component';
@@ -17,13 +19,26 @@ const IconButtonWithTooltip = withTooltip(IconButton);
 const IconTextButtonWithTooltip = withTooltip(IconTextButton);
 
 type ChartToolbarProps = {
+  chart: any;
   type?: ChartType;
 };
-const ChartToolbar = ({ type = ChartType.RECORD }: ChartToolbarProps) => {
+const ChartToolbar = ({
+  chart,
+  type = ChartType.RECORD,
+}: ChartToolbarProps) => {
   const recordState = useSelector((state: any) => state.recordState.value);
   const toolbarMenu = type === ChartType.RECORD ? RecordToolbar : ReviewToolbar;
+  const chartOptionsRef = useRef<ChartOptions>();
 
-  console.log(recordState);
+  useEffect(() => {
+    const chartOptions = new ChartOptions(
+      chart.channels,
+      chart.dashboard,
+      chart.charts,
+      chart.series
+    );
+    chartOptionsRef.current = chartOptions;
+  }, []);
 
   return (
     <div className="w-full bg-grey1 px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-2 items-center relative">
@@ -33,7 +48,10 @@ const ChartToolbar = ({ type = ChartType.RECORD }: ChartToolbarProps) => {
           return (
             <IconButtonWithTooltip
               icon={option.icon}
-              onClick={() => {}}
+              onClick={() =>
+                //@ts-ignore
+                option.click && option.click(chartOptionsRef.current)
+              }
               tooltip={option.tooltip}
               key={index}
             />

@@ -6,6 +6,9 @@ import ZoomInIcon from '@icons/zoom-in.svg';
 import ZoomOutIcon from '@icons/zoom-out.svg';
 import ResetZoom from '@icons/reset-zoom.svg';
 import FocusModeIcon from '@icons/focus-mode.svg';
+import ResetHeight from '@icons/reset-height.svg';
+import ChartScreenshot from '@icons/chart-screenshot.svg';
+import Marker from '@icons/marker.svg';
 
 // Constants
 import { RecordState } from '@utils/constants';
@@ -17,6 +20,7 @@ const { dispatch } = store;
 
 // Adapters
 import { handleRecord } from '@adapters/recordAdapter';
+import ChartOptions from '../ChartClass/ChartOptions';
 
 export const RecordToolbar = [
   {
@@ -37,7 +41,6 @@ export const RecordToolbar = [
     icon: ResetZoom,
     click: () => {},
   },
-
   {
     label: 'separator',
   },
@@ -46,6 +49,33 @@ export const RecordToolbar = [
     tooltip: 'Focus Mode',
     icon: FocusModeIcon,
     click: () => {},
+  },
+  {
+    label: 'separator',
+  },
+  {
+    label: 'Reset Layout',
+    tooltip: 'Reset Charts Layout',
+    icon: ResetHeight,
+    click: (chartOptions: ChartOptions) => {
+      chartOptions.resetChartsHeight();
+    },
+  },
+  {
+    label: 'Take Screenshot',
+    tooltip: 'Take Screenshot',
+    icon: ChartScreenshot,
+    click: (chartOptions: ChartOptions) => {
+      chartOptions.screenshot();
+    },
+  },
+  {
+    label: 'َAdd Marker',
+    tooltip: 'Add Marker',
+    icon: Marker,
+    click: (chartOptions: ChartOptions) => {
+      chartOptions.addMarker();
+    },
   },
 ];
 

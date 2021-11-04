@@ -29,6 +29,7 @@ export const ReviewToolbar = [
 
   {
     label: 'separator',
+    onclick: () => {},
   },
   {
     label: 'Focus Icon',

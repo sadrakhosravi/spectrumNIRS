@@ -17,7 +17,7 @@ const WidgetsContainer = () => {
   return (
     <>
       {isSidebarActive && (
-        <>
+        <div className="h-full relative pb-3">
           <Filter />
           <Gain />
           <Source />
@@ -27,7 +27,7 @@ const WidgetsContainer = () => {
           >
             Hide Sidebar
           </button>
-        </>
+        </div>
       )}
     </>
   );

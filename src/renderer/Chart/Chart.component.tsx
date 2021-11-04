@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // Components
 import LCJSChart from 'renderer/Chart/ChartClass/Chart';
@@ -18,26 +18,38 @@ declare const window: any;
 
 // Prepares and enders the chart
 const Chart: React.FC<IProps> = ({ type }) => {
+  const [chartLoaded, setChartLoaded] = useState(false);
   const recordState = useAppSelector((state) => state.recordState.value);
   const sensorState = useAppSelector(
     (state) => state.sensorState.detectedSensor
   );
+  const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
+  const samplingRate = (sensorState && sensorState.samplingRate) || 100;
 
   const containerID = 'chart';
   const chartRef = useRef(undefined);
 
   useEffect(() => {
-    // Create chart, series and any other static components.
-    console.log('create chart');
-    // Store references to chart components.
-    const chart: any = new LCJSChart(channels || ['No Channels Found'], type);
+    requestAnimationFrame(() => {
+      // Create chart, series and any other static components.
+      console.log('create chart');
+      // Store references to chart components.
+      chart = new LCJSChart(
+        channels || ['No Channels Found'],
+        type,
+        samplingRate
+      );
 
-    // Attach event listeners
-    type === ChartType.RECORD && chart.recordData();
+      // Attach event listeners
+      type === ChartType.RECORD && chart.recordData();
 
-    // Keep a ref to the chart
-    chartRef.current = chart;
+      // Keep a ref to the chart
+      chartRef.current = chart as any;
+
+      setChartLoaded(true);
+    });
+    let chart: LCJSChart;
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -51,6 +63,16 @@ const Chart: React.FC<IProps> = ({ type }) => {
       chartRef.current = undefined;
     };
   }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const container = document.getElementById(containerID) as HTMLElement;
+      const { offsetWidth } = container;
+      //@ts-ignore
+      chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
+      container.style.overflowX = 'hidden';
+    });
+  }, [recordSidebar]);
 
   // Clear series if recording has restarted
   useEffect(() => {
@@ -89,7 +111,7 @@ const Chart: React.FC<IProps> = ({ type }) => {
 
   return (
     <>
-      <ChartToolbar type={type} />
+      {chartLoaded && <ChartToolbar chart={chartRef.current} type={type} />}
 
       <div className="h-[calc(100%-50px)]" id={containerID} />
     </>

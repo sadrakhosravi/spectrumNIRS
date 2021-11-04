@@ -21,10 +21,12 @@ const RecordPage = () => {
 
   return (
     <>
-      <div className="h-full w-full flex">
+      <div className="h-full w-full flex gap-2">
         <div
-          className={`h-full transition-all duration-150 ${
-            isSidebarActive ? 'w-10/12' : 'w-full pr-4'
+          className={`h-full ${
+            isSidebarActive
+              ? 'w-[calc(100%-200px)]'
+              : 'w-[calc(100%-20px)] pr-1'
           }`}
         >
           <React.Suspense fallback={<p>Loading ...</p>}>
@@ -32,10 +34,10 @@ const RecordPage = () => {
           </React.Suspense>
         </div>
         <div
-          className={`h-full transition-all duration-150 ${
+          className={`h-full ${
             isSidebarActive
-              ? 'w-2/12 mx-3 pb-4'
-              : 'w-4 bg-grey1 hover:bg-accent hover:cursor-pointer'
+              ? 'w-[250px]'
+              : 'w-[20px] bg-grey1 hover:bg-accent hover:cursor-pointer'
           }`}
           onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
         >

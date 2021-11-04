@@ -2,7 +2,6 @@
 import {
   lightningChart,
   SolidFill,
-  Themes,
   ColorHEX,
   AutoCursorModes,
   AxisScrollStrategies,
@@ -14,6 +13,7 @@ import {
   UIElementBuilders,
   UILayoutBuilders,
   UIOrigins,
+  emptyLine,
 } from '@arction/lcjs';
 
 // Constants
@@ -28,22 +28,20 @@ class ChartClass {
   // ChartSyncXAxis: any;
   seriesLength: any;
   type: string;
-  numberOfRows: number;
   channels: string[];
   series: any;
-  chartRowSize: number;
+  samplingRate: number;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
-    type: ChartType.RECORD | ChartType.REVIEW
+    type: ChartType.RECORD | ChartType.REVIEW,
+    samplingRate: number
   ) {
     this.channels = channels;
     this.channelCount = channels.length;
-    this.numberOfRows = this.channelCount * 2;
-    this.chartRowSize = 2;
     this.type = type;
+    this.samplingRate = samplingRate;
     this.seriesLineColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
-
     this.createChart();
   }
 
@@ -67,6 +65,8 @@ class ChartClass {
     // Create series for each chart created
     this.series = this.createSeriesForEachChart();
 
+    this.uiList();
+
     // Customize the default behaviour & options
     this.customizeChart();
 
@@ -79,11 +79,11 @@ class ChartClass {
 
   // Listens for data for the record page
   recordData() {
-    window.api.getRecordingData((data: any) => {
+    window.api.onIPCData('data:reader-record', (_, data: any) => {
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 10 reading lines
-      data.forEach((line: any) => {
+      requestAnimationFrame(() => {
         for (let i = 0; i < this.series.length; i++) {
-          this.series[i].add({ x: line[0], y: line[i + 1] });
+          this.series[i].add({ x: data[0], y: data[i + 1] });
         }
       });
     });
@@ -107,11 +107,14 @@ class ChartClass {
   // Chart dashboard
   createDashboard() {
     const dashboard = lightningChart().Dashboard({
-      numberOfRows: this.numberOfRows, //Total number of rows for the dashboard - default 8
-      numberOfColumns: 1, //Full width
+      numberOfRows: this.channelCount, //Total number of rows for the dashboard - default 8
+      numberOfColumns: 2, //Full width
       container: 'chart', //div id to attach to
-      antialias: true,
+      disableAnimations: true,
     });
+
+    dashboard.setColumnWidth(0, 1);
+    dashboard.setColumnWidth(1, 11);
 
     return dashboard;
   }
@@ -120,19 +123,13 @@ class ChartClass {
   createChartPerChannel() {
     // Create an array containing all the charts that is being created
     const charts = this.channels.map((_channel, i) => {
-      const chart = this.dashboard.createChartXY({
-        theme: Themes.darkGold,
-        columnIndex: 0,
-        rowIndex: i === 0 ? 0 : this.chartRowSize,
-        columnSpan: 1,
-        rowSpan: 2,
-      });
+      const chart = this.dashboard
+        .createChartXY({
+          rowIndex: i,
+          columnIndex: 1,
+        })
+        .setPadding({ bottom: 10, top: 10, right: 10 });
 
-      // Position each chart after another
-      this.chartRowSize =
-        i === 0 ? this.chartRowSize : (this.chartRowSize += 2);
-
-      // Adjust layout based on each charts position
       return chart;
     });
     return charts;
@@ -152,7 +149,7 @@ class ChartClass {
               regularProgressiveStep: true,
             },
           })
-          // .setDataCleaning({ minDataPointCount: 2000 })
+          .setDataCleaning({ minDataPointCount: 1 })
 
           //Styling
           .setStrokeStyle(
@@ -171,38 +168,58 @@ class ChartClass {
   // Remove unused elements from each chart
   customizeChart() {
     this.charts.forEach((chart: any, index: number) => {
+      const axisX = chart.getDefaultAxisX();
+      const axisY = chart.getDefaultAxisY();
       // Set scrolling strategies
       chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting);
 
       if (this.type === ChartType.RECORD) {
-        chart
-          .getDefaultAxisX()
+        axisX
           .setInterval(0, 20.0)
           .setScrollStrategy(AxisScrollStrategies.progressive);
       } else {
-        chart
-          .getDefaultAxisX()
+        axisX
           .setInterval(0, 20.0)
           .setScrollStrategy(AxisScrollStrategies.regressive);
       }
 
       // Disable animation on both axes
-      chart.getDefaultAxisY().disableAnimations();
-      chart.getDefaultAxisX().disableAnimations();
+      axisY.disableAnimations();
+      axisX.disableAnimations();
 
       // Remove X Axis on all charts except the last one
       if (index !== this.channelCount - 1) {
-        chart.getDefaultAxisX().setTickStrategy(AxisTickStrategies.Empty);
+        axisX
+          .setTickStrategy(AxisTickStrategies.Time, (ticks: any) =>
+            ticks
+              .setMajorTickStyle((majorTicks: any) =>
+                majorTicks
+                  .setLabelFillStyle(emptyFill)
+                  .setTickStyle(emptyLine)
+                  .setTickLength(0)
+                  .setTickPadding(0)
+              )
+              .setMinorTickStyle((minorTicks: any) =>
+                minorTicks
+                  .setLabelFillStyle(emptyFill)
+                  .setTickStyle(emptyLine)
+                  .setTickLength(0)
+                  .setTickPadding(0)
+              )
+          )
+          .setStrokeStyle(emptyLine)
+          .setScrollStrategy(undefined)
+          .setTickStrategy(AxisTickStrategies.Empty)
+          .setStrokeStyle(emptyLine);
       } else {
         // Add X Axis to the last chart
         if (this.type === ChartType.RECORD) {
-          chart
-            .getDefaultAxisX()
+          axisX
+            .setTickStrategy(AxisTickStrategies.Time)
             .setTitle('Seconds')
             .setScrollStrategy(AxisScrollStrategies.progressive);
         } else {
-          chart
-            .getDefaultAxisX()
+          axisX
             .setTitle('Seconds')
             .setScrollStrategy(AxisScrollStrategies.regressive);
         }
@@ -221,6 +238,116 @@ class ChartClass {
       // Disable default auto cursor.
       chart.setAutoCursorMode(AutoCursorModes.disabled);
     });
+  }
+
+  uiList() {
+    this.charts.forEach((chart: any, i: number) => {
+      const axisX = chart.getDefaultAxisX();
+      const axisY = chart.getDefaultAxisY();
+      const panel = this.dashboard.createUIPanel({
+        columnIndex: 0,
+        rowIndex: i,
+      });
+
+      const legendLayout = panel
+        .addUIElement(UILayoutBuilders.Column)
+        .setPosition(
+          translatePoint(
+            {
+              x: 0,
+              y: axisY.getInterval().end,
+            },
+            { x: axisX, y: axisY },
+            chart.uiScale
+          )
+        )
+        .setOrigin(UIOrigins.LeftTop)
+        .setMouseInteractions(false)
+        .setBackground((bg: any) =>
+          bg.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
+        );
+
+      legendLayout
+        .addElement(UIElementBuilders.TextBox)
+        .setText(this.channels[i])
+        .setTextFont((font: any) => font.setSize(16));
+
+      legendLayout
+        .addElement(UIElementBuilders.TextBox)
+        .setText(' ')
+        .setMargin({ top: 5 })
+        .setBackground((background: any) =>
+          background.setFillStyle(
+            new SolidFill({
+              color: ColorHEX(this.seriesLineColorArr[i]),
+            })
+          )
+        );
+
+      legendLayout
+        .addElement(UIElementBuilders.TextBox)
+        .setText(this.samplingRate.toString() + ' samples/s')
+        .setTextFont((font: any) => font.setSize(9))
+        .setMargin({ top: 10 });
+    });
+    // this.charts.map((chart: any, i: number) => {
+    //   const axisX = chart.getDefaultAxisX();
+    //   const axisY = chart.getDefaultAxisY();
+    //   const channel = this.channels[i];
+
+    //   const ui = chart
+    //     .addUIElement(UILayoutBuilders.Column)
+    //     .setMouseInteractions(false)
+    //     .setBackground((background: any) =>
+    //       background.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
+    //     )
+    //     .dispose();
+
+    //   const channelText = ui
+    //     .addElement(UIElementBuilders.TextBox)
+    //     .setText(channel)
+    //     .setTextFont((font: any) => font.setSize(16))
+    //     .dispose();
+
+    //   const channelColor = ui
+    //     .addElement(UIElementBuilders.TextBox)
+    //     .setText(' ')
+    //     .setMargin({ top: 5 })
+    //     .setBackground((background: any) =>
+    //       background.setFillStyle(
+    //         new SolidFill({
+    //           color: ColorHEX(this.seriesLineColorArr[i]),
+    //         })
+    //       )
+    //     )
+    //     .dispose();
+
+    //   const samplingRate = ui
+    //     .addElement(UIElementBuilders.TextBox)
+    //     .setText(this.samplingRate.toString() + ' samples/s')
+    //     .setTextFont((font: any) => font.setSize(9))
+    //     .setMargin({ top: 10 })
+    //     .dispose();
+
+    //   requestAnimationFrame(() => {
+    //     ui.setPosition(
+    //       translatePoint(
+    //         {
+    //           x: axisX.getInterval().start,
+    //           y: axisY.getInterval().end,
+    //         },
+    //         { x: axisX, y: axisY },
+    //         chart.uiScale
+    //       )
+    //     )
+    //       .setOrigin(UIOrigins.LeftTop)
+    //       .restore();
+
+    //     channelText.restore();
+    //     channelColor.restore();
+    //     samplingRate.restore();
+    //   });
+    // });
   }
 
   // Synchronizes all X axis to have the same interval/move at the same time
@@ -359,11 +486,11 @@ class ChartClass {
 
         // Format result table text.
         rowX.setText(
-          `X: ${axisX.formatValue(nearestDataPoints[i].location.x)}`
+          `Time: ${axisX.formatValue(nearestDataPoints[i].location.x)}`
         );
         rowsY.forEach((rowY: any, i: number) => {
           rowY.setText(
-            `Y${i}: ${this.charts[i]
+            `${this.channels[i]}: ${this.charts[i]
               .getDefaultAxisY()
               .formatValue(nearestDataPoints[i].location.y)}`
           );
