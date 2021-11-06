@@ -2,18 +2,17 @@
  * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
 
-import { BrowserWindow } from 'electron'; // Electron
-
 const path = require('path');
 const readline = require('readline');
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
 
 // Defining the variables here for memory cleanup later.
 let rl: any;
+let rawData = false;
+let outputArr: number[] = [0, 0, 0, 0, 0];
 let readUSBData: any;
 let lastTimeSequence = 0;
 let timeSequence = 0; // timeSequence in centiseconds
-let outputArr: Array<any> = []; // Variable before starting to read data
 
 // Spawned processes array to keep track.
 const spawnedProcesses: any[] = [];
@@ -23,12 +22,11 @@ const spawnedProcesses: any[] = [];
  * Send the parsed data through IPC.
  * @param prevTime - Last timestamp (used for pause and continue functions only)
  */
-const start = (
+export const start = (
   prevTime = 0,
   _insertRecordingData: (data: unknown) => Promise<any>,
   sender: any
 ) => {
-  const mainWindow = BrowserWindow.getAllWindows()[0];
   // Spawn NIRSReader.exe
   readUSBData = spawn(
     path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),
@@ -72,24 +70,25 @@ const start = (
       }
 
       // Prepare an array of data
-      const _outputArr = [
-        timeSequence / 100,
-        parseFloat(data[1]),
-        parseFloat(data[2]),
-        parseFloat(data[3]),
-        parseFloat(data[4]),
-      ]; // [timeSequence, O2hb, HHb, tHb, TOI]
-
-      outputArr.push(_outputArr);
-
-      if (outputArr.length === 5) {
-        // Send the data to be graphed to the renderer
-        mainWindow.webContents.send('data:reader-record', outputArr);
-
-        sender.send('data:reader-record', outputArr);
-        // mainWindow.webContents.send('data:reader-record', outputArr); // Format = 'TimeSequence,O2Hb,HHb,tHb,TOI'
-        outputArr = [];
+      if (!rawData) {
+        outputArr = [
+          timeSequence / 100,
+          parseFloat(data[1]),
+          parseFloat(data[2]),
+          parseFloat(data[3]),
+          parseFloat(data[4]),
+        ]; // [timeSequence, O2hb, HHb, tHb, TOI]
+      } else {
+        outputArr = [
+          timeSequence / 100,
+          parseFloat(data[6]),
+          parseFloat(data[7]),
+          parseFloat(data[8]),
+          parseFloat(data[9]),
+        ]; // [timeSequence, O2hb, HHb, tHb, TOI]
       }
+
+      sender.send('data:reader-record', outputArr);
 
       //Adjust the data array and swap the timeSequence with the one generated here
       data[0] = (timeSequence / 100).toString();
@@ -114,14 +113,13 @@ const start = (
  * Stops the spawned process, closes the readline module, and does some memory cleanup.
  * @returns `lastTimeSequence` the last time sequence saved
  */
-const stop = (): number => {
+export const stop = (): number => {
   // Stop the readline
   rl.close();
   rl.removeAllListeners();
 
   // Reset the timeSequence
   timeSequence = 0;
-  outputArr = [];
 
   // Kill all spawned processes
   spawnedProcesses.forEach((process) => process.kill());
@@ -130,12 +128,19 @@ const stop = (): number => {
   return lastTimeSequence;
 };
 
+/**
+ * Toggle the data to be sent to the UI - Calculated Data or Raw Data
+ */
+export const toggleRawData = () => {
+  rawData = !rawData;
+};
+
 // Final object to be exported
 const nirsReader = {
-  start: start,
-  stop: stop,
+  start,
+  stop,
+  toggleRawData,
 };
 
 // Export module
 export default nirsReader;
-export { start, stop };

@@ -9,13 +9,13 @@ export interface ISensor {
 }
 
 export interface ISensorState {
-  detectedSensor: ISensor | false;
-  selectedSensor: ISensor | false;
+  detectedSensor: ISensor | null;
+  selectedSensor: ISensor | null;
 }
 
 const initialState: ISensorState = {
-  detectedSensor: false,
-  selectedSensor: false,
+  detectedSensor: null,
+  selectedSensor: null,
 };
 
 export const SensorSlice = createSlice({

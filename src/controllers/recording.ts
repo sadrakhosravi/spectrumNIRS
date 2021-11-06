@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainEvent } from 'electron';
+import { ipcMain } from 'electron';
 
 // Models
 import DataReader from '../main/models/DataReader';
@@ -17,15 +17,15 @@ let reader: DataReader;
 // Select the sensor
 ipcMain.handle(
   RecordChannels.Init,
-  (_, { sensorId, patientId }: RecordInit) => {
+  (event, { sensorId, patientId }: RecordInit) => {
     console.log(sensorId, patientId);
-    reader = new DataReader(patientId, sensorId);
+    reader = new DataReader(patientId, sensorId, event.sender);
   }
 );
 
 // Start recording
-ipcMain.on(RecordChannels.Recording, (event: IpcMainEvent) => {
-  reader.startRecording(event.sender); // All necessary functionality of reading NIRS sensor data.
+ipcMain.on(RecordChannels.Recording, () => {
+  reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
 });
 
 // Stop recording
@@ -40,5 +40,11 @@ ipcMain.on(RecordChannels.Pause, () => {
 
 // Continue recording
 ipcMain.on(RecordChannels.Continue, () => {
+  console.log('Continue');
   reader.continueRecording();
+});
+
+// Display Raw Data
+ipcMain.on(RecordChannels.RawData, () => {
+  reader.toggleRawData();
 });

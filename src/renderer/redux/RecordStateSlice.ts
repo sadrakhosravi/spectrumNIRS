@@ -1,11 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RecordState } from 'utils/constants';
 
-interface IRecordState {
-  value: RecordState;
-}
-
-const initialState: IRecordState = { value: RecordState.IDLE };
+const initialState = { value: RecordState.IDLE };
 
 /**
  * State to determine whether the app is recording data, paused, continued recording, or idle(not recording)
@@ -15,6 +11,7 @@ export const RecordStateSlice = createSlice({
   initialState,
   reducers: {
     changeRecordState: (state, action) => {
+      console.log(action.type);
       state.value = action.payload;
     },
   },

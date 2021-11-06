@@ -31,6 +31,8 @@ const Chart: React.FC<IProps> = ({ type }) => {
   const chartRef = useRef(undefined);
 
   useEffect(() => {
+    let chart: LCJSChart;
+
     requestAnimationFrame(() => {
       // Create chart, series and any other static components.
       console.log('create chart');
@@ -47,22 +49,24 @@ const Chart: React.FC<IProps> = ({ type }) => {
       // Keep a ref to the chart
       chartRef.current = chart as any;
 
-      setChartLoaded(true);
+      sensorState && setChartLoaded(true);
+      !sensorState && setChartLoaded(false);
     });
-    let chart: LCJSChart;
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
-      // Destroy chart.
-      console.log('destroy chart');
-      chart.cleanup();
+      requestAnimationFrame(() => {
+        // Destroy chart.
+        console.log('destroy chart');
+        chart.cleanup();
 
-      delete window.chart;
-      delete window.ChartClass;
+        delete window.chart;
+        delete window.ChartClass;
 
-      chartRef.current = undefined;
+        chartRef.current = undefined;
+      });
     };
-  }, []);
+  }, [sensorState]);
 
   useEffect(() => {
     requestAnimationFrame(() => {

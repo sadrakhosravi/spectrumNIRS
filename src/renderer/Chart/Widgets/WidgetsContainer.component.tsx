@@ -5,14 +5,27 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 import Filter from './Filter/Filter.component';
 import Gain from './Gain/Gain.component';
 import Source from './Source/Source.component';
-import { setRecordSidebar } from '@redux/AppStateSlice';
+import { setRecordSidebar, setReviewSidebar } from '@redux/AppStateSlice';
+
+// Constants
+import { ChartType } from '@utils/constants';
 
 //The container for each widget to be rendered in
-const WidgetsContainer = () => {
+const WidgetsContainer = ({
+  type = ChartType.RECORD,
+}: {
+  type?: ChartType;
+}) => {
   const isSidebarActive = useAppSelector(
-    (state) => state.appState.recordSidebar
+    (state) => state.appState[`${type}Sidebar`]
   );
   const dispatch = useAppDispatch();
+
+  // Hides the sidebar based on its type
+  const handleHideSidebarClick = () => {
+    type === ChartType.RECORD && dispatch(setRecordSidebar(false));
+    type === ChartType.REVIEW && dispatch(setReviewSidebar(false));
+  };
 
   return (
     <>
@@ -23,7 +36,7 @@ const WidgetsContainer = () => {
           <Source />
           <button
             className="absolute bottom-1 left-2 w-full h-8 text-light2 hover:text-white"
-            onClick={() => dispatch(setRecordSidebar(false))}
+            onClick={handleHideSidebarClick}
           >
             Hide Sidebar
           </button>

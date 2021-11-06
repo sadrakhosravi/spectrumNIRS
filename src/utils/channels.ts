@@ -24,11 +24,13 @@ export const StartupChannels = {
 // Record Channel
 const RecordBase = 'record:';
 export const RecordChannels = {
+  Base: RecordBase,
   Init: RecordBase + 'init',
   Recording: RecordBase + 'recording',
   Stop: RecordBase + 'stop',
   Pause: RecordBase + 'pause',
   Continue: RecordBase + 'continue',
+  RawData: RecordBase + 'raw-data',
 };
 
 // Review Tab

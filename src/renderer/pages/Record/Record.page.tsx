@@ -25,7 +25,7 @@ const RecordPage = () => {
         <div
           className={`h-full ${
             isSidebarActive
-              ? 'w-[calc(100%-200px)]'
+              ? 'w-[calc(100%-250px)]'
               : 'w-[calc(100%-20px)] pr-1'
           }`}
         >
@@ -41,7 +41,7 @@ const RecordPage = () => {
           }`}
           onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
         >
-          <WidgetsContainer />
+          <WidgetsContainer type={ChartType.RECORD} />
         </div>
       </div>
     </>

@@ -16,7 +16,6 @@ class ChartOptions {
   resetChartsHeight() {
     this.channels.forEach((_, i: number) => {
       this.dashboard.setRowHeight(i, 1);
-      i === 0 && this.dashboard.setRowHeight(i, 0);
     });
   }
 

@@ -33,4 +33,4 @@ const TitleBar = () => {
   );
 };
 
-export default React.memo(TitleBar);
+export default TitleBar;

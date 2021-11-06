@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
-import { setRecordSidebar } from '@redux/AppStateSlice';
+import { setReviewSidebar } from '@redux/AppStateSlice';
 
 // Main area components
 const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
@@ -12,24 +12,25 @@ import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component'
 import { ChartType } from 'utils/constants';
 
 const Review = () => {
-  const isSidebarActive = useAppSelector(
-    (state) => state.appState.recordSidebar
-  );
   const dispatch = useAppDispatch();
+  const isSidebarActive = useAppSelector(
+    (state) => state.appState.reviewSidebar
+  );
+  console.log(isSidebarActive);
 
   const isNewWindow = useAppSelector(
     (state) => state.appState.reviewTabInNewWindow
   );
 
-  useEffect(() => {}, []);
-
   return (
     <>
       {!isNewWindow && (
-        <div className="h-full w-full flex">
+        <div className="h-full w-full flex gap-2">
           <div
-            className={`h-full transition-all duration-150 ${
-              isSidebarActive ? 'w-10/12' : 'w-full pr-4'
+            className={`h-full ${
+              isSidebarActive
+                ? 'w-[calc(100%-250px)]'
+                : 'w-[calc(100%-20px)] pr-1'
             }`}
           >
             <React.Suspense fallback={<p>Loading ...</p>}>
@@ -37,14 +38,14 @@ const Review = () => {
             </React.Suspense>
           </div>
           <div
-            className={`h-full transition-all duration-150 ${
+            className={`h-full ${
               isSidebarActive
-                ? 'w-2/12 mx-3 pb-4'
-                : 'w-4 bg-grey1 hover:bg-accent hover:cursor-pointer'
+                ? 'w-[250px]'
+                : 'w-[20px] bg-grey1 hover:bg-accent hover:cursor-pointer'
             }`}
-            onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
+            onClick={() => !isSidebarActive && dispatch(setReviewSidebar(true))}
           >
-            <WidgetsContainer />
+            <WidgetsContainer type={ChartType.REVIEW} />
           </div>
         </div>
       )}

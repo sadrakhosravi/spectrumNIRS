@@ -11,10 +11,12 @@ const WindowButtons = () => {
 
   useEffect(() => {
     window.api.onIPCData('window:unmaximize', () => {
-      isMaximized && setIsMaximized(false);
+      setIsMaximized(false);
     });
     window.api.onIPCData('window:maximize', () => {
-      !isMaximized && setIsMaximized(true);
+      console.log('Maximize');
+
+      setIsMaximized(true);
     });
   }, []);
 

@@ -74,6 +74,18 @@ const createMainWindow = async () => {
   // Default app state is maximized
   mainWindow.maximize();
 
+  // Unmaximize event
+  mainWindow.on('unmaximize', () => {
+    console.log('Maximized');
+    mainWindow?.webContents.send('window:unmaximize');
+  });
+
+  // Maximize event
+  mainWindow.on('maximize', () => {
+    console.log('Maximized');
+    mainWindow?.webContents.send('window:maximize');
+  });
+
   return mainWindow;
 };
 

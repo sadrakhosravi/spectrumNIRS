@@ -28,7 +28,8 @@ export const handleRecord = async () => {
   // Check record state and decide accordingly
   if (recordState.value !== RecordState.IDLE) {
     dispatch(changeRecordState(RecordState.IDLE));
-    window.api.sendIPC(RecordChannels.Stop);
+    recordState.value !== RecordState.PAUSED &&
+      window.api.sendIPC(RecordChannels.Stop);
   } else {
     dispatch(changeRecordState(RecordState.RECORD));
     await window.api.invokeIPC(RecordChannels.Init, { sensorId, patientId });
@@ -37,13 +38,15 @@ export const handleRecord = async () => {
 };
 
 // Pause and continue recording logic
-export const pauseRecording = () => {
+export const handlePause = () => {
   const { recordState } = store.getState();
+  if (recordState.value === 'idle') return;
 
   // Check the current record state and decide accordingly
   recordState.value === 'pause'
     ? dispatch(changeRecordState('continue'))
     : dispatch(changeRecordState('pause'));
 
-  window.api.sendRecordState(store.getState().recordState.value);
+  console.log(store.getState().recordState.value);
+  window.api.sendIPC(RecordChannels.Base + store.getState().recordState.value);
 };

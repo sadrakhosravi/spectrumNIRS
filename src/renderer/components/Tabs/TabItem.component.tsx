@@ -11,13 +11,13 @@ type TabItems = {
 
 const TabItem = ({ name, icon, isActive, onClick }: TabItems) => {
   const tabColor = isActive
-    ? `bg-accent`
-    : `bg-grey2 hover:bg-light2 active:bg-accent`;
+    ? `bg-grey1 z-10 border-accent hover:border-accent`
+    : `border-dark hover:bg-grey2 hover:border-grey2 z-0`;
 
   return (
     <button
       type="button"
-      className={`${tabColor} w-64 px-3 h-40px grid grid-flow-col auto-cols-max items-center transition duration-100`}
+      className={`w-64 px-3 h-40px border-t-4 grid grid-flow-col auto-cols-max items-center transition duration-100 ${tabColor} `}
       onClick={onClick}
       id={name}
     >

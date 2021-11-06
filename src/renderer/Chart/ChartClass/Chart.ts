@@ -15,7 +15,6 @@ import {
   UIOrigins,
   emptyLine,
 } from '@arction/lcjs';
-
 // Constants
 import { ChartType } from 'utils/constants';
 
@@ -37,7 +36,7 @@ class ChartClass {
     type: ChartType.RECORD | ChartType.REVIEW,
     samplingRate: number
   ) {
-    this.channels = channels;
+    this.channels = channels || ['No Channel'];
     this.channelCount = channels.length;
     this.type = type;
     this.samplingRate = samplingRate;

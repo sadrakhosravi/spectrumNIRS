@@ -31,6 +31,7 @@ const TrayIcons = () => {
 
   useEffect(() => {
     window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
+      console.log(data);
       dispatch(setDetectedSensor(data));
     });
 
@@ -58,9 +59,17 @@ const TrayIcons = () => {
   let experimentButton = null,
     patientButton = null;
 
+  // Fix layout issue with margin bottom
+  const SeparatorBar = (
+    <div className="mb-[5px]">
+      <Separator />
+    </div>
+  );
+
   if (experimentData.currentExperiment.name) {
     experimentButton = (
       <>
+        {SeparatorBar}
         <TrayIconWithTooltip
           icon={ExperimentIcon}
           text={`Experiment: ${experimentData.currentExperiment.name}`}
@@ -72,6 +81,8 @@ const TrayIcons = () => {
 
     patientButton = (
       <>
+        {SeparatorBar}
+
         <Separator />
         <TrayIconWithTooltip
           icon={PatientIcon}
@@ -84,25 +95,27 @@ const TrayIcons = () => {
   }
 
   return (
-    <footer className="text-right col-span-9 h-30px grid grid-flow-col auto-cols-max justify-end">
-      {experimentButton}
-      {patientButton}
-      <Separator />
-      <TrayIconWithTooltip
-        icon={SensorIcon}
-        tooltip={
-          sensorState.detectedSensor.name ? (
-            <p>Sensor Status: Connected</p>
-          ) : (
-            <p>Sensor Status: No Sensor Found</p>
-          )
-        }
-        text={`Sensor: ${
-          sensorState.detectedSensor.name || 'Not Connected ❌'
-        }`}
-      />
+    <footer className="text-right col-span-9 h-30px">
+      <div className="grid grid-flow-col items-center justify-end pb-2">
+        {experimentButton}
+        {patientButton}
+        {SeparatorBar}
+        <TrayIconWithTooltip
+          icon={SensorIcon}
+          tooltip={
+            sensorState.detectedSensor?.name ? (
+              <p>Sensor Status: Connected</p>
+            ) : (
+              <p>Sensor Status: No Sensor Found</p>
+            )
+          }
+          text={`Sensor: ${
+            sensorState.detectedSensor?.name || 'Not Connected ❌'
+          }`}
+        />
+      </div>
     </footer>
   );
 };
 
-export default React.memo(TrayIcons);
+export default TrayIcons;

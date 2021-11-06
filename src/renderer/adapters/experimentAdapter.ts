@@ -35,7 +35,7 @@ export const setSensorStatus = (data: Object) => {
   const { detectedSensor } = getState().sensorState;
 
   // Check if the detected and selected sensors match
-  if (data.toString() !== detectedSensor.toString()) {
+  if (data.toString() !== detectedSensor?.toString()) {
     window.api.invokeIPC(DialogBoxChannels.MessageBox, {
       title: 'Sensor Mismatch Error',
       type: 'error',

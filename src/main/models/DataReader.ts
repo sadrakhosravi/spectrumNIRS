@@ -6,7 +6,7 @@ export interface IDataReaders {
   /**
    * Starts reading data from the sensor.
    */
-  startRecording(arg: any): void;
+  startRecording(): void;
   /**
    * Stops reading data and kills the process.
    */
@@ -19,6 +19,10 @@ export interface IDataReaders {
    * Continues reading data.
    */
   continueRecording(): void;
+  /**
+   * Toggles the data to either display raw data or the calculated values.
+   */
+  toggleRawData(): void;
 }
 
 type CurrentSensor = {
@@ -28,8 +32,9 @@ type CurrentSensor = {
     sender: any
   ) => void;
   pause: () => void;
-  continueRecording: () => void;
+  continueRecording: (sender: any) => void;
   stop: () => number;
+  toggleRawData: () => void;
 };
 
 /**
@@ -42,21 +47,26 @@ export class DataReader implements IDataReaders {
   dataReader: any[] = [NIRSV5];
   lastTimeSequence: number;
   Recording: Recording;
+  senderWindow: Electron.WebContents;
 
-  constructor(patientId: number, sensorId: number) {
+  constructor(
+    patientId: number,
+    sensorId: number,
+    senderWindow: Electron.WebContents
+  ) {
     this.sensor = sensorId;
     this.patientId = patientId;
+    this.senderWindow = senderWindow;
     this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
     this.Recording = new Recording(this.patientId);
     this.lastTimeSequence = 0;
   }
 
-  startRecording(sender: any) {
-    sender.send('testing:channel');
+  startRecording() {
     this.currentSensor.start(
       this.lastTimeSequence,
       this.Recording.insertRecordingData,
-      sender
+      this.senderWindow
     );
   }
 
@@ -72,7 +82,11 @@ export class DataReader implements IDataReaders {
   }
 
   continueRecording() {
-    // this.startRecording();
+    this.startRecording();
+  }
+
+  toggleRawData() {
+    this.currentSensor.toggleRawData();
   }
 }
 

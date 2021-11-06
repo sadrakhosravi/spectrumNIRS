@@ -15,9 +15,9 @@ type ConnectedDevice = {
   driverName: string;
 };
 
-const checkConnectedDevice = (device: any): false | ConnectedDevice => {
-  // If the device is not available return false.
-  if (!device) return false;
+const checkConnectedDevice = (device: any): null | ConnectedDevice => {
+  // If the device is not available return null.
+  if (!device) return null;
 
   // Check if any of the sensors are available in the list.
   const connectedSensor = devices.filter((sensor) =>
@@ -26,8 +26,20 @@ const checkConnectedDevice = (device: any): false | ConnectedDevice => {
 
   // If any sensor is available, return the first one.
   const availableSensor =
-    connectedSensor.length === 0 ? false : connectedSensor[0];
+    connectedSensor.length === 0 ? null : connectedSensor[0];
   return availableSensor;
+};
+
+/**
+ * Sends the sensor status to every available page
+ * @param sensorStatus Status of the sensor to be sent
+ */
+const sendDataToUI = (sensorStatus: null | ConnectedDevice) => {
+  // Send the result to the UI.
+  const windows = BrowserWindow.getAllWindows();
+  windows.forEach((window) => {
+    window.webContents.send(USBDetectionChannels.NIRSV5, sensorStatus);
+  });
 };
 
 // Detect USB insert
@@ -36,19 +48,17 @@ usbDetect.on('add', function (device: any) {
   const sensorStatus = checkConnectedDevice(device);
 
   // Send the result to the UI.
-  const mainWindow = BrowserWindow.getAllWindows()[0];
-  mainWindow.webContents.send(USBDetectionChannels.NIRSV5, sensorStatus);
+  sendDataToUI(sensorStatus);
 });
 
 // Detect USB insert
 usbDetect.on('remove', function (device: any) {
   // Check if the removed device is a sensor.
   const sensorStatus = checkConnectedDevice(device);
-  const isNIRSV5 = sensorStatus ? false : sensorStatus;
+  const isNIRSV5 = sensorStatus ? null : sensorStatus;
 
   // Send the result to the UI.
-  const mainWindow = BrowserWindow.getAllWindows()[0];
-  mainWindow.webContents.send(USBDetectionChannels.NIRSV5, isNIRSV5);
+  sendDataToUI(isNIRSV5);
 });
 
 // Look for the sensor in the connected devices list.

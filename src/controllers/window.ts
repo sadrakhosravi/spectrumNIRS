@@ -19,14 +19,9 @@ ipcMain.on('window:restore', (event: IpcMainEvent) => {
     : mainWindow?.maximize();
 });
 
-ipcMain.on('window:myexam', () => {
-  console.log('messagee');
-});
-
 app.on('browser-window-created', () => {
   const mainWindow = BrowserWindow.getFocusedWindow();
   mainWindow?.on('unmaximize', () => {
-    console.log('Unmaximized');
     mainWindow?.webContents.send('window:unmaximize');
   });
   mainWindow?.on('maximize', () => {

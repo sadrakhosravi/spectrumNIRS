@@ -13,6 +13,7 @@ import withTooltip from '@hoc/withTooltip.hoc';
 
 // Constants
 import { ChartType } from '@utils/constants';
+import { useAppSelector } from '@redux/hooks/hooks';
 
 // Buttons with tooltip
 const IconButtonWithTooltip = withTooltip(IconButton);
@@ -29,6 +30,8 @@ const ChartToolbar = ({
   const recordState = useSelector((state: any) => state.recordState.value);
   const toolbarMenu = type === ChartType.RECORD ? RecordToolbar : ReviewToolbar;
   const chartOptionsRef = useRef<ChartOptions>();
+  const chartState = useAppSelector((state) => state.chartState) as any;
+  console.log(chartState);
 
   useEffect(() => {
     const chartOptions = new ChartOptions(
@@ -45,9 +48,11 @@ const ChartToolbar = ({
       <div className="grid grid-flow-col auto-cols-max items-center gap-3">
         {toolbarMenu.map((option, index) => {
           if (option.label === 'separator') return <Separator key={index} />;
+          console.log(chartState[option.label]);
           return (
             <IconButtonWithTooltip
               icon={option.icon}
+              isActive={chartState[option.label] || false}
               onClick={() =>
                 //@ts-ignore
                 option.click && option.click(chartOptionsRef.current)
@@ -77,7 +82,7 @@ const ChartToolbar = ({
                 button.isDisabled ? button.isDisabled(recordState) : false
               }
               onClick={() => {
-                button.click(recordState);
+                button.click();
               }}
               key={index}
             />

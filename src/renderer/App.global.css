@@ -108,6 +108,10 @@ input[type]:focus-visible {
   height: 3rem;
 }
 
+.overflow-y-hidden {
+  overflow-y: hidden !important;
+}
+
 .separator {
   border-left: 2px solid rgba(255, 255, 255, 0.5);
   height: 75%;

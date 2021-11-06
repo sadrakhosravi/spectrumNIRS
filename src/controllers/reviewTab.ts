@@ -19,7 +19,7 @@ const reviewTabNewWindow = async () => {
     frame: true,
     roundedCorners: true,
     webPreferences: {
-      devTools: false,
+      devTools: true,
       contextIsolation: true,
       preload: path.join(__dirname, '../main/preload.js'),
       backgroundThrottling: false,

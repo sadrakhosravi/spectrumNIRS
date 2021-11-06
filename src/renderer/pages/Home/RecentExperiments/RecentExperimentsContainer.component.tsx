@@ -29,10 +29,11 @@ const RecentExperimentsContainer = ({
     (state) => state.experimentData.currentExperiment.id
   );
 
-  const { data, isLoading } = useGetRecentExperimentsQuery(5);
+  const { data, isLoading, refetch } = useGetRecentExperimentsQuery(5);
 
   // Handle side effects
   useEffect(() => {
+    refetch();
     setLoading(isLoading);
     !isLoading && setExperiments({ data, searchedExperiments: data });
   }, [isLoading]);
