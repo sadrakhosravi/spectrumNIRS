@@ -6,9 +6,18 @@ import DataReader from '../main/models/DataReader';
 // Constants
 import { RecordChannels } from '@utils/channels';
 
+export type CurrentRecording = {
+  id: number;
+  name: string;
+  description: string;
+  date: string;
+};
+
 type RecordInit = {
   sensorId: number;
   patientId: number;
+  currentRecording: CurrentRecording;
+  isRawData: boolean;
 };
 
 // Store
@@ -17,9 +26,15 @@ let reader: DataReader;
 // Select the sensor
 ipcMain.handle(
   RecordChannels.Init,
-  (event, { sensorId, patientId }: RecordInit) => {
+  (event, { sensorId, patientId, currentRecording, isRawData }: RecordInit) => {
     console.log(sensorId, patientId);
-    reader = new DataReader(patientId, sensorId, event.sender);
+    reader = new DataReader(
+      patientId,
+      sensorId,
+      currentRecording,
+      isRawData,
+      event.sender
+    );
   }
 );
 
@@ -46,5 +61,5 @@ ipcMain.on(RecordChannels.Continue, () => {
 
 // Display Raw Data
 ipcMain.on(RecordChannels.RawData, () => {
-  reader.toggleRawData();
+  reader && reader.toggleRawData();
 });

@@ -25,8 +25,12 @@ const spawnedProcesses: any[] = [];
 export const start = (
   prevTime = 0,
   _insertRecordingData: (data: unknown) => Promise<any>,
+  isRawData: boolean,
   sender: any
 ) => {
+  // Check if RawData was requested
+  isRawData ? (rawData = true) : (rawData = false);
+
   // Spawn NIRSReader.exe
   readUSBData = spawn(
     path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),

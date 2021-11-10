@@ -14,6 +14,7 @@ import {
   UILayoutBuilders,
   UIOrigins,
   emptyLine,
+  Themes,
 } from '@arction/lcjs';
 // Constants
 import { ChartType } from 'utils/constants';
@@ -30,6 +31,7 @@ class ChartClass {
   channels: string[];
   series: any;
   samplingRate: number;
+  TOILegend: any;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
@@ -41,16 +43,17 @@ class ChartClass {
     this.type = type;
     this.samplingRate = samplingRate;
     this.seriesLineColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
-    this.createChart();
+
+    this.TOILegend = null;
   }
 
   // Cleanup function when chart is removed from the screen - IMPORTANT
   cleanup() {
+    window.api.removeListeners('data:reader-record');
     this.dashboard.dispose();
-    this.dashboard = null;
-    this.charts = null;
-    this.series = null;
-    window.api.removeChartEventListeners();
+    this.dashboard = undefined;
+    this.charts = undefined;
+    this.series = undefined;
   }
 
   // Create chart
@@ -74,34 +77,41 @@ class ChartClass {
 
     // Add a custom cursor to show each chart value
     this.customCursor();
+
+    // Set data cleaning
+    this.seriesDataCleaning();
   }
 
   // Listens for data for the record page
   recordData() {
+    let count = 0;
+    let dataPoints: any = [];
     window.api.onIPCData('data:reader-record', (_, data: any) => {
+      // Store the coming data points
+      dataPoints.push(data);
+
+      // Change TOI value every 25 samples (based on 100samples/s)
+      if (count === 25) {
+        this.TOILegend.setText(Math.round(data[4]).toString());
+        count = 0;
+      }
+      count++;
+
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 10 reading lines
       requestAnimationFrame(() => {
-        for (let i = 0; i < this.series.length; i++) {
-          this.series[i].add({ x: data[0], y: data[i + 1] });
-        }
+        dataPoints.forEach((data: any) => {
+          for (let i = 0; i < this.series.length; i++) {
+            this.series[i].add({ x: data[0], y: data[i + 1] });
+          }
+        });
+
+        dataPoints = [];
       });
     });
   }
 
   // Listens for events of the review page
-  reviewData(data: Array<Object>) {
-    console.log(data);
-    // Loads all the data
-    data.forEach((line: any) => {
-      const data = line.value.split(',');
-      for (let i = 0; i < this.series.length; i++) {
-        this.series[i].add({
-          x: parseFloat(data[0]),
-          y: parseFloat(data[i + 1]),
-        });
-      }
-    });
-  }
+  reviewData(_data: Array<Object>) {}
 
   // Chart dashboard
   createDashboard() {
@@ -110,7 +120,13 @@ class ChartClass {
       numberOfColumns: 2, //Full width
       container: 'chart', //div id to attach to
       disableAnimations: true,
+      theme: Themes.darkGold,
     });
+    dashboard.setBackgroundFillStyle(
+      new SolidFill({
+        color: ColorHEX('#0d0c0c'),
+      })
+    );
 
     dashboard.setColumnWidth(0, 1);
     dashboard.setColumnWidth(1, 11);
@@ -127,6 +143,7 @@ class ChartClass {
           rowIndex: i,
           columnIndex: 1,
         })
+
         .setPadding({ bottom: 10, top: 10, right: 10 });
 
       return chart;
@@ -149,7 +166,6 @@ class ChartClass {
             },
           })
           .setDataCleaning({ minDataPointCount: 1 })
-
           //Styling
           .setStrokeStyle(
             new SolidLine({
@@ -164,27 +180,33 @@ class ChartClass {
     return series;
   }
 
+  // Series data cleaning
+  seriesDataCleaning() {
+    this.series.forEach((_series: any) => {
+      // series.setMaxPointCount(2000);
+    });
+    this.charts.forEach((chart: any) => {
+      chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting);
+    });
+  }
+
   // Remove unused elements from each chart
   customizeChart() {
     this.charts.forEach((chart: any, index: number) => {
       const axisX = chart.getDefaultAxisX();
       const axisY = chart.getDefaultAxisY();
       // Set scrolling strategies
-      chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting);
+      axisY.setScrollStrategy(AxisScrollStrategies.fitting);
 
       if (this.type === ChartType.RECORD) {
         axisX
-          .setInterval(0, 20.0)
+          .setInterval(0, 20)
           .setScrollStrategy(AxisScrollStrategies.progressive);
       } else {
         axisX
-          .setInterval(0, 20.0)
+          .setInterval(0, 20)
           .setScrollStrategy(AxisScrollStrategies.regressive);
       }
-
-      // Disable animation on both axes
-      axisY.disableAnimations();
-      axisX.disableAnimations();
 
       // Remove X Axis on all charts except the last one
       if (index !== this.channelCount - 1) {
@@ -207,7 +229,7 @@ class ChartClass {
               )
           )
           .setStrokeStyle(emptyLine)
-          .setScrollStrategy(undefined)
+          .setScrollStrategy(AxisScrollStrategies.progressive)
           .setTickStrategy(AxisTickStrategies.Empty)
           .setStrokeStyle(emptyLine);
       } else {
@@ -266,10 +288,24 @@ class ChartClass {
           bg.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
         );
 
-      legendLayout
-        .addElement(UIElementBuilders.TextBox)
-        .setText(this.channels[i])
-        .setTextFont((font: any) => font.setSize(16));
+      if (this.channels[i] === 'TOI') {
+        legendLayout
+          .addElement(UIElementBuilders.TextBox)
+          .setMargin({ top: -15 })
+          .setText(this.channels[i])
+          .setTextFont((font: any) => font.setSize(16));
+
+        this.TOILegend = legendLayout
+          .addElement(UIElementBuilders.TextBox)
+          .setText('-')
+          .setMargin({ top: 5, bottom: 5 })
+          .setTextFont((font: any) => font.setSize(18));
+      } else {
+        legendLayout
+          .addElement(UIElementBuilders.TextBox)
+          .setText(this.channels[i])
+          .setTextFont((font: any) => font.setSize(16));
+      }
 
       legendLayout
         .addElement(UIElementBuilders.TextBox)
@@ -289,64 +325,6 @@ class ChartClass {
         .setTextFont((font: any) => font.setSize(9))
         .setMargin({ top: 10 });
     });
-    // this.charts.map((chart: any, i: number) => {
-    //   const axisX = chart.getDefaultAxisX();
-    //   const axisY = chart.getDefaultAxisY();
-    //   const channel = this.channels[i];
-
-    //   const ui = chart
-    //     .addUIElement(UILayoutBuilders.Column)
-    //     .setMouseInteractions(false)
-    //     .setBackground((background: any) =>
-    //       background.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
-    //     )
-    //     .dispose();
-
-    //   const channelText = ui
-    //     .addElement(UIElementBuilders.TextBox)
-    //     .setText(channel)
-    //     .setTextFont((font: any) => font.setSize(16))
-    //     .dispose();
-
-    //   const channelColor = ui
-    //     .addElement(UIElementBuilders.TextBox)
-    //     .setText(' ')
-    //     .setMargin({ top: 5 })
-    //     .setBackground((background: any) =>
-    //       background.setFillStyle(
-    //         new SolidFill({
-    //           color: ColorHEX(this.seriesLineColorArr[i]),
-    //         })
-    //       )
-    //     )
-    //     .dispose();
-
-    //   const samplingRate = ui
-    //     .addElement(UIElementBuilders.TextBox)
-    //     .setText(this.samplingRate.toString() + ' samples/s')
-    //     .setTextFont((font: any) => font.setSize(9))
-    //     .setMargin({ top: 10 })
-    //     .dispose();
-
-    //   requestAnimationFrame(() => {
-    //     ui.setPosition(
-    //       translatePoint(
-    //         {
-    //           x: axisX.getInterval().start,
-    //           y: axisY.getInterval().end,
-    //         },
-    //         { x: axisX, y: axisY },
-    //         chart.uiScale
-    //       )
-    //     )
-    //       .setOrigin(UIOrigins.LeftTop)
-    //       .restore();
-
-    //     channelText.restore();
-    //     channelColor.restore();
-    //     samplingRate.restore();
-    //   });
-    // });
   }
 
   // Synchronizes all X axis to have the same interval/move at the same time

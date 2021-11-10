@@ -1,19 +1,25 @@
 import db from 'db/models/index';
 
-interface IPatient {}
+// Interfaces
+import { INewPatientData } from 'interfaces/interfaces';
 
 /**
  * Patient logic
  */
-export class Patient implements IPatient {
+export class Patient {
   constructor() {}
 
   /**
    * Creates a new patient associated with the experiment in the database
    */
-  public static async createNewPatient(data: unknown): Promise<any> {
+  public static async createNewPatient(data: INewPatientData): Promise<any> {
     try {
-      return await db.Patient.create(data);
+      const newPatient = await db.Patient.create(data, { raw: true });
+      console.log(newPatient);
+      const { id, name, dob, description, experimentId } =
+        newPatient.dataValues;
+
+      return { id, name, dob, description, experimentId };
     } catch (error: any) {
       throw new Error(error.message);
     }

@@ -34,7 +34,7 @@ declare namespace api {
   /**
    *  Removes all listeners, or those of the specified `channel`.
    */
-  function removeAllListeners(channel: string): void;
+  function removeListeners(channel: string): void;
 
   /**
    * Window functions

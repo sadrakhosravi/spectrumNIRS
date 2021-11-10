@@ -13,9 +13,12 @@ import './App.global.css';
 import { AppState } from '@utils/constants';
 
 //Component import
+import LoadingIndicator from '@components/LoadingIndicator/LoadingIndicator.component';
+
 import TitleBar from './layout/TitleBar/TitleBar.component';
 import BottomBar from './layout/BottomBar/BottomBar.component';
 import MainNavigation from './layout/MainNavigation/MainNavigation.component';
+
 const ModalsContainer = React.lazy(
   () => import('@layout/ModalsContainer/ModalsContainer.component')
 );
@@ -31,7 +34,9 @@ const App = () => {
   return (
     <div className="relative h-full w-full">
       <Router>
-        <React.Suspense fallback={<p>Loading ... </p>}>
+        <React.Suspense
+          fallback={<LoadingIndicator loadingMessage="Initializing..." />}
+        >
           <Route path="/main" component={RouteHandler} />
           <Route path="/main" component={MainNavigation} />
           <Route path="/main" component={BottomBar} />

@@ -33,8 +33,7 @@ type AllReducers = typeof reducers;
 const reducersWithStateSync: AllReducers = withReduxStateSync(reducers) as any;
 
 const config = {
-  predicate: (action: any) =>
-    !action.type.includes('appState/setReviewTabInNewWindow'),
+  blacklist: ['appState/setReviewTabInNewWindow', 'chartState/toggleRawData'],
 };
 
 const middlewares = [

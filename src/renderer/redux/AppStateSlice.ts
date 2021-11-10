@@ -22,7 +22,6 @@ export const AppStateSlice = createSlice({
   initialState,
   reducers: {
     changeAppState: (state, action) => {
-      console.log(action.type);
       state.value = action.payload;
     },
     setRecordSidebar: (state, { payload }: { payload: boolean }) => {

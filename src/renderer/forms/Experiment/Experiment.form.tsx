@@ -49,7 +49,7 @@ const ExperimentForm = () => {
         <span className="block pb-1">Description:</span>
         <TextAreaField register={register('patient.description')} />
       </label>
-      <SubmitButton text={'Create a New Experiment'} />
+      <SubmitButton text={'Create Experiment'} />
     </form>
   );
 };

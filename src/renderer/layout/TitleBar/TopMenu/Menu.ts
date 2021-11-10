@@ -4,7 +4,7 @@ import { ModalConstants } from '@utils/constants';
 import { DialogBoxChannels } from '@utils/channels';
 
 import store from '@redux/store';
-const { dispatch } = store;
+const { dispatch, getState } = store;
 
 export const TopMenu = [
   {
@@ -31,11 +31,17 @@ export const TopMenu = [
       },
       {
         label: 'Patient',
-        click: () => dispatch(openModal(ModalConstants.NEWPATIENT)),
+        click: () =>
+          getState().experimentData.currentExperiment.name
+            ? dispatch(openModal(ModalConstants.NEWPATIENT))
+            : dispatch(openModal(ModalConstants.NEWEXPERIMENT)),
       },
       {
         label: 'Recording',
-        click: () => dispatch(openModal(ModalConstants.NEWRECORDING)),
+        click: () =>
+          getState().experimentData.currentPatient.name
+            ? dispatch(openModal(ModalConstants.NEWRECORDING))
+            : dispatch(openModal(ModalConstants.NEWEXPERIMENT)),
       },
     ],
   },
@@ -50,6 +56,16 @@ export const TopMenu = [
             message: 'Photon Lab',
             type: 'info',
             detail: "Powered by Microsoft's Electron. Current version: 0.1.0",
+          }),
+      },
+      {
+        label: 'Check for Updates',
+        click: () =>
+          window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+            title: 'No updates available',
+            message: 'No updates available',
+            detail: 'No updates currently available, please check back later.',
+            type: 'info',
           }),
       },
     ],

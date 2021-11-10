@@ -9,21 +9,37 @@ const dispatch = store.dispatch;
 
 // Creates a new recording and starts it
 export const handleRecord = async () => {
-  const { experimentData, recordState, sensorState } = store.getState();
+  const { experimentData, recordState, sensorState, chartState } =
+    store.getState();
+
+  // If there is no experimentData, display error message.
+  if (!experimentData.isDataReady) {
+    window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+      title: 'No Recording Found',
+      type: 'error',
+      message: 'No Recording Found',
+      detail: 'Please create a recording first.',
+    });
+    return;
+  }
 
   // Check if the sensor is connected
   if (!sensorState.detectedSensor) {
     window.api.invokeIPC(DialogBoxChannels.MessageBox, {
       title: 'Sensor Mismatch Error',
       type: 'error',
-      message:
+      message: 'Sensor was not detected',
+      detail:
         'The sensor you have selected was not detected on your system. Please attach the sensor and try again.',
     });
     return;
   }
 
+  // Get the information to the be sent to the controller
   const patientId = experimentData.currentPatient.id;
+  const { currentRecording } = experimentData;
   const sensorId = sensorState.detectedSensor.id;
+  const isRawData = chartState.rawdata;
 
   // Check record state and decide accordingly
   if (recordState.value !== RecordState.IDLE) {
@@ -31,9 +47,18 @@ export const handleRecord = async () => {
     recordState.value !== RecordState.PAUSED &&
       window.api.sendIPC(RecordChannels.Stop);
   } else {
-    dispatch(changeRecordState(RecordState.RECORD));
-    await window.api.invokeIPC(RecordChannels.Init, { sensorId, patientId });
+    // Initialize the sensor controller
+    await window.api.invokeIPC(RecordChannels.Init, {
+      sensorId,
+      patientId,
+      currentRecording,
+      isRawData,
+    });
+
+    // Start recording
     window.api.sendIPC(RecordChannels.Recording);
+
+    dispatch(changeRecordState(RecordState.RECORD));
   }
 };
 

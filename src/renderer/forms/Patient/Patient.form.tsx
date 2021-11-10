@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { newPatient } from '@adapters/experimentAdapter';
 
 // Components
 import InputField from '@components/Form/InputField.component';
@@ -7,13 +8,15 @@ import DateField from '@components/Form/DateField.component';
 import TextAreaField from '@components/Form/TextAreaField.component';
 import SubmitButton from '@components/Form/SubmitButton.component';
 
-// Controllers
+// Interfaces
+import { INewPatientData } from 'interfaces/interfaces';
 
 const PatientForm = () => {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data: any) => {
-    console.log(data.patient.name);
+    const patient: INewPatientData = data.patient;
+    newPatient(patient);
   };
 
   return (
@@ -31,7 +34,7 @@ const PatientForm = () => {
         <span className="block pb-1">Description:</span>
         <TextAreaField register={register('patient.description')} />
       </label>
-      <SubmitButton text={'Create a New Patient'} />
+      <SubmitButton text={'Create Patient'} />
     </form>
   );
 };

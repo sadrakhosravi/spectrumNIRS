@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { devices } from '@electron/configs/devices';
 
 export interface ISensor {
   id: number;
@@ -10,12 +11,12 @@ export interface ISensor {
 
 export interface ISensorState {
   detectedSensor: ISensor | null;
-  selectedSensor: ISensor | null;
+  selectedSensor: ISensor;
 }
 
 const initialState: ISensorState = {
   detectedSensor: null,
-  selectedSensor: null,
+  selectedSensor: devices[0],
 };
 
 export const SensorSlice = createSlice({

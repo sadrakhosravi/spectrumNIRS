@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useAppSelector } from '@redux/hooks/hooks';
 import { useForm } from 'react-hook-form';
-
-// Headless UI
 import { RadioGroup } from '@headlessui/react';
+
+// Interfaces
+import { INewRecordingData } from 'interfaces/interfaces';
 
 // Config file
 import { devices } from '@electron/configs/devices';
@@ -10,16 +12,22 @@ import { devices } from '@electron/configs/devices';
 // Components
 import InputField from '@components/Form/InputField.component';
 import SubmitButton from '@components/Form/SubmitButton.component';
+import DateField from '@components/Form/DateField.component';
+import TextAreaField from '@components/Form/TextAreaField.component';
 
 // Adapters
-import { setSensorStatus } from '@adapters/experimentAdapter';
+import { newRecording, setSensorStatus } from '@adapters/experimentAdapter';
 
 // Icon
 import SensorIcon from '@icons/sensor.svg';
 
 const RecordingForm = () => {
-  let [sensor, setSensor] = useState(0);
+  const [sensor, setSensor] = useState(0);
   const { register, handleSubmit } = useForm();
+
+  const detectedSensor = useAppSelector(
+    (state) => state.sensorState.detectedSensor
+  );
 
   // Sets the current sensor state to the global experimentData current sensor state
 
@@ -28,6 +36,7 @@ const RecordingForm = () => {
       channels: string;
       samplingRate: string;
     };
+    recording: INewRecordingData;
   };
 
   // Handle form submit
@@ -37,48 +46,74 @@ const RecordingForm = () => {
     const currentSensor = devices[sensor];
     currentSensor.samplingRate = samplingRate;
     currentSensor.channels = channels;
+    newRecording(formData.recording);
     setSensorStatus(currentSensor);
   };
 
   return (
     <div className="w-full px-4 pt-2 ">
       <div className="w-full">
-        <h3 className="py-4 text-xl">Select a sensor:</h3>
-        <RadioGroup value={sensor} onChange={setSensor}>
-          <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-          <div className="grid grid-cols-4 gap-6">
-            {devices.map((device: any) => (
-              <RadioGroup.Option
-                value={device.id}
-                disabled={device.id > 0 && true}
-                key={device.id}
-              >
-                {({ checked, disabled }) => (
-                  <>
-                    <div
-                      className={`${
-                        checked && 'ring-2 ring-accent'
-                      } w-full h-32 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
-                        disabled && 'bg-light bg-opacity-40 cursor-not-allowed'
-                      }`}
-                    >
-                      <img
-                        src={SensorIcon}
-                        width="48px"
-                        height="48px"
-                        alt="Sensor"
-                      />
-                      <p className="mt-2">{device.name}</p>
-                    </div>
-                  </>
-                )}
-              </RadioGroup.Option>
-            ))}
-          </div>
-        </RadioGroup>
-        <h3 className="mt-8  text-xl">Sensor settings:</h3>
         <form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
+          <h3 className="py-2 text-xl">Recording Information:</h3>
+
+          <label className="text-sm inline-block w-1/2 mt-2 pr-2">
+            <span className="block pb-1">Name:</span>
+            <InputField
+              type="text"
+              register={register('recording.name', { required: true })}
+            />
+          </label>
+          <label className="text-sm inline-block w-1/2 mt-2 pl-2">
+            <span className="block pb-1">Date:</span>
+            <DateField
+              type="text"
+              register={register('recording.date', { required: true })}
+            />
+          </label>
           <label className="text-sm inline-block w-full mt-2">
+            <span className="block pb-1">Description:</span>
+            <TextAreaField
+              type="text"
+              register={register('recording.description')}
+            />
+          </label>
+
+          <h3 className="mt-4 py-2 text-xl">Select a sensor:</h3>
+          <RadioGroup value={sensor} onChange={setSensor}>
+            <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
+            <div className="grid grid-cols-2 gap-6">
+              {devices.map((device: any) => (
+                <RadioGroup.Option
+                  value={device.id}
+                  disabled={detectedSensor?.name === device.name ? false : true}
+                  key={device.id}
+                >
+                  {({ checked, disabled }) => (
+                    <>
+                      <div
+                        className={`${
+                          checked && 'ring-2 ring-accent'
+                        } w-full h-20 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
+                          disabled &&
+                          'bg-light bg-opacity-40 cursor-not-allowed'
+                        }`}
+                      >
+                        <img
+                          src={SensorIcon}
+                          width="28px"
+                          height="28px"
+                          alt="Sensor"
+                        />
+                        <p className="mt-2">{device.name}</p>
+                      </div>
+                    </>
+                  )}
+                </RadioGroup.Option>
+              ))}
+            </div>
+          </RadioGroup>
+          <h3 className="mt-4 py-2 text-xl">Sensor settings:</h3>
+          <label className="text-sm inline-block w-1/2 mt-2 pr-2">
             <span className="block pb-1">Sampling Rate:</span>
             <InputField
               defaultValue={devices[sensor].samplingRate}
@@ -86,7 +121,7 @@ const RecordingForm = () => {
               register={register('sensor.samplingRate')}
             />
           </label>
-          <label className="text-sm inline-block w-full mt-2">
+          <label className="text-sm inline-block w-1/2 mt-2 pl-2">
             <span className="block pb-1">Channels:</span>
             <InputField
               defaultValue={devices[sensor].channels.join(', ')}
@@ -94,7 +129,8 @@ const RecordingForm = () => {
               register={register('sensor.channels')}
             />
           </label>
-          <SubmitButton text="Save" />
+
+          <SubmitButton text="Create Recording" />
         </form>
       </div>
     </div>

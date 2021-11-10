@@ -6,7 +6,7 @@ const HeadingText = () => {
     <>
       <h1 className="text-4xl font-bold">NIRS Software</h1>
       <p>Software Version: {version}</p>
-      <p>Developed by Shadgan Lab at ICORD</p>
+      <p>Developed by Implantable Biosensing Lab at ICORD</p>
     </>
   );
 };

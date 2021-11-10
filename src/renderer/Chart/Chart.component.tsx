@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 // Components
 import LCJSChart from 'renderer/Chart/ChartClass/Chart';
@@ -10,27 +10,25 @@ import { useAppSelector } from '@redux/hooks/hooks';
 
 // State
 
-interface IProps {
+type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
-}
-
-declare const window: any;
+};
 
 // Prepares and enders the chart
-const Chart: React.FC<IProps> = ({ type }) => {
+const Chart = ({ type }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
   const recordState = useAppSelector((state) => state.recordState.value);
   const sensorState = useAppSelector(
-    (state) => state.sensorState.detectedSensor
+    (state) => state.sensorState.selectedSensor
   );
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
 
   const containerID = 'chart';
-  const chartRef = useRef(undefined);
+  const chartRef = useRef<LCJSChart | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let chart: LCJSChart;
 
     requestAnimationFrame(() => {
@@ -43,28 +41,25 @@ const Chart: React.FC<IProps> = ({ type }) => {
         samplingRate
       );
 
+      chart.createChart();
+
       // Attach event listeners
       type === ChartType.RECORD && chart.recordData();
 
       // Keep a ref to the chart
       chartRef.current = chart as any;
 
-      sensorState && setChartLoaded(true);
-      !sensorState && setChartLoaded(false);
+      setChartLoaded(true);
     });
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
-      requestAnimationFrame(() => {
-        // Destroy chart.
-        console.log('destroy chart');
-        chart.cleanup();
+      // Destroy chart.
+      chart.cleanup();
+      window.api.removeListeners('data:reader-record');
+      console.log('destroy chart');
 
-        delete window.chart;
-        delete window.ChartClass;
-
-        chartRef.current = undefined;
-      });
+      chartRef.current = null;
     };
   }, [sensorState]);
 
@@ -79,14 +74,16 @@ const Chart: React.FC<IProps> = ({ type }) => {
   }, [recordSidebar]);
 
   // Clear series if recording has restarted
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (recordState === RecordState.RECORD) {
-      const chart: any = chartRef.current;
+      const chart = chartRef.current;
 
-      // Clear all series
-      chart.series.forEach((series: any) => {
-        series.clear();
-      });
+      if (chart) {
+        // Clear all series
+        chart.series.forEach((series: any) => {
+          series.clear();
+        });
+      }
     }
   }, [recordState]);
 

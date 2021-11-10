@@ -1,5 +1,5 @@
 // Icons
-import RecordIcon from '@icons/record.svg';
+import StartIcon from '@icons/start.svg';
 import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 import ZoomInIcon from '@icons/zoom-in.svg';
@@ -18,7 +18,7 @@ import { RecordState } from '@utils/constants';
 import { handlePause, handleRecord } from '@adapters/recordAdapter';
 import ChartOptions from '../ChartClass/ChartOptions';
 import { dispatch } from '@redux/store';
-import { toggleRawData } from '@redux/ChartSlice';
+import { toggleRawData, toggleHypoxia, toggleEvent2 } from '@redux/ChartSlice';
 
 export const RecordToolbar = [
   {
@@ -56,15 +56,15 @@ export const RecordToolbar = [
     click: () => {},
   },
   {
-    label: 'separator',
-  },
-  {
     label: 'Reset Layout',
     tooltip: 'Reset Charts Layout',
     icon: ResetHeightIcon,
     click: (chartOptions: ChartOptions) => {
       chartOptions.resetChartsHeight();
     },
+  },
+  {
+    label: 'separator',
   },
   {
     label: 'Take Screenshot',
@@ -75,19 +75,32 @@ export const RecordToolbar = [
     },
   },
   {
-    label: 'َAdd Marker',
-    tooltip: 'Add Marker',
-    icon: MarkerIcon,
-    click: (chartOptions: ChartOptions) => {
-      chartOptions.addMarker();
-    },
-  },
-  {
     label: 'rawdata',
     tooltip: 'Display Raw Data',
     icon: RawDataIcon,
     click: () => {
       dispatch(toggleRawData());
+    },
+  },
+  {
+    label: 'separator',
+  },
+  {
+    label: `hypoxia`,
+    tooltip: 'Hypoxia Event',
+    icon: MarkerIcon,
+    click: (chartOptions: ChartOptions) => {
+      chartOptions.addMarker('Hypoxia', '#007ACD');
+      dispatch(toggleHypoxia());
+    },
+  },
+  {
+    label: `event2`,
+    tooltip: 'Event 2',
+    icon: MarkerIcon,
+    click: (chartOptions: ChartOptions) => {
+      chartOptions.addMarker('Event2', '#fff');
+      dispatch(toggleEvent2());
     },
   },
 ];
@@ -97,7 +110,7 @@ export const RecordButtons = [
     dynamicLabel: (state: RecordState) => {
       switch (state) {
         case RecordState.IDLE:
-          return 'Record';
+          return 'Start';
         case RecordState.RECORD:
         case RecordState.PAUSED:
         case RecordState.CONTINUE:
@@ -105,7 +118,7 @@ export const RecordButtons = [
       }
     },
     dynamicIcon: (state: RecordState) =>
-      state !== RecordState.IDLE ? StopIcon : RecordIcon,
+      state !== RecordState.IDLE ? StopIcon : StartIcon,
     isActive: (state: RecordState) => state !== RecordState.IDLE,
     click: handleRecord,
   },

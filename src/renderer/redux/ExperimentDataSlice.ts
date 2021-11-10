@@ -12,11 +12,21 @@ type CurrentPatient = {
   name: string;
   description: string;
   dob: string;
+  experimentId: number;
+};
+
+type CurrentRecording = {
+  id: number;
+  name: string;
+  description: string;
+  date: string;
+  patientId: number;
 };
 
 export type ExperimentData = {
   currentExperiment: CurrentExperiment;
   currentPatient: CurrentPatient;
+  currentRecording: CurrentRecording;
   isDataReady: boolean;
 };
 
@@ -32,6 +42,14 @@ const initialState: ExperimentData = {
     name: '',
     description: '',
     dob: '',
+    experimentId: -1,
+  },
+  currentRecording: {
+    id: -1,
+    name: '',
+    description: '',
+    date: '',
+    patientId: -1,
   },
   isDataReady: false,
 };
@@ -43,18 +61,26 @@ export const ExperimentDataSlice = createSlice({
     setExperimentData: (state, { payload }) => {
       state.currentExperiment = payload.currentExperiment;
       state.currentPatient = payload.currentPatient;
-      if (state.currentExperiment.name && state.currentPatient.name)
-        state.isDataReady = true;
     },
     setPatientData: (state, { payload }) => {
       state.currentPatient = payload;
-      if (state.currentExperiment.name && state.currentPatient.name)
+    },
+    setRecordingData: (state, { payload }) => {
+      state.currentRecording = payload;
+      if (
+        state.currentExperiment.name &&
+        state.currentPatient.name &&
+        state.currentRecording.name
+      ) {
         state.isDataReady = true;
+      } else {
+        state.isDataReady = false;
+      }
     },
   },
 });
 
-export const { setExperimentData, setPatientData } =
+export const { setExperimentData, setPatientData, setRecordingData } =
   ExperimentDataSlice.actions;
 
 export default ExperimentDataSlice.reducer;

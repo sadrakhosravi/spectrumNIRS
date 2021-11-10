@@ -1,5 +1,7 @@
 import { ColorHEX, Dashboard, SolidFill, SolidLine } from '@arction/lcjs';
 
+import { getState } from '@redux/store';
+
 class ChartOptions {
   channels: string[];
   dashboard: Dashboard;
@@ -23,24 +25,34 @@ class ChartOptions {
     this.dashboard.saveToFile('Sensor Data');
   }
 
-  addMarker() {
+  addMarker(name: string, color: string) {
+    const lastSeries = this.series[this.series.length - 1];
+    const xValue = lastSeries.getBoundaries().max.x;
+
+    const lastChart = this.charts[this.charts.length - 1];
+    const axisX = lastChart.getDefaultAxisX();
+
+    const state: any = getState().chartState;
+    const eventState = state[name.toLocaleLowerCase()];
+
+    axisX
+      .addCustomTick()
+      .setValue(xValue)
+      .setTextFormatter((_value: any) =>
+        eventState ? `${name}:End` : `${name}:Start`
+      );
+
     this.charts.forEach((chart: any) => {
       const cl = chart.getDefaultAxisX().addConstantLine();
       cl.setName('CL')
-        .setValue(5)
+        .setValue(xValue)
         .setHighlightOnHover(true)
         .setMouseInteractions(false)
 
         .setStrokeStyle(
           new SolidLine({
             thickness: 4,
-            fillStyle: new SolidFill({ color: ColorHEX('#007ACD') }),
-          })
-        )
-        .setStrokeStyleHighlight(
-          new SolidLine({
-            thickness: 8,
-            fillStyle: new SolidFill({ color: ColorHEX('#007ACD') }),
+            fillStyle: new SolidFill({ color: ColorHEX(color) }),
           })
         );
     });

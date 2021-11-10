@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Dialog } from '@headlessui/react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
+import { isLoading } from '@redux/IsLoadingSlice';
 
 // Icons
 import CloseIcon from '@icons/close.svg';
@@ -14,10 +15,10 @@ interface IProps {
 
 const Modal: React.FC<IProps> = (props) => {
   const { title, size, id } = props;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
-  const whichModal = useSelector((state: any) => state.modalState.value);
+  const whichModal = useAppSelector((state) => state.modalState.value);
 
   const largeStyles =
     size === 'large'
@@ -28,45 +29,63 @@ const Modal: React.FC<IProps> = (props) => {
     whichModal === id ? setIsOpen(true) : setIsOpen(false);
   }, [whichModal]);
 
+  // Handle close of the modal
+  const handleClose = () => {
+    dispatch(closeModal());
+    dispatch(isLoading(false));
+  };
+
   return (
     <>
-      <Dialog
-        open={isOpen}
-        as="div"
-        className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-70 transition-all duration-100"
-        onClose={() => dispatch(closeModal())}
-      >
-        <div className="min-h-screen px-4 text-center ">
-          <Dialog.Overlay className="fixed inset-0" />
-
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span
-            className="inline-block h-screen align-middle"
-            aria-hidden="true"
+      <Transition appear show={isOpen}>
+        <Dialog
+          open={isOpen}
+          as="div"
+          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-70 transition-all duration-100 "
+          onClose={handleClose}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-150"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-100"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
           >
-            &#8203;
-          </span>
+            <div className="min-h-screen px-4 text-center ">
+              <Dialog.Overlay className="fixed inset-0" />
 
-          <div
-            className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 shadow-xl rounded-md ${largeStyles}`}
-          >
-            <Dialog.Title as="h1" className="text-3xl font-bold">
-              {title}
-            </Dialog.Title>
+              {/* This element is to trick the browser into centering the modal contents. */}
+              <span
+                className="inline-block h-screen align-middle"
+                aria-hidden="true"
+              >
+                &#8203;
+              </span>
 
-            <button
-              className="absolute right-4 top-4 p-2"
-              onClick={() => dispatch(closeModal())}
-            >
-              <img src={CloseIcon} width="44px" alt="CloseIcon" />
-            </button>
+              <div
+                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 shadow-xl rounded-md ${largeStyles}`}
+              >
+                <Dialog.Title as="h1" className="text-3xl font-bold">
+                  {title}
+                </Dialog.Title>
 
-            <div className="mt-10">{props.children}</div>
+                <button
+                  className="absolute right-4 top-4 p-2"
+                  onClick={handleClose}
+                >
+                  <img src={CloseIcon} width="44px" alt="CloseIcon" />
+                </button>
 
-            <div className="mt-4 w-full text-center"></div>
-          </div>
-        </div>
-      </Dialog>
+                <div className="mt-10">{props.children}</div>
+
+                <div className="mt-4 w-full text-center"></div>
+              </div>
+            </div>
+          </Transition.Child>
+        </Dialog>
+      </Transition>
     </>
   );
 };

@@ -10,7 +10,7 @@ const Patient = sequelize.define('patient', {
     primaryKey: true,
   },
   name: Sequelize.DataTypes.STRING,
-  dob: Sequelize.DataTypes.DATE,
+  dob: Sequelize.DataTypes.DATEONLY,
   description: Sequelize.DataTypes.TEXT,
 });
 
