@@ -1,7 +1,7 @@
 /**
  * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
-
+import RecordData from '@electron/models/RecordData';
 const path = require('path');
 const readline = require('readline');
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
@@ -24,9 +24,9 @@ const spawnedProcesses: any[] = [];
  */
 export const start = (
   prevTime = 0,
-  _insertRecordingData: (data: unknown) => Promise<any>,
   isRawData: boolean,
-  sender: any
+  sender: any,
+  recordingId: number
 ) => {
   // Check if RawData was requested
   isRawData ? (rawData = true) : (rawData = false);
@@ -48,6 +48,11 @@ export const start = (
 
   // Count variable to keep track of the readline loop
   let count = 0;
+  let dataCount = 0;
+  let dataArr: any[] = [];
+  let databaseArr: any[] = [];
+  let databaseCount = 0;
+  const Database = new RecordData(recordingId);
 
   // Read each line from reader.exe stdout.
   rl = readline
@@ -55,17 +60,9 @@ export const start = (
       input: readUSBData.stdout,
       terminal: false,
     })
-    .on('line', function (line: string) {
+    .on('line', async function (line: string) {
       // Split data by , into an array
       const data = line.split(',');
-      // const rawValues = [
-      //   parseFloat(data[6]), // RI 1
-      //   parseFloat(data[7]), // RI 2
-      //   parseFloat(data[8]), // RI 3
-      //   parseFloat(data[9]), // RI 4
-      //   parseFloat(data[10]), // RI 5
-      //   parseFloat(data[11]), // Baseline
-      // ];
 
       // Reset the previous time
       if (count === 0) {
@@ -73,35 +70,55 @@ export const start = (
         count = 2;
       }
 
+      // Raw Data
+      const rawDataArr = [
+        timeSequence / 100,
+        parseFloat(data[1]),
+        parseFloat(data[2]),
+        parseFloat(data[3]),
+        parseFloat(data[4]),
+        parseInt(data[5]),
+        parseInt(data[6]),
+        parseInt(data[7]),
+        parseInt(data[8]),
+        parseInt(data[9]),
+        parseInt(data[10]),
+        parseInt(data[11]),
+        parseInt(data[12]),
+        parseInt(data[13]),
+        parseInt(data[14]),
+        parseInt(data[15]),
+        parseInt(data[16]),
+      ];
+
       // Prepare an array of data
       if (!rawData) {
-        outputArr = [
-          timeSequence / 100,
-          parseFloat(data[1]),
-          parseFloat(data[2]),
-          parseFloat(data[3]),
-          parseFloat(data[4]),
-        ]; // [timeSequence, O2hb, HHb, tHb, TOI]
+        outputArr = rawDataArr.slice(0, 5); // [timeSequence, O2hb, HHb, tHb, TOI]
       } else {
-        outputArr = [
-          timeSequence / 100,
-          parseFloat(data[6]),
-          parseFloat(data[7]),
-          parseFloat(data[8]),
-          parseFloat(data[9]),
-        ]; // [timeSequence, O2hb, HHb, tHb, TOI]
+        outputArr = [timeSequence / 100, ...rawDataArr.slice(4, 9)]; // [timeSequence, O2hb, HHb, tHb, TOI]
       }
 
-      sender.send('data:reader-record', outputArr);
+      // Recording.insertRecordingData(line, recordingId);
+      databaseArr.push({ values: rawDataArr.join(','), recordingId });
 
-      //Adjust the data array and swap the timeSequence with the one generated here
-      data[0] = (timeSequence / 100).toString();
+      if (databaseCount === 200) {
+        Database.addDataToTransaction(databaseArr);
+        databaseArr = [];
+        databaseCount = 0;
+      }
 
-      // Insert the all data to the database
-      // insertRecordingData(data.join(','));
+      dataArr.push(outputArr);
+
+      if (dataCount === 5) {
+        sender.send('data:reader-record', dataArr);
+        dataArr = [];
+        dataCount = 0;
+      }
 
       // Last Step: increment the time sequence +10ms = 1unit (Centiseconds)
       timeSequence += 1;
+      dataCount++;
+      databaseCount++;
 
       // Save the last time sequence
       lastTimeSequence = timeSequence;

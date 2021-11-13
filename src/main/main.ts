@@ -56,6 +56,9 @@ const createMainWindow = async () => {
     frame: false,
     roundedCorners: true,
     webPreferences: {
+      partition: 'persist:spectrum',
+      webviewTag: true,
+      webgl: true,
       contextIsolation: true,
       nodeIntegration: false,
       preload: path.join(__dirname, 'preload.js'),
@@ -63,6 +66,8 @@ const createMainWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
   });
+
+  mainWindow.maximize();
 
   await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -72,7 +77,6 @@ const createMainWindow = async () => {
   // await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Default app state is maximized
-  mainWindow.maximize();
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {
@@ -97,7 +101,18 @@ app.on('activate', async () => {
 
 (async () => {
   const { sequelize } = require('../db/models/index');
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
 
+    await sequelize.sync();
+    console.log('Sync Successful');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+})();
+
+(async () => {
   // Set dark theme by default - Light theme will be added in the next versions
   nativeTheme.themeSource = 'dark';
 
@@ -113,14 +128,4 @@ app.on('activate', async () => {
       app.quit();
     }
   });
-
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-
-    await sequelize.sync({ force: true });
-    console.log('Sync Successful');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
 })();

@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "sequelize": "^6.6.5",
+    "sequelize": "^6.9.0",
     "sqlite3": "^5.0.2",
     "usb-detection": "^4.13.0"
   }

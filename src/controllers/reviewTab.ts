@@ -19,6 +19,7 @@ const reviewTabNewWindow = async () => {
     frame: true,
     roundedCorners: true,
     webPreferences: {
+      partition: 'persist:spectrum',
       devTools: true,
       contextIsolation: true,
       preload: path.join(__dirname, '../main/preload.js'),

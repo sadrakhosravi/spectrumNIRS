@@ -27,7 +27,7 @@ let reader: DataReader;
 ipcMain.handle(
   RecordChannels.Init,
   (event, { sensorId, patientId, currentRecording, isRawData }: RecordInit) => {
-    console.log(sensorId, patientId);
+    console.log(currentRecording);
     reader = new DataReader(
       patientId,
       sensorId,

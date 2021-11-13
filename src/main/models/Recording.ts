@@ -4,22 +4,16 @@ import db from 'db/models/index';
 import { INewRecordingData } from 'interfaces/interfaces';
 
 // TODO: Add interfaces for the data parameters.
-export interface IRecording {
-  /**
-   * Inserts the recording data to the database.
-   */
-  insertRecordingData(data: unknown): Promise<any>;
-}
+export interface IRecording {}
 
 /**
  * Recording logic
  */
 export class Recording implements IRecording {
-  patientId: number;
+  currentRecording: any;
 
-  constructor(patientId: number) {
-    this.patientId = patientId;
-    console.log('PatientId ' + this.patientId);
+  constructor(currentRecording: any) {
+    this.currentRecording = currentRecording;
   }
 
   /**
@@ -38,15 +32,20 @@ export class Recording implements IRecording {
     }
   };
 
-  async insertRecordingData(data: unknown): Promise<any> {
+  /**
+   * Inserts the recording data to the database in the `data` table
+   * @param data - Data to be written to the database
+   */
+  public static insertRecordingData = async (
+    data: any,
+    recordingId: number
+  ): Promise<any> => {
     try {
-      await db.Recording.create({
-        value: data,
-      });
+      await db.Data.create({ values: data, recordingId });
     } catch (error: any) {
       throw new Error(error.message);
     }
-  }
+  };
 }
 
 export default Recording;

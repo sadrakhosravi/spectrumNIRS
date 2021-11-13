@@ -1,5 +1,4 @@
 import { dispatch, getState } from '@redux/store';
-import { isLoading } from '@redux/IsLoadingSlice';
 import {
   setExperimentData,
   setPatientData,
@@ -7,6 +6,7 @@ import {
 } from '@redux/ExperimentDataSlice';
 import { setSelectedSensor } from '@redux/SensorStateSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
+import { setInitialState } from '@redux/ChartSlice';
 
 // Constants
 import { AppState, ModalConstants } from 'utils/constants';
@@ -22,7 +22,6 @@ import { INewPatientData, INewRecordingData } from 'interfaces/interfaces';
  */
 export const newExperiment = async (newExpData: object) => {
   // Set isLoading to true
-  dispatch(isLoading(true));
 
   // Create a new experiment and await the result
   const newExperiment = await window.api.experiment.newExp(newExpData);
@@ -67,6 +66,7 @@ export const newRecording = async (data: INewRecordingData) => {
   );
   console.log(newRecording);
   dispatch(setRecordingData(newRecording));
+  dispatch(setInitialState());
 };
 
 /**

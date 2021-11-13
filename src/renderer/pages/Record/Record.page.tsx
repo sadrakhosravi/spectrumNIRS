@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Main area components
-const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
+import RecordChart from 'renderer/Chart/RecordChart.component';
 
 // Sidebar components
 import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
@@ -21,17 +21,15 @@ const RecordPage = () => {
 
   return (
     <>
-      <div className="h-full w-full flex gap-2">
+      <div className={`absolute top-0 left-0 h-full w-full flex`}>
         <div
-          className={`h-full ${
+          className={`h-full relative ${
             isSidebarActive
-              ? 'w-[calc(100%-250px)]'
-              : 'w-[calc(100%-20px)] pr-1'
+              ? 'w-[calc(100%-280px)] mr-[15px]'
+              : 'w-[calc(100%-20px)]'
           }`}
         >
-          <React.Suspense fallback={<p>Loading ...</p>}>
-            <Chart type={ChartType.RECORD} />
-          </React.Suspense>
+          <RecordChart type={ChartType.RECORD} />
         </div>
         <div
           className={`h-full ${

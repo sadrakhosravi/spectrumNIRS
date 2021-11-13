@@ -53,3 +53,9 @@ export const USBDetectionChannels = {
   CHECK_USB: USBDetectionBase + 'check-usb',
   NIRSV5: USBDetectionBase + 'nirs-v5',
 };
+
+// Chart Channels
+const ChartBase = 'chart:';
+export const ChartChannels = {
+  ExportAll: ChartBase + 'export-all',
+};

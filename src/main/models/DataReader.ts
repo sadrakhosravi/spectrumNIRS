@@ -29,9 +29,9 @@ export interface IDataReaders {
 type CurrentSensor = {
   start: (
     lastTimeSequence: number | undefined,
-    insertRecordingData: (data: unknown) => Promise<any>,
     isRawData: boolean,
-    sender: any
+    sender: any,
+    recordingId: number
   ) => void;
   pause: () => void;
   continueRecording: (sender: any) => void;
@@ -66,16 +66,16 @@ export class DataReader implements IDataReaders {
     this.currentRecording = currentRecording;
     this.senderWindow = senderWindow;
     this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
-    this.Recording = new Recording(this.patientId);
+    this.Recording = new Recording(this.currentRecording);
     this.lastTimeSequence = 0;
   }
 
   startRecording() {
     this.currentSensor.start(
       this.lastTimeSequence,
-      this.Recording.insertRecordingData,
       this.isRawData,
-      this.senderWindow
+      this.senderWindow,
+      this.currentRecording.id
     );
   }
 

@@ -74,20 +74,10 @@ const ChartToolbar = ({
           {RecordButtons.map((button, index) => (
             <IconTextButtonWithTooltip
               text={button.dynamicLabel(recordState)}
-              icon={
-                button.dynamicIcon
-                  ? button.dynamicIcon(recordState)
-                  : button.icon
-              }
+              icon={button.dynamicIcon(recordState)}
               darker
-              tooltip={button.tooltip ? button.tooltip(recordState) : null}
               isActive={button.isActive(recordState)}
-              disabled={
-                button.isDisabled ? button.isDisabled(recordState) : false
-              }
-              onClick={() => {
-                button.click();
-              }}
+              onClick={button.click(recordState)}
               key={index}
             />
           ))}

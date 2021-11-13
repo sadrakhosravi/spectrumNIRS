@@ -22,13 +22,16 @@ import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 const ModalsContainer = React.lazy(
   () => import('@layout/ModalsContainer/ModalsContainer.component')
 );
-const Tabs = React.lazy(() => import('@components/Tabs/Tabs.component'));
 import RouteHandler from '@pages/RouteHandler';
 
 // Pages
-const HomePage = React.lazy(() => import('@pages/Home/Home.page'));
-const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
-const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
+import RecordPage from '@pages/Record/Record.page';
+import ReviewPage from '@pages/Review/Review.page';
+// const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
+// const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
+
+// Test
+// import ReviewWebView from '@pages/Review/ReviewWebView';
 
 const App = () => {
   return (
@@ -42,24 +45,13 @@ const App = () => {
           <Route path="/main" component={BottomBar} />
           <Route path="/main" component={TitleBar} />
           <Route path="/main" component={ModalsContainer} />
-
-          <main className="main-container">
-            <Route path={AppState.RECORDING} component={Tabs} />
-
-            <Route exact path={AppState.HOME} component={HomePage} />
-
-            <div className="fit-to-container">
-              <Route exact path={AppState.RECORD} component={RecordPage} />
-              <Route exact path={AppState.REVIEW} component={ReviewPage} />
-            </div>
-          </main>
-
-          <Switch>
-            <Route exact path="/" render={() => <Redirect to="/main" />} />
-
-            <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
-          </Switch>
         </React.Suspense>
+        <Route exact path={AppState.RECORD_TAB} component={RecordPage} />
+        <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
+
+        <Switch>
+          <Route exact path="/" render={() => <Redirect to="/main" />} />
+        </Switch>
       </Router>
     </div>
   );

@@ -32,16 +32,19 @@ class ChartClass {
   series: any;
   samplingRate: number;
   TOILegend: any;
+  containerId: string;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
     type: ChartType.RECORD | ChartType.REVIEW,
-    samplingRate: number
+    samplingRate: number,
+    containerId: string
   ) {
     this.channels = channels || ['No Channel'];
     this.channelCount = channels.length;
     this.type = type;
     this.samplingRate = samplingRate;
+    this.containerId = containerId;
     this.seriesLineColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
 
     this.TOILegend = null;
@@ -58,6 +61,7 @@ class ChartClass {
 
   // Create chart
   createChart() {
+    console.log('CHART CALLED');
     // Create the dashboard first
     this.dashboard = this.createDashboard();
 
@@ -85,27 +89,21 @@ class ChartClass {
   // Listens for data for the record page
   recordData() {
     let count = 0;
-    let dataPoints: any = [];
-    window.api.onIPCData('data:reader-record', (_, data: any) => {
-      // Store the coming data points
-      dataPoints.push(data);
-
+    window.api.onIPCData('data:reader-record', (_event, data: any) => {
       // Change TOI value every 25 samples (based on 100samples/s)
-      if (count === 25) {
-        this.TOILegend.setText(Math.round(data[4]).toString());
+      if (count === 5) {
+        this.TOILegend.setText(Math.round(data[data.length - 1][4]).toString());
         count = 0;
       }
       count++;
 
       // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 10 reading lines
       requestAnimationFrame(() => {
-        dataPoints.forEach((data: any) => {
+        data.forEach((data: any) => {
           for (let i = 0; i < this.series.length; i++) {
             this.series[i].add({ x: data[0], y: data[i + 1] });
           }
         });
-
-        dataPoints = [];
       });
     });
   }
@@ -118,7 +116,7 @@ class ChartClass {
     const dashboard = lightningChart().Dashboard({
       numberOfRows: this.channelCount, //Total number of rows for the dashboard - default 8
       numberOfColumns: 2, //Full width
-      container: 'chart', //div id to attach to
+      container: this.containerId, //div id to attach to
       disableAnimations: true,
       theme: Themes.darkGold,
     });
@@ -200,11 +198,11 @@ class ChartClass {
 
       if (this.type === ChartType.RECORD) {
         axisX
-          .setInterval(0, 20)
+          .setInterval(0, 30)
           .setScrollStrategy(AxisScrollStrategies.progressive);
       } else {
         axisX
-          .setInterval(0, 20)
+          .setInterval(0, 30)
           .setScrollStrategy(AxisScrollStrategies.regressive);
       }
 
@@ -299,7 +297,7 @@ class ChartClass {
           .addElement(UIElementBuilders.TextBox)
           .setText('-')
           .setMargin({ top: 5, bottom: 5 })
-          .setTextFont((font: any) => font.setSize(18));
+          .setTextFont((font: any) => font.setSize(24));
       } else {
         legendLayout
           .addElement(UIElementBuilders.TextBox)

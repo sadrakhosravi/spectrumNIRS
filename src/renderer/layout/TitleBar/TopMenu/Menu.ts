@@ -1,6 +1,9 @@
+import { version } from '~/package.json';
+// Actions
 import { openModal } from '@redux/ModalStateSlice';
-import { ModalConstants } from '@utils/constants';
 
+// Constants
+import { ModalConstants } from '@utils/constants';
 import { DialogBoxChannels } from '@utils/channels';
 
 import store from '@redux/store';
@@ -55,7 +58,8 @@ export const TopMenu = [
             title: 'Photon Lab Software',
             message: 'Photon Lab',
             type: 'info',
-            detail: "Powered by Microsoft's Electron. Current version: 0.1.0",
+            detail:
+              "Powered by Microsoft's Electron. Current version: " + version,
           }),
       },
       {

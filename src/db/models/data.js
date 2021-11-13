@@ -2,19 +2,15 @@
 const Sequelize = require('sequelize');
 import sequelize from 'db/models/database';
 
-const Data = sequelize.define('data', {
-  timeStamp: {
-    type: Sequelize.DataTypes.FLOAT(undefined, 2),
+const Data = sequelize.define(
+  'data',
+  {
+    // don't add the timestamp attributes (updatedAt, createdAt)
+    values: Sequelize.DataTypes.TEXT,
   },
-  calcValues: {
-    type: Sequelize.DataTypes.STRING,
-  },
-  rawValues: {
-    type: Sequelize.DataTypes.STRING,
-  },
-  intensities: {
-    type: Sequelize.DataTypes.STRING,
-  },
-});
+  {
+    timestamps: false,
+  }
+);
 
 export default Data;

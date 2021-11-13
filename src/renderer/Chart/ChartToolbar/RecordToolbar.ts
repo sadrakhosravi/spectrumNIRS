@@ -1,6 +1,5 @@
 // Icons
 import StartIcon from '@icons/start.svg';
-import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 import ZoomInIcon from '@icons/zoom-in.svg';
 import ZoomOutIcon from '@icons/zoom-out.svg';
@@ -10,14 +9,16 @@ import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import MarkerIcon from '@icons/marker.svg';
 import RawDataIcon from '@icons/raw-data.svg';
+import ExportTxtIcon from '@icons/export-txt.svg';
 
 // Constants
 import { RecordState } from '@utils/constants';
+import { ChartChannels } from '@utils/channels';
 
 // Adapters
 import { handlePause, handleRecord } from '@adapters/recordAdapter';
 import ChartOptions from '../ChartClass/ChartOptions';
-import { dispatch } from '@redux/store';
+import { dispatch, getState } from '@redux/store';
 import { toggleRawData, toggleHypoxia, toggleEvent2 } from '@redux/ChartSlice';
 
 export const RecordToolbar = [
@@ -103,6 +104,18 @@ export const RecordToolbar = [
       dispatch(toggleEvent2());
     },
   },
+  {
+    label: 'separator',
+  },
+  {
+    label: `ExportTxt`,
+    tooltip: 'Export Text File',
+    icon: ExportTxtIcon,
+    click: () => {
+      const experimentData = getState().experimentData;
+      window.api.sendIPC(ChartChannels.ExportAll, experimentData);
+    },
+  },
 ];
 
 export const RecordButtons = [
@@ -112,33 +125,33 @@ export const RecordButtons = [
         case RecordState.IDLE:
           return 'Start';
         case RecordState.RECORD:
-        case RecordState.PAUSED:
-        case RecordState.CONTINUE:
-          return 'Stop';
-      }
-    },
-    dynamicIcon: (state: RecordState) =>
-      state !== RecordState.IDLE ? StopIcon : StartIcon,
-    isActive: (state: RecordState) => state !== RecordState.IDLE,
-    click: handleRecord,
-  },
-  {
-    dynamicLabel: (state: RecordState) => {
-      switch (state) {
-        case RecordState.IDLE:
-        case RecordState.RECORD:
         case RecordState.CONTINUE:
           return 'Pause';
-
         case RecordState.PAUSED:
           return 'Continue';
       }
     },
-    icon: PauseIcon,
-    tooltip: (state: RecordState) =>
-      state === RecordState.IDLE ? 'Start a recording first' : null,
-    isActive: (state: RecordState) => state === RecordState.PAUSED,
-    isDisabled: (state: RecordState) => state === RecordState.IDLE,
-    click: handlePause,
+    dynamicIcon: (state: RecordState) => {
+      switch (state) {
+        case RecordState.IDLE:
+        case RecordState.PAUSED:
+          return StartIcon;
+        case RecordState.RECORD:
+        case RecordState.CONTINUE:
+          return PauseIcon;
+      }
+    },
+
+    isActive: (state: RecordState) => state !== RecordState.IDLE,
+    click: (state: RecordState) => {
+      switch (state) {
+        case RecordState.IDLE:
+          return handleRecord;
+        case RecordState.PAUSED:
+        case RecordState.RECORD:
+        case RecordState.CONTINUE:
+          return handlePause;
+      }
+    },
   },
 ];

@@ -24,6 +24,7 @@ export const ChartSlice = createSlice({
   name: 'chartState',
   initialState,
   reducers: {
+    setInitialState: () => initialState,
     toggleRawData: (state) => {
       state.rawdata = !state.rawdata;
       window.api.sendIPC(RecordChannels.RawData);
@@ -37,7 +38,7 @@ export const ChartSlice = createSlice({
   },
 });
 
-export const { toggleRawData, toggleHypoxia, toggleEvent2 } =
+export const { setInitialState, toggleRawData, toggleHypoxia, toggleEvent2 } =
   ChartSlice.actions;
 
 export default ChartSlice.reducer;

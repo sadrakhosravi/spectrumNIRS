@@ -3,7 +3,7 @@ import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { setReviewSidebar } from '@redux/AppStateSlice';
 
 // Main area components
-const Chart = React.lazy(() => import('renderer/Chart/Chart.component'));
+import ReviewChart from 'renderer/Chart/ReviewChart.component';
 
 // Sidebar components
 import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
@@ -16,7 +16,6 @@ const Review = () => {
   const isSidebarActive = useAppSelector(
     (state) => state.appState.reviewSidebar
   );
-  console.log(isSidebarActive);
 
   const isNewWindow = useAppSelector(
     (state) => state.appState.reviewTabInNewWindow
@@ -25,17 +24,15 @@ const Review = () => {
   return (
     <>
       {!isNewWindow && (
-        <div className="h-full w-full flex gap-2">
+        <div className={`absolute top-0 left-0 h-full w-full flex`}>
           <div
             className={`h-full ${
               isSidebarActive
-                ? 'w-[calc(100%-250px)]'
-                : 'w-[calc(100%-20px)] pr-1'
+                ? 'w-[calc(100%-280px)] mr-[15px]'
+                : 'w-[calc(100%-20px)]'
             }`}
           >
-            <React.Suspense fallback={<p>Loading ...</p>}>
-              <Chart type={ChartType.REVIEW} />
-            </React.Suspense>
+            <ReviewChart type={ChartType.REVIEW} />
           </div>
           <div
             className={`h-full ${
