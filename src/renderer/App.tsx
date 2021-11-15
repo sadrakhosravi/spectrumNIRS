@@ -5,6 +5,7 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 // CSS
 import './App.global.css';
@@ -48,7 +49,19 @@ const App = () => {
         </React.Suspense>
         <Route exact path={AppState.RECORD_TAB} component={RecordPage} />
         <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
-
+        <Route
+          path={'/main'}
+          render={() => (
+            <Toaster
+              position="bottom-right"
+              containerClassName="mb-6"
+              toastOptions={{
+                className: 'bg-grey2 text-white rounded-md',
+                duration: 5000,
+              }}
+            />
+          )}
+        />
         <Switch>
           <Route exact path="/" render={() => <Redirect to="/main" />} />
         </Switch>

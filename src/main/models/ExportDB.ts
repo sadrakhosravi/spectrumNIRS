@@ -8,25 +8,58 @@ class ExportDB {
     this.recordingId = recordingId;
   }
 
-  async exportToTextFile(_experimentData: any) {
-    const savePath = dialog.showSaveDialogSync(
-      BrowserWindow.getAllWindows()[0]
-    );
-    // const experimentName = experimentData?.currentExperiment?.name || 'Test123';
-    // const BATCH_SIZE = 10000;
-    let writeStream = fs.createWriteStream(savePath + '.txt');
-    const result = await db.Data.findAll({
-      where: {
-        recordingId: 1,
-      },
-      raw: true,
-    });
+  /**
+   * Exports the given recording data to a text file
+   * @param _experimentData - The current experiment, patient, and recording information
+   */
+  async exportToTextFile(_experimentData: any): Promise<boolean | 'canceled'> {
+    try {
+      // Show save dialog to get the export file path.
+      const savePath = dialog.showSaveDialogSync(
+        BrowserWindow.getAllWindows()[0]
+      );
 
-    result.forEach((result: any) => {
-      writeStream.write(result.values.toString() + '\n', 'utf-8');
-    });
+      // If the path was undefined, the export was canceled.
+      if (!savePath) return 'canceled';
 
-    writeStream.close();
+      // Create a write stream to write to a text file
+      let writeStream = fs.createWriteStream(savePath + '.txt');
+
+      // Settings for querying data from the database.
+      let offset = 0;
+      const LIMIT = 50000;
+
+      // Run the loop while there's still recording data available
+      while (true) {
+        const records = await db.Data.findAll({
+          where: {
+            recordingId: 5,
+          },
+          offset: offset,
+          limit: LIMIT,
+          raw: true,
+        });
+
+        // If there's no recording data, break the loop
+        if (records.length === 0) break;
+        offset += LIMIT;
+
+        // Calculate the length once so that the for loop doesn't need to calculate it on
+        // every iteration
+        const RECORDS_LENGTH = records.length;
+        for (let i = 0; i < RECORDS_LENGTH - 1; i++) {
+          writeStream.write(records[i].values.toString() + '\n', 'utf-8');
+        }
+      }
+
+      // Close the write stream once done.
+      writeStream.close();
+
+      return true;
+    } catch (error: any) {
+      // Catch any error that might occur
+      throw new Error(error.message);
+    }
   }
 }
 

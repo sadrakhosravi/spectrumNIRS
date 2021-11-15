@@ -18,8 +18,15 @@ import { ChartChannels } from '@utils/channels';
 // Adapters
 import { handlePause, handleRecord } from '@adapters/recordAdapter';
 import ChartOptions from '../ChartClass/ChartOptions';
+
+// Store
 import { dispatch, getState } from '@redux/store';
-import { toggleRawData, toggleHypoxia, toggleEvent2 } from '@redux/ChartSlice';
+import {
+  toggleRawData,
+  toggleHypoxia,
+  toggleEvent2,
+  setExportStatus,
+} from '@redux/ChartSlice';
 
 export const RecordToolbar = [
   {
@@ -108,12 +115,20 @@ export const RecordToolbar = [
     label: 'separator',
   },
   {
-    label: `ExportTxt`,
+    label: `exporttxt`,
     tooltip: 'Export Text File',
     icon: ExportTxtIcon,
-    click: () => {
+    click: async () => {
+      dispatch(setExportStatus('loading'));
+
       const experimentData = getState().experimentData;
-      window.api.sendIPC(ChartChannels.ExportAll, experimentData);
+      const result = await window.api.invokeIPC(
+        ChartChannels.ExportAll,
+        experimentData
+      );
+      result === 'canceled' && dispatch(setExportStatus('canceled'));
+      result === true && dispatch(setExportStatus('done'));
+      result === false && dispatch(setExportStatus('error'));
     },
   },
 ];

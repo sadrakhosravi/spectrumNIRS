@@ -3,16 +3,22 @@ import { createSlice } from '@reduxjs/toolkit';
 // Constants
 import { RecordChannels } from '@utils/channels';
 
+type ExportStatus = 'idle' | 'loading' | 'done' | 'error' | 'canceled';
+
 export type ChartSliceType = {
   rawdata: boolean;
   hypoxia: boolean;
   event2: boolean;
+  exporttxt: boolean;
+  exportStatus: ExportStatus;
 };
 
 const initialState: ChartSliceType = {
   rawdata: false,
   hypoxia: false,
   event2: false,
+  exporttxt: false,
+  exportStatus: 'idle',
 };
 
 export type chartStateOptions = keyof typeof initialState;
@@ -35,10 +41,22 @@ export const ChartSlice = createSlice({
     toggleEvent2: (state) => {
       state.event2 = !state.event2;
     },
+    toggleExportTxt: (state) => {
+      state.exporttxt = !state.exporttxt;
+    },
+    setExportStatus: (state, { payload }: { payload: ExportStatus }) => {
+      state.exportStatus = payload;
+    },
   },
 });
 
-export const { setInitialState, toggleRawData, toggleHypoxia, toggleEvent2 } =
-  ChartSlice.actions;
+export const {
+  setInitialState,
+  toggleRawData,
+  toggleHypoxia,
+  toggleEvent2,
+  toggleExportTxt,
+  setExportStatus,
+} = ChartSlice.actions;
 
 export default ChartSlice.reducer;
