@@ -3,6 +3,7 @@ import {
   setExperimentData,
   setPatientData,
   setRecordingData,
+  resetRecordingData,
 } from '@redux/ExperimentDataSlice';
 import { setSelectedSensor } from '@redux/SensorStateSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
@@ -28,6 +29,7 @@ export const newExperiment = async (newExpData: object) => {
 
   if (newExperiment) {
     dispatch(setExperimentData(newExperiment));
+    dispatch(resetRecordingData());
     dispatch(closeModal());
     dispatch(openModal(ModalConstants.NEWRECORDING));
   }
@@ -48,6 +50,8 @@ export const newPatient = async (data: INewPatientData) => {
     data
   );
   dispatch(setPatientData(newPatient));
+  dispatch(closeModal());
+  dispatch(openModal(ModalConstants.NEWRECORDING));
 };
 
 /**

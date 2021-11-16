@@ -101,7 +101,7 @@ export const start = (
       // Recording.insertRecordingData(line, recordingId);
       databaseArr.push({ values: rawDataArr.join(','), recordingId });
 
-      if (databaseCount === 200) {
+      if (databaseCount === 10) {
         Database.addDataToTransaction(databaseArr);
         databaseArr = [];
         databaseCount = 0;

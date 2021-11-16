@@ -5,6 +5,7 @@ type CurrentExperiment = {
   name: string;
   description: string;
   date: string;
+  settings: JSON | null;
 };
 
 type CurrentPatient = {
@@ -36,6 +37,7 @@ const initialState: ExperimentData = {
     name: '',
     description: '',
     date: '',
+    settings: null,
   },
   currentPatient: {
     id: -1,
@@ -58,6 +60,9 @@ export const ExperimentDataSlice = createSlice({
   name: 'experimentData',
   initialState,
   reducers: {
+    setCurrentExperiment: (state, { payload }) => {
+      state.currentExperiment = payload;
+    },
     setExperimentData: (state, { payload }) => {
       state.currentExperiment = payload.currentExperiment;
       state.currentPatient = payload.currentPatient;
@@ -77,10 +82,20 @@ export const ExperimentDataSlice = createSlice({
         state.isDataReady = false;
       }
     },
+    resetRecordingData: (state) => {
+      state.currentRecording = initialState.currentRecording;
+    },
+    resetExperimentData: () => initialState,
   },
 });
 
-export const { setExperimentData, setPatientData, setRecordingData } =
-  ExperimentDataSlice.actions;
+export const {
+  setCurrentExperiment,
+  setExperimentData,
+  setPatientData,
+  setRecordingData,
+  resetRecordingData,
+  resetExperimentData,
+} = ExperimentDataSlice.actions;
 
 export default ExperimentDataSlice.reducer;

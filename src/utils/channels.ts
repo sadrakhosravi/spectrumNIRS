@@ -1,10 +1,13 @@
 // Experiment Channel
 const ExpChannelBase = 'experiment:';
 export const ExperimentChannels = {
-  NewExp: ExpChannelBase + 'newExp',
+  NewExp: ExpChannelBase + 'new-exp',
+  UpdateExp: ExpChannelBase + 'update-exp',
   NewPatient: ExpChannelBase + 'newPatient',
   NewRecording: ExpChannelBase + 'newRecording',
   getRecentExperiments: ExpChannelBase + 'get-recent-experiments',
+  getAllPatients: ExpChannelBase + 'get-all-patients',
+  getAllRecordings: ExpChannelBase + 'get-all-recordings',
 };
 
 // App State Channel

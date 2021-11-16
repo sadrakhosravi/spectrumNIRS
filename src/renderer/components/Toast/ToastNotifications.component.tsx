@@ -8,8 +8,10 @@ const ToastNotifications = () => {
     toast.dismiss();
     exportStatus === 'loading' &&
       toast.loading('Exporting data', { duration: Infinity });
-    exportStatus === 'done' && toast.success('Exporting data completed!');
-
+    exportStatus === 'done' && toast.success('Data export completed!');
+    exportStatus === 'error' &&
+      toast.error('An error has occurred during export');
+    exportStatus === 'canceled' && toast('Export was canceled');
     return () => {
       toast.dismiss;
     };

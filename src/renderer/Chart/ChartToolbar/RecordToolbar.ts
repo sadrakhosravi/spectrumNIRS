@@ -13,7 +13,7 @@ import ExportTxtIcon from '@icons/export-txt.svg';
 
 // Constants
 import { RecordState } from '@utils/constants';
-import { ChartChannels } from '@utils/channels';
+import { ChartChannels, DialogBoxChannels } from '@utils/channels';
 
 // Adapters
 import { handlePause, handleRecord } from '@adapters/recordAdapter';
@@ -119,12 +119,24 @@ export const RecordToolbar = [
     tooltip: 'Export Text File',
     icon: ExportTxtIcon,
     click: async () => {
+      const recordingId = getState().experimentData.currentRecording.id;
+
+      if (recordingId === -1) {
+        window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+          title: 'No recording found',
+          type: 'error',
+          message: 'No recording found',
+          detail:
+            'No recording found. Either open a recording or create a new one.',
+        });
+        return;
+      }
+
       dispatch(setExportStatus('loading'));
 
-      const experimentData = getState().experimentData;
       const result = await window.api.invokeIPC(
         ChartChannels.ExportAll,
-        experimentData
+        recordingId
       );
       result === 'canceled' && dispatch(setExportStatus('canceled'));
       result === true && dispatch(setExportStatus('done'));

@@ -24,6 +24,14 @@ export class Patient {
       throw new Error(error.message);
     }
   }
+
+  public static async getAllPatient(experimentId: number): Promise<any> {
+    try {
+      return await db.Patient.findAll({ where: { experimentId }, raw: true });
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
 }
 
 export default Patient;

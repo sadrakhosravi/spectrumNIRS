@@ -1,9 +1,6 @@
 import React from 'react';
-
-// Adapters
-import { openNewExperimentForm } from '@adapters/dispatchAdapter';
-
-// Adapters
+import { useAppDispatch } from '@redux/hooks/hooks';
+import { openModal } from '@redux/ModalStateSlice';
 
 // Icons
 import NewFileIcon from '@icons/new-file.svg';
@@ -14,7 +11,11 @@ import HeadingText from './HeadingText/HeadingText.component';
 import RecentExperiments from './RecentExperiments/RecentExperimentsContainer.component';
 import LargeIconTextButton from '@components/Buttons/LargeIconTextButton.component';
 
+// Constants
+import { ModalConstants } from '@utils/constants';
+
 const HomePage = () => {
+  const dispatch = useAppDispatch();
   return (
     <div id="testing123" className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">
       <HeadingText />
@@ -28,13 +29,14 @@ const HomePage = () => {
             title="New Experiment"
             description="Create a new experiment"
             onClick={() => {
-              openNewExperimentForm();
+              dispatch(openModal(ModalConstants.NEWEXPERIMENT));
             }}
           />
           <LargeIconTextButton
             icon={OpenFileIcon}
             title="Open Experiment"
             description="Open an experiment file or project"
+            onClick={() => dispatch(openModal(ModalConstants.OPEN_EXPERIMENT))}
           />
         </div>
       </div>

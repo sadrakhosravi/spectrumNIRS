@@ -1,4 +1,10 @@
 import React from 'react';
+import { useAppDispatch } from '@redux/hooks/hooks';
+import { closeModal, openModal } from '@redux/ModalStateSlice';
+import {
+  resetExperimentData,
+  setCurrentExperiment,
+} from '@redux/ExperimentDataSlice';
 
 // Icons
 import RecentFileIcon from '@icons/recent-file.svg';
@@ -6,10 +12,15 @@ import RecentFileIcon from '@icons/recent-file.svg';
 // Components
 import ButtonTitleDescription from '@components/MicroComponents/ButtonTitleDescription/ButtonTitleDescription.component';
 
+// Constants
+import { ModalConstants } from '@utils/constants';
+import { ExperimentChannels } from '@utils/channels';
+
 interface IProps {
   title: string;
   description: string;
   saved: string;
+  experiment: any;
   isActive?: boolean;
   key?: any;
 }
@@ -18,13 +29,25 @@ const RecentExperiment: React.FC<IProps> = ({
   title,
   description,
   saved,
+  experiment,
   isActive = false,
 }) => {
+  const dispatch = useAppDispatch();
+
+  const handleOpenExperimentButton = async () => {
+    dispatch(resetExperimentData());
+    dispatch(closeModal());
+    dispatch(setCurrentExperiment(experiment));
+    dispatch(openModal(ModalConstants.OPEN_PATIENT));
+    await window.api.invokeIPC(ExperimentChannels.UpdateExp, experiment.id);
+  };
+
   return (
-    <div
+    <button
       className={`${
         isActive ? 'bg-accent' : 'bg-grey2'
-      } grid grid-cols-5 px-3 py-5 mb-3 rounded-md`}
+      } grid grid-cols-5 items-center w-full px-3 py-5 mb-3 rounded-md duration-150 hover:bg-grey3 hover:cursor-pointer active:bg-accent`}
+      onClick={handleOpenExperimentButton}
     >
       <div className="col-span-3 flex items-center">
         <span className="inline-block mr-5">
@@ -44,7 +67,7 @@ const RecentExperiment: React.FC<IProps> = ({
           Saved: {saved.toString().split(' ')[0]}
         </p>
       </div>
-    </div>
+    </button>
   );
 };
 

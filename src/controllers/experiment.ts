@@ -21,14 +21,34 @@ ipcMain.handle(
   async (_event, limit: number) => Experiment.getRecentExperiments(limit)
 );
 
+ipcMain.handle(
+  ExperimentChannels.UpdateExp,
+  async (_event, experimentId: number) =>
+    await Experiment.updateExperiment(experimentId)
+);
+
 // Creates a new patient record in the database
 ipcMain.handle(
   ExperimentChannels.NewPatient,
   async (_event, data: INewPatientData) => await Patient.createNewPatient(data)
 );
 
+// Retrieves all patients from the database with the same experimentId (belongs to the same experiment)
+ipcMain.handle(
+  ExperimentChannels.getAllPatients,
+  async (_event, experimentId: number) =>
+    await Patient.getAllPatient(experimentId)
+);
+
 // Creates a new recording in the database
 ipcMain.handle(
   ExperimentChannels.NewRecording,
   async (_event, data: any) => await Recording.createNewRecording(data)
+);
+
+// Retrieves all recordings from the database with the same patientId (belongs to the same patient)
+ipcMain.handle(
+  ExperimentChannels.getAllRecordings,
+  async (_event, patientId: number) =>
+    await Recording.getAllRecordings(patientId)
 );

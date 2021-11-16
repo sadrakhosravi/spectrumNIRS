@@ -33,6 +33,23 @@ export class Recording implements IRecording {
   };
 
   /**
+   * Retrieves all recordings related to the same patient
+   * @param patientId
+   */
+  public static getAllRecordings = async (patientId: number): Promise<any> => {
+    try {
+      return await db.Recording.findAll({
+        where: {
+          patientId,
+        },
+        raw: true,
+      });
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
+
+  /**
    * Inserts the recording data to the database in the `data` table
    * @param data - Data to be written to the database
    */

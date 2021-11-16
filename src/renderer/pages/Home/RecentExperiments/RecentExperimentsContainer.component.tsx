@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react';
-
-import RecentExperiment from './RecentExperiment.component';
-
-import withLoading from '@hoc/withLoading.hoc';
-import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
 import { useAppSelector } from '@redux/hooks/hooks';
+import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
+
+// Components
+import RecentExperiment from './RecentExperiment.component';
+import IconButton from '@components/Buttons/IconButton.component';
+
+// HOC
+import withLoading from '@hoc/withLoading.hoc';
+import withTooltip from '@hoc/withTooltip.hoc';
+
+// Icons
+import UpdateIcon from '@icons/update.svg';
+
+const IconButtonWithTooltip = withTooltip(IconButton);
 
 type ExperimentsContainer = {
+  numOfExps?: number;
   recentExperiments?: Object[];
   children?: React.ReactNode;
   setLoading?: any;
@@ -18,6 +28,7 @@ type ExperimentState = {
 };
 
 const RecentExperimentsContainer = ({
+  numOfExps = 5,
   children,
   setLoading,
 }: ExperimentsContainer): JSX.Element => {
@@ -29,14 +40,16 @@ const RecentExperimentsContainer = ({
     (state) => state.experimentData.currentExperiment.id
   );
 
-  const { data, isLoading, refetch } = useGetRecentExperimentsQuery(5);
+  const { data, isLoading, refetch } = useGetRecentExperimentsQuery(numOfExps);
 
-  // Handle side effects
   useEffect(() => {
     refetch();
+  }, [currentExperimentId]);
+  // Handle side effects
+  useEffect(() => {
     setLoading(isLoading);
     !isLoading && setExperiments({ data, searchedExperiments: data });
-  }, [isLoading]);
+  }, [isLoading, data]);
 
   const handleChange = (event: any) => {
     if (event.target.value !== '') {
@@ -56,11 +69,20 @@ const RecentExperimentsContainer = ({
 
   return (
     <div className="bg-grey1 h-full p-6 rounded-md overflow-y-auto">
-      <input
-        className="bg-light text-dark px-3 py-1 w-full placeholder-grey1 mb-5 rounded-sm"
-        placeholder="Search recent experiments ..."
-        onChange={handleChange}
-      />
+      <div className="flex gap-2 items-center w-full mb-5">
+        <input
+          className="bg-light text-dark h-40px px-3 placeholder-grey1 rounded-sm w-full"
+          placeholder="Search recent experiments ..."
+          onChange={handleChange}
+        />
+        <span className="h-40px w-12">
+          <IconButtonWithTooltip
+            icon={UpdateIcon}
+            tooltip={'Refresh List'}
+            onClick={refetch}
+          />
+        </span>
+      </div>
       {experiments.searchedExperiments &&
         experiments.searchedExperiments.map((experiment: any) => (
           <RecentExperiment
@@ -69,6 +91,7 @@ const RecentExperimentsContainer = ({
             saved={experiment.updatedAt}
             key={experiment.id}
             isActive={experiment.id === currentExperimentId}
+            experiment={experiment}
           />
         ))}
       {experiments.searchedExperiments.length === 0 && (

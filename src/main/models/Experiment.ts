@@ -56,11 +56,21 @@ export class Experiment implements IExperiment {
     limit: number
   ): Promise<Object[]> =>
     await db.Experiment.findAll({
-      limit,
-      order: [['createdAt', 'DESC']],
+      limit: limit === -1 ? null : limit,
+      order: [['updatedAt', 'DESC']],
       attributes: { exclude: ['createdAt'] },
       raw: true,
     });
+
+  /**
+   * Updates the given experiment
+   * @param experimentId - The id of the experiment to update
+   */
+  public static updateExperiment = async (experimentId: number) => {
+    const experiment = await db.Experiment.findByPk(experimentId);
+    experiment.changed('updatedAt', true);
+    await experiment.save();
+  };
 }
 
 export default Experiment;

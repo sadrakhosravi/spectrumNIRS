@@ -10,14 +10,16 @@ class ExportDB {
 
   /**
    * Exports the given recording data to a text file
-   * @param _experimentData - The current experiment, patient, and recording information
+   * @param recordingId - Recording of the the data to be exported
    */
-  async exportToTextFile(_experimentData: any): Promise<boolean | 'canceled'> {
+  async exportToTextFile(recordingId: number): Promise<boolean | 'canceled'> {
     try {
       // Show save dialog to get the export file path.
       const savePath = dialog.showSaveDialogSync(
         BrowserWindow.getAllWindows()[0]
       );
+
+      console.log(recordingId);
 
       // If the path was undefined, the export was canceled.
       if (!savePath) return 'canceled';
@@ -33,7 +35,7 @@ class ExportDB {
       while (true) {
         const records = await db.Data.findAll({
           where: {
-            recordingId: 5,
+            recordingId,
           },
           offset: offset,
           limit: LIMIT,

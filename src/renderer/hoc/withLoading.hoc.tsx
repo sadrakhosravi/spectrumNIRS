@@ -12,7 +12,9 @@ const withLoading = (
     const [isLoading, setIsLoading] = useState(true);
 
     const setLoadingState = (isComponentLoading: boolean) => {
-      setIsLoading(isComponentLoading);
+      requestAnimationFrame(() => {
+        setIsLoading(isComponentLoading);
+      });
     };
 
     return (
