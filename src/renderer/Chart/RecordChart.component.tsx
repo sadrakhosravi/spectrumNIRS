@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { changeRecordState } from '@redux/RecordStateSlice';
 // Components
@@ -15,6 +15,7 @@ type ChartProps = {
 // Prepares and enders the chart
 const RecordChart = ({ type }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
+  const [chartState, setChartState] = useState<null | LCJSChart>(null);
   const dispatch = useAppDispatch();
   const recordingName = useAppSelector(
     (state) => state.experimentData.currentRecording.name
@@ -29,8 +30,9 @@ const RecordChart = ({ type }: ChartProps): JSX.Element => {
   const containerId = 'recordChart';
   const chartRef = useRef<LCJSChart | null>(null);
 
-  useEffect(() => {
-    let chart: LCJSChart | undefined;
+  let chart: LCJSChart | undefined;
+
+  useLayoutEffect(() => {
     console.log('RECORD CHARTTT');
 
     // Create chart, series and any other static components.
@@ -52,6 +54,7 @@ const RecordChart = ({ type }: ChartProps): JSX.Element => {
     chartRef.current = chart as LCJSChart;
 
     setChartLoaded(true);
+    setChartState(chart);
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -79,7 +82,9 @@ const RecordChart = ({ type }: ChartProps): JSX.Element => {
 
   return (
     <>
-      {chartLoaded && <ChartToolbar chart={chartRef.current} type={type} />}
+      {chartLoaded && chartState && (
+        <ChartToolbar chartOptions={chartState.ChartOptions} type={type} />
+      )}
 
       <div
         hidden={false}

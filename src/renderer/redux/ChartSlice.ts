@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // Constants
-import { RecordChannels } from '@utils/channels';
+import { ChartChannels, RecordChannels } from '@utils/channels';
 
 type ExportStatus = 'idle' | 'loading' | 'done' | 'error' | 'canceled';
 
@@ -37,9 +37,15 @@ export const ChartSlice = createSlice({
     },
     toggleHypoxia: (state) => {
       state.hypoxia = !state.hypoxia;
+
+      // Send the state to the controller
+      window.api.sendIPC(ChartChannels.Event, { hypoxia: state.hypoxia });
     },
     toggleEvent2: (state) => {
       state.event2 = !state.event2;
+
+      // Send the state to the controller
+      window.api.sendIPC(ChartChannels.Event, { event2: state.event2 });
     },
     toggleExportTxt: (state) => {
       state.exporttxt = !state.exporttxt;

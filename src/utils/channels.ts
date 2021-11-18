@@ -34,6 +34,7 @@ export const RecordChannels = {
   Pause: RecordBase + 'pause',
   Continue: RecordBase + 'continue',
   RawData: RecordBase + 'raw-data',
+  SyncGain: RecordBase + 'gain-base',
 };
 
 // Review Tab
@@ -60,5 +61,6 @@ export const USBDetectionChannels = {
 // Chart Channels
 const ChartBase = 'chart:';
 export const ChartChannels = {
+  Event: ChartBase + 'event',
   ExportAll: ChartBase + 'export-all',
 };

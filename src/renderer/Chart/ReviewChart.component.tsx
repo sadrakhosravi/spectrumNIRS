@@ -72,7 +72,12 @@ const ReviewChart = ({ type }: ChartProps): JSX.Element => {
 
   return (
     <>
-      {chartLoaded && <ChartToolbar chart={chartRef.current} type={type} />}
+      {chartLoaded && chartRef.current?.ChartOptions && (
+        <ChartToolbar
+          chartOptions={chartRef.current.ChartOptions}
+          type={type}
+        />
+      )}
 
       <div
         key={containerId}

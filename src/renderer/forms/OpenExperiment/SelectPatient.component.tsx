@@ -76,16 +76,16 @@ const SelectPatient = ({ patient }: { patient: PatientData }) => {
       >
         {recordings &&
           recordings.map((recording: any, index: number) => (
-            <div className="inline-block w-1/2 px-2">
+            <div className="inline-block w-full rounded-sm border-light2 border-b-2 last:border-b-0">
               <button
-                className="bg-grey1 hover:bg-accent p-4 w-full text-left flex items-center gap-4 rounded-sm border-accent border-2 "
+                className="bg-grey1 hover:bg-accent px-4 py-2 w-full text-left flex items-center gap-4 rounded-sm"
                 onClick={() => handleOpenRecordingButton(recording)}
                 key={recording.id}
               >
                 <span className="w-[40px]">
-                  <img src={RecordingIcon} width="40px" />
+                  <img src={RecordingIcon} width="30px" />
                 </span>
-                <span className="w-2/3 text-lg font-medium">
+                <span className="w-2/3 font-medium">
                   Recording{index + 1}: {recording.name}
                 </span>
                 <span className="w-1/3 text-right">
@@ -95,7 +95,12 @@ const SelectPatient = ({ patient }: { patient: PatientData }) => {
             </div>
           ))}
         {recordings?.length === 0 && (
-          <p>No recordings found for patient {patient.name}</p>
+          <p>
+            No recordings found for the patient:{' '}
+            <span className="text-accent font-medium text-lg text-opacity-75">
+              {patient.name}
+            </span>
+          </p>
         )}
       </div>
       <div className="mb-6"></div>

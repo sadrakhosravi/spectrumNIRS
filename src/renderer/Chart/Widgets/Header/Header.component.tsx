@@ -9,7 +9,7 @@ const Header: React.FC<IProps> = (props) => {
   const { title } = props;
 
   return (
-    <div className="w-full bg-grey1 h-10 grid items-center pl-3">
+    <div className="w-full bg-grey1 h-10 grid items-center pl-3 rounded-t-md">
       <h5>{title}</h5>
     </div>
   );

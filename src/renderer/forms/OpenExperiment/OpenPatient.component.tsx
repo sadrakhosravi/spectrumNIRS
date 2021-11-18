@@ -10,7 +10,7 @@ import { ModalConstants } from 'utils/constants';
 const OpenPatient: React.FC = () => {
   return (
     <Modal id={ModalConstants.OPEN_PATIENT} title="Select Patient" size="large">
-      <div className="min-h-screen w-full">
+      <div className="min-h-[50vh] w-full">
         <OpenPatientForm />
       </div>
     </Modal>

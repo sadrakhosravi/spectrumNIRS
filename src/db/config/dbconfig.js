@@ -8,8 +8,6 @@ const appDataDir = path.join(
   'main.db'
 );
 
-console.log(appDataDir);
-
 module.exports = {
   development: {
     storage: appDataDir,

@@ -16,6 +16,8 @@ import {
   emptyLine,
   Themes,
 } from '@arction/lcjs';
+import ChartOptions from './ChartOptions';
+
 // Constants
 import { ChartType } from 'utils/constants';
 
@@ -33,6 +35,7 @@ class ChartClass {
   samplingRate: number;
   TOILegend: any;
   containerId: string;
+  ChartOptions: any;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
@@ -48,11 +51,13 @@ class ChartClass {
     this.seriesLineColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
 
     this.TOILegend = null;
+    this.ChartOptions = null;
   }
 
   // Cleanup function when chart is removed from the screen - IMPORTANT
   cleanup() {
     window.api.removeListeners('data:reader-record');
+    this.ChartOptions = undefined;
     this.dashboard.dispose();
     this.dashboard = undefined;
     this.charts = undefined;
@@ -84,6 +89,20 @@ class ChartClass {
 
     // Set data cleaning
     this.seriesDataCleaning();
+
+    // Chart Options
+    this.ChartOptions = new ChartOptions(
+      this.channels,
+      this.dashboard,
+      this.charts,
+      this.series
+    );
+  }
+
+  resetHeight() {
+    this.channels.forEach((_, i: number) => {
+      this.dashboard.setRowHeight(i, 1);
+    });
   }
 
   // Listens for data for the record page

@@ -2,9 +2,15 @@
  * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
 import RecordData from '@electron/models/RecordData';
+import net from 'net';
+
 const path = require('path');
 const readline = require('readline');
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
+
+// Socket for connecting to the driver
+const DRIVER_SOCKET_IP = '127.0.0.1';
+const DRIVER_SOCKET_PORT = 1337;
 
 // Defining the variables here for memory cleanup later.
 let rl: any;
@@ -13,6 +19,35 @@ let outputArr: number[] = [0, 0, 0, 0, 0];
 let readUSBData: any;
 let lastTimeSequence = 0;
 let timeSequence = 0; // timeSequence in centiseconds
+
+let events = {
+  hypoxia: false,
+  event2: false,
+};
+
+/**
+ * Sends the gains given from the UI to the driver
+ */
+export const syncGains = async (data: string[]) => {
+  let response = true;
+
+  const mySocket = new net.Socket();
+  mySocket.connect(DRIVER_SOCKET_PORT, DRIVER_SOCKET_IP, function () {
+    console.log('Connection Established');
+  });
+
+  mySocket.write(data.join(','));
+
+  mySocket.on('error', (data) => {
+    if (data) response = false;
+    console.log(data);
+  });
+
+  mySocket.destroy();
+  mySocket.on('close', () => console.log('Socket Destroyed'));
+
+  return response;
+};
 
 // Spawned processes array to keep track.
 const spawnedProcesses: any[] = [];
@@ -37,7 +72,7 @@ export const start = (
     ['run', path.join('../../../resources/drivers/nirs-v5/Test1.exe')]
   );
   readUSBData.stderr.on('data', (data: string) => {
-    console.error(`Error on loading NIRS Reader: ${data}`);
+    console.error(`Log from NIRS Reader: ${data}`);
   });
   readUSBData.on('exit', () => {
     console.log('Process Terminated');
@@ -66,11 +101,22 @@ export const start = (
 
       // Reset the previous time
       if (count === 0) {
+        // Synchronize gain on start
+        syncGains([
+          '180.00',
+          '165.00',
+          '140.00',
+          '140.00',
+          '140.00',
+          'HIGH',
+          '100',
+        ]);
         timeSequence += prevTime;
         count = 2;
       }
 
       // Raw Data
+      // Used direct array element access instead of a loop for the fastest possible calculationj
       const rawDataArr = [
         timeSequence / 100,
         parseFloat(data[1]),
@@ -99,7 +145,11 @@ export const start = (
       }
 
       // Recording.insertRecordingData(line, recordingId);
-      databaseArr.push({ values: rawDataArr.join(','), recordingId });
+      databaseArr.push({
+        values: rawDataArr.join(','),
+        recordingId,
+        ...events,
+      });
 
       if (databaseCount === 10) {
         Database.addDataToTransaction(databaseArr);
@@ -124,7 +174,7 @@ export const start = (
       lastTimeSequence = timeSequence;
     });
 
-  // Log if rl closes
+  // Log if readline closes
   rl.on('close', () => {
     console.log('Readline closed!');
   });
@@ -156,11 +206,22 @@ export const toggleRawData = () => {
   rawData = !rawData;
 };
 
+/**
+ * Toggles the event that was passed in
+ */
+export const toggleEvent = (event: object | any) => {
+  const eventName = Object.keys(event)[0] as keyof typeof events;
+  const eventState = event[eventName] as boolean;
+  events[eventName] = eventState;
+};
+
 // Final object to be exported
 const nirsReader = {
   start,
   stop,
   toggleRawData,
+  toggleEvent,
+  syncGains,
 };
 
 // Export module

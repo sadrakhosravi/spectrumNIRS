@@ -3,8 +3,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 //Components
 import Filter from './Filter/Filter.component';
-import Gain from './Gain/Gain.component';
-import Source from './Source/Source.component';
+import Intensities from './Gain/Intensities.component';
 import { setRecordSidebar, setReviewSidebar } from '@redux/AppStateSlice';
 
 // Constants
@@ -30,10 +29,9 @@ const WidgetsContainer = ({
   return (
     <>
       {isSidebarActive && (
-        <div className="h-full relative pb-3">
+        <div className="h-[calc(100%-1px)] relative pb-3">
           <Filter />
-          <Gain />
-          <Source />
+          <Intensities />
           <button
             className="absolute bottom-1 left-2 w-full h-8 text-light2 hover:text-white"
             onClick={handleHideSidebarClick}

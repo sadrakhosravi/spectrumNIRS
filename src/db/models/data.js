@@ -5,10 +5,12 @@ import sequelize from 'db/models/database';
 const Data = sequelize.define(
   'data',
   {
-    // don't add the timestamp attributes (updatedAt, createdAt)
     values: Sequelize.DataTypes.TEXT,
+    hypoxia: Sequelize.DataTypes.BOOLEAN,
+    event2: Sequelize.DataTypes.BOOLEAN,
   },
   {
+    // don't add the timestamp attributes (updatedAt, createdAt)
     timestamps: false,
   }
 );

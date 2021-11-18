@@ -21,6 +21,7 @@ import ChartOptions from '../ChartClass/ChartOptions';
 
 // Store
 import { dispatch, getState } from '@redux/store';
+
 import {
   toggleRawData,
   toggleHypoxia,
@@ -82,6 +83,7 @@ export const RecordToolbar = [
       chartOptions.screenshot();
     },
   },
+
   {
     label: 'rawdata',
     tooltip: 'Display Raw Data',
@@ -98,8 +100,20 @@ export const RecordToolbar = [
     tooltip: 'Hypoxia Event',
     icon: MarkerIcon,
     click: (chartOptions: ChartOptions) => {
+      const recordState = getState().recordState.value;
+      if (recordState === 'idle') {
+        window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+          title: 'Error',
+          type: 'error',
+          message: 'No Recording Found',
+          detail: 'Please start a recording first',
+        });
+        return;
+      }
       chartOptions.addMarker('Hypoxia', '#007ACD');
-      dispatch(toggleHypoxia());
+      setTimeout(() => {
+        dispatch(toggleHypoxia());
+      }, 0);
     },
   },
   {
@@ -107,6 +121,16 @@ export const RecordToolbar = [
     tooltip: 'Event 2',
     icon: MarkerIcon,
     click: (chartOptions: ChartOptions) => {
+      const recordState = getState().recordState.value;
+      if (recordState === 'idle') {
+        window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+          title: 'Error',
+          type: 'error',
+          message: 'No Recording Found',
+          detail: 'Please start a recording first',
+        });
+        return;
+      }
       chartOptions.addMarker('Event2', '#fff');
       dispatch(toggleEvent2());
     },

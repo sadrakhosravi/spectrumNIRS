@@ -4,7 +4,7 @@ import { ipcMain } from 'electron';
 import DataReader from '../main/models/DataReader';
 
 // Constants
-import { RecordChannels } from '@utils/channels';
+import { ChartChannels, RecordChannels } from '@utils/channels';
 
 export type CurrentRecording = {
   id: number;
@@ -62,4 +62,16 @@ ipcMain.on(RecordChannels.Continue, () => {
 // Display Raw Data
 ipcMain.on(RecordChannels.RawData, () => {
   reader && reader.toggleRawData();
+});
+
+// Gain Sync
+ipcMain.handle(
+  RecordChannels.SyncGain,
+  async (_event, data: string[]) =>
+    reader && (await reader.syncGainsWithHardware(data))
+);
+
+// Hypoxia Event
+ipcMain.on(ChartChannels.Event, (_event, data: Object) => {
+  reader.toggleEvent(data);
 });

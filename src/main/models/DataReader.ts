@@ -24,6 +24,14 @@ export interface IDataReaders {
    * Toggles the data to either display raw data or the calculated values.
    */
   toggleRawData(): void;
+  /**
+   * Toggles the passed event in the reader
+   */
+  toggleEvent(data: object): void;
+  /**
+   * Sends the new gain to the hardware
+   */
+  syncGainsWithHardware(data: string[]): Promise<any>;
 }
 
 type CurrentSensor = {
@@ -37,6 +45,8 @@ type CurrentSensor = {
   continueRecording: (sender: any) => void;
   stop: () => number;
   toggleRawData: () => void;
+  toggleEvent: (data: object) => void;
+  syncGains: (data: string[]) => Promise<any>;
 };
 
 /**
@@ -96,6 +106,14 @@ export class DataReader implements IDataReaders {
 
   toggleRawData() {
     this.currentSensor.toggleRawData();
+  }
+
+  toggleEvent(data: object) {
+    this.currentSensor.toggleEvent(data);
+  }
+
+  async syncGainsWithHardware(data: string[]): Promise<any> {
+    return await this.currentSensor.syncGains(data);
   }
 }
 

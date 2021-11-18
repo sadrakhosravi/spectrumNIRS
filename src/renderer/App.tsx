@@ -26,10 +26,8 @@ const ModalsContainer = React.lazy(
 import RouteHandler from '@pages/RouteHandler';
 
 // Pages
-import RecordPage from '@pages/Record/Record.page';
-import ReviewPage from '@pages/Review/Review.page';
-// const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
-// const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
+const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
+const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 // Test
 // import ReviewWebView from '@pages/Review/ReviewWebView';
@@ -46,25 +44,25 @@ const App = () => {
           <Route path="/main" component={BottomBar} />
           <Route path="/main" component={TitleBar} />
           <Route path="/main" component={ModalsContainer} />
+          <Route exact path={AppState.RECORD_TAB} component={RecordPage} />
+          <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
+          <Route
+            path={'/main'}
+            render={() => (
+              <Toaster
+                position="bottom-right"
+                containerClassName="mb-6"
+                toastOptions={{
+                  className: 'bg-grey2 text-white rounded-md',
+                  duration: 5000,
+                }}
+              />
+            )}
+          />
+          <Switch>
+            <Route exact path="/" render={() => <Redirect to="/main" />} />
+          </Switch>
         </React.Suspense>
-        <Route exact path={AppState.RECORD_TAB} component={RecordPage} />
-        <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
-        <Route
-          path={'/main'}
-          render={() => (
-            <Toaster
-              position="bottom-right"
-              containerClassName="mb-6"
-              toastOptions={{
-                className: 'bg-grey2 text-white rounded-md',
-                duration: 5000,
-              }}
-            />
-          )}
-        />
-        <Switch>
-          <Route exact path="/" render={() => <Redirect to="/main" />} />
-        </Switch>
       </Router>
     </div>
   );

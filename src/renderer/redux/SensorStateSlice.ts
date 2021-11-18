@@ -1,17 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { devices } from '@electron/configs/devices';
 
-export interface ISensor {
-  id: number;
-  name: string;
-  samplingRate: number;
-  channels: string[];
-  driverName: string;
-}
-
 export interface ISensorState {
-  detectedSensor: ISensor | null;
-  selectedSensor: ISensor;
+  detectedSensor: typeof devices[0] | null;
+  selectedSensor: typeof devices[0];
 }
 
 const initialState: ISensorState = {

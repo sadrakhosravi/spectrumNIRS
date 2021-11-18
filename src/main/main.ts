@@ -69,14 +69,9 @@ const createMainWindow = async () => {
 
   mainWindow.maximize();
 
-  await mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.setBackgroundColor('#1E1E1E');
-  mainWindow.webContents.openDevTools();
-
-  // await mainWindow.loadURL(resolveHtmlPath('index.html'));
-
-  // Default app state is maximized
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {

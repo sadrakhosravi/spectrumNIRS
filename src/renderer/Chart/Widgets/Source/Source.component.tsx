@@ -15,7 +15,7 @@ const Source = () => {
   const [source, setSource] = useState(sources[0]);
 
   return (
-    <div className="bg-grey3 h-1/4 relative mt-5">
+    <div className="bg-grey3 h-1/4 relative mt-5 rounded-md">
       <Header title="Source" />
 
       {/** Filter Form */}

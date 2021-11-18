@@ -1,8 +1,6 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React from 'react';
 import { RecordToolbar, RecordButtons } from './RecordToolbar';
 import { ReviewToolbar } from './ReviewToolbar';
-
-import ChartOptions from '../ChartClass/ChartOptions';
 
 // Components
 import Separator from '@components/Separator/Separator.component';
@@ -19,34 +17,16 @@ const IconButtonWithTooltip = withTooltip(IconButton);
 const IconTextButtonWithTooltip = withTooltip(IconTextButton);
 
 type ChartToolbarProps = {
-  chart: any;
+  chartOptions: any;
   type?: ChartType | undefined;
 };
 const ChartToolbar = ({
-  chart,
+  chartOptions,
   type = ChartType.RECORD,
 }: ChartToolbarProps) => {
   const recordState = useAppSelector((state: any) => state.recordState.value);
   const chartState = useAppSelector((state) => state.chartState) as any;
   const toolbarMenu = type === ChartType.RECORD ? RecordToolbar : ReviewToolbar;
-  const chartOptionsRef = useRef<ChartOptions>();
-
-  let chartOptions: ChartOptions | undefined;
-
-  useLayoutEffect(() => {
-    chartOptions = new ChartOptions(
-      chart.channels,
-      chart.dashboard,
-      chart.charts,
-      chart.series
-    );
-    chartOptionsRef.current = chartOptions;
-
-    return () => {
-      chartOptions = undefined;
-      chartOptionsRef.current = undefined;
-    };
-  }, [chart]);
 
   return (
     <div className="w-full bg-grey1 px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-2 items-center relative">
@@ -59,7 +39,7 @@ const ChartToolbar = ({
               isActive={chartState[option.label] || false}
               onClick={() =>
                 //@ts-ignore
-                option.click && option.click(chartOptionsRef.current)
+                option.click && option.click(chartOptions)
               }
               tooltip={option.tooltip}
               key={index}
@@ -87,4 +67,4 @@ const ChartToolbar = ({
   );
 };
 
-export default ChartToolbar;
+export default React.memo(ChartToolbar);

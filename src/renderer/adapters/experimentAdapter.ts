@@ -25,7 +25,10 @@ export const newExperiment = async (newExpData: object) => {
   // Set isLoading to true
 
   // Create a new experiment and await the result
-  const newExperiment = await window.api.experiment.newExp(newExpData);
+  const newExperiment = await window.api.invokeIPC(
+    ExperimentChannels.NewExp,
+    newExpData
+  );
 
   if (newExperiment) {
     dispatch(setExperimentData(newExperiment));
