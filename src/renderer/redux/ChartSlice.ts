@@ -11,6 +11,10 @@ export type ChartSliceType = {
   event2: boolean;
   exporttxt: boolean;
   exportStatus: ExportStatus;
+  reviewXInterval: {
+    start: number;
+    end: number;
+  };
 };
 
 const initialState: ChartSliceType = {
@@ -19,6 +23,10 @@ const initialState: ChartSliceType = {
   event2: false,
   exporttxt: false,
   exportStatus: 'idle',
+  reviewXInterval: {
+    start: 0,
+    end: 30,
+  },
 };
 
 export type chartStateOptions = keyof typeof initialState;
@@ -52,6 +60,12 @@ export const ChartSlice = createSlice({
     },
     setExportStatus: (state, { payload }: { payload: ExportStatus }) => {
       state.exportStatus = payload;
+    },
+    setReviewXInterval: (
+      state,
+      { payload }: { payload: { start: number; end: number } }
+    ) => {
+      state.reviewXInterval = payload;
     },
   },
 });

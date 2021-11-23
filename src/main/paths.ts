@@ -1,8 +1,11 @@
 import path from 'path';
 import { app } from 'electron';
 
+// Constants
+import { productName } from '../../package.json';
+
 // Main application data path
-export const appDataPath = path.join(app.getPath('appData'), 'PhotonLab');
+export const appDataPath = path.join(app.getPath('appData'), productName);
 
 // Database data path
 export const databasePath = path.join(path.join(appDataPath, 'database'));

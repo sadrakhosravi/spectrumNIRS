@@ -1,17 +1,13 @@
 import React from 'react';
 
-interface IProps {
-  title: string;
-}
+type WidgetHeaderProps = {
+  children?: JSX.Element | JSX.Element[];
+};
 
 //Widget header to display the title of each widget
-const Header: React.FC<IProps> = (props) => {
-  const { title } = props;
-
+const Header = ({ children }: WidgetHeaderProps) => {
   return (
-    <div className="w-full bg-grey1 h-10 grid items-center pl-3 rounded-t-md">
-      <h5>{title}</h5>
-    </div>
+    <div className="flex w-full bg-grey1 h-10 items-center">{children}</div>
   );
 };
 

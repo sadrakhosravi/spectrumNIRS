@@ -5,7 +5,10 @@ const {
   contextBridge,
 } = require('electron');
 
-console.log(dialog);
+// Check if the window is loaded
+const windowLoaded = new Promise((resolve) => {
+  window.onload = resolve;
+});
 
 // Adds an object 'api' to the global window object:
 contextBridge.exposeInMainWorld('api', {

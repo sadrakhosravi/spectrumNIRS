@@ -63,6 +63,18 @@ export class Recording implements IRecording {
       throw new Error(error.message);
     }
   };
+
+  public static checkForRecordingData = async (recordingId: number) => {
+    try {
+      const data = await db.Data.findAll({
+        where: { recordingId },
+        order: [['id', 'DESC']],
+        limit: 3000,
+        raw: true,
+      });
+      return data;
+    } catch (error) {}
+  };
 }
 
 export default Recording;

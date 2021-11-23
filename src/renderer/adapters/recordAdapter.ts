@@ -35,6 +35,21 @@ export const handleRecord = async () => {
     return;
   }
 
+  let result: 0 | 1 = 1;
+  console.log(experimentData.previousRecording);
+  if (experimentData.previousRecording.hasPreviousData) {
+    result = await window.api.invokeIPC(DialogBoxChannels.MessageBoxSync, {
+      title: 'Warning',
+      type: 'warning',
+      buttons: ['Cancel', 'Continue'],
+      message: 'This recording has previous data',
+      detail:
+        'The current recording has previous data, this will add to the existing data',
+    });
+    console.log(experimentData.previousRecording.timeStamp);
+  }
+  if (!result) return;
+
   // Get the information to the be sent to the controller
   const patientId = experimentData.currentPatient.id;
   const { currentRecording } = experimentData;
@@ -53,6 +68,7 @@ export const handleRecord = async () => {
       patientId,
       currentRecording,
       isRawData,
+      lastTimeStamp: experimentData.previousRecording.timeStamp,
     });
 
     // Start recording

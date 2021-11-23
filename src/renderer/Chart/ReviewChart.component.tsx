@@ -1,24 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
 
+// HOC
+import withLoading from '@hoc/withLoading.hoc';
+
 // Components
 import LCJSChart from 'renderer/Chart/ChartClass/Chart';
-import ChartToolbar from './ChartToolbar/GraphToolbar.component';
+import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
+import { ChartChannels } from '@utils/channels';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
+  setLoading?: any;
+  children?: JSX.Element | JSX.Element[];
 };
 
 // Prepares and enders the chart
-const ReviewChart = ({ type }: ChartProps): JSX.Element => {
+const ReviewChart = ({
+  type,
+  setLoading,
+  children,
+}: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
   const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
+  const recordState = useAppSelector(
+    (state) => state.experimentData.currentRecording
+  );
+  const isReviewInNewTab = useAppSelector(
+    (state) => state.appState.reviewTabInNewWindow
+  );
+
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
 
@@ -58,7 +75,43 @@ const ReviewChart = ({ type }: ChartProps): JSX.Element => {
 
       chartRef.current = null;
     };
-  }, []);
+  }, [recordState.id, isReviewInNewTab]);
+
+  // Check if the current recording has data
+  useEffect(() => {
+    setLoading(true);
+
+    (async () => {
+      const data: any[] = await window.api.invokeIPC(
+        ChartChannels.CheckForData,
+        recordState.id
+      );
+
+      // If the recording has data, display it and save the last timestamp
+      if (data.length !== 0) {
+        data &&
+          data.reverse().forEach((dataPoint: any) => {
+            const data = dataPoint.values.split(',');
+            const sensorData = [
+              parseFloat(data[0]),
+              parseFloat(data[1]),
+              parseFloat(data[2]),
+              parseFloat(data[3]),
+              parseFloat(data[4]),
+            ];
+            requestAnimationFrame(() => {
+              setTimeout(() => {
+                chartRef.current &&
+                  chartRef.current.series.forEach((series: any, i: number) => {
+                    series.add({ x: sensorData[0], y: sensorData[i + 1] });
+                  });
+              }, 100);
+            });
+          });
+      }
+      requestAnimationFrame(() => setLoading(false));
+    })();
+  }, [recordState.id]);
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -84,8 +137,9 @@ const ReviewChart = ({ type }: ChartProps): JSX.Element => {
         className="absolute top-0 left-0 w-full h-[calc(100%-50px)]"
         id={containerId}
       />
+      {children}
     </>
   );
 };
 
-export default ReviewChart;
+export default withLoading(ReviewChart, 'Loading Data...');

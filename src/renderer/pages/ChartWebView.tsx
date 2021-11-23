@@ -1,3 +1,4 @@
+import { useAppSelector } from '@redux/hooks/hooks';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 
@@ -8,7 +9,10 @@ const ChartWebView = () => {
   const recordWebViewRef = useRef<HTMLElement | any>(null);
   const currentDir = window.api.dirname();
 
-  console.log(recordCount);
+  const isReviewInNewTab = useAppSelector(
+    (state) => state.appState.reviewTabInNewWindow
+  );
+  console.log(isReviewInNewTab);
 
   useEffect(() => {
     const webview = document.getElementById('recordWebView') as
@@ -18,9 +22,6 @@ const ChartWebView = () => {
       webview.style.display = 'flex';
       if (recordCount === 0) {
         webview.loadURL('http://localhost:1212#/tabs/recording/record');
-        webview.addEventListener('did-finish-load', () => {
-          webview.openDevTools();
-        });
       }
 
       setRecordCount(1);
@@ -31,16 +32,19 @@ const ChartWebView = () => {
 
   useEffect(() => {
     const webview = document.getElementById('reviewWebView') as
-      | HTMLElement
+      | HTMLWebViewElement
       | any;
-    if (location.pathname === '/main/recording/review') {
-      webview.style.display = 'flex';
-      reviewCount === 0 &&
-        webview.loadURL('http://localhost:1212#/tabs/recording/review');
+    if (!isReviewInNewTab) {
+      if (location.pathname === '/main/recording/review') {
+        webview.style.display = 'flex';
+        reviewCount === 0 &&
+          webview.loadURL('http://localhost:1212#/tabs/recording/review');
+        reviewCount === 0 && webview.openDevTools();
 
-      setReviewCount(1);
-    } else {
-      webview.style.display = 'none';
+        setReviewCount(1);
+      } else {
+        webview.style.display = 'none';
+      }
     }
   }, [location]);
 
@@ -54,6 +58,7 @@ const ChartWebView = () => {
         preload={`${currentDir}/preload.js`}
         partition="persist:spectrum"
       ></webview>
+
       <webview
         src="about:blank"
         id="reviewWebView"

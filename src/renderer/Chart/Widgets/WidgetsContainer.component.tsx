@@ -8,6 +8,7 @@ import { setRecordSidebar, setReviewSidebar } from '@redux/AppStateSlice';
 
 // Constants
 import { ChartType } from '@utils/constants';
+import EventsWidget from './Events/Events.widget';
 
 //The container for each widget to be rendered in
 const WidgetsContainer = ({
@@ -30,8 +31,18 @@ const WidgetsContainer = ({
     <>
       {isSidebarActive && (
         <div className="h-[calc(100%-1px)] relative pb-3">
-          <Filter />
-          <Intensities />
+          {type === ChartType.RECORD && (
+            <>
+              <Filter />
+              <Intensities />
+            </>
+          )}
+          {type === ChartType.REVIEW && (
+            <>
+              <EventsWidget />
+            </>
+          )}
+
           <button
             className="absolute bottom-1 left-2 w-full h-8 text-light2 hover:text-white"
             onClick={handleHideSidebarClick}

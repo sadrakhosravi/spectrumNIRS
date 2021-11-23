@@ -15,13 +15,18 @@ export const TopMenu = [
     submenu: [
       {
         label: 'Open',
-        click: () => {},
+        click: () => {
+          dispatch(openModal(ModalConstants.OPEN_EXPERIMENT));
+        },
       },
       {
         label: 'Close',
       },
       {
         label: 'Exit',
+        click: () => {
+          window.api.window.close();
+        },
       },
     ],
   },

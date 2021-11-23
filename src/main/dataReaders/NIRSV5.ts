@@ -19,6 +19,9 @@ let outputArr: number[] = [0, 0, 0, 0, 0];
 let readUSBData: any;
 let lastTimeSequence = 0;
 let timeSequence = 0; // timeSequence in centiseconds
+const databaseArr: any[] = [];
+let databaseCount = 0;
+let Database: RecordData | undefined;
 
 let events = {
   hypoxia: false,
@@ -29,21 +32,18 @@ let events = {
  * Sends the gains given from the UI to the driver
  */
 export const syncGains = async (data: string[]) => {
-  let response = true;
-
   const mySocket = new net.Socket();
   mySocket.connect(DRIVER_SOCKET_PORT, DRIVER_SOCKET_IP, function () {
     console.log('Connection Established');
   });
 
-  mySocket.write(data.join(','));
+  let response = mySocket.write(data.join(','));
 
   mySocket.on('error', (data) => {
     if (data) response = false;
     console.log(data);
   });
 
-  mySocket.destroy();
   mySocket.on('close', () => console.log('Socket Destroyed'));
 
   return response;
@@ -66,6 +66,8 @@ export const start = (
   // Check if RawData was requested
   isRawData ? (rawData = true) : (rawData = false);
 
+  lastTimeSequence = 0;
+
   // Spawn NIRSReader.exe
   readUSBData = spawn(
     path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),
@@ -84,10 +86,9 @@ export const start = (
   // Count variable to keep track of the readline loop
   let count = 0;
   let dataCount = 0;
-  let dataArr: any[] = [];
-  let databaseArr: any[] = [];
-  let databaseCount = 0;
-  const Database = new RecordData(recordingId);
+  const dataArr: any[] = [];
+
+  Database = new RecordData(recordingId);
 
   // Read each line from reader.exe stdout.
   rl = readline
@@ -116,7 +117,7 @@ export const start = (
       }
 
       // Raw Data
-      // Used direct array element access instead of a loop for the fastest possible calculationj
+      // Used direct array element access instead of a loop for the fastest possible calculation
       const rawDataArr = [
         timeSequence / 100,
         parseFloat(data[1]),
@@ -151,17 +152,17 @@ export const start = (
         ...events,
       });
 
-      if (databaseCount === 10) {
-        Database.addDataToTransaction(databaseArr);
-        databaseArr = [];
+      if (databaseCount === 200) {
+        Database?.addDataToTransaction(databaseArr);
+        databaseArr.length = 0;
         databaseCount = 0;
       }
 
       dataArr.push(outputArr);
 
-      if (dataCount === 5) {
+      if (dataCount === 3) {
         sender.send('data:reader-record', dataArr);
-        dataArr = [];
+        dataArr.length = 0;
         dataCount = 0;
       }
 
@@ -188,6 +189,12 @@ export const stop = (): number => {
   // Stop the readline
   rl.close();
   rl.removeAllListeners();
+
+  // Write the remaining data to the database
+  databaseArr.length > 0 && Database?.addDataToTransaction(databaseArr);
+  databaseArr.length = 0;
+  databaseCount = 0;
+  Database = undefined;
 
   // Reset the timeSequence
   timeSequence = 0;

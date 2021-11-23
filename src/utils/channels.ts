@@ -49,6 +49,7 @@ export const ReviewTabChannels = {
 const dialogBoxBase = 'dialog:';
 export const DialogBoxChannels = {
   MessageBox: dialogBoxBase + 'message-box',
+  MessageBoxSync: dialogBoxBase + 'message-box-sync',
 };
 
 // USB Detection
@@ -61,6 +62,15 @@ export const USBDetectionChannels = {
 // Chart Channels
 const ChartBase = 'chart:';
 export const ChartChannels = {
+  CheckForData: ChartBase + 'check-for-data',
   Event: ChartBase + 'event',
   ExportAll: ChartBase + 'export-all',
+};
+
+// User Settings
+const UserSettings = 'user-settings:';
+export const UserSettingsChannels = {
+  AddSetting: UserSettings + 'add-settings',
+  GetSetting: UserSettings + 'get-settings',
+  RemoveSetting: UserSettings + 'remove-settings',
 };

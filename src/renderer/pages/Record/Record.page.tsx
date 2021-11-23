@@ -25,7 +25,7 @@ const RecordPage = () => {
         <div
           className={`h-full relative ${
             isSidebarActive
-              ? 'w-[calc(100%-280px)] mr-[15px]'
+              ? 'w-[calc(100%-350px)] mr-[15px]'
               : 'w-[calc(100%-20px)]'
           }`}
         >
@@ -34,7 +34,7 @@ const RecordPage = () => {
         <div
           className={`h-full ${
             isSidebarActive
-              ? 'w-[250px]'
+              ? 'w-[325px]'
               : 'w-[20px] bg-grey1 hover:bg-accent hover:cursor-pointer'
           }`}
           onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}

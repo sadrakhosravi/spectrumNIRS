@@ -46,10 +46,14 @@ const createMainWindow = async () => {
   // Create a window that fills the screen's available work area.
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
+  const { x, y } = primaryDisplay.bounds;
 
   mainWindow = await new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
+    backgroundColor: '#1E1E1E',
+    x,
+    y,
     width: width,
     height: height,
     darkTheme: true,
@@ -66,12 +70,9 @@ const createMainWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
   });
-
-  mainWindow.maximize();
-
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
-
   mainWindow.setBackgroundColor('#1E1E1E');
+  mainWindow.maximize();
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {

@@ -1,22 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
-import { RecordChannels } from '@utils/channels';
+import { RecordChannels, UserSettingsChannels } from '@utils/channels';
 
 // HOC
 import withLoading from '@hoc/withLoading.hoc';
 
 //Components
 import Header from 'renderer/Chart/Widgets/Header/Header.component';
+import TabButton from '../Tabs/TabButton.component';
 
 //Renders the filter widget on the sidebar
 const Intensities = ({ setLoading, children }: any) => {
-  const defaultValues = [180, 165, 140, 140, 140];
+  const [currentTab, setCurrentTab] = useState(0);
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
+  let defaultValues = sensorState.defaultIntensities;
 
   useEffect(() => {
-    setLoading(false);
+    (async () => {
+      const test = await window.api.invokeIPC(
+        UserSettingsChannels.GetSetting,
+        '1'
+      );
+      await window.api.invokeIPC(UserSettingsChannels.AddSetting, {
+        key: 'LEDIntensities',
+        value: defaultValues,
+      });
+      console.log(test);
+      setLoading(false);
+    })();
   }, []);
 
   const handleRangeSliderChange = (event: any) => {
@@ -49,40 +62,53 @@ const Intensities = ({ setLoading, children }: any) => {
   };
 
   return (
-    <div className="bg-grey3 h-[calc(66.7%-3rem)] mt-5 rounded-md duration-300 border-[1.5px] border-[transparent] hover:drop-shadow-xl hover:border-[1.5px] hover:border-accent">
-      <Header title="Intensities" />
+    <div className="bg-grey3 h-[calc(66.7%-3rem)] mt-5 rounded-b-md duration-300 hover:drop-shadow-xl">
+      <Header>
+        <TabButton
+          text="Intensities"
+          isActive={currentTab === 0}
+          onClick={() => setCurrentTab(0)}
+        />
+        <TabButton
+          text="Gain"
+          isActive={currentTab === 1}
+          onClick={() => setCurrentTab(1)}
+        />
+      </Header>
 
       {/** Filter Form */}
+
       <div className="px-4 py-4">
-        <h3>LED Intensities</h3>
-        {sensorState.LEDs.map((LED, index) => (
-          <div className="mb-4 flex items-center group" key={LED}>
-            <label
-              className="inline-block w-3/12 group-hover:text-accent"
-              htmlFor={LED}
-            >
-              {LED}
-            </label>
-            <input
-              id={`${LED}`}
-              className="inline-block w-9/12"
-              type="range"
-              min="1"
-              max="180"
-              defaultValue={defaultValues[index]}
-              onMouseUp={handleRangeMouseUp}
-              onChange={handleRangeSliderChange}
-            />
-            <span
-              id={`${LED}Value`}
-              className="absolute right-0 -bottom-4 text-base"
-            >
-              {defaultValues[index]}
-            </span>
-          </div>
-        ))}
-        <h3>Pre Gain:</h3>
-        <div className="grid grid-cols-3 gap-1">
+        <div hidden={currentTab !== 0}>
+          {sensorState.LEDs.map((LED, index) => (
+            <div className="mb-4 flex items-center group" key={LED}>
+              <label
+                className="inline-block w-3/12 group-hover:text-accent"
+                htmlFor={LED}
+              >
+                {LED}
+              </label>
+              <input
+                id={`${LED}`}
+                className="inline-block w-9/12"
+                type="range"
+                min="1"
+                max="180"
+                defaultValue={defaultValues[index]}
+                onMouseUp={handleRangeMouseUp}
+                onChange={handleRangeSliderChange}
+              />
+              <span
+                id={`${LED}Value`}
+                className="absolute right-0 -bottom-4 text-base"
+              >
+                {defaultValues[index]}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="" hidden={currentTab !== 1}>
           {sensorState.PreGain.map((preGainOption) => (
             <span>
               <input
@@ -97,15 +123,17 @@ const Intensities = ({ setLoading, children }: any) => {
               </label>
             </span>
           ))}
+
+          <input
+            className="my-2 h-40px px-4 w-1/2 mx-auto bg-grey1 rounded-sm"
+            defaultValue="100"
+            type="number"
+            min="1"
+            max="127"
+          />
         </div>
-        <input
-          className="my-2 h-40px px-4 w-1/2 mx-auto bg-grey1 rounded-sm"
-          defaultValue="100"
-          type="number"
-          min="1"
-          max="127"
-        />
       </div>
+
       {children}
       <span className="p-4 text-base">
         Status: <span id="LEDStatus"></span>

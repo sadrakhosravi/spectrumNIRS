@@ -24,10 +24,16 @@ type CurrentRecording = {
   patientId: number;
 };
 
+type PreviousData = {
+  timeStamp: number;
+  hasPreviousData: boolean;
+};
+
 export type ExperimentData = {
   currentExperiment: CurrentExperiment;
   currentPatient: CurrentPatient;
   currentRecording: CurrentRecording;
+  previousRecording: PreviousData;
   isDataReady: boolean;
 };
 
@@ -53,6 +59,10 @@ const initialState: ExperimentData = {
     date: '',
     patientId: -1,
   },
+  previousRecording: {
+    timeStamp: 0,
+    hasPreviousData: false,
+  },
   isDataReady: false,
 };
 
@@ -68,9 +78,12 @@ export const ExperimentDataSlice = createSlice({
       state.currentPatient = payload.currentPatient;
     },
     setPatientData: (state, { payload }) => {
-      state.currentPatient = payload;
+      (state.currentRecording = initialState.currentRecording),
+        (state.previousRecording = initialState.previousRecording),
+        (state.currentPatient = payload);
     },
     setRecordingData: (state, { payload }) => {
+      state.previousRecording = initialState.previousRecording;
       state.currentRecording = payload;
       if (
         state.currentExperiment.name &&
@@ -82,8 +95,12 @@ export const ExperimentDataSlice = createSlice({
         state.isDataReady = false;
       }
     },
+    setPreviousData: (state, { payload }: { payload: PreviousData }) => {
+      state.previousRecording = payload;
+    },
     resetRecordingData: (state) => {
       state.currentRecording = initialState.currentRecording;
+      state.previousRecording = initialState.previousRecording;
     },
     resetExperimentData: () => initialState,
   },
@@ -94,6 +111,7 @@ export const {
   setExperimentData,
   setPatientData,
   setRecordingData,
+  setPreviousData,
   resetRecordingData,
   resetExperimentData,
 } = ExperimentDataSlice.actions;

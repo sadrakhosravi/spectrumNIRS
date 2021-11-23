@@ -36,7 +36,6 @@ const OpenPatientForm = () => {
     });
   }, []);
 
-  console.log(patients);
   return (
     <div>
       <ul className="w-full">

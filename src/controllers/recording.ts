@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 
 // Models
 import DataReader from '../main/models/DataReader';
+import Recording from '@electron/models/Recording';
 
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
@@ -18,6 +19,7 @@ type RecordInit = {
   patientId: number;
   currentRecording: CurrentRecording;
   isRawData: boolean;
+  lastTimeStamp: number;
 };
 
 // Store
@@ -26,13 +28,23 @@ let reader: DataReader;
 // Select the sensor
 ipcMain.handle(
   RecordChannels.Init,
-  (event, { sensorId, patientId, currentRecording, isRawData }: RecordInit) => {
+  (
+    event,
+    {
+      sensorId,
+      patientId,
+      currentRecording,
+      isRawData,
+      lastTimeStamp,
+    }: RecordInit
+  ) => {
     console.log(currentRecording);
     reader = new DataReader(
       patientId,
       sensorId,
       currentRecording,
       isRawData,
+      lastTimeStamp,
       event.sender
     );
   }
@@ -69,6 +81,13 @@ ipcMain.handle(
   RecordChannels.SyncGain,
   async (_event, data: string[]) =>
     reader && (await reader.syncGainsWithHardware(data))
+);
+
+// Checks if the current recording has data and sends the data back to the chart.
+ipcMain.handle(
+  ChartChannels.CheckForData,
+  async (_event, recordingId: number) =>
+    await Recording.checkForRecordingData(recordingId)
 );
 
 // Hypoxia Event

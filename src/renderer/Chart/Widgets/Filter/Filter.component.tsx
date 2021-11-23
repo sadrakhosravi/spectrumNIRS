@@ -8,7 +8,7 @@ import WidgetButton from 'renderer/Chart/Widgets/WidgetButton/WidgetButton.compo
 const Filter = () => {
   return (
     <div className="bg-grey3 h-1/3 relative rounded-md">
-      <Header title="Filters" />
+      <Header />
 
       {/** Filter Form */}
       <form className=" p-4">

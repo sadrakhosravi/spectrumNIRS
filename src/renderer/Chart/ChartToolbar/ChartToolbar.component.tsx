@@ -51,16 +51,28 @@ const ChartToolbar = ({
       {/* Stop Start Button */}
       <div className="grid grid-flow-col auto-cols-max items-center gap-3 justify-end">
         <div className="grid grid-flow-col auto-cols-max gap-3">
-          {RecordButtons.map((button, index) => (
-            <IconTextButtonWithTooltip
-              text={button.dynamicLabel(recordState)}
-              icon={button.dynamicIcon(recordState)}
-              darker
-              isActive={button.isActive(recordState)}
-              onClick={button.click(recordState)}
-              key={index}
-            />
-          ))}
+          {type === ChartType.RECORD &&
+            RecordButtons.map((button, index) => (
+              <IconTextButtonWithTooltip
+                text={button.dynamicLabel(recordState)}
+                icon={button.dynamicIcon(recordState)}
+                darker
+                isActive={button.isActive(recordState)}
+                onClick={button.click(recordState)}
+                key={index}
+              />
+            ))}
+          {type === ChartType.REVIEW &&
+            RecordButtons.map((button, index) => (
+              <IconTextButtonWithTooltip
+                text={`Status: ${button.dynamicLabel(recordState)}`}
+                icon={button.dynamicIcon(recordState)}
+                darker
+                isActive={button.isActive(recordState)}
+                disabled
+                key={index}
+              />
+            ))}
         </div>
       </div>
     </div>

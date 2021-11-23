@@ -58,7 +58,7 @@ export class DataReader implements IDataReaders {
   isRawData: boolean;
   currentSensor: CurrentSensor;
   dataReader: any[] = [NIRSV5];
-  lastTimeSequence: number;
+  lastTimeStamp: number;
   Recording: Recording;
   senderWindow: Electron.WebContents;
   currentRecording: CurrentRecording;
@@ -68,6 +68,7 @@ export class DataReader implements IDataReaders {
     sensorId: number,
     currentRecording: CurrentRecording,
     isRawData: boolean,
+    lastTimeStamp: number,
     senderWindow: Electron.WebContents
   ) {
     this.sensor = sensorId;
@@ -77,12 +78,12 @@ export class DataReader implements IDataReaders {
     this.senderWindow = senderWindow;
     this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
     this.Recording = new Recording(this.currentRecording);
-    this.lastTimeSequence = 0;
+    this.lastTimeStamp = lastTimeStamp * 100;
   }
 
   startRecording() {
     this.currentSensor.start(
-      this.lastTimeSequence,
+      this.lastTimeStamp,
       this.isRawData,
       this.senderWindow,
       this.currentRecording.id
@@ -91,13 +92,13 @@ export class DataReader implements IDataReaders {
 
   stopRecording() {
     this.currentSensor.stop();
-    this.lastTimeSequence = 0;
+    this.lastTimeStamp = 0;
   }
 
   pauseRecording() {
-    const lastTimeSequence = this.currentSensor.stop();
-    this.lastTimeSequence = lastTimeSequence;
-    console.log(this.lastTimeSequence);
+    const lastTimeStamp = this.currentSensor.stop();
+    this.lastTimeStamp = lastTimeStamp;
+    console.log(this.lastTimeStamp);
   }
 
   continueRecording() {

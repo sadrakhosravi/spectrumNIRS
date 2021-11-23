@@ -3,7 +3,7 @@ import React from 'react';
 
 // Returns a component with a hoverable tooltip text
 const withTooltip = (
-  WrappedComponent: JSX.Element | any,
+  WrappedComponent: any,
   tooltipText?: string,
   tooltipPosition?: 'top' | 'right' | 'bottom' | 'left'
 ) => {

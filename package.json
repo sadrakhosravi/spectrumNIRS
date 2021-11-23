@@ -1,6 +1,6 @@
 {
-  "name": "photon-lab",
-  "productName": "Photon Lab",
+  "name": "spectrum",
+  "productName": "SpectrumNIRS",
   "description": "Data Acquisition software for NIRS sensors",
   "version": "0.2.0",
   "scripts": {
@@ -164,6 +164,7 @@
     "@types/redux-state-sync": "^3.1.2",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/webpack-env": "^1.16.2",
+    "@types/ws": "^8.2.0",
     "autoprefixer": "^10.3.4",
     "browserslist-config-erb": "^0.0.3",
     "chalk": "^4.1.2",
@@ -177,7 +178,7 @@
     "electron-builder": "^22.13.1",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.1.0",
-    "electron-rebuild": "^3.2.3",
+    "electron-rebuild": "^3.2.5",
     "electron-reloader": "^1.2.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
@@ -220,6 +221,7 @@
   },
   "dependencies": {
     "@arction/lcjs": "^3.2.0",
+    "@arction/xydata": "^1.4.0",
     "@headlessui/react": "^1.4.1",
     "@reduxjs/toolkit": "^1.6.2",
     "@tippyjs/react": "^4.2.5",
@@ -227,6 +229,7 @@
     "crypto-browserify": "^3.12.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.1",
+    "electron-store": "^8.0.1",
     "electron-updater": "^4.3.9",
     "history": "4.x.x",
     "nodemon": "^2.0.14",
@@ -239,7 +242,8 @@
     "redux-persist": "^6.0.0",
     "redux-state-sync": "^3.1.2",
     "regenerator-runtime": "^0.13.9",
-    "tsconfig-paths": "^3.11.0"
+    "tsconfig-paths": "^3.11.0",
+    "ws": "^8.2.3"
   },
   "devEngines": {
     "node": ">=14.x",

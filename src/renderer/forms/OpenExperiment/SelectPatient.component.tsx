@@ -40,7 +40,7 @@ const SelectPatient = ({ patient }: { patient: PatientData }) => {
     dispatch(setPatientData(patient));
     dispatch(setRecordingData(recording));
     dispatch(closeModal());
-    dispatch(changeAppState(AppState.REVIEW));
+    dispatch(changeAppState(AppState.RECORD));
   };
 
   return (

@@ -1,24 +1,36 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { changeRecordState } from '@redux/RecordStateSlice';
+
+//HOC
+import withLoading from '@hoc/withLoading.hoc';
+
 // Components
 import LCJSChart from 'renderer/Chart/ChartClass/Chart';
-import ChartToolbar from './ChartToolbar/GraphToolbar.component';
+import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType, RecordState } from 'utils/constants';
+import { ChartChannels } from '@utils/channels';
+import { setPreviousData } from '@redux/ExperimentDataSlice';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
+  setLoading: any;
+  children: JSX.Element[];
 };
 
 // Prepares and enders the chart
-const RecordChart = ({ type }: ChartProps): JSX.Element => {
+const RecordChart = ({
+  type,
+  setLoading,
+  children,
+}: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
   const [chartState, setChartState] = useState<null | LCJSChart>(null);
   const dispatch = useAppDispatch();
-  const recordingName = useAppSelector(
-    (state) => state.experimentData.currentRecording.name
+  const recordState = useAppSelector(
+    (state) => state.experimentData.currentRecording
   );
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
@@ -32,6 +44,7 @@ const RecordChart = ({ type }: ChartProps): JSX.Element => {
 
   let chart: LCJSChart | undefined;
 
+  // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useLayoutEffect(() => {
     console.log('RECORD CHARTTT');
 
@@ -65,18 +78,65 @@ const RecordChart = ({ type }: ChartProps): JSX.Element => {
       console.log('destroy chart');
       setChartLoaded(false);
       chart = undefined;
-
       chartRef.current = null;
     };
-  }, [recordingName]);
+  }, [recordState.id]);
 
+  // Check if the current recording has data
+  useEffect(() => {
+    setLoading(true);
+
+    (async () => {
+      const data: any[] = await window.api.invokeIPC(
+        ChartChannels.CheckForData,
+        recordState.id
+      );
+
+      // If the recording has data, display it and save the last timestamp
+      if (data.length !== 0) {
+        data &&
+          data.reverse().forEach((dataPoint: any) => {
+            const data = dataPoint.values.split(',');
+            const sensorData = [
+              parseFloat(data[0]),
+              parseFloat(data[1]),
+              parseFloat(data[2]),
+              parseFloat(data[3]),
+              parseFloat(data[4]),
+            ];
+            requestAnimationFrame(() => {
+              setTimeout(() => {
+                chartRef.current &&
+                  chartRef.current.series.forEach((series: any, i: number) => {
+                    series.add({ x: sensorData[0], y: sensorData[i + 1] });
+                  });
+              }, 100);
+            });
+          });
+
+        const lastTimeStamp = data[data.length - 1].values.split(',')[0];
+        dispatch(
+          setPreviousData({
+            timeStamp: parseFloat(lastTimeStamp),
+            hasPreviousData: true,
+          })
+        );
+      }
+      requestAnimationFrame(() => setLoading(false));
+    })();
+  }, [recordState.id]);
+
+  // Adjust chart width and height on sidebar resize
   useEffect(() => {
     requestAnimationFrame(() => {
       const container = document.getElementById(containerId) as HTMLElement;
-      const { offsetWidth } = container;
-      //@ts-ignore
+      const { offsetWidth, offsetHeight } = container;
+
       chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
+      chartRef.current && chartRef.current.dashboard.setHeight(offsetHeight);
+
       container.style.overflowX = 'hidden';
+      container.style.overflowY = 'hidden';
     });
   }, [recordSidebar]);
 
@@ -91,8 +151,9 @@ const RecordChart = ({ type }: ChartProps): JSX.Element => {
         className="absolute top-0 left-0 h-[calc(100%-50px)]"
         id={containerId}
       />
+      {children}
     </>
   );
 };
 
-export default RecordChart;
+export default withLoading(RecordChart, 'Loading Data ...');

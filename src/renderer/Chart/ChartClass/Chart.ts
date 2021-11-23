@@ -17,6 +17,7 @@ import {
   Themes,
 } from '@arction/lcjs';
 import ChartOptions from './ChartOptions';
+// Import data-generators from 'xydata'-library.
 
 // Constants
 import { ChartType } from 'utils/constants';
@@ -48,7 +49,7 @@ class ChartClass {
     this.type = type;
     this.samplingRate = samplingRate;
     this.containerId = containerId;
-    this.seriesLineColorArr = ['#E3170A', '#ABFF4F', '#00FFFF', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
+    this.seriesLineColorArr = ['#E3170A', '#00FFFF', '#ABFF4F', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
 
     this.TOILegend = null;
     this.ChartOptions = null;
@@ -109,14 +110,16 @@ class ChartClass {
   recordData() {
     let count = 0;
     window.api.onIPCData('data:reader-record', (_event, data: any) => {
-      // Change TOI value every 25 samples (based on 100samples/s)
+      if (count === 0) {
+        console.log(data);
+      }
+      // Change TOI value every 15 samples (based on 100samples/s)
       if (count === 5) {
         this.TOILegend.setText(Math.round(data[data.length - 1][4]).toString());
         count = 0;
       }
       count++;
-
-      // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 10 reading lines
+      // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 3 reading lines
       requestAnimationFrame(() => {
         data.forEach((data: any) => {
           for (let i = 0; i < this.series.length; i++) {

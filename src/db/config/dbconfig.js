@@ -1,12 +1,8 @@
 const { app } = require('electron');
+const { databasePath } = require('@electron/paths');
 const path = require('path');
 
-const appDataDir = path.join(
-  app.getPath('appData'),
-  'PhotonLab',
-  'database',
-  'main.db'
-);
+const appDataDir = path.join(databasePath, 'main.db');
 
 module.exports = {
   development: {
