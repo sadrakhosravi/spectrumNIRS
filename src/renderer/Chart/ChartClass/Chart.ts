@@ -57,7 +57,7 @@ class ChartClass {
 
   // Cleanup function when chart is removed from the screen - IMPORTANT
   cleanup() {
-    window.api.removeListeners('data:reader-record');
+    this.type === 'record' && window.api.removeListeners('data:reader-record');
     this.ChartOptions = undefined;
     this.dashboard.dispose();
     this.dashboard = undefined;
@@ -100,19 +100,21 @@ class ChartClass {
     );
   }
 
-  resetHeight() {
-    this.channels.forEach((_, i: number) => {
-      this.dashboard.setRowHeight(i, 1);
+  // Clears the series and custom ticks
+  clearCharts() {
+    this.series.forEach((series: any) => {
+      series.clear();
     });
+    this.charts.forEach((chart: any) => {
+      chart.getDefaultAxisX().setInterval(0, 30);
+    });
+    this.ChartOptions.clearCharts();
   }
 
   // Listens for data for the record page
   recordData() {
     let count = 0;
     window.api.onIPCData('data:reader-record', (_event, data: any) => {
-      if (count === 0) {
-        console.log(data);
-      }
       // Change TOI value every 15 samples (based on 100samples/s)
       if (count === 5) {
         this.TOILegend.setText(Math.round(data[data.length - 1][4]).toString());
@@ -220,7 +222,7 @@ class ChartClass {
 
       if (this.type === ChartType.RECORD) {
         axisX
-          .setInterval(0, 30)
+          .setInterval(0, 30000)
           .setScrollStrategy(AxisScrollStrategies.progressive);
       } else {
         axisX

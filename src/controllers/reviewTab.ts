@@ -1,6 +1,6 @@
+import path from 'path';
 import { BrowserWindow, dialog, ipcMain, Menu, screen } from 'electron';
 import { ReviewTabChannels } from '../utils/channels';
-import path from 'path';
 
 let reviewWindow: BrowserWindow | null;
 

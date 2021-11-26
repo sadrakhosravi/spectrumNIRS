@@ -8,10 +8,15 @@ import {
 import { setSelectedSensor } from '@redux/SensorStateSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
 import { setInitialState } from '@redux/ChartSlice';
+import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Constants
-import { AppState, ModalConstants } from 'utils/constants';
-import { DialogBoxChannels, ExperimentChannels } from '@utils/channels';
+import { AppState, ModalConstants, RecordState } from 'utils/constants';
+import {
+  DialogBoxChannels,
+  ExperimentChannels,
+  RecordChannels,
+} from '@utils/channels';
 import { changeAppState } from '@redux/AppStateSlice';
 
 // Interfaces
@@ -45,7 +50,7 @@ export const newExperiment = async (newExpData: object) => {
 export const newPatient = async (data: INewPatientData) => {
   // Add the current experiment Id to the data
   const experimentId: number = getState().experimentData.currentExperiment.id;
-  data.experimentId = experimentId;
+  data.experiment = experimentId;
 
   // Send the prepared data to the controller
   const newPatient = await window.api.invokeIPC(
@@ -64,7 +69,8 @@ export const newPatient = async (data: INewPatientData) => {
 export const newRecording = async (data: INewRecordingData) => {
   // Add the current patient Id to the data
   const patientId = getState().experimentData.currentPatient.id;
-  data.patientId = patientId;
+  const recordState = getState().recordState.value;
+  data.patient = patientId;
 
   // Send the data to the controller
   const newRecording = await window.api.invokeIPC(
@@ -74,6 +80,11 @@ export const newRecording = async (data: INewRecordingData) => {
   dispatch(resetRecordingData());
   dispatch(setRecordingData(newRecording));
   dispatch(setInitialState());
+
+  recordState !== RecordState.IDLE &&
+    recordState !== RecordState.PAUSED &&
+    window.api.sendIPC(RecordChannels.Stop);
+  dispatch(changeRecordState(RecordState.IDLE));
 };
 
 /**
@@ -87,12 +98,11 @@ export const setSensorStatus = (data: {}) => {
   if (data.toString() !== detectedSensor?.toString()) {
     window.api.invokeIPC(DialogBoxChannels.MessageBox, {
       title: 'Sensor Mismatch Error',
-      type: 'error',
+      type: 'warning',
       message: 'Sensor was not detected',
       detail:
-        'The sensor you have selected was not detected on your system. Please attach the sensor and try again.',
+        'The sensor you have selected was not detected on your system. In order to start a recording, you need to attach the sensor first',
     });
-    return;
   }
   dispatch(setSelectedSensor(data));
   dispatch(closeModal());

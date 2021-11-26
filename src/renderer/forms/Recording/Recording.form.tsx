@@ -85,7 +85,7 @@ const RecordingForm = () => {
               {devices.map((device: any) => (
                 <RadioGroup.Option
                   value={device.id}
-                  disabled={detectedSensor?.name === device.name ? false : true}
+                  disabled={device.name.includes('Beast')}
                   key={device.id}
                 >
                   {({ checked, disabled }) => (
@@ -105,6 +105,9 @@ const RecordingForm = () => {
                           alt="Sensor"
                         />
                         <p className="mt-2">{device.name}</p>
+                        <p className="absolute right-2 top-1">
+                          Status: {detectedSensor?.name ? '✅' : '❌'}
+                        </p>
                       </div>
                     </>
                   )}

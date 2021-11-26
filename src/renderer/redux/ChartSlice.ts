@@ -77,6 +77,7 @@ export const {
   toggleEvent2,
   toggleExportTxt,
   setExportStatus,
+  setReviewXInterval,
 } = ChartSlice.actions;
 
 export default ChartSlice.reducer;

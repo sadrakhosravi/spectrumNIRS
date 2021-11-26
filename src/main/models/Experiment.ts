@@ -1,5 +1,6 @@
-import db from 'db/models/index';
-
+import { getConnection } from 'typeorm';
+import { Experiments } from 'db/entity/Experiments';
+import { Patients } from 'db/entity/Patients';
 interface IExperiment {}
 
 type ExpData = {
@@ -18,31 +19,30 @@ export class Experiment implements IExperiment {
    */
   public static async createExperiment(data: ExpData): Promise<any> {
     const { experiment, patient } = data;
-
+    console.log(experiment);
     try {
-      // Create a new experiment record in the database
-      const newExperiment = await db.Experiment.create(experiment);
-      patient.experimentId = newExperiment.id;
+      const _newExperiment = new Experiments();
+      Object.assign(_newExperiment, experiment);
+      const newExperiment = await _newExperiment.save();
 
-      // Create a new patient in the database
-      const newPatient = await db.Patient.create(patient);
+      const _newPatient = new Patients();
+      Object.assign(_newPatient, patient);
+      _newPatient.experiment = newExperiment;
+      const newPatient = await _newPatient.save();
 
-      // Extract only the useful information from the query
-      const currentPatient = {
-        id: newPatient.dataValues.id,
-        name: newPatient.dataValues.name,
-        description: newPatient.dataValues.description,
-        dob: newPatient.dataValues.dob.toString(),
+      return {
+        currentExperiment: {
+          id: newExperiment.id,
+          name: newExperiment.name,
+          description: newExperiment.description,
+        },
+        currentPatient: {
+          id: newPatient.id,
+          name: newPatient.name,
+          description: newPatient.description,
+        },
       };
-      const currentExperiment = {
-        id: newExperiment.dataValues.id,
-        name: newExperiment.dataValues.name,
-        description: newExperiment.dataValues.description,
-        date: newExperiment.dataValues.date.toString(),
-      };
-
-      return { currentExperiment, currentPatient };
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       return;
     }
@@ -55,22 +55,27 @@ export class Experiment implements IExperiment {
   public static getRecentExperiments = async (
     limit: number
   ): Promise<Object[]> =>
-    await db.Experiment.findAll({
-      limit: limit === -1 ? null : limit,
-      order: [['updatedAt', 'DESC']],
-      attributes: { exclude: ['createdAt'] },
-      raw: true,
-    });
+    await getConnection()
+      .createQueryBuilder()
+      .select()
+      .from(Experiments, '')
+      .limit(limit)
+      .orderBy({
+        updatedAt: 'DESC',
+      })
+      .getRawMany();
 
   /**
    * Updates the given experiment
    * @param experimentId - The id of the experiment to update
    */
-  public static updateExperiment = async (experimentId: number) => {
-    const experiment = await db.Experiment.findByPk(experimentId);
-    experiment.changed('updatedAt', true);
-    await experiment.save();
-  };
+  public static updateExperiment = async (experimentId: number) =>
+    await getConnection()
+      .createQueryBuilder()
+      .update(Experiments)
+      .set({ updatedAt: new Date() })
+      .where('id = :id', { id: experimentId })
+      .execute();
 }
 
 export default Experiment;

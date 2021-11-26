@@ -1,4 +1,6 @@
-import db from 'db/models/index';
+import { getConnection } from 'typeorm';
+import { Recordings } from 'db/entity/Recordings';
+import { RecordingsData } from 'db/entity/RecordingsData';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
@@ -23,10 +25,12 @@ export class Recording implements IRecording {
     data: INewRecordingData
   ): Promise<any> => {
     try {
-      const newRecording = await db.Recording.create(data, { raw: true });
-      const { id, name, description, date, patientId } =
-        newRecording.dataValues;
-      return { id, name, description, date, patientId };
+      const _newRecording = await new Recordings();
+      Object.assign(_newRecording, data);
+      const newRecording = await _newRecording.save();
+      console.log(newRecording);
+
+      return newRecording;
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -38,27 +42,15 @@ export class Recording implements IRecording {
    */
   public static getAllRecordings = async (patientId: number): Promise<any> => {
     try {
-      return await db.Recording.findAll({
-        where: {
-          patientId,
-        },
-        raw: true,
-      });
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  /**
-   * Inserts the recording data to the database in the `data` table
-   * @param data - Data to be written to the database
-   */
-  public static insertRecordingData = async (
-    data: any,
-    recordingId: number
-  ): Promise<any> => {
-    try {
-      await db.Data.create({ values: data, recordingId });
+      return await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(Recordings, '')
+        .where('patientId = :patientId', { patientId })
+        .orderBy({
+          updatedAt: 'DESC',
+        })
+        .getRawMany();
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -66,14 +58,17 @@ export class Recording implements IRecording {
 
   public static checkForRecordingData = async (recordingId: number) => {
     try {
-      const data = await db.Data.findAll({
-        where: { recordingId },
-        order: [['id', 'DESC']],
-        limit: 3000,
-        raw: true,
-      });
-      return data;
-    } catch (error) {}
+      return await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(RecordingsData, '')
+        .where('recordingId = :recordingId', { recordingId })
+        .orderBy({ id: 'DESC' })
+        .limit(30000)
+        .getRawMany();
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
   };
 }
 

@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
+
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { setReviewSidebar } from '@redux/AppStateSlice';
 
@@ -12,6 +14,10 @@ import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component'
 import { ChartType } from 'utils/constants';
 
 const Review = () => {
+  const [reviewChartLoaded, setReviewChartLoaded] = useState(false);
+
+  const location = useLocation();
+
   const dispatch = useAppDispatch();
   const isSidebarActive = useAppSelector(
     (state) => state.appState.reviewSidebar
@@ -20,9 +26,21 @@ const Review = () => {
   const isNewWindow = useAppSelector(
     (state) => state.appState.reviewTabInNewWindow
   );
+  const recordState = useAppSelector(
+    (state) => state.experimentData.currentRecording
+  );
+
+  useEffect(() => {
+    !reviewChartLoaded &&
+      location.pathname === '/main/recording/review' &&
+      setReviewChartLoaded(true);
+  }, [location]);
 
   return (
-    <>
+    <div
+      className="h-full"
+      hidden={location.pathname.includes('review') ? false : true}
+    >
       {!isNewWindow && (
         <div className={`absolute top-0 left-0 h-full w-full flex`}>
           <div
@@ -32,7 +50,11 @@ const Review = () => {
                 : 'w-[calc(100%-20px)]'
             }`}
           >
-            <ReviewChart type={ChartType.REVIEW} />
+            <ReviewChart
+              reviewChartLoaded={reviewChartLoaded}
+              recordState={recordState}
+              type={ChartType.REVIEW}
+            />
           </div>
           <div
             className={`h-full ${
@@ -52,7 +74,7 @@ const Review = () => {
           to be able to use the Review tab here.
         </p>
       )}
-    </>
+    </div>
   );
 };
 

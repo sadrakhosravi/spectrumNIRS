@@ -1,7 +1,6 @@
 /**
  * Base webpack config used across other specific configs
  */
-//@ts-nocheck
 
 import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
@@ -20,6 +19,10 @@ export default {
         exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
+          options: {
+            // Remove this line to enable type checking in webpack builds
+            // transpileOnly: true,
+          },
         },
       },
     ],
@@ -43,6 +46,7 @@ export default {
       crypto: false,
       'crypto-browserify': require.resolve('crypto-browserify'), //if you want to use this module also don't forget npm i crypto-browserify
     },
+
     /* Custom path alias */
     plugins: [
       new TsconfigPathsPlugin({

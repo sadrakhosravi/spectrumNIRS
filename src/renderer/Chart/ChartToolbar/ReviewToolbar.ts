@@ -8,6 +8,8 @@ import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import RawDataIcon from '@icons/raw-data.svg';
 import ExportTxtIcon from '@icons/export-txt.svg';
 
+import toast from 'react-hot-toast';
+
 // Constants
 import { ChartChannels, DialogBoxChannels } from '@utils/channels';
 
@@ -16,7 +18,7 @@ import ChartOptions from '../ChartClass/ChartOptions';
 
 // Store
 import { dispatch, getState } from '@redux/store';
-import { toggleRawData, setExportStatus } from '@redux/ChartSlice';
+import { toggleRawData } from '@redux/ChartSlice';
 
 export const ReviewToolbar = [
   {
@@ -103,15 +105,13 @@ export const ReviewToolbar = [
         return;
       }
 
-      dispatch(setExportStatus('loading'));
+      const result = window.api.invokeIPC(ChartChannels.ExportAll, recordingId);
 
-      const result = await window.api.invokeIPC(
-        ChartChannels.ExportAll,
-        recordingId
-      );
-      result === 'canceled' && dispatch(setExportStatus('canceled'));
-      result === true && dispatch(setExportStatus('done'));
-      result === false && dispatch(setExportStatus('error'));
+      toast.promise(result, {
+        loading: 'Exporting Data',
+        error: 'Export Failed!',
+        success: 'Export Completed!',
+      });
     },
   },
 ];

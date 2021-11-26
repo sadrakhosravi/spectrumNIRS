@@ -1,7 +1,6 @@
 {
   "name": "electron-react-boilerplate",
-  "productName": "electron-react-boilerplate",
-  "version": "4.0.0",
+  "version": "4.4.0",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "main": "./dist/main/main.js",
   "author": {
@@ -11,13 +10,14 @@
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
-    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.js",
+    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "license": "MIT",
   "dependencies": {
-    "sequelize": "^6.9.0",
-    "sqlite3": "^5.0.2",
+    "better-sqlite3": "^7.4.5",
+    "typeorm": "^0.2.41",
+    "usb": "^1.9.1",
     "usb-detection": "^4.13.0"
   }
 }

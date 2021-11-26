@@ -7,12 +7,16 @@ class ChartOptions {
   dashboard: Dashboard;
   charts: any;
   series: any;
+  customTicks: any[];
+  constantLines: any[];
 
   constructor(channels: string[], dashboard: any, charts: any, series: any) {
     this.channels = channels;
     this.dashboard = dashboard;
     this.charts = charts;
     this.series = series;
+    this.customTicks = [];
+    this.constantLines = [];
   }
 
   resetChartsHeight() {
@@ -35,7 +39,7 @@ class ChartOptions {
     const state: any = getState().chartState;
     const eventState = state[name.toLocaleLowerCase()];
 
-    axisX
+    const customTick = axisX
       .addCustomTick()
       .setValue(xValue)
       .setTextFormatter((_value: any) =>
@@ -55,6 +59,18 @@ class ChartOptions {
             fillStyle: new SolidFill({ color: ColorHEX(color) }),
           })
         );
+      this.constantLines.push(cl);
+    });
+
+    this.customTicks.push(customTick);
+  }
+
+  clearCharts() {
+    this.customTicks.forEach((customTick: any) => {
+      customTick.dispose();
+    });
+    this.constantLines.forEach((constantLine: any) => {
+      constantLine.dispose();
     });
   }
 }

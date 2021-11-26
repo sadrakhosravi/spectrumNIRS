@@ -12,10 +12,11 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
+import 'reflect-metadata';
 import { resolveHtmlPath } from './util';
-
+import '../db/index';
 // Import controllers
-import '../controllers/';
+import '../controllers';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -60,8 +61,8 @@ const createMainWindow = async () => {
     frame: false,
     roundedCorners: true,
     webPreferences: {
+      nativeWindowOpen: false,
       partition: 'persist:spectrum',
-      webviewTag: true,
       webgl: true,
       contextIsolation: true,
       nodeIntegration: false,
@@ -94,19 +95,6 @@ app.on('activate', async () => {
     createMainWindow();
   }
 });
-
-(async () => {
-  const { sequelize } = require('../db/models/index');
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-
-    await sequelize.sync();
-    console.log('Sync Successful');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
-})();
 
 (async () => {
   // Set dark theme by default - Light theme will be added in the next versions

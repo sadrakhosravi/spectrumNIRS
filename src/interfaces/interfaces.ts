@@ -2,12 +2,12 @@ export interface INewPatientData {
   name: string;
   dob: string;
   description: string;
-  experimentId?: number;
+  experiment?: number;
 }
 
 export interface INewRecordingData {
   name: string;
   date: string;
   description: string;
-  patientId?: number;
+  patient?: number;
 }

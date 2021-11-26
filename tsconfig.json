@@ -15,7 +15,7 @@
       "@forms/*": ["./renderer/forms/*"],
       "@microComp/*": ["./renderer/components/MicroComponents/*"],
       "@hoc/*": ["./renderer/hoc/*"],
-      "@chart/*": ["./renderer/components/Chart/*"],
+      "@chart/*": ["./renderer/Chart/*"],
       "@redux/*": ["./renderer/redux/*"],
       "@hooks/*": ["./renderer/hooks/*"],
       "@adapters/*": ["./renderer/adapters/*"],
@@ -43,7 +43,9 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "outDir": "release/app/dist"
+    "outDir": "release/app/dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
 
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]

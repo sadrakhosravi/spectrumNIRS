@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { changeRecordState } from '@redux/RecordStateSlice';
 
@@ -16,6 +16,8 @@ import { setPreviousData } from '@redux/ExperimentDataSlice';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
+  recordChartLoaded: boolean;
+  recordState: any;
   setLoading: any;
   children: JSX.Element[];
 };
@@ -23,15 +25,14 @@ type ChartProps = {
 // Prepares and enders the chart
 const RecordChart = ({
   type,
+  recordChartLoaded,
   setLoading,
+  recordState,
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
   const [chartState, setChartState] = useState<null | LCJSChart>(null);
   const dispatch = useAppDispatch();
-  const recordState = useAppSelector(
-    (state) => state.experimentData.currentRecording
-  );
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
@@ -44,30 +45,36 @@ const RecordChart = ({
 
   let chart: LCJSChart | undefined;
 
+  console.log(chartLoaded);
+
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
-  useLayoutEffect(() => {
-    console.log('RECORD CHARTTT');
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      if (!chart) {
+        console.log('RECORD CHARTTT');
 
-    // Create chart, series and any other static components.
-    console.log('create chart');
-    // Store references to chart components.
-    chart = new LCJSChart(
-      channels || ['No Channels Found'],
-      type,
-      samplingRate,
-      containerId
-    );
+        // Create chart, series and any other static components.
+        console.log('create chart');
+        // Store references to chart components.
+        chart = new LCJSChart(
+          channels || ['No Channels Found'],
+          type,
+          samplingRate,
+          containerId
+        );
 
-    chart.createChart();
+        chart.createChart();
 
-    // Attach event listeners
-    chart.recordData();
+        // Attach event listeners
+        chart.recordData();
 
-    // Keep a ref to the chart
-    chartRef.current = chart as LCJSChart;
+        // Keep a ref to the chart
+        chartRef.current = chart as LCJSChart;
 
-    setChartLoaded(true);
-    setChartState(chart);
+        setChartLoaded(true);
+        setChartState(chart);
+      }
+    });
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -80,13 +87,17 @@ const RecordChart = ({
       chart = undefined;
       chartRef.current = null;
     };
-  }, [recordState.id]);
+  }, [recordChartLoaded]);
+
+  useEffect(() => {
+    chartRef.current?.clearCharts();
+  }, [recordState]);
 
   // Check if the current recording has data
   useEffect(() => {
     setLoading(true);
 
-    (async () => {
+    requestAnimationFrame(async () => {
       const data: any[] = await window.api.invokeIPC(
         ChartChannels.CheckForData,
         recordState.id
@@ -122,8 +133,8 @@ const RecordChart = ({
           })
         );
       }
-      requestAnimationFrame(() => setLoading(false));
-    })();
+    });
+    requestAnimationFrame(() => setLoading(false));
   }, [recordState.id]);
 
   // Adjust chart width and height on sidebar resize

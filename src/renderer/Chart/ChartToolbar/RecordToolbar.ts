@@ -9,11 +9,10 @@ import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import MarkerIcon from '@icons/marker.svg';
 import RawDataIcon from '@icons/raw-data.svg';
-import ExportTxtIcon from '@icons/export-txt.svg';
 
 // Constants
 import { RecordState } from '@utils/constants';
-import { ChartChannels, DialogBoxChannels } from '@utils/channels';
+import { DialogBoxChannels } from '@utils/channels';
 
 // Adapters
 import { handlePause, handleRecord } from '@adapters/recordAdapter';
@@ -22,12 +21,7 @@ import ChartOptions from '../ChartClass/ChartOptions';
 // Store
 import { dispatch, getState } from '@redux/store';
 
-import {
-  toggleRawData,
-  toggleHypoxia,
-  toggleEvent2,
-  setExportStatus,
-} from '@redux/ChartSlice';
+import { toggleRawData, toggleHypoxia, toggleEvent2 } from '@redux/ChartSlice';
 
 export const RecordToolbar = [
   {
@@ -133,38 +127,6 @@ export const RecordToolbar = [
       }
       chartOptions.addMarker('Event2', '#fff');
       dispatch(toggleEvent2());
-    },
-  },
-  {
-    label: 'separator',
-  },
-  {
-    label: `exporttxt`,
-    tooltip: 'Export Text File',
-    icon: ExportTxtIcon,
-    click: async () => {
-      const recordingId = getState().experimentData.currentRecording.id;
-
-      if (recordingId === -1) {
-        window.api.invokeIPC(DialogBoxChannels.MessageBox, {
-          title: 'No recording found',
-          type: 'error',
-          message: 'No recording found',
-          detail:
-            'No recording found. Either open a recording or create a new one.',
-        });
-        return;
-      }
-
-      dispatch(setExportStatus('loading'));
-
-      const result = await window.api.invokeIPC(
-        ChartChannels.ExportAll,
-        recordingId
-      );
-      result === 'canceled' && dispatch(setExportStatus('canceled'));
-      result === true && dispatch(setExportStatus('done'));
-      result === false && dispatch(setExportStatus('error'));
     },
   },
 ];

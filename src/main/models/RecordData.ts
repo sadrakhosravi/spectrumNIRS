@@ -1,4 +1,6 @@
-import db from 'db/models/index';
+// import db from 'db/models/index';
+import { RecordingsData } from 'db/entity/RecordingsData';
+import { getConnection } from 'typeorm';
 class RecordData {
   recordingId: number;
   transaction: any;
@@ -7,9 +9,14 @@ class RecordData {
     this.recordingId = recordingId;
   }
 
-  async addDataToTransaction(data: any) {
+  async addDataToTransaction(data: any[]) {
     try {
-      db.Data.bulkCreate(data);
+      await getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(RecordingsData)
+        .values([...data])
+        .execute();
     } catch (error: any) {
       throw Error(error.message);
     }

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Main area components
@@ -6,21 +7,36 @@ import RecordChart from 'renderer/Chart/RecordChart.component';
 
 // Sidebar components
 import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
-import useLoadingState from '@hooks/useLoadingState.hook';
 
 // Constants
 import { ChartType } from 'utils/constants';
 import { setRecordSidebar } from '@redux/AppStateSlice';
 
 const RecordPage = () => {
+  const [recordChartLoaded, setRecordChartLoaded] = useState(false);
+  const recordState = useAppSelector(
+    (state) => state.experimentData.currentRecording
+  );
+
+  const location = useLocation();
   const isSidebarActive = useAppSelector(
     (state) => state.appState.recordSidebar
   );
   const dispatch = useAppDispatch();
-  useLoadingState(false);
+
+  useEffect(() => {
+    if (recordChartLoaded !== true) {
+      location.pathname === '/main/recording/record' &&
+        setRecordChartLoaded(true);
+      console.log('LOCATION CHANGE');
+    }
+  }, [location]);
 
   return (
-    <>
+    <div
+      className="h-full"
+      hidden={location.pathname === '/main/recording/record' ? false : true}
+    >
       <div className={`absolute top-0 left-0 h-full w-full flex`}>
         <div
           className={`h-full relative ${
@@ -29,7 +45,11 @@ const RecordPage = () => {
               : 'w-[calc(100%-20px)]'
           }`}
         >
-          <RecordChart type={ChartType.RECORD} />
+          <RecordChart
+            recordState={recordState}
+            recordChartLoaded={recordChartLoaded}
+            type={ChartType.RECORD}
+          />
         </div>
         <div
           className={`h-full ${
@@ -42,7 +62,7 @@ const RecordPage = () => {
           <WidgetsContainer type={ChartType.RECORD} />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

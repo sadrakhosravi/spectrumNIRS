@@ -1,4 +1,5 @@
-import db from 'db/models/index';
+import { getConnection } from 'typeorm';
+import { Patients } from 'db/entity/Patients';
 
 // Interfaces
 import { INewPatientData } from 'interfaces/interfaces';
@@ -14,12 +15,10 @@ export class Patient {
    */
   public static async createNewPatient(data: INewPatientData): Promise<any> {
     try {
-      const newPatient = await db.Patient.create(data, { raw: true });
-      console.log(newPatient);
-      const { id, name, dob, description, experimentId } =
-        newPatient.dataValues;
-
-      return { id, name, dob, description, experimentId };
+      const _newPatient = new Patients();
+      Object.assign(_newPatient, data);
+      const newPatient = await _newPatient.save();
+      return newPatient;
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -27,7 +26,13 @@ export class Patient {
 
   public static async getAllPatient(experimentId: number): Promise<any> {
     try {
-      return await db.Patient.findAll({ where: { experimentId }, raw: true });
+      return await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(Patients, '')
+        .where('experimentId = :experimentId', { experimentId })
+        .orderBy({ updatedAt: 'DESC' })
+        .getRawMany();
     } catch (error: any) {
       throw new Error(error.message);
     }

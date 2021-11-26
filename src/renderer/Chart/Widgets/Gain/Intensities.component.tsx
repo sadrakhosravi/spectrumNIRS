@@ -62,7 +62,7 @@ const Intensities = ({ setLoading, children }: any) => {
   };
 
   return (
-    <div className="bg-grey3 h-[calc(66.7%-3rem)] mt-5 rounded-b-md duration-300 hover:drop-shadow-xl">
+    <div className="bg-grey3 h-[calc(66.7%-3rem)] mt-5 rounded-b-md">
       <Header>
         <TabButton
           text="Intensities"

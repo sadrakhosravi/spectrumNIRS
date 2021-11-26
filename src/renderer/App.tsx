@@ -8,7 +8,7 @@ import {
 import { Toaster } from 'react-hot-toast';
 
 // CSS
-import './App.global.css';
+import './App.css';
 
 // Constants
 import { AppState } from '@utils/constants';
@@ -26,7 +26,6 @@ const ModalsContainer = React.lazy(
 import RouteHandler from '@pages/RouteHandler';
 
 // Pages
-const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 // Test
@@ -44,7 +43,6 @@ const App = () => {
           <Route path="/main" component={BottomBar} />
           <Route path="/main" component={TitleBar} />
           <Route path="/main" component={ModalsContainer} />
-          <Route exact path={AppState.RECORD_TAB} component={RecordPage} />
           <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
           <Route
             path={'/main'}

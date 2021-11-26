@@ -3,6 +3,8 @@
     "no-console": "off",
     "global-require": "off",
     "import/no-dynamic-require": "off",
-    "import/no-extraneous-dependencies": "off"
+    "no-unused-expressions": 0,
+    "allowForLoopAfterthoughts": true,
+    "no-plusplus": "off"
   }
 }

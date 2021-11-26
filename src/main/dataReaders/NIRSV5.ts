@@ -119,7 +119,7 @@ export const start = (
       // Raw Data
       // Used direct array element access instead of a loop for the fastest possible calculation
       const rawDataArr = [
-        timeSequence / 100,
+        timeSequence,
         parseFloat(data[1]),
         parseFloat(data[2]),
         parseFloat(data[3]),
@@ -147,10 +147,14 @@ export const start = (
 
       // Recording.insertRecordingData(line, recordingId);
       databaseArr.push({
-        values: rawDataArr.join(','),
-        recordingId,
-        ...events,
+        timeStamp: rawDataArr[0],
+        O2Hb: rawDataArr[1],
+        HHb: rawDataArr[2],
+        THb: rawDataArr[3],
+        TOI: rawDataArr[4],
       });
+
+      // Database?.addDataToTransaction(rawDataArr.join(','));
 
       if (databaseCount === 200) {
         Database?.addDataToTransaction(databaseArr);
@@ -167,7 +171,7 @@ export const start = (
       }
 
       // Last Step: increment the time sequence +10ms = 1unit (Centiseconds)
-      timeSequence += 1;
+      timeSequence += 10;
       dataCount++;
       databaseCount++;
 

@@ -4,9 +4,11 @@ import useNavigation from '@hooks/useNavigation.hook';
 
 // Pages
 import HomePage from './Home/Home.page';
+const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
+const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 // Webview
-import ChartWebView from './ChartWebView';
+// import ChartWebView from './ChartWebView';
 // Components
 import Tabs from '@components/Tabs/Tabs.component';
 
@@ -25,9 +27,12 @@ const RouteHandler = () => {
       </Router>
       <div
         className="fit-to-container absolute top-[40px] left-0 w-full h-full"
-        hidden={!location.pathname.includes('record')}
+        hidden={!location.pathname.includes('recording')}
       >
-        <ChartWebView />
+        <RecordPage />
+        <ReviewPage />
+
+        {/* <ChartWebView /> */}
       </div>
     </main>
   );

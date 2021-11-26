@@ -3,8 +3,8 @@ import { ipcMain } from 'electron';
 import Store from 'electron-store';
 
 // Constants
-import { UserSettingsChannels } from '@utils/channels';
-import { appDataPath, databasePath, settingsPath } from '@electron/paths';
+import { appDataPath, databasePath, settingsPath } from '../main/paths';
+import { UserSettingsChannels } from '../utils/channels';
 
 (async () => {
   // Create the main application data folder

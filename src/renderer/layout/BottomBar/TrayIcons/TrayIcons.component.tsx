@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
+import { useAppSelector } from '@redux/hooks/hooks';
 
-// Components
-import Separator from '@components/Separator/Separator.component';
-import TrayIconButtons from '../TrayIconButton/TrayIconButton.component';
+// HOC
+import withTooltip from '@hoc/withTooltip.hoc';
 
 // Icons
 import SensorIcon from '@icons/sensor.svg';
@@ -11,34 +10,36 @@ import PatientIcon from '@icons/user-checked.svg';
 import ExperimentIcon from '@icons/experiment.svg';
 import DataIcon from '@icons/raw-data.svg';
 
+// Components
+import Separator from '@components/Separator/Separator.component';
+import TrayIconButtons from '../TrayIconButton/TrayIconButton.component';
+
 // Constants
-import { USBDetectionChannels } from '@utils/channels';
-import { setDetectedSensor } from '@redux/SensorStateSlice';
-import withTooltip from '@hoc/withTooltip.hoc';
+// import { USBDetectionChannels } from '@utils/channels';
+// import { setDetectedSensor } from '@redux/SensorStateSlice';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
 const TrayIcons = () => {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const experimentData = useAppSelector((state) => state.experimentData);
   const sensorState = useAppSelector((state) => state.sensorState);
 
   // Send a request to the controller to get the sensor info and set it in the state.
-  const checkUSBDevices = async () => {
-    const connectedSensor = await window.api.invokeIPC(
-      USBDetectionChannels.CHECK_USB
-    );
-    dispatch(setDetectedSensor(connectedSensor));
-  };
+  // const checkUSBDevices = async () => {
+  //   const connectedSensor = await window.api.invokeIPC(
+  //     USBDetectionChannels.CHECK_USB
+  //   );
+  //   dispatch(setDetectedSensor(connectedSensor));
+  // };
 
   // Get sensor info on mount.
   useEffect(() => {
-    window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
-      console.log(data);
-      dispatch(setDetectedSensor(data));
-    });
-
-    checkUSBDevices();
+    // window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
+    //   console.log(data);
+    //   dispatch(setDetectedSensor(data));
+    // });
+    // checkUSBDevices();
   }, []);
 
   // Tooltip for experiment and patient icons.
@@ -91,9 +92,9 @@ const TrayIcons = () => {
     </div>
   );
 
-  let experimentButton = null,
-    patientButton = null,
-    recordingButton = null;
+  let experimentButton = null;
+  let patientButton = null;
+  let recordingButton = null;
 
   // Fix layout issue with margin bottom.
   const SeparatorBar = (

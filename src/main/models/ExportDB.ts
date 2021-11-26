@@ -1,4 +1,5 @@
-import db from 'db/models';
+import { getConnection } from 'typeorm';
+import { RecordingsData } from 'db/entity/RecordingsData';
 import fs from 'fs';
 import { dialog, BrowserWindow } from 'electron';
 
@@ -33,14 +34,13 @@ class ExportDB {
 
       // Run the loop while there's still recording data available
       while (true) {
-        const records = await db.Data.findAll({
-          where: {
-            recordingId,
-          },
-          offset: offset,
-          limit: LIMIT,
-          raw: true,
-        });
+        const records = await getConnection()
+          .createQueryBuilder()
+          .select()
+          .from(RecordingsData, '')
+          .limit(LIMIT)
+          .offset(offset)
+          .getRawMany();
 
         // If there's no recording data, break the loop
         if (records.length === 0) break;

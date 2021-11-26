@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
-import { ExperimentChannels } from 'utils/channels';
+import { ExperimentChannels } from '@utils/channels';
 
 // Models
-import Experiment from '@electron/models/Experiment';
+import Experiment from '../main/models/Experiment';
 import Patient from '../main/models/Patient';
 import Recording from '../main/models/Recording';
 
