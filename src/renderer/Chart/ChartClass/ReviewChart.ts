@@ -15,6 +15,7 @@ class ReviewChart extends Chart {
   charts: null | ChartXY<PointMarker, UIBackground>[];
   series: null | LineSeries[];
   chartOptions: null | ChartOptions;
+  INTERVAL_LENGTH: number;
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
     type: ChartType.RECORD | ChartType.REVIEW,
@@ -27,6 +28,7 @@ class ReviewChart extends Chart {
     this.charts = null;
     this.series = null;
     this.chartOptions = null;
+    this.INTERVAL_LENGTH = 30000;
   }
 
   // Creates the record chart
@@ -44,25 +46,44 @@ class ReviewChart extends Chart {
       this.charts,
       this.series
     );
+    this.listenForRightArrowKey();
   }
 
-  listenForData() {
-    let count = 0;
-    window.api.onIPCData('data:reader-record', (_event, data) => {
-      // Change TOI value every 15 samples (based on 100samples/s)
-      if (count === 5) {
-        this.TOILegend.setText(Math.round(data[4]).toString());
-        count = 0;
-      }
-      count++;
-      // data format = 'TimeStamp,O2Hb,HHb,tHb,TOI' - data should contain 3 reading lines
-      requestAnimationFrame(() => {
-        for (let i = 0; i < (this.series as LineSeries[]).length; i++) {
-          (this.series as LineSeries[])[i].add({ x: data[0], y: data[i + 1] });
-        }
-      });
-    });
+  listenForRightArrowKey() {
+    window.addEventListener('keydown', this.loadDataOnKeyPress);
   }
+
+  loadDataOnKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight' && this.charts) {
+      const axisX = this.charts[0].getDefaultAxisX();
+      const currentInterval = axisX.getInterval();
+      const newInterval = {
+        start: currentInterval.start + this.INTERVAL_LENGTH,
+        end: currentInterval.end + this.INTERVAL_LENGTH,
+      };
+      this.charts.forEach((chart) =>
+        chart
+          .getDefaultAxisX()
+          .setInterval(newInterval.start, newInterval.end, 300, true)
+      );
+    }
+
+    if (event.key === 'ArrowLeft' && this.charts) {
+      console.log(event.key);
+      const axisX = this.charts[0].getDefaultAxisX();
+      const currentInterval = axisX.getInterval();
+      const newInterval = {
+        start: currentInterval.start - this.INTERVAL_LENGTH,
+        end: currentInterval.end - this.INTERVAL_LENGTH,
+      };
+
+      this.charts.forEach((chart) =>
+        chart
+          .getDefaultAxisX()
+          .setInterval(newInterval.start, newInterval.end, 300, true)
+      );
+    }
+  };
 
   customizeCharts() {}
 
@@ -72,6 +93,7 @@ class ReviewChart extends Chart {
     this.dashboard?.dispose();
     this.charts = null;
     this.series = null;
+    window.removeEventListener('keydown', this.loadDataOnKeyPress);
   }
 
   // Clears the series and custom ticks

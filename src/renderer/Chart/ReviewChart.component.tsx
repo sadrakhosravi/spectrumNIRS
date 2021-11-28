@@ -24,7 +24,7 @@ type ChartProps = {
 // Prepares and enders the chart
 const ReviewChart = ({
   type,
-  reviewChartLoaded,
+
   recordState,
   setLoading,
   children,
@@ -36,9 +36,6 @@ const ReviewChart = ({
     (state) => state.sensorState.selectedSensor
   );
 
-  const isReviewInNewTab = useAppSelector(
-    (state) => state.appState.reviewTabInNewWindow
-  );
   const location = useLocation();
 
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
@@ -77,7 +74,7 @@ const ReviewChart = ({
       chart = undefined;
       chartRef.current = null;
     };
-  }, [isReviewInNewTab, reviewChartLoaded]);
+  }, []);
 
   // Check if the current recording has data
   useEffect(() => {

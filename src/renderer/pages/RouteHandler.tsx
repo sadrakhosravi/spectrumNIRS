@@ -30,7 +30,7 @@ const RouteHandler = () => {
         hidden={!location.pathname.includes('recording')}
       >
         <RecordPage />
-        <ReviewPage />
+        <Route path={AppState.REVIEW} component={ReviewPage} />
 
         {/* <ChartWebView /> */}
       </div>
