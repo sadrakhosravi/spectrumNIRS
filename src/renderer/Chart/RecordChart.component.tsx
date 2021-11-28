@@ -6,13 +6,15 @@ import { changeRecordState } from '@redux/RecordStateSlice';
 import withLoading from '@hoc/withLoading.hoc';
 
 // Components
-import LCJSChart from 'renderer/Chart/ChartClass/Chart';
+import RecordChartClass from './ChartClass/RecordChart';
 import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType, RecordState } from 'utils/constants';
-import { ChartChannels } from '@utils/channels';
 import { setPreviousData } from '@redux/ExperimentDataSlice';
+import { ChartChannels } from '@utils/channels';
+// import { ChartChannels } from '@utils/channels';
+// import { setPreviousData } from '@redux/ExperimentDataSlice';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -31,19 +33,19 @@ const RecordChart = ({
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
-  const [chartState, setChartState] = useState<null | LCJSChart>(null);
+  const [chartState, setChartState] = useState<null | RecordChartClass>(null);
   const dispatch = useAppDispatch();
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
+  // const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
-
   const containerId = 'recordChart';
-  const chartRef = useRef<LCJSChart | null>(null);
+  const chartRef = useRef<RecordChartClass | null>(null);
 
-  let chart: LCJSChart | undefined;
+  let chart: RecordChartClass | undefined;
 
   console.log(chartLoaded);
 
@@ -56,23 +58,24 @@ const RecordChart = ({
         // Create chart, series and any other static components.
         console.log('create chart');
         // Store references to chart components.
-        chart = new LCJSChart(
+        chart = new RecordChartClass(
           channels || ['No Channels Found'],
           type,
           samplingRate,
           containerId
         );
 
-        chart.createChart();
+        chart.createRecordChart();
 
         // Attach event listeners
-        chart.recordData();
+        chart.listenForData();
 
         // Keep a ref to the chart
-        chartRef.current = chart as LCJSChart;
+        chartRef.current = chart as RecordChartClass;
 
         setChartLoaded(true);
         setChartState(chart);
+        setLoading(false);
       }
     });
 
@@ -103,29 +106,32 @@ const RecordChart = ({
         recordState.id
       );
 
+      console.log(data);
+
       // If the recording has data, display it and save the last timestamp
       if (data.length !== 0) {
         data &&
           data.reverse().forEach((dataPoint: any) => {
-            const data = dataPoint.values.split(',');
             const sensorData = [
-              parseFloat(data[0]),
-              parseFloat(data[1]),
-              parseFloat(data[2]),
-              parseFloat(data[3]),
-              parseFloat(data[4]),
+              dataPoint.timeStamp,
+              dataPoint.O2Hb,
+              dataPoint.HHb,
+              dataPoint.THb,
+              dataPoint.TOI,
             ];
             requestAnimationFrame(() => {
               setTimeout(() => {
                 chartRef.current &&
-                  chartRef.current.series.forEach((series: any, i: number) => {
-                    series.add({ x: sensorData[0], y: sensorData[i + 1] });
-                  });
+                  chartRef.current?.series?.forEach(
+                    (series: any, i: number) => {
+                      series.add({ x: sensorData[0], y: sensorData[i + 1] });
+                    }
+                  );
               }, 100);
             });
           });
 
-        const lastTimeStamp = data[data.length - 1].values.split(',')[0];
+        const lastTimeStamp = data[data.length - 1].timeStamp;
         dispatch(
           setPreviousData({
             timeStamp: parseFloat(lastTimeStamp),
@@ -143,8 +149,8 @@ const RecordChart = ({
       const container = document.getElementById(containerId) as HTMLElement;
       const { offsetWidth, offsetHeight } = container;
 
-      chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
-      chartRef.current && chartRef.current.dashboard.setHeight(offsetHeight);
+      chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
+      chartRef.current && chartRef.current?.dashboard?.setHeight(offsetHeight);
 
       container.style.overflowX = 'hidden';
       container.style.overflowY = 'hidden';
@@ -154,7 +160,7 @@ const RecordChart = ({
   return (
     <>
       {chartLoaded && chartState && (
-        <ChartToolbar chartOptions={chartState.ChartOptions} type={type} />
+        <ChartToolbar chartOptions={chartState.chartOptions} type={type} />
       )}
 
       <div

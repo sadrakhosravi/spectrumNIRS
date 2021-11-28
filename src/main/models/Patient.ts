@@ -18,7 +18,11 @@ export class Patient {
       const _newPatient = new Patients();
       Object.assign(_newPatient, data);
       const newPatient = await _newPatient.save();
-      return newPatient;
+      return {
+        ...newPatient,
+        createdAt: newPatient.createdAt.toString(),
+        updatedAt: newPatient.updatedAt.toString(),
+      };
     } catch (error: any) {
       throw new Error(error.message);
     }

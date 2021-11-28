@@ -38,6 +38,7 @@ class ExportDB {
           .createQueryBuilder()
           .select()
           .from(RecordingsData, '')
+          .where('recordingId = :recordingId', { recordingId })
           .limit(LIMIT)
           .offset(offset)
           .getRawMany();
@@ -50,7 +51,10 @@ class ExportDB {
         // every iteration
         const RECORDS_LENGTH = records.length;
         for (let i = 0; i < RECORDS_LENGTH - 1; i++) {
-          writeStream.write(records[i].values.toString() + '\n', 'utf-8');
+          for (const property in records[i]) {
+            writeStream.write(records[i][property].toString() + ',', 'utf-8');
+          }
+          writeStream.write('\n', 'utf-8');
         }
       }
 

@@ -5,7 +5,7 @@ import { useAppSelector } from '@redux/hooks/hooks';
 import withLoading from '@hoc/withLoading.hoc';
 
 // Components
-import LCJSChart from 'renderer/Chart/ChartClass/Chart';
+import ReviewChartClass from 'renderer/Chart/ChartClass/ReviewChart';
 import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
@@ -31,7 +31,7 @@ const ReviewChart = ({
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
+  // const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
@@ -45,36 +45,36 @@ const ReviewChart = ({
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
 
   const containerId = 'reviewChart';
-  const chartRef = useRef<LCJSChart | null>(null);
+  const chartRef = useRef<ReviewChartClass | null>(null);
 
-  let reviewChart: LCJSChart | undefined;
+  let chart: ReviewChartClass | undefined;
 
   useEffect(() => {
     requestAnimationFrame(() => {
       // Create chart, series and any other static components.
       console.log('create chart');
       // Store references to chart components.
-      reviewChart = new LCJSChart(
+      chart = new ReviewChartClass(
         channels || ['No Channels Found'],
         type,
         samplingRate,
         containerId
       );
 
-      reviewChart.createChart();
+      chart.createReviewChart();
 
       // Keep a ref to the chart
-      chartRef.current = reviewChart as any;
+      chartRef.current = chart as any;
 
       setChartLoaded(true);
     });
     // Return function that will destroy the chart when component is unmounted.
     return () => {
       // Destroy chart.
-      reviewChart?.cleanup();
       console.log('destroy chart');
+      chart?.cleanup();
       setChartLoaded(false);
-      reviewChart = undefined;
+      chart = undefined;
       chartRef.current = null;
     };
   }, [isReviewInNewTab, reviewChartLoaded]);
@@ -94,18 +94,17 @@ const ReviewChart = ({
         if (data.length !== 0) {
           data &&
             data.reverse().forEach((dataPoint: any) => {
-              const data = dataPoint.values.split(',');
               const sensorData = [
-                parseFloat(data[0]),
-                parseFloat(data[1]),
-                parseFloat(data[2]),
-                parseFloat(data[3]),
-                parseFloat(data[4]),
+                dataPoint.timeStamp,
+                dataPoint.O2Hb,
+                dataPoint.HHb,
+                dataPoint.THb,
+                dataPoint.TOI,
               ];
               requestAnimationFrame(() => {
                 setTimeout(() => {
                   chartRef.current &&
-                    chartRef.current.series.forEach(
+                    chartRef.current?.series?.forEach(
                       (series: any, i: number) => {
                         series.add({ x: sensorData[0], y: sensorData[i + 1] });
                       }
@@ -118,23 +117,27 @@ const ReviewChart = ({
     }
     setDataLoaded(true);
     requestAnimationFrame(() => setLoading(false));
-  }, [recordState.id, location]);
+  }, [location]);
 
   useEffect(() => {
-    requestAnimationFrame(() => {
-      const container = document.getElementById(containerId) as HTMLElement;
-      const { offsetWidth } = container;
-      //@ts-ignore
-      chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
-      container.style.overflowX = 'hidden';
-    });
-  }, [reviewSidebar]);
+    setDataLoaded(false);
+  }, [recordState.id]);
+
+  // useEffect(() => {
+  //   requestAnimationFrame(() => {
+  //     const container = document.getElementById(containerId) as HTMLElement;
+  //     const { offsetWidth } = container;
+  //     //@ts-ignore
+  //     chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
+  //     container.style.overflowX = 'hidden';
+  //   });
+  // }, [reviewSidebar]);
 
   return (
     <>
-      {chartLoaded && chartRef.current?.ChartOptions && (
+      {chartLoaded && chartRef.current?.chartOptions && (
         <ChartToolbar
-          chartOptions={chartRef.current.ChartOptions}
+          chartOptions={chartRef.current.chartOptions}
           type={type}
         />
       )}

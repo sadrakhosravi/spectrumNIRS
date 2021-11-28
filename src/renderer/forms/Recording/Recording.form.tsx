@@ -106,7 +106,8 @@ const RecordingForm = () => {
                         />
                         <p className="mt-2">{device.name}</p>
                         <p className="absolute right-2 top-1">
-                          Status: {detectedSensor?.name ? '✅' : '❌'}
+                          Status:{' '}
+                          {detectedSensor?.name === device.name ? '✅' : '❌'}
                         </p>
                       </div>
                     </>

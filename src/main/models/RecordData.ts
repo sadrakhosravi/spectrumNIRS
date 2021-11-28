@@ -16,6 +16,7 @@ class RecordData {
         .insert()
         .into(RecordingsData)
         .values([...data])
+        .useTransaction(true)
         .execute();
     } catch (error: any) {
       throw Error(error.message);

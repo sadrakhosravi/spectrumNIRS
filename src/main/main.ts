@@ -59,9 +59,9 @@ const createMainWindow = async () => {
     height: height,
     darkTheme: true,
     frame: false,
-    roundedCorners: true,
     webPreferences: {
-      nativeWindowOpen: false,
+      nativeWindowOpen: true,
+      sandbox: true,
       partition: 'persist:spectrum',
       webgl: true,
       contextIsolation: true,

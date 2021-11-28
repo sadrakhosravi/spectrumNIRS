@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppSelector } from '@redux/hooks/hooks';
+import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 
 // HOC
 import withTooltip from '@hoc/withTooltip.hoc';
@@ -15,31 +15,31 @@ import Separator from '@components/Separator/Separator.component';
 import TrayIconButtons from '../TrayIconButton/TrayIconButton.component';
 
 // Constants
-// import { USBDetectionChannels } from '@utils/channels';
-// import { setDetectedSensor } from '@redux/SensorStateSlice';
+import { USBDetectionChannels } from '@utils/channels';
+import { setDetectedSensor } from '@redux/SensorStateSlice';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
 const TrayIcons = () => {
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const experimentData = useAppSelector((state) => state.experimentData);
   const sensorState = useAppSelector((state) => state.sensorState);
 
   // Send a request to the controller to get the sensor info and set it in the state.
-  // const checkUSBDevices = async () => {
-  //   const connectedSensor = await window.api.invokeIPC(
-  //     USBDetectionChannels.CHECK_USB
-  //   );
-  //   dispatch(setDetectedSensor(connectedSensor));
-  // };
+  const checkUSBDevices = async () => {
+    const connectedSensor = await window.api.invokeIPC(
+      USBDetectionChannels.CHECK_USB
+    );
+    dispatch(setDetectedSensor(connectedSensor));
+  };
 
   // Get sensor info on mount.
   useEffect(() => {
-    // window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
-    //   console.log(data);
-    //   dispatch(setDetectedSensor(data));
-    // });
-    // checkUSBDevices();
+    window.api.onIPCData(USBDetectionChannels.NIRSV5, (_event, data) => {
+      console.log(data);
+      dispatch(setDetectedSensor(data));
+    });
+    checkUSBDevices();
   }, []);
 
   // Tooltip for experiment and patient icons.

@@ -78,7 +78,7 @@ export class DataReader implements IDataReaders {
     this.senderWindow = senderWindow;
     this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
     this.Recording = new Recording(this.currentRecording);
-    this.lastTimeStamp = lastTimeStamp * 100;
+    this.lastTimeStamp = lastTimeStamp;
   }
 
   startRecording() {

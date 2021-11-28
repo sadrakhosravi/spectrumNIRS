@@ -28,9 +28,12 @@ export class Recording implements IRecording {
       const _newRecording = await new Recordings();
       Object.assign(_newRecording, data);
       const newRecording = await _newRecording.save();
-      console.log(newRecording);
 
-      return newRecording;
+      return {
+        ...newRecording,
+        createdAt: newRecording.createdAt.toString(),
+        updatedAt: newRecording.updatedAt.toString(),
+      };
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -64,7 +67,7 @@ export class Recording implements IRecording {
         .from(RecordingsData, '')
         .where('recordingId = :recordingId', { recordingId })
         .orderBy({ id: 'DESC' })
-        .limit(30000)
+        .limit(3000)
         .getRawMany();
     } catch (error: any) {
       throw new Error(error.message);

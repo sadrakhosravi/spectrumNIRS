@@ -10,7 +10,6 @@ import { databasePath } from '../main/paths';
     type: 'better-sqlite3',
     database: path.join(databasePath, 'mydb.db'),
     synchronize: true,
-    dropSchema: true,
     logging: false,
     entities: ['src/db/entity/**/*.ts'],
     migrations: ['src/db/migration/**/*.ts'],

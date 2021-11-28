@@ -1,8 +1,11 @@
-import { BrowserWindow } from 'electron';
+import { ipcMain, BrowserWindow } from 'electron';
+import usbDetect from 'usb-detection';
 
 import { devices } from '@electron/configs/devices';
-import usb from 'usb';
-import { USBDetectionChannels } from '@utils/channels';
+import { USBDetectionChannels } from '../utils/channels';
+
+// Starts listening for insert/remove events of USB devices.
+usbDetect.startMonitoring();
 
 type ConnectedDevice = {
   id: number;
@@ -25,7 +28,6 @@ const checkConnectedDevice = (device: any): null | ConnectedDevice => {
   const availableSensor =
     connectedSensor.length === 0 ? null : connectedSensor[0];
 
-  console.log(availableSensor);
   return availableSensor;
 };
 
@@ -42,8 +44,7 @@ const sendDataToUI = (sensorStatus: null | ConnectedDevice) => {
 };
 
 // Detect USB insert
-usb.on('add', function (device: any) {
-  console.log(device);
+usbDetect.on('add', function (device: any) {
   // Check if the connected device is a sensor.
   const sensorStatus = checkConnectedDevice(device);
 
@@ -52,29 +53,27 @@ usb.on('add', function (device: any) {
 });
 
 // Detect USB insert
-usb.on('remove', function (device: any) {
+usbDetect.on('remove', function (device: any) {
   // Check if the removed device is a sensor.
   const sensorStatus = checkConnectedDevice(device);
   const isNIRSV5 = sensorStatus ? null : sensorStatus;
-
   // Send the result to the UI.
   sendDataToUI(isNIRSV5);
 });
 
 // Look for the sensor in the connected devices list.
-// ipcMain.handle(USBDetectionChannels.CHECK_USB, async () => {
-//   // Get all the connected devices.
-//   const USBDevices = await usb.find();
-//   console.log('Check for USB');
+ipcMain.handle(USBDetectionChannels.CHECK_USB, async () => {
+  // Get all the connected devices.
+  const USBDevices = await usbDetect.find();
+  console.log('Check for USB');
 
-//   // TODO: Make this function dynamic so that it checks all available sensors.
-//   // Check if NIRSV5 is available in the list.
-//   const checkForNIRSV5 = USBDevices.filter((device) =>
-//     device.deviceName.includes('STM32')
-//   );
+  // TODO: Make this function dynamic so that it checks all available sensors.
+  // Check if NIRSV5 is available in the list.
+  const checkForNIRSV5 = USBDevices.filter((device) =>
+    device.deviceName.includes('STM32')
+  );
 
-//   // Check if the device is connected and send the result.
-//   const sensorStatus = checkConnectedDevice(checkForNIRSV5[0]);
-//   console.log(sensorStatus);
-//   return sensorStatus;
-// });
+  // Check if the device is connected and send the result.
+  const sensorStatus = checkConnectedDevice(checkForNIRSV5[0]);
+  return sensorStatus;
+});

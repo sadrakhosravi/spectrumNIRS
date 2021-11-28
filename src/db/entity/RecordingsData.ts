@@ -13,11 +13,8 @@ import { Recordings } from 'db/entity/Recordings';
 
 @Entity()
 export class RecordingsData extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ select: false })
   id: number;
-
-  @Column({ type: 'text', nullable: true })
-  values: string;
 
   @Column({ type: 'float' })
   timeStamp: number;
@@ -34,12 +31,18 @@ export class RecordingsData extends BaseEntity {
   @Column({ type: 'float' })
   TOI: number;
 
-  @Column({ type: 'tinyint', nullable: true })
-  hypoxia: string;
+  @Column({ type: 'text', nullable: true })
+  rawValues: string;
 
-  @Column({ type: 'tinyint', nullable: true })
-  event2: string;
+  @Column({ type: 'text', nullable: true })
+  LEDIntensities: string;
 
-  @ManyToOne(() => Recordings)
+  @Column({ type: 'text', nullable: true })
+  gainValues: string;
+
+  @Column({ type: 'text', nullable: true })
+  events: string;
+
+  @ManyToOne(() => Recordings, { select: false })
   recording: Recordings;
 }

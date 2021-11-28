@@ -13,7 +13,7 @@ export const handleRecord = async () => {
     store.getState();
 
   // If there is no experimentData, display error message.
-  if (experimentData.isDataReady) {
+  if (!experimentData.isDataReady) {
     window.api.invokeIPC(DialogBoxChannels.MessageBox, {
       title: 'No Recording Found',
       type: 'error',

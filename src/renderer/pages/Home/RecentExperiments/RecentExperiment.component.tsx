@@ -5,6 +5,7 @@ import {
   resetExperimentData,
   setCurrentExperiment,
 } from '@redux/ExperimentDataSlice';
+import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Icons
 import RecentFileIcon from '@icons/recent-file.svg';
@@ -13,7 +14,7 @@ import RecentFileIcon from '@icons/recent-file.svg';
 import ButtonTitleDescription from '@components/MicroComponents/ButtonTitleDescription/ButtonTitleDescription.component';
 
 // Constants
-import { ModalConstants } from '@utils/constants';
+import { ModalConstants, RecordState } from '@utils/constants';
 import { ExperimentChannels } from '@utils/channels';
 
 interface IProps {
@@ -36,6 +37,7 @@ const RecentExperiment: React.FC<IProps> = ({
 
   const handleOpenExperimentButton = async () => {
     dispatch(resetExperimentData());
+    dispatch(changeRecordState(RecordState.IDLE));
     dispatch(closeModal());
     dispatch(setCurrentExperiment(experiment));
     dispatch(openModal(ModalConstants.OPEN_PATIENT));

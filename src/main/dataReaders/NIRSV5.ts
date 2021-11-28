@@ -18,7 +18,7 @@ let rawData = false;
 let outputArr: number[] = [0, 0, 0, 0, 0];
 let readUSBData: any;
 let lastTimeSequence = 0;
-let timeSequence = 0; // timeSequence in centiseconds
+let timeSequence = 0; // timeSequence in milliseconds
 const databaseArr: any[] = [];
 let databaseCount = 0;
 let Database: RecordData | undefined;
@@ -26,6 +26,11 @@ let Database: RecordData | undefined;
 let events = {
   hypoxia: false,
   event2: false,
+};
+
+const gainValues = {
+  hardware: ['HIGH', 100],
+  software: 1,
 };
 
 /**
@@ -57,7 +62,7 @@ const spawnedProcesses: any[] = [];
  * Send the parsed data through IPC.
  * @param prevTime - Last timestamp (used for pause and continue functions only)
  */
-export const start = (
+export const start = async (
   prevTime = 0,
   isRawData: boolean,
   sender: any,
@@ -65,14 +70,15 @@ export const start = (
 ) => {
   // Check if RawData was requested
   isRawData ? (rawData = true) : (rawData = false);
-
+  console.log('RecordingId:' + recordingId);
   lastTimeSequence = 0;
 
   // Spawn NIRSReader.exe
   readUSBData = spawn(
     path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),
-    ['run', path.join('../../../resources/drivers/nirs-v5/Test1.exe')]
+    ['test', path.join('../../../resources/drivers/nirs-v5/Test1.exe')]
   );
+
   readUSBData.stderr.on('data', (data: string) => {
     console.error(`Log from NIRS Reader: ${data}`);
   });
@@ -85,8 +91,6 @@ export const start = (
 
   // Count variable to keep track of the readline loop
   let count = 0;
-  let dataCount = 0;
-  const dataArr: any[] = [];
 
   Database = new RecordData(recordingId);
 
@@ -152,9 +156,12 @@ export const start = (
         HHb: rawDataArr[2],
         THb: rawDataArr[3],
         TOI: rawDataArr[4],
+        rawValues: rawDataArr.slice(6, 12).join(','),
+        LEDIntensities: rawDataArr.slice(12, 17).join(','),
+        gainValues: JSON.stringify(gainValues),
+        events: JSON.stringify(events),
+        recording: recordingId,
       });
-
-      // Database?.addDataToTransaction(rawDataArr.join(','));
 
       if (databaseCount === 200) {
         Database?.addDataToTransaction(databaseArr);
@@ -162,17 +169,10 @@ export const start = (
         databaseCount = 0;
       }
 
-      dataArr.push(outputArr);
+      sender.send('data:reader-record', outputArr);
 
-      if (dataCount === 3) {
-        sender.send('data:reader-record', dataArr);
-        dataArr.length = 0;
-        dataCount = 0;
-      }
-
-      // Last Step: increment the time sequence +10ms = 1unit (Centiseconds)
-      timeSequence += 10;
-      dataCount++;
+      // Last Step: increment the time sequence +10ms = 1unit (milliseconds)
+      timeSequence += 10; // Increase time by 10 milliseconds
       databaseCount++;
 
       // Save the last time sequence
