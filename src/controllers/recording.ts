@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 
 // Models
 import DataReader from '../main/models/DataReader';
-import Recording from '@electron/models/Recording';
+import RecordingsData from '@electron/models/RecordingsData';
 
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
@@ -87,7 +87,14 @@ ipcMain.handle(
 ipcMain.handle(
   ChartChannels.CheckForData,
   async (_event, recordingId: number) =>
-    await Recording.checkForRecordingData(recordingId)
+    await RecordingsData.checkForRecordingData(recordingId)
+);
+
+// Get RecordingsData based on the given interval
+ipcMain.handle(
+  ChartChannels.GetDataForInterval,
+  async (_event, { recordingId, start, end }) =>
+    await RecordingsData.getRecordingDataForInterval(recordingId, start, end)
 );
 
 // Hypoxia Event

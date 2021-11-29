@@ -1,7 +1,7 @@
 /**
  * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
-import RecordData from '@electron/models/RecordData';
+import RecordingsData from '@electron/models/RecordingsData';
 import net from 'net';
 
 const path = require('path');
@@ -21,7 +21,7 @@ let lastTimeSequence = 0;
 let timeSequence = 0; // timeSequence in milliseconds
 const databaseArr: any[] = [];
 let databaseCount = 0;
-let Database: RecordData | undefined;
+let Database: RecordingsData | undefined;
 
 let events = {
   hypoxia: false,
@@ -92,7 +92,7 @@ export const start = async (
   // Count variable to keep track of the readline loop
   let count = 0;
 
-  Database = new RecordData(recordingId);
+  Database = new RecordingsData(recordingId);
 
   // Read each line from reader.exe stdout.
   rl = readline

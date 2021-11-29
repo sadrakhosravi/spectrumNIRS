@@ -109,7 +109,6 @@ class ChartClass {
             regularProgressiveStep: true,
           },
         })
-        .setDataCleaning({ minDataPointCount: 1 })
         .setStrokeStyle(
           new SolidLine({
             thickness: 2,

@@ -24,7 +24,6 @@ type ChartProps = {
 // Prepares and enders the chart
 const ReviewChart = ({
   type,
-
   recordState,
   setLoading,
   children,
@@ -86,6 +85,7 @@ const ReviewChart = ({
           ChartChannels.CheckForData,
           recordState.id
         );
+        console.log(data);
 
         // If the recording has data, display it and save the last timestamp
         if (data.length !== 0) {

@@ -63,6 +63,7 @@ export const USBDetectionChannels = {
 const ChartBase = 'chart:';
 export const ChartChannels = {
   CheckForData: ChartBase + 'check-for-data',
+  GetDataForInterval: ChartBase + 'get-data-for-interval',
   Event: ChartBase + 'event',
   ExportAll: ChartBase + 'export-all',
 };

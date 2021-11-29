@@ -1,6 +1,5 @@
 import { getConnection } from 'typeorm';
 import { Recordings } from 'db/entity/Recordings';
-import { RecordingsData } from 'db/entity/RecordingsData';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
@@ -53,21 +52,6 @@ export class Recording implements IRecording {
         .orderBy({
           updatedAt: 'DESC',
         })
-        .getRawMany();
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  public static checkForRecordingData = async (recordingId: number) => {
-    try {
-      return await getConnection()
-        .createQueryBuilder()
-        .select()
-        .from(RecordingsData, '')
-        .where('recordingId = :recordingId', { recordingId })
-        .orderBy({ id: 'DESC' })
-        .limit(3000)
         .getRawMany();
     } catch (error: any) {
       throw new Error(error.message);

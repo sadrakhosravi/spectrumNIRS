@@ -8,6 +8,8 @@ import {
   UIBackground,
 } from '@arction/lcjs';
 import ChartOptions from './ChartOptions';
+import { getState } from '@redux/store';
+import { ChartChannels } from '@utils/channels';
 
 class ReviewChart extends Chart {
   numberOfRows: number;
@@ -46,14 +48,74 @@ class ReviewChart extends Chart {
       this.charts,
       this.series
     );
+    this.customizeCharts();
     this.listenForRightArrowKey();
   }
+
+  drawDataOnCharts = (data: any, interval: { start: number; end: number }) => {
+    const DATA_LENGTH = data.length;
+    const dataArr: any[] = [];
+    const dataArr2: any[] = [];
+    const dataArr3: any[] = [];
+    const dataArr4: any[] = [];
+    // Using for loop for fastest possible execution
+    for (let i = 0; i < DATA_LENGTH; i++) {
+      const O2Hb = {
+        x: parseInt(data[i].timeStamp),
+        y: parseFloat(data[i].O2Hb.toFixed(2)),
+      };
+      const HHb = {
+        x: parseInt(data[i].timeStamp),
+        y: parseFloat(data[i].HHb.toFixed(2)),
+      };
+      const THb = {
+        x: parseInt(data[i].timeStamp),
+        y: parseFloat(data[i].THb.toFixed(2)),
+      };
+      const TOI = {
+        x: parseInt(data[i].timeStamp),
+        y: parseFloat(data[i].TOI.toFixed(2)),
+      };
+      dataArr.push(O2Hb);
+      dataArr2.push(HHb);
+      dataArr3.push(THb);
+      dataArr4.push(TOI);
+    }
+    this.clearCharts();
+    this.series && this.series[0].add(dataArr.reverse().splice(0, 3000));
+    this.series && this.series[1].add(dataArr2.reverse().splice(0, 3000));
+    this.series && this.series[2].add(dataArr3.reverse().splice(0, 3000));
+    this.series && this.series[3].add(dataArr4.reverse().splice(0, 3000));
+
+    requestAnimationFrame(() =>
+      this.charts?.forEach((chart) => {
+        chart
+          .getDefaultAxisX()
+          .setInterval(interval.start, interval.end, 0, false);
+      })
+    );
+    requestAnimationFrame(() =>
+      this.charts?.forEach((chart) => {
+        chart.getDefaultAxisY().fit();
+      })
+    );
+  };
 
   listenForRightArrowKey() {
     window.addEventListener('keydown', this.loadDataOnKeyPress);
   }
 
-  loadDataOnKeyPress = (event: KeyboardEvent) => {
+  getIntervalDataAndDraw = async (interval: { start: number; end: number }) => {
+    const recordingId = getState().experimentData?.currentRecording?.id;
+    if (!recordingId) return;
+    const data = await window.api.invokeIPC(ChartChannels.GetDataForInterval, {
+      recordingId,
+      ...interval,
+    });
+    data && this.drawDataOnCharts(data, interval);
+  };
+
+  loadDataOnKeyPress = async (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight' && this.charts) {
       const axisX = this.charts[0].getDefaultAxisX();
       const currentInterval = axisX.getInterval();
@@ -61,11 +123,7 @@ class ReviewChart extends Chart {
         start: currentInterval.start + this.INTERVAL_LENGTH,
         end: currentInterval.end + this.INTERVAL_LENGTH,
       };
-      this.charts.forEach((chart) =>
-        chart
-          .getDefaultAxisX()
-          .setInterval(newInterval.start, newInterval.end, 300, true)
-      );
+      this.getIntervalDataAndDraw(newInterval);
     }
 
     if (event.key === 'ArrowLeft' && this.charts) {
@@ -77,11 +135,9 @@ class ReviewChart extends Chart {
         end: currentInterval.end - this.INTERVAL_LENGTH,
       };
 
-      this.charts.forEach((chart) =>
-        chart
-          .getDefaultAxisX()
-          .setInterval(newInterval.start, newInterval.end, 300, true)
-      );
+      console.log(newInterval);
+
+      this.getIntervalDataAndDraw(newInterval);
     }
   };
 
