@@ -8,6 +8,7 @@ type AppStateSlice = {
   recordSidebar: boolean;
   reviewSidebar: boolean;
   reviewTabInNewWindow: boolean;
+  isLoadingData: boolean;
   isLoading: boolean;
 };
 
@@ -18,6 +19,7 @@ const initialState: AppStateSlice = {
   recordSidebar: true,
   reviewSidebar: true,
   reviewTabInNewWindow: false,
+  isLoadingData: false,
   isLoading: false,
 };
 
@@ -46,6 +48,9 @@ export const AppStateSlice = createSlice({
     setIsAppLoading: (state, { payload }: { payload: boolean }) => {
       state.isLoading = payload;
     },
+    setIsLoadingData: (state, { payload }: { payload: boolean }) => {
+      state.isLoadingData = payload;
+    },
   },
 });
 
@@ -53,11 +58,11 @@ export const {
   changeAppState,
   setRecordChartLoaded,
   setReviewChartLoaded,
-
   setRecordSidebar,
   setReviewSidebar,
   setReviewTabInNewWindow,
   setIsAppLoading,
+  setIsLoadingData,
 } = AppStateSlice.actions;
 
 export default AppStateSlice.reducer;

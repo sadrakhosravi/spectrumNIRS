@@ -7,10 +7,10 @@
   "resolved" "https://registry.npmjs.org/@arction/eventer/-/eventer-1.0.1.tgz"
   "version" "1.0.1"
 
-"@arction/lcjs@^3.2.0":
-  "integrity" "sha512-VxnowdZvuFJreICpVnEpTiDbWnqimKt8D3KlD+V3Lgu1E7Yyz1cGoBnBsIJv4hzci+hkl1g/F6Y7xkHppjq/3Q=="
-  "resolved" "https://registry.npmjs.org/@arction/lcjs/-/lcjs-3.2.0.tgz"
-  "version" "3.2.0"
+"@arction/lcjs@^3.3.0":
+  "integrity" "sha512-Y6gx9rKrwb52j1UIXZLTa3QYVblEWteDPZQ4b4VbqxhO1tIZhIvaS+DWWu+P94YGtLwrt3ypGHHed2lIFUvVLQ=="
+  "resolved" "https://registry.npmjs.org/@arction/lcjs/-/lcjs-3.3.0.tgz"
+  "version" "3.3.0"
   dependencies:
     "@arction/eventer" "^1.0.1"
     "earcut" "^2.2.2"

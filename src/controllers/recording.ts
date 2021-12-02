@@ -97,6 +97,13 @@ ipcMain.handle(
     await RecordingsData.getRecordingDataForInterval(recordingId, start, end)
 );
 
+// Get RecordingsData based on the given interval
+ipcMain.on(
+  ChartChannels.StreamData,
+  async (event, recordingId) =>
+    await RecordingsData.streamRecordingData(recordingId, event.sender)
+);
+
 // Hypoxia Event
 ipcMain.on(ChartChannels.Event, (_event, data: Object) => {
   reader.toggleEvent(data);

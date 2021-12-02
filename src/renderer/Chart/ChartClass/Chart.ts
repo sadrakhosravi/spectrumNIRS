@@ -208,7 +208,7 @@ class ChartClass {
       if (this.channels[i] === 'TOI') {
         legendLayout
           .addElement(UIElementBuilders.TextBox)
-          .setMargin({ top: 5 })
+          .setMargin({ top: 15 })
           .setText(this.channels[i])
           .setTextFont((font: any) => font.setSize(16));
 
@@ -221,7 +221,7 @@ class ChartClass {
         legendLayout
           .addElement(UIElementBuilders.TextBox)
           .setText(this.channels[i])
-          .setMargin({ top: 5 })
+          .setMargin({ top: 15 })
           .setTextFont((font: any) => font.setSize(16));
       }
 

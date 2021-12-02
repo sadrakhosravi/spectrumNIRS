@@ -10,8 +10,6 @@ import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
-import { ChartChannels } from '@utils/channels';
-import { useLocation } from 'react-router';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -29,13 +27,11 @@ const ReviewChart = ({
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
   // const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
-
-  const location = useLocation();
+  const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
 
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
@@ -63,6 +59,7 @@ const ReviewChart = ({
       chartRef.current = chart as any;
 
       setChartLoaded(true);
+      setLoading(false);
     });
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -73,62 +70,24 @@ const ReviewChart = ({
       chart = undefined;
       chartRef.current = null;
     };
-  }, []);
-
-  // Check if the current recording has data
-  useEffect(() => {
-    if (location.pathname.includes('review') && dataLoaded === false) {
-      setLoading(true);
-
-      requestAnimationFrame(async () => {
-        const data: any[] = await window.api.invokeIPC(
-          ChartChannels.CheckForData,
-          recordState.id
-        );
-        console.log(data);
-
-        // If the recording has data, display it and save the last timestamp
-        if (data.length !== 0) {
-          data &&
-            data.reverse().forEach((dataPoint: any) => {
-              const sensorData = [
-                dataPoint.timeStamp,
-                dataPoint.O2Hb,
-                dataPoint.HHb,
-                dataPoint.THb,
-                dataPoint.TOI,
-              ];
-              requestAnimationFrame(() => {
-                setTimeout(() => {
-                  chartRef.current &&
-                    chartRef.current?.series?.forEach(
-                      (series: any, i: number) => {
-                        series.add({ x: sensorData[0], y: sensorData[i + 1] });
-                      }
-                    );
-                }, 100);
-              });
-            });
-        }
-      });
-    }
-    setDataLoaded(true);
-    requestAnimationFrame(() => setLoading(false));
-  }, [location]);
+  }, [recordState]);
 
   useEffect(() => {
-    setDataLoaded(false);
-  }, [recordState.id]);
+    requestAnimationFrame(() => {
+      const container = document.getElementById(containerId) as HTMLElement;
+      const { offsetWidth, offsetHeight } = container;
+      //@ts-ignore
+      chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
+      chartRef.current && chartRef.current?.dashboard?.setHeight(offsetHeight);
 
-  // useEffect(() => {
-  //   requestAnimationFrame(() => {
-  //     const container = document.getElementById(containerId) as HTMLElement;
-  //     const { offsetWidth } = container;
-  //     //@ts-ignore
-  //     chartRef.current && chartRef.current.dashboard.setWidth(offsetWidth);
-  //     container.style.overflowX = 'hidden';
-  //   });
-  // }, [reviewSidebar]);
+      container.style.overflowX = 'hidden';
+      container.style.overflowY = 'hidden';
+    });
+  }, [reviewSidebar]);
+
+  useEffect(() => {
+    chartLoaded && chartRef.current && chartRef.current.loadInitialData();
+  }, [chartLoaded]);
 
   return (
     <>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAppDispatch } from '@redux/hooks/hooks';
 import { setPatientData, setRecordingData } from '@redux/ExperimentDataSlice';
 import { closeModal } from '@redux/ModalStateSlice';
-import { changeAppState } from '@redux/AppStateSlice';
 
 // Icons
 import PatientIcon from '@icons/user-checked.svg';
@@ -11,7 +10,6 @@ import RecordingIcon from '@icons/raw-data.svg';
 
 // Constants
 import { ExperimentChannels } from '@utils/channels';
-import { AppState } from '@utils/constants';
 
 type PatientData = {
   createdAt: string;
@@ -40,7 +38,6 @@ const SelectPatient = ({ patient }: { patient: PatientData }) => {
     dispatch(setPatientData(patient));
     dispatch(setRecordingData(recording));
     dispatch(closeModal());
-    dispatch(changeAppState(AppState.RECORD));
   };
 
   return (

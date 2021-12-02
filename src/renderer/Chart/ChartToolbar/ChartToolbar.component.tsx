@@ -7,6 +7,7 @@ import Separator from '@components/Separator/Separator.component';
 import IconButton from '@components/Buttons/IconButton.component';
 import IconTextButton from '@components/Buttons/IconTextButton.component';
 import withTooltip from '@hoc/withTooltip.hoc';
+import TimeDivision from './TimeDivision.component';
 
 // Constants
 import { ChartType } from '@utils/constants';
@@ -41,8 +42,16 @@ const ChartToolbar = ({
                 //@ts-ignore
                 option.click && option.click(chartOptions)
               }
-              tooltip={option.tooltip}
+              tooltip={
+                option.tooltip === 'timeDivision' ? (
+                  <TimeDivision chartOptions={chartOptions} />
+                ) : (
+                  option.tooltip
+                )
+              }
+              interactive={option.tooltip === 'timeDivision'}
               key={index}
+              disabled={true}
             />
           );
         })}

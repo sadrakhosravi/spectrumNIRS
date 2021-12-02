@@ -4,7 +4,7 @@ import React from 'react';
 import IconText from '@components/MicroComponents/IconText/IconText.component';
 
 interface IProps {
-  icon: string;
+  icon?: string;
   text?: string;
   darker?: boolean;
   isActive?: boolean;

@@ -1,4 +1,5 @@
 // import db from 'db/models/index';
+import AccurateTimer from '@electron/helpers/accurateTimer';
 import { RecordingsData } from 'db/entity/RecordingsData';
 import { getConnection } from 'typeorm';
 class RecordData {
@@ -53,6 +54,37 @@ class RecordData {
         .andWhere('timeStamp <= :end', { end })
         .orderBy({ id: 'DESC' })
         .getRawMany();
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
+
+  public static streamRecordingData = async (
+    recordingId: number,
+    sender: any
+  ) => {
+    try {
+      let offset = 0;
+      let LIMIT = 3000;
+      let data = [];
+      const dataStream = new AccurateTimer(async () => {
+        data = await getConnection()
+          .createQueryBuilder()
+          .select()
+          .from(RecordingsData, '')
+          .where('recordingId = :recordingId', { recordingId })
+          .orderBy({ id: 'ASC' })
+          .limit(LIMIT)
+          .offset(offset)
+          .getRawMany();
+        if (data.length === 0) {
+          dataStream.stop();
+          return;
+        }
+        sender.send('test:stream-data', data);
+        offset += LIMIT;
+      }, 50);
+      dataStream.start();
     } catch (error: any) {
       throw new Error(error.message);
     }

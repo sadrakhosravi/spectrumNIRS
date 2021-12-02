@@ -9,6 +9,7 @@ class ChartOptions {
   series: any;
   customTicks: any[];
   constantLines: any[];
+  timeDivision: number;
 
   constructor(channels: string[], dashboard: any, charts: any, series: any) {
     this.channels = channels;
@@ -17,16 +18,53 @@ class ChartOptions {
     this.series = series;
     this.customTicks = [];
     this.constantLines = [];
+    this.timeDivision = 30 * 1000; // Time in milliseconds - default 30s
   }
 
+  /**
+   * Resets the height of each chart back to default equal heights
+   */
   resetChartsHeight() {
-    this.channels.forEach((_, i: number) => {
-      this.dashboard.setRowHeight(i, 1);
-    });
+    this.dashboard.setRowHeight(0, 1);
+    this.dashboard.setRowHeight(1, 1);
+    this.dashboard.setRowHeight(2, 1);
+    this.dashboard.setRowHeight(3, 1);
+    this.dashboard.setRowHeight(4, 0.7);
   }
 
+  /**
+   * Takes a screenshot of the chart area
+   */
   screenshot() {
     this.dashboard.saveToFile('Sensor Data');
+  }
+
+  /**
+   * Sets the new time division to be used for the related chart
+   * @param newTimeDivision - New time division to be set in milliseconds
+   */
+  setTimeDivision(newTimeDivision: number) {
+    this.timeDivision = newTimeDivision;
+    if (this.charts) {
+      const currentInterval = this.charts[0].getDefaultAxisX().getInterval();
+      console.log(currentInterval);
+      this.charts[0]
+        .getDefaultAxisX()
+        .setInterval(
+          currentInterval.start,
+          currentInterval.start + this.timeDivision,
+          0,
+          true
+        );
+    }
+  }
+
+  /**
+   * Gets the current time division in milliseconds `default: 30s`
+   * @returns current time division in milliseconds
+   */
+  getTimeDivision() {
+    return this.timeDivision;
   }
 
   addMarker(name: string, color: string) {

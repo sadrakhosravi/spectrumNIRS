@@ -7,6 +7,7 @@ import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import RawDataIcon from '@icons/raw-data.svg';
 import ExportTxtIcon from '@icons/export-txt.svg';
+import TimeDivisionIcon from '@icons/time-division.svg';
 
 import toast from 'react-hot-toast';
 
@@ -86,7 +87,6 @@ export const ReviewToolbar = [
   {
     label: 'separator',
   },
-
   {
     label: `exporttxt`,
     tooltip: 'Export Text File',
@@ -113,5 +113,14 @@ export const ReviewToolbar = [
         success: 'Export Completed!',
       });
     },
+  },
+  {
+    label: 'separator',
+  },
+  {
+    label: 'timeDivision',
+    tooltip: 'timeDivision',
+    icon: TimeDivisionIcon,
+    click: () => {},
   },
 ];
