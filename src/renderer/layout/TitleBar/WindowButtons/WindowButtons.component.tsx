@@ -1,13 +1,18 @@
 //Contains minimize, restore/maximize, and close button for the titlebar.
 
 import React, { useEffect, useState } from 'react';
+import { useAppDispatch } from '@redux/hooks/hooks';
+
+// Icons
 import Minimize from '@icons/minimize.svg';
 import Restore from '@icons/restore.svg';
 import Close from '@icons/close.svg';
 import Maximize from '@icons/maximize.svg';
+import { setWindowResized } from '@redux/AppStateSlice';
 
 const WindowButtons = () => {
   const [isMaximized, setIsMaximized] = useState(true);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     window.api.onIPCData('window:unmaximize', () => {
@@ -17,6 +22,12 @@ const WindowButtons = () => {
       console.log('Maximize');
 
       setIsMaximized(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    window.api.onIPCData('window:resize', () => {
+      dispatch(setWindowResized(Math.random()));
     });
   }, []);
 

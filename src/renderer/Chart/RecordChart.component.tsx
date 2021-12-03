@@ -38,16 +38,14 @@ const RecordChart = ({
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
+  const windowResized = useAppSelector((state) => state.appState.windowResized);
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
-  // const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
   const containerId = 'recordChart';
   const chartRef = useRef<RecordChartClass | null>(null);
 
   let chart: RecordChartClass | undefined;
-
-  console.log(chartLoaded);
 
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useEffect(() => {
@@ -155,7 +153,7 @@ const RecordChart = ({
       container.style.overflowX = 'hidden';
       container.style.overflowY = 'hidden';
     });
-  }, [recordSidebar]);
+  }, [recordSidebar, windowResized]);
 
   return (
     <>

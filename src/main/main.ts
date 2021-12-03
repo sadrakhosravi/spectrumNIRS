@@ -81,6 +81,10 @@ const createMainWindow = async () => {
     mainWindow?.webContents.send('window:unmaximize');
   });
 
+  mainWindow.on('resize', () => {
+    mainWindow?.webContents.send('window:resize');
+  });
+
   // Maximize event
   mainWindow.on('maximize', () => {
     console.log('Maximized');

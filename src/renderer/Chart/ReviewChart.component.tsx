@@ -27,12 +27,12 @@ const ReviewChart = ({
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
-  // const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
+
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
   const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
-
+  const windowResized = useAppSelector((state) => state.appState.windowResized);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
 
@@ -83,7 +83,7 @@ const ReviewChart = ({
       container.style.overflowX = 'hidden';
       container.style.overflowY = 'hidden';
     });
-  }, [reviewSidebar]);
+  }, [reviewSidebar, windowResized]);
 
   useEffect(() => {
     chartLoaded && chartRef.current && chartRef.current.loadInitialData();

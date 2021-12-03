@@ -67,6 +67,7 @@ class ChartClass {
       numberOfColumns: 2, //Full width
       container, //div id to attach to
       disableAnimations: true,
+      antialias: true,
       theme: Themes.darkGold,
     });
     dashboard.setBackgroundFillStyle(

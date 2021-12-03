@@ -30,8 +30,8 @@ const ChartToolbar = ({
   const toolbarMenu = type === ChartType.RECORD ? RecordToolbar : ReviewToolbar;
 
   return (
-    <div className="w-full bg-grey1 px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-2 items-center relative">
-      <div className="grid grid-flow-col auto-cols-max items-center gap-1">
+    <div className="w-full bg-grey1 px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-6 items-center relative">
+      <div className="grid grid-flow-col col-span-4 auto-cols-max items-center gap-1">
         {toolbarMenu.map((option, index) => {
           if (option.label === 'separator') return <Separator key={index} />;
           return (
@@ -58,7 +58,7 @@ const ChartToolbar = ({
       </div>
 
       {/* Stop Start Button */}
-      <div className="grid grid-flow-col auto-cols-max items-center gap-3 justify-end">
+      <div className="grid grid-flow-col col-span-2 auto-cols-max items-center gap-3 justify-end">
         <div className="grid grid-flow-col auto-cols-max gap-3">
           {type === ChartType.RECORD &&
             RecordButtons.map((button, index) => (

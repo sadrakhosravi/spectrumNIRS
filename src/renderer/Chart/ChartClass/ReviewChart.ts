@@ -128,13 +128,18 @@ class ReviewChart extends Chart {
       dataArr4.push(TOI);
     }
 
-    const plottingTimer = new AccurateTimer(() => {
-      this.series && this.series[0].add(dataArr.splice(0, 10000));
-      this.series && this.series[1].add(dataArr2.splice(0, 10000));
-      this.series && this.series[2].add(dataArr3.splice(0, 10000));
-      this.series && this.series[3].add(dataArr4.splice(0, 10000));
+    this.clearCharts();
 
-      this.charts?.forEach((chart) => chart.getDefaultAxisY().fit());
+    const plottingTimer = new AccurateTimer(() => {
+      requestAnimationFrame(() => {
+        this.series && this.series[0].add(dataArr.splice(0, 10000));
+        this.series && this.series[1].add(dataArr2.splice(0, 10000));
+        this.series && this.series[2].add(dataArr3.splice(0, 10000));
+        this.series && this.series[3].add(dataArr4.splice(0, 10000));
+      });
+      requestAnimationFrame(() => {
+        this.charts?.forEach((chart) => chart.getDefaultAxisY().fit());
+      });
 
       if (dataArr.length === 0) {
         plottingTimer.stop();
@@ -233,7 +238,12 @@ class ReviewChart extends Chart {
         data.reverse();
         this.XMax = data[data.length - 1].timeStamp;
         this.drawDataOnCharts(data, { start: 0, end: 300000 });
-        console.log(data[0]);
+        const currentInterval =
+          this.charts && this.charts[0].getDefaultAxisX().getInterval();
+        console.log(currentInterval, this.XMax);
+        this.zoomBandChart
+          ?.getDefaultAxisX()
+          .setInterval(currentInterval.start, currentInterval.end);
       } else {
         this.isLoadingData = false;
         this.endOfData = true;
@@ -288,7 +298,7 @@ class ReviewChart extends Chart {
 
       // Automatic Data Cleaning
 
-      this.series && this.series[i].setDataCleaningThreshold(3000);
+      this.series && this.series[i].setMaxPointCount(1000);
 
       this.dashboard?.setRowHeight(i, 1);
 

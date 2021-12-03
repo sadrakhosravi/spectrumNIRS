@@ -3,6 +3,7 @@ import { AppState } from 'utils/constants';
 
 type AppStateSlice = {
   value: AppState;
+  windowResized: number;
   recordChartLoaded: boolean;
   reviewChartLoaded: boolean;
   recordSidebar: boolean;
@@ -14,6 +15,7 @@ type AppStateSlice = {
 
 const initialState: AppStateSlice = {
   value: AppState.HOME,
+  windowResized: 0,
   recordChartLoaded: false,
   reviewChartLoaded: false,
   recordSidebar: true,
@@ -29,6 +31,9 @@ export const AppStateSlice = createSlice({
   reducers: {
     changeAppState: (state, action) => {
       state.value = action.payload;
+    },
+    setWindowResized: (state, { payload }: { payload: number }) => {
+      state.windowResized = payload;
     },
     setRecordChartLoaded: (state, { payload }: { payload: boolean }) => {
       state.recordChartLoaded = payload;
@@ -56,6 +61,7 @@ export const AppStateSlice = createSlice({
 
 export const {
   changeAppState,
+  setWindowResized,
   setRecordChartLoaded,
   setReviewChartLoaded,
   setRecordSidebar,
