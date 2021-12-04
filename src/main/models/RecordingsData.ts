@@ -89,6 +89,21 @@ class RecordData {
       throw new Error(error.message);
     }
   };
+
+  public static getAllEvents = async (recordingId: number) => {
+    try {
+      return await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(RecordingsData, '')
+        .where('recordingId = :recordingId', { recordingId })
+        .andWhere('event = 1')
+        .orderBy({ id: 'DESC' })
+        .getRawMany();
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
 }
 
 export default RecordData;

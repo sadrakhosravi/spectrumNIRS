@@ -9,6 +9,8 @@ export type ChartSliceType = {
   rawdata: boolean;
   hypoxia: boolean;
   event2: boolean;
+  allEvents: any[] | null;
+  currentEventTimeStamp: number;
   exporttxt: boolean;
   exportStatus: ExportStatus;
   reviewXInterval: {
@@ -21,6 +23,8 @@ const initialState: ChartSliceType = {
   rawdata: false,
   hypoxia: false,
   event2: false,
+  allEvents: null,
+  currentEventTimeStamp: 0,
   exporttxt: false,
   exportStatus: 'idle',
   reviewXInterval: {
@@ -55,6 +59,12 @@ export const ChartSlice = createSlice({
       // Send the state to the controller
       window.api.sendIPC(ChartChannels.Event, { event2: state.event2 });
     },
+    setAllEvents: (state, { payload }: { payload: any[] }) => {
+      state.allEvents = payload;
+    },
+    setCurrentEventTimeStamp: (state, { payload }: { payload: number }) => {
+      state.currentEventTimeStamp = payload;
+    },
     toggleExportTxt: (state) => {
       state.exporttxt = !state.exporttxt;
     },
@@ -75,6 +85,8 @@ export const {
   toggleRawData,
   toggleHypoxia,
   toggleEvent2,
+  setAllEvents,
+  setCurrentEventTimeStamp,
   toggleExportTxt,
   setExportStatus,
   setReviewXInterval,

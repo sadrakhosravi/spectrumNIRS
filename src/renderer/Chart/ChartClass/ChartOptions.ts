@@ -1,6 +1,8 @@
 import { ColorHEX, Dashboard, SolidFill, SolidLine } from '@arction/lcjs';
-
-import { getState } from '@redux/store';
+import { setAllEvents } from '@redux/ChartSlice';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import { getState, dispatch } from '@redux/store';
 
 class ChartOptions {
   channels: string[];
@@ -101,6 +103,78 @@ class ChartOptions {
     });
 
     this.customTicks.push(customTick);
+  }
+
+  drawMarker(xValue: number, name: string, color: string) {
+    const axisX =
+      this.charts && this.charts[this.charts.length - 1].getDefaultAxisX();
+
+    const customTick = axisX
+      .addCustomTick()
+      .setValue(xValue)
+      .setTextFormatter((_value: any) => name);
+
+    this.charts.forEach((chart: any) => {
+      const cl = chart.getDefaultAxisX().addConstantLine();
+      cl.setName('CL')
+        .setValue(xValue)
+        .setHighlightOnHover(true)
+        .setMouseInteractions(false)
+
+        .setStrokeStyle(
+          new SolidLine({
+            thickness: 4,
+            fillStyle: new SolidFill({ color: ColorHEX(color) }),
+          })
+        );
+      this.constantLines.push(cl);
+    });
+    return customTick;
+  }
+
+  /**
+   * Adds the given events to each chart
+   * @param events Array of events
+   */
+  addEventsToCharts(data: any[]) {
+    dayjs.extend(duration);
+    const DATA_LENGTH = data.length;
+    const eventsArr = [];
+    let hypoxia = false;
+    let event2 = false;
+    // Using for loop for maximum performance
+    for (let i = 0; i < DATA_LENGTH; i++) {
+      const events = JSON.parse(data[i].events);
+      if (events.hypoxia && !hypoxia) {
+        this.drawMarker(data[i].timeStamp, 'Hypoxia: Start', '#FFF');
+        eventsArr.push({
+          timeStamp: data[i].timeStamp,
+          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          name: 'Hypoxia',
+          color: '#FFF',
+        });
+        hypoxia = true;
+      }
+      if (!events.hypoxia && hypoxia) {
+        this.drawMarker(data[i].timeStamp, 'Hypoxia: End', '#FFF');
+        hypoxia = false;
+      }
+      if (events.event2 && !event2) {
+        this.drawMarker(data[i].timeStamp, 'Event2', '#333');
+        event2 = true;
+        eventsArr.push({
+          timeStamp: data[i].timeStamp,
+          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          name: 'Event2',
+          color: '#FFF',
+        });
+      }
+      if (!events.event2 && event2) {
+        this.drawMarker(data[i].timeStamp, 'Event2: End', '#333');
+        event2 = false;
+      }
+    }
+    dispatch(setAllEvents(eventsArr));
   }
 
   clearCharts() {

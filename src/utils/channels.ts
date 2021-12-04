@@ -64,6 +64,7 @@ const ChartBase = 'chart:';
 export const ChartChannels = {
   CheckForData: ChartBase + 'check-for-data',
   GetDataForInterval: ChartBase + 'get-data-for-interval',
+  GetAllEvents: ChartBase + 'get-all-events',
   StreamData: ChartBase + 'stream-data',
   Event: ChartBase + 'event',
   ExportAll: ChartBase + 'export-all',

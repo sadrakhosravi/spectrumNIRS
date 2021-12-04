@@ -40,6 +40,9 @@ export class RecordingsData extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   gainValues: string;
 
+  @Column({ type: 'tinyint', nullable: true })
+  event: number;
+
   @Column({ type: 'text', nullable: true })
   events: string;
 

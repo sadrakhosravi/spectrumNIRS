@@ -91,6 +91,8 @@ export const start = async (
 
   // Count variable to keep track of the readline loop
   let count = 0;
+  let sendCount = 0;
+  let sendArr: any[] = [];
 
   Database = new RecordingsData(recordingId);
 
@@ -159,6 +161,7 @@ export const start = async (
         rawValues: rawDataArr.slice(6, 12).join(','),
         LEDIntensities: rawDataArr.slice(12, 17).join(','),
         gainValues: JSON.stringify(gainValues),
+        event: Object.values(events).some((event) => event === true) ? 1 : null,
         events: JSON.stringify(events),
         recording: recordingId,
       });
@@ -169,11 +172,18 @@ export const start = async (
         databaseCount = 0;
       }
 
-      sender.send('data:reader-record', outputArr);
+      if (sendCount === 3) {
+        sender.send('data:reader-record', sendArr);
+        sendArr.length = 0;
+        sendCount = 0;
+      }
+
+      sendArr.push(outputArr);
 
       // Last Step: increment the time sequence +10ms = 1unit (milliseconds)
       timeSequence += 10; // Increase time by 10 milliseconds
       databaseCount++;
+      sendCount++;
 
       // Save the last time sequence
       lastTimeSequence = timeSequence;

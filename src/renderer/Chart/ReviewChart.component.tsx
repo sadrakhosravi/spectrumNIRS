@@ -31,6 +31,9 @@ const ReviewChart = ({
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
+  const currentTimeStamp = useAppSelector(
+    (state) => state.chartState.currentEventTimeStamp
+  );
   const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
   const windowResized = useAppSelector((state) => state.appState.windowResized);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
@@ -88,6 +91,11 @@ const ReviewChart = ({
   useEffect(() => {
     chartLoaded && chartRef.current && chartRef.current.loadInitialData();
   }, [chartLoaded]);
+
+  useEffect(() => {
+    console.log(currentTimeStamp);
+    chartRef.current?.setInterval(currentTimeStamp);
+  }, [currentTimeStamp]);
 
   return (
     <>

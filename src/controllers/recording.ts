@@ -97,6 +97,12 @@ ipcMain.handle(
     await RecordingsData.getRecordingDataForInterval(recordingId, start, end)
 );
 
+// Get all events
+ipcMain.handle(
+  ChartChannels.GetAllEvents,
+  async (_event, recordingId) => await RecordingsData.getAllEvents(recordingId)
+);
+
 // Get RecordingsData based on the given interval
 ipcMain.on(
   ChartChannels.StreamData,

@@ -5,6 +5,7 @@ import {
   AxisTickStrategies,
   ChartXY,
   ColorHEX,
+  ColorRGBA,
   Dashboard,
   emptyFill,
   // emptyFill,
@@ -76,6 +77,7 @@ class ReviewChart extends Chart {
     this.synchronizeXAxis(this.charts);
     this.customizeZoomBandChart();
     this.checkIntervalChange();
+    this.loadAllEvents();
   }
 
   loadInitialData = async () => {
@@ -104,6 +106,7 @@ class ReviewChart extends Chart {
     const dataArr2: any[] = [];
     const dataArr3: any[] = [];
     const dataArr4: any[] = [];
+    const events: any[] = [];
     // Using for loop for fastest possible execution
     for (let i = 0; i < DATA_LENGTH; i++) {
       const O2Hb = {
@@ -122,13 +125,12 @@ class ReviewChart extends Chart {
         x: parseInt(data[i].timeStamp),
         y: parseFloat(data[i].TOI.toFixed(2)),
       };
+      data[i].events && events.push(data[i]);
       dataArr.push(O2Hb);
       dataArr2.push(HHb);
       dataArr3.push(THb);
       dataArr4.push(TOI);
     }
-
-    this.clearCharts();
 
     const plottingTimer = new AccurateTimer(() => {
       requestAnimationFrame(() => {
@@ -142,6 +144,8 @@ class ReviewChart extends Chart {
       });
 
       if (dataArr.length === 0) {
+        this.chartOptions?.addEventsToCharts(events);
+
         plottingTimer.stop();
         return;
       }
@@ -191,9 +195,12 @@ class ReviewChart extends Chart {
     }
   };
 
-  setInterval(start: number, end: number) {
+  setInterval(start: number, end?: number) {
+    const timeDivision = this.chartOptions?.getTimeDivision() as number;
     if (this.charts) {
-      this.charts[0].getDefaultAxisX().setInterval(start, end, 0, true);
+      this.charts[0]
+        .getDefaultAxisX()
+        .setInterval(start, end || start + timeDivision, 0, true);
     }
   }
 
@@ -227,29 +234,29 @@ class ReviewChart extends Chart {
       const data = await window.api.invokeIPC(
         ChartChannels.GetDataForInterval,
         {
-          recordingId: 2,
+          recordingId: getState().experimentData.currentRecording.id,
           start: this.XMax,
           end: this.XMax + 300000,
         }
       );
-      console.log(data.length);
-      console.log(data[data.length - 1]);
       if (data.length > 1) {
         data.reverse();
         this.XMax = data[data.length - 1].timeStamp;
         this.drawDataOnCharts(data, { start: 0, end: 300000 });
-        const currentInterval =
-          this.charts && this.charts[0].getDefaultAxisX().getInterval();
-        console.log(currentInterval, this.XMax);
-        this.zoomBandChart
-          ?.getDefaultAxisX()
-          .setInterval(currentInterval.start, currentInterval.end);
       } else {
         this.isLoadingData = false;
         this.endOfData = true;
         dispatch(setIsLoadingData(false));
       }
     }
+  };
+
+  loadAllEvents = async () => {
+    const data = await window.api.invokeIPC(
+      ChartChannels.GetAllEvents,
+      getState().experimentData.currentRecording.id
+    );
+    console.log(data);
   };
 
   createZoomBandChart() {
@@ -267,6 +274,15 @@ class ReviewChart extends Chart {
   customizeZoomBandChart() {
     this.zoomBandChart?.band.setValueStart(0);
     this.zoomBandChart?.band.setValueEnd(30000);
+    this.zoomBandChart?.band.setFillStyle(
+      new SolidFill({ color: ColorRGBA(255, 255, 255, 50) })
+    );
+    this.zoomBandChart?.band.setStrokeStyle(
+      new SolidLine({
+        thickness: 2,
+        fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255, 150) }),
+      })
+    );
     this.zoomBandChart
       ?.getDefaultAxisX()
       .setTickStrategy(AxisTickStrategies.Time);
@@ -298,7 +314,8 @@ class ReviewChart extends Chart {
 
       // Automatic Data Cleaning
 
-      this.series && this.series[i].setMaxPointCount(1000);
+      this.series &&
+        this.series[i].setDataCleaning({ minDataPointCount: 30000 });
 
       this.dashboard?.setRowHeight(i, 1);
 

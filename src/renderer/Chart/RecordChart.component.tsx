@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { changeRecordState } from '@redux/RecordStateSlice';
+import { useLocation } from 'react-router';
 
 //HOC
 import withLoading from '@hoc/withLoading.hoc';
@@ -11,15 +12,10 @@ import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType, RecordState } from 'utils/constants';
-import { setPreviousData } from '@redux/ExperimentDataSlice';
-import { ChartChannels } from '@utils/channels';
-// import { ChartChannels } from '@utils/channels';
-// import { setPreviousData } from '@redux/ExperimentDataSlice';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
   recordChartLoaded: boolean;
-  recordState: any;
   setLoading: any;
   children: JSX.Element[];
 };
@@ -29,14 +25,18 @@ const RecordChart = ({
   type,
   recordChartLoaded,
   setLoading,
-  recordState,
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
   const [chartState, setChartState] = useState<null | RecordChartClass>(null);
+  const [newData, setNewData] = useState(false);
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
+  );
+  const recordingId = useAppSelector(
+    (state) => state.experimentData.currentRecording.id
   );
   const windowResized = useAppSelector((state) => state.appState.windowResized);
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
@@ -49,33 +49,35 @@ const RecordChart = ({
 
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useEffect(() => {
-    requestAnimationFrame(() => {
-      if (!chart) {
-        console.log('RECORD CHARTTT');
+    if (location.pathname === '/main/recording/record' && !chartLoaded) {
+      requestAnimationFrame(() => {
+        if (!chart) {
+          console.log('RECORD CHARTTT');
 
-        // Create chart, series and any other static components.
-        console.log('create chart');
-        // Store references to chart components.
-        chart = new RecordChartClass(
-          channels || ['No Channels Found'],
-          type,
-          samplingRate,
-          containerId
-        );
+          // Create chart, series and any other static components.
+          console.log('create chart');
+          // Store references to chart components.
+          chart = new RecordChartClass(
+            channels || ['No Channels Found'],
+            type,
+            samplingRate,
+            containerId
+          );
 
-        chart.createRecordChart();
+          chart.createRecordChart();
 
-        // Attach event listeners
-        chart.listenForData();
+          // Attach event listeners
+          chart.listenForData();
 
-        // Keep a ref to the chart
-        chartRef.current = chart as RecordChartClass;
+          // Keep a ref to the chart
+          chartRef.current = chart as RecordChartClass;
 
-        setChartLoaded(true);
-        setChartState(chart);
-        setLoading(false);
-      }
-    });
+          setChartLoaded(true);
+          setChartState(chart);
+          setLoading(false);
+        }
+      });
+    }
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -91,55 +93,17 @@ const RecordChart = ({
   }, [recordChartLoaded]);
 
   useEffect(() => {
+    setNewData(true);
     chartRef.current?.clearCharts();
-  }, [recordState]);
+  }, [recordingId]);
 
-  // Check if the current recording has data
   useEffect(() => {
-    setLoading(true);
-
-    requestAnimationFrame(async () => {
-      const data: any[] = await window.api.invokeIPC(
-        ChartChannels.CheckForData,
-        recordState.id
-      );
-
-      console.log(data);
-
-      // If the recording has data, display it and save the last timestamp
-      if (data.length !== 0) {
-        data &&
-          data.reverse().forEach((dataPoint: any) => {
-            const sensorData = [
-              dataPoint.timeStamp,
-              dataPoint.O2Hb,
-              dataPoint.HHb,
-              dataPoint.THb,
-              dataPoint.TOI,
-            ];
-            requestAnimationFrame(() => {
-              setTimeout(() => {
-                chartRef.current &&
-                  chartRef.current?.series?.forEach(
-                    (series: any, i: number) => {
-                      series.add({ x: sensorData[0], y: sensorData[i + 1] });
-                    }
-                  );
-              }, 100);
-            });
-          });
-
-        const lastTimeStamp = data[data.length - 1].timeStamp;
-        dispatch(
-          setPreviousData({
-            timeStamp: parseFloat(lastTimeStamp),
-            hasPreviousData: true,
-          })
-        );
-      }
-    });
-    requestAnimationFrame(() => setLoading(false));
-  }, [recordState.id]);
+    if (location.pathname === '/main/recording/record' && newData) {
+      chartRef.current?.clearCharts();
+      chartRef.current?.loadLatestData();
+      setNewData(false);
+    }
+  }, [newData, location]);
 
   // Adjust chart width and height on sidebar resize
   useEffect(() => {

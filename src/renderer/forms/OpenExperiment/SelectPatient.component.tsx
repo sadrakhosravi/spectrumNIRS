@@ -88,6 +88,12 @@ const SelectPatient = ({ patient }: { patient: PatientData }) => {
                 <span className="w-1/3 text-right">
                   {recording.updatedAt.split(' ')[0]}
                 </span>
+                <span
+                  onClick={() => console.log('Test')}
+                  title="Delete Recording Data!"
+                >
+                  ❌
+                </span>
               </button>
             </div>
           ))}

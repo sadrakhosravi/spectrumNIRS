@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
+import { setCurrentEventTimeStamp } from '@redux/ChartSlice';
 
 // HOC
 import withLoading from '@hoc/withLoading.hoc';
@@ -15,8 +17,9 @@ import LoadIcon from '@icons/load.svg';
 //Renders the filter widget on the sidebar
 const EventsWidget = ({ setLoading, children }: any) => {
   const [currentTab, setCurrentTab] = useState(0);
+  const dispatch = useAppDispatch();
   const { register, handleSubmit } = useForm();
-
+  const allEvents = useAppSelector((state) => state.chartState.allEvents);
   const onTimeFormSubmit = (data: any) => {
     console.log(data);
   };
@@ -25,7 +28,7 @@ const EventsWidget = ({ setLoading, children }: any) => {
     setLoading(false);
   }, []);
   return (
-    <div className="bg-grey3 h-[calc(66.7%-3rem)] rounded-b-md duration-300 hover:drop-shadow-xl">
+    <div className="bg-grey3 h-[calc(66.7%-3rem)] rounded-b-md">
       <Header>
         <TabButton
           text="Events"
@@ -33,7 +36,7 @@ const EventsWidget = ({ setLoading, children }: any) => {
           onClick={() => setCurrentTab(0)}
         />
         <TabButton
-          text="Events"
+          text="Quick Actions"
           isActive={currentTab === 1}
           onClick={() => setCurrentTab(1)}
         />
@@ -43,6 +46,30 @@ const EventsWidget = ({ setLoading, children }: any) => {
 
       <div className="px-4 py-4">
         <div hidden={currentTab !== 0}>
+          <h3 className="text-xl font-medium">All Events:</h3>
+          <div className="overflow-y-auto">
+            <ul className="my-4 bg-grey1 p-3 w-full rounded-md">
+              <li className="w-full border-b-grey2 border-b-2 h-8 flex items-center mb-2">
+                <span className="w-2/3">Name</span>
+                <span className="w-1/3">Time</span>
+              </li>
+              <div className="h-72 overflow-y-auto  overflow-x-hidden">
+                {allEvents?.map((event: any) => (
+                  <li
+                    className="w-full h-8 flex items-center cursor-pointer"
+                    onClick={() => {
+                      dispatch(setCurrentEventTimeStamp(event.timeStamp));
+                    }}
+                  >
+                    <span className="w-2/3"> {event.name}</span>
+                    <span className="w-1/3"> {event.time}</span>
+                  </li>
+                ))}
+              </div>
+            </ul>
+          </div>
+        </div>
+        <div hidden={currentTab !== 1}>
           <h3 className="text-xl font-medium">Jump to:</h3>
           <form
             onSubmit={handleSubmit(onTimeFormSubmit)}

@@ -17,7 +17,6 @@ const RecordPage = () => {
   const recordState = useAppSelector(
     (state) => state.experimentData.currentRecording
   );
-
   const location = useLocation();
   const isSidebarActive = useAppSelector(
     (state) => state.appState.recordSidebar
