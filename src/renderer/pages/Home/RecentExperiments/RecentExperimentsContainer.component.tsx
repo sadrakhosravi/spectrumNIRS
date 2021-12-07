@@ -92,11 +92,12 @@ const RecentExperimentsContainer = ({
             key={experiment.id}
             isActive={experiment.id === currentExperimentId}
             experiment={experiment}
+            refetch={refetch}
           />
         ))}
-      {experiments.searchedExperiments.length === 0 && (
+      {/* {experiments.searchedExperiments.length === 0 && (
         <p className="text-white opacity-30">No recent experiment found.</p>
-      )}
+      )} */}
       {children}
     </div>
   );

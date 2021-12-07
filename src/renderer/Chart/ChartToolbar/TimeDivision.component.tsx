@@ -12,6 +12,7 @@ const TimeDivision = ({ chartOptions }: any) => {
       <div className="flex h-10 items-center">
         {timeDivisions.map((timeDivision) => (
           <button
+            key={timeDivision}
             className={`h-10 px-3 mx-2 hover:bg-grey3 active:bg-accent rounded-md ${
               activeTime === timeDivision && 'bg-accent'
             }`}

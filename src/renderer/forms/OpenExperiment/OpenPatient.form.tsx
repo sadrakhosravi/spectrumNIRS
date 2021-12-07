@@ -41,7 +41,11 @@ const OpenPatientForm = () => {
       <ul className="w-full">
         {patients &&
           patients.map((patient) => (
-            <SelectPatient patient={patient} key={patient.id} />
+            <SelectPatient
+              patient={patient}
+              key={patient.id}
+              getAllPatients={getAllPatients}
+            />
           ))}
       </ul>
     </div>

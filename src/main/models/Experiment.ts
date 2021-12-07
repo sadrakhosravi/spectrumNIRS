@@ -1,7 +1,8 @@
 import { getConnection } from 'typeorm';
-import { Experiments } from 'db/entity/Experiments';
-import { Patients } from 'db/entity/Patients';
-interface IExperiment {}
+import { ExperimentsEntity, PatientsEntity } from '@electron/paths';
+import createDBConnection from 'db';
+const { Experiments } = require(ExperimentsEntity);
+const { Patients } = require(PatientsEntity);
 
 type ExpData = {
   experiment: any;
@@ -11,16 +12,17 @@ type ExpData = {
 /**
  * Experiment settings and logic
  */
-export class Experiment implements IExperiment {
-  constructor() {}
-
+export class Experiment {
   /**
    * Creates a new experiment with one patient in the database
    */
   public static async createExperiment(data: ExpData): Promise<any> {
+    console.log('New Experiment DB');
     const { experiment, patient } = data;
-    console.log(experiment);
+
     try {
+      // console.log(newExperiment);
+
       const _newExperiment = new Experiments();
       Object.assign(_newExperiment, experiment);
       const newExperiment = await _newExperiment.save();
@@ -58,7 +60,7 @@ export class Experiment implements IExperiment {
     await getConnection()
       .createQueryBuilder()
       .select()
-      .from(Experiments, '')
+      .from('Experiments', '')
       .limit(limit)
       .orderBy({
         updatedAt: 'DESC',
@@ -72,10 +74,32 @@ export class Experiment implements IExperiment {
   public static updateExperiment = async (experimentId: number) =>
     await getConnection()
       .createQueryBuilder()
-      .update(Experiments)
+      .update('Experiments')
       .set({ updatedAt: new Date() })
       .where('id = :id', { id: experimentId })
       .execute();
+
+  /**
+   * Deletes the data of the given table based on the given id
+   * @param id - Id of the record to be deleted
+   * @param table - name of the table
+   */
+  public static deleteData = async (
+    id: number,
+    table: 'Experiments' | 'Patients' | 'Recordings'
+  ) => {
+    const deleted = await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(table)
+      .where('id = :id', { id })
+      .execute();
+
+    await getConnection().query('VACUUM');
+    await getConnection().close();
+    await createDBConnection();
+    return deleted;
+  };
 }
 
 export default Experiment;

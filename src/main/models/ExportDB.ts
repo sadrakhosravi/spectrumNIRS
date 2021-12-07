@@ -1,5 +1,4 @@
 import { getConnection } from 'typeorm';
-import { RecordingsData } from 'db/entity/RecordingsData';
 import fs from 'fs';
 import { dialog, BrowserWindow } from 'electron';
 
@@ -37,7 +36,7 @@ class ExportDB {
         const records = await getConnection()
           .createQueryBuilder()
           .select()
-          .from(RecordingsData, '')
+          .from('RecordingsData', '')
           .where('recordingId = :recordingId', { recordingId })
           .limit(LIMIT)
           .offset(offset)

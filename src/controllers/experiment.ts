@@ -10,10 +10,10 @@ import Recording from '../main/models/Recording';
 import { INewPatientData } from 'interfaces/interfaces';
 
 // Creates a new experiment record with one patient in the database
-ipcMain.handle(
-  ExperimentChannels.NewExp,
-  async (_event, data: any) => await Experiment.createExperiment(data)
-);
+ipcMain.handle(ExperimentChannels.NewExp, async (_event, data: any) => {
+  console.log('New Experiment');
+  return await Experiment.createExperiment(data);
+});
 
 // Retrieve the numOfRecentExperiment most recent experiments from DB
 ipcMain.handle(
@@ -51,4 +51,25 @@ ipcMain.handle(
   ExperimentChannels.getAllRecordings,
   async (_event, patientId: number) =>
     await Recording.getAllRecordings(patientId)
+);
+
+// Delete the selected experiment and all its data
+ipcMain.handle(
+  ExperimentChannels.deleteExperiment,
+  async (_event, experimentId: number) =>
+    await Experiment.deleteData(experimentId, 'Experiments')
+);
+
+// Delete the selected patient and all its data
+ipcMain.handle(
+  ExperimentChannels.deletePatient,
+  async (_event, patientId: number) =>
+    await Experiment.deleteData(patientId, 'Patients')
+);
+
+// Delete the selected recordings and all its data
+ipcMain.handle(
+  ExperimentChannels.deleteRecording,
+  async (_event, recordingId: number) =>
+    await Experiment.deleteData(recordingId, 'Recordings')
 );

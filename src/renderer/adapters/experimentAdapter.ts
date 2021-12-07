@@ -1,4 +1,6 @@
 import { dispatch, getState } from '@redux/store';
+import toast from 'react-hot-toast';
+
 import {
   setExperimentData,
   setPatientData,
@@ -85,6 +87,118 @@ export const newRecording = async (data: INewRecordingData) => {
     recordState !== RecordState.PAUSED &&
     window.api.sendIPC(RecordChannels.Stop);
   dispatch(changeRecordState(RecordState.IDLE));
+};
+
+/**
+ * Deleted the selected experiment and its relevant data
+ * @param experimentId - The id of the experiment to be deleted
+ */
+export const deleteExperimentAndData = async (experimentId: number) => {
+  // Confirm user selection before deleting data permanently
+  const confirmation = await window.api.invokeIPC(
+    DialogBoxChannels.MessageBoxSync,
+    {
+      title: 'Confirm your selection',
+      type: 'warning',
+      message: 'Deleting Experiment and All its Data!',
+      detail:
+        'Are you sure you want to delete this experiment and all its data. This is a permanent action!',
+      buttons: ['Confirm', 'Cancel'],
+      defaultId: 1,
+      noLink: true,
+    }
+  );
+
+  // Operation was cancelled
+  if (confirmation === 1) return;
+
+  const dataDeleted = window.api.invokeIPC(
+    ExperimentChannels.deleteExperiment,
+    experimentId
+  );
+
+  toast.dismiss();
+  toast.promise(dataDeleted, {
+    success: 'Experiment Deleted Successfully',
+    loading: 'Deleting Experiment',
+    error: 'Failed to Delete Experiment!',
+  });
+
+  return await dataDeleted;
+};
+
+/**
+ * Deleted the selected experiment and its relevant data
+ * @param patientId - The id of the experiment to be deleted
+ */
+export const deletePatientAndData = async (patientId: number) => {
+  // Confirm user selection before deleting data permanently
+  const confirmation = await window.api.invokeIPC(
+    DialogBoxChannels.MessageBoxSync,
+    {
+      title: 'Confirm your selection',
+      type: 'warning',
+      message: 'Deleting Patient and All its Data!',
+      detail:
+        'Are you sure you want to delete this patient and all its data. This is a permanent action!',
+      buttons: ['Confirm', 'Cancel'],
+      defaultId: 1,
+      noLink: true,
+    }
+  );
+
+  // Operation was cancelled
+  if (confirmation === 1) return;
+
+  const dataDeleted = window.api.invokeIPC(
+    ExperimentChannels.deletePatient,
+    patientId
+  );
+
+  toast.dismiss();
+  toast.promise(dataDeleted, {
+    success: 'Patient Deleted Successfully',
+    loading: 'Deleting Patient',
+    error: 'Failed to Delete Patient!',
+  });
+
+  return await dataDeleted;
+};
+
+/**
+ * Deleted the selected recording and its relevant data
+ * @param recordingId - The id of the recording to be deleted
+ */
+export const deleteRecordingAndData = async (recordingId: number) => {
+  // Confirm user selection before deleting data permanently
+  const confirmation = await window.api.invokeIPC(
+    DialogBoxChannels.MessageBoxSync,
+    {
+      title: 'Confirm your selection',
+      type: 'warning',
+      message: 'Deleting Recording Data!',
+      detail:
+        'Are you sure you want to delete this recording and its data. This is a permanent action!',
+      buttons: ['Confirm', 'Cancel'],
+      defaultId: 1,
+      noLink: true,
+    }
+  );
+
+  // Operation was cancelled
+  if (confirmation === 1) return;
+
+  const dataDeleted = window.api.invokeIPC(
+    ExperimentChannels.deleteRecording,
+    recordingId
+  );
+
+  toast.dismiss();
+  toast.promise(dataDeleted, {
+    success: 'Data Deleted Successfully',
+    loading: 'Deleting Data',
+    error: 'Failed to Delete Data!',
+  });
 };
 
 /**

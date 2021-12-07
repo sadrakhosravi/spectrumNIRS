@@ -1,5 +1,6 @@
 import { getConnection } from 'typeorm';
-import { Recordings } from 'db/entity/Recordings';
+import { RecordingsEntity } from '@electron/paths';
+const { Recordings } = require(RecordingsEntity);
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
@@ -47,7 +48,7 @@ export class Recording implements IRecording {
       return await getConnection()
         .createQueryBuilder()
         .select()
-        .from(Recordings, '')
+        .from('Recordings', '')
         .where('patientId = :patientId', { patientId })
         .orderBy({
           updatedAt: 'DESC',

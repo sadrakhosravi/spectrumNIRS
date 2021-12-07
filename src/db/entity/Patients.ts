@@ -10,12 +10,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Experiments } from 'db/entity/Experiments';
-import { Recordings } from 'db/entity/Recordings';
+import { Experiments } from './Experiments';
+import { Recordings } from './Recordings';
 
 @Entity()
 export class Patients extends BaseEntity {
-  @OneToMany(() => Recordings, Recordings.patient)
+  @OneToMany(() => Recordings, (recordings) => recordings.patient)
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,7 +28,7 @@ export class Patients extends BaseEntity {
   @Column({ type: 'text' })
   description: Date;
 
-  @ManyToOne(() => Experiments)
+  @ManyToOne(() => Experiments, { onDelete: 'CASCADE' })
   experiment: Experiments;
 
   @CreateDateColumn()
@@ -37,3 +37,5 @@ export class Patients extends BaseEntity {
   @UpdateDateColumn()
   public updatedAt: Date;
 }
+
+exports.Patients = Patients;

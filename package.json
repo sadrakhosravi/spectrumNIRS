@@ -12,7 +12,10 @@
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts && opencollective-postinstall",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
+    "compiledb": "tsc ./src/db/entity/Experiments.ts && tsc ./src/db/entity/Patients.ts && tsc ./src/db/entity/Recordings.ts && tsc ./src/db/entity/RecordingsData.ts",
     "start:main": "cross-env NODE_ENV=development electron -r ts-node/register/transpile-only -r tsconfig-paths/register ./src/main/main.ts",
+    "start:main-build": "electron ./release/app/dist/main/main.js",
+    "start:main-prod": "electron ./release/build/win-unpacked/resources/app/dist/main/main.js",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "jest",
     "prepare": "husky install"
@@ -32,9 +35,9 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
-    "asar": true,
+    "productName": "Spectrum",
+    "appId": "org.erb.Spectrum",
+    "asar": false,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
       "dist",
@@ -87,7 +90,9 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./resources/**",
+      "./src/db/entity/**"
     ],
     "publish": {
       "provider": "github",
@@ -100,8 +105,8 @@
     "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
+    "name": "Sadra Khosravi + Electron React Boilerplate Maintainers",
+    "email": "sadrakh@outlook.com",
     "url": "https://electron-react-boilerplate.js.org"
   },
   "contributors": [
@@ -121,15 +126,9 @@
     "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
   },
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "NIRS",
+    "Spectrum",
+    "SpectrumNIRS"
   ],
   "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
   "jest": {

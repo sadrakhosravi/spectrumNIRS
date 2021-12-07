@@ -1,5 +1,6 @@
 import { getConnection } from 'typeorm';
-import { Patients } from 'db/entity/Patients';
+import { PatientsEntity } from '@electron/paths';
+const { Patients } = require(PatientsEntity);
 
 // Interfaces
 import { INewPatientData } from 'interfaces/interfaces';
@@ -33,7 +34,7 @@ export class Patient {
       return await getConnection()
         .createQueryBuilder()
         .select()
-        .from(Patients, '')
+        .from('Patients', '')
         .where('experimentId = :experimentId', { experimentId })
         .orderBy({ updatedAt: 'DESC' })
         .getRawMany();

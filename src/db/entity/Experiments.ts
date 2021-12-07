@@ -8,11 +8,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Patients } from 'db/entity/Patients';
+import { Patients } from './Patients';
 
 @Entity()
 export class Experiments extends BaseEntity {
-  @OneToMany(() => Patients, Patients.experiment)
+  @OneToMany(() => Patients, (patients) => patients.experiment)
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -31,3 +31,5 @@ export class Experiments extends BaseEntity {
   @UpdateDateColumn({ type: 'datetime' })
   public updatedAt: Date;
 }
+
+exports.Experiments = Experiments;

@@ -97,11 +97,16 @@ const RecordChart = ({
     chartRef.current?.clearCharts();
   }, [recordingId]);
 
+  console.log(newData);
+
   useEffect(() => {
     if (location.pathname === '/main/recording/record' && newData) {
-      chartRef.current?.clearCharts();
-      chartRef.current?.loadLatestData();
-      setNewData(false);
+      setTimeout(() => {
+        console.log('Load Data Record Chart ');
+        chartRef.current?.clearCharts();
+        chartRef.current?.loadLatestData();
+        setNewData(false);
+      }, 100);
     }
   }, [newData, location]);
 

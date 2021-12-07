@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "module": "CommonJS",
     "baseUrl": "./src",
     "paths": {
       //React Related Paths
@@ -25,7 +23,9 @@
       "@electron/*": ["./main/*"],
       "@utils/*": ["./utils/*"]
     },
-    "lib": ["dom", "es2019", "esnext"],
+    "target": "ES2019",
+    "module": "CommonJS",
+    "lib": ["dom", "ES2019", "esnext"],
     "declaration": true,
     "declarationMap": true,
     "jsx": "react",

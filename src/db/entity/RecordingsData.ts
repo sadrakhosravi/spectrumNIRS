@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { Recordings } from 'db/entity/Recordings';
+import { Recordings } from './Recordings';
 
 @Entity()
 export class RecordingsData extends BaseEntity {
@@ -46,6 +46,11 @@ export class RecordingsData extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   events: string;
 
-  @ManyToOne(() => Recordings, { select: false })
+  @ManyToOne(() => Recordings, {
+    select: false,
+    onDelete: 'CASCADE',
+  })
   recording: Recordings;
 }
+
+exports.RecordingsData = RecordingsData;

@@ -26,7 +26,6 @@ export default merge(baseConfig, {
   ...devtoolsConfig,
 
   mode: 'production',
-
   target: 'electron-main',
 
   entry: {

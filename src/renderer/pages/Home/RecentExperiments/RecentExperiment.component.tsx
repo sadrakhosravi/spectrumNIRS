@@ -6,13 +6,14 @@ import {
   setCurrentExperiment,
 } from '@redux/ExperimentDataSlice';
 import { changeRecordState } from '@redux/RecordStateSlice';
+import { deleteExperimentAndData } from '@adapters/experimentAdapter';
 
 // Icons
 import RecentFileIcon from '@icons/recent-file.svg';
 
 // Components
 import ButtonTitleDescription from '@components/MicroComponents/ButtonTitleDescription/ButtonTitleDescription.component';
-
+import DeleteButton from '@components/Buttons/DeleteButton.component';
 // Constants
 import { ModalConstants, RecordState } from '@utils/constants';
 import { ExperimentChannels } from '@utils/channels';
@@ -23,7 +24,7 @@ interface IProps {
   saved: string;
   experiment: any;
   isActive?: boolean;
-  key?: any;
+  refetch: any;
 }
 
 const RecentExperiment: React.FC<IProps> = ({
@@ -32,6 +33,7 @@ const RecentExperiment: React.FC<IProps> = ({
   saved,
   experiment,
   isActive = false,
+  refetch,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -47,28 +49,36 @@ const RecentExperiment: React.FC<IProps> = ({
   return (
     <button
       className={`${
-        isActive ? 'bg-accent' : 'bg-grey2'
-      } grid grid-cols-5 items-center w-full px-3 py-5 mb-3 rounded-md duration-150 hover:bg-grey3 hover:cursor-pointer active:bg-accent`}
-      onClick={handleOpenExperimentButton}
+        isActive ? 'bg-accent' : 'bg-grey2 hover:bg-grey3 '
+      } flex gap-2 items-center w-full px-3 py-5 mb-3 rounded-md duration-150 hover:cursor-pointer`}
     >
-      <div className="col-span-3 flex items-center">
-        <span className="inline-block mr-5">
-          <img
-            className="my-auto"
-            src={RecentFileIcon}
-            width="48px"
-            alt="File"
-          />
-        </span>
-        <span className="inline-block">
-          <ButtonTitleDescription title={title} description={description} />
-        </span>
+      <div className="w-full flex" onClick={handleOpenExperimentButton}>
+        <div className="flex w-2/3 items-center">
+          <span className="inline-block mr-5">
+            <img
+              className="my-auto"
+              src={RecentFileIcon}
+              width="48px"
+              alt="File"
+            />
+          </span>
+          <span className="inline-block">
+            <ButtonTitleDescription title={title} description={description} />
+          </span>
+        </div>
+        <div className="flex w-1/3 items-center justify-end mr-1">
+          <p className="text-light text-base">
+            Saved: {saved.toString().split(' ')[0]}
+          </p>
+        </div>
       </div>
-      <div className="col-span-2 flex items-center justify-end mr-1">
-        <p className="text-light text-base">
-          Saved: {saved.toString().split(' ')[0]}
-        </p>
-      </div>
+      <DeleteButton
+        onClick={async () => {
+          await deleteExperimentAndData(experiment.id);
+          refetch();
+        }}
+        title="Delete Experiment and its Data"
+      />
     </button>
   );
 };

@@ -1,6 +1,5 @@
 // import db from 'db/models/index';
 import AccurateTimer from '@electron/helpers/accurateTimer';
-import { RecordingsData } from 'db/entity/RecordingsData';
 import { getConnection } from 'typeorm';
 class RecordData {
   recordingId: number;
@@ -15,7 +14,7 @@ class RecordData {
       await getConnection()
         .createQueryBuilder()
         .insert()
-        .into(RecordingsData)
+        .into('RecordingsData')
         .values([...data])
         .useTransaction(true)
         .execute();
@@ -29,7 +28,7 @@ class RecordData {
       return await getConnection()
         .createQueryBuilder()
         .select()
-        .from(RecordingsData, '')
+        .from('RecordingsData', '')
         .where('recordingId = :recordingId', { recordingId })
         .orderBy({ id: 'DESC' })
         .limit(3000)
@@ -48,7 +47,7 @@ class RecordData {
       return await getConnection()
         .createQueryBuilder()
         .select()
-        .from(RecordingsData, '')
+        .from('RecordingsData', '')
         .where('recordingId = :recordingId', { recordingId })
         .andWhere('timeStamp >= :start', { start })
         .andWhere('timeStamp <= :end', { end })
@@ -71,7 +70,7 @@ class RecordData {
         data = await getConnection()
           .createQueryBuilder()
           .select()
-          .from(RecordingsData, '')
+          .from('RecordingsData', '')
           .where('recordingId = :recordingId', { recordingId })
           .orderBy({ id: 'ASC' })
           .limit(LIMIT)
@@ -95,7 +94,7 @@ class RecordData {
       return await getConnection()
         .createQueryBuilder()
         .select()
-        .from(RecordingsData, '')
+        .from('RecordingsData', '')
         .where('recordingId = :recordingId', { recordingId })
         .andWhere('event = 1')
         .orderBy({ id: 'DESC' })

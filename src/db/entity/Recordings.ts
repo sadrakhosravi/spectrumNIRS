@@ -12,12 +12,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Patients } from 'db/entity/Patients';
-import { RecordingsData } from 'db/entity/RecordingsData';
+import { Patients } from './Patients';
+import { RecordingsData } from './RecordingsData';
 
 @Entity()
 export class Recordings extends BaseEntity {
-  @OneToMany(() => RecordingsData, RecordingsData.recording)
+  @OneToMany(() => RecordingsData, (recordingsData) => recordingsData.recording)
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -33,7 +33,7 @@ export class Recordings extends BaseEntity {
   @Column({ type: 'blob', nullable: true })
   settings: JSON;
 
-  @ManyToOne(() => Patients)
+  @ManyToOne(() => Patients, { onDelete: 'CASCADE' })
   patient: Patients;
 
   @CreateDateColumn()
@@ -42,3 +42,4 @@ export class Recordings extends BaseEntity {
   @UpdateDateColumn()
   public updatedAt: Date;
 }
+exports.Recordings = Recordings;

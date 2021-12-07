@@ -8,13 +8,11 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import 'reflect-metadata';
 import { resolveHtmlPath } from './util';
-import '../db/index';
+import createDBConnection from '../db/index';
 // Import controllers
 import '../controllers';
 
@@ -60,8 +58,8 @@ const createMainWindow = async () => {
     darkTheme: true,
     frame: false,
     webPreferences: {
-      nativeWindowOpen: true,
-      sandbox: true,
+      nativeWindowOpen: false,
+      sandbox: false,
       partition: 'persist:spectrum',
       webgl: true,
       contextIsolation: true,
@@ -74,6 +72,7 @@ const createMainWindow = async () => {
   mainWindow.setBackgroundColor('#1E1E1E');
   mainWindow.maximize();
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+  // mainWindow.loadURL('http://localhost:1212');
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {
@@ -101,6 +100,8 @@ app.on('activate', async () => {
 });
 
 (async () => {
+  createDBConnection();
+
   // Set dark theme by default - Light theme will be added in the next versions
   nativeTheme.themeSource = 'dark';
 

@@ -8,6 +8,9 @@ export const ExperimentChannels = {
   getRecentExperiments: ExpChannelBase + 'get-recent-experiments',
   getAllPatients: ExpChannelBase + 'get-all-patients',
   getAllRecordings: ExpChannelBase + 'get-all-recordings',
+  deleteExperiment: ExpChannelBase + 'delete-experiment',
+  deletePatient: ExpChannelBase + 'delete-patient',
+  deleteRecording: ExpChannelBase + 'delete-recording',
 };
 
 // App State Channel

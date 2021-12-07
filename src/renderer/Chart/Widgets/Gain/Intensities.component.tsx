@@ -110,7 +110,7 @@ const Intensities = ({ setLoading, children }: any) => {
 
         <div className="" hidden={currentTab !== 1}>
           {sensorState.PreGain.map((preGainOption) => (
-            <span>
+            <span key={preGainOption}>
               <input
                 type="radio"
                 id={`${preGainOption}Gain`}
