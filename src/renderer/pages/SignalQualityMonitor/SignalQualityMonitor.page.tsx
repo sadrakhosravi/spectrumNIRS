@@ -25,20 +25,26 @@ const SignalQualityMonitorPage = () => {
     (state) => state.appState.recordSidebar
   );
   const dispatch = useAppDispatch();
-
+  let chart: SignalQualityMonitor | undefined;
   useEffect(() => {
-    const chart = new SignalQualityMonitor(containerId);
+    chart = new SignalQualityMonitor(containerId);
     chart.createSignalMonitorChart();
 
     return () => {
       window.api.sendIPC(RecordChannels.Stop);
-      chart.cleanup();
+      chart?.cleanup();
     };
   }, []);
 
   useEffect(() => {
     !isFirstTime && signalQualityMonitor(isQualityChecking);
     isFirstTime && setIsFirstTime(false);
+
+    if (!isQualityChecking) {
+      console.log('Clear Data');
+      console.log(chart);
+      chart?.resetData();
+    }
   }, [isQualityChecking]);
 
   return (

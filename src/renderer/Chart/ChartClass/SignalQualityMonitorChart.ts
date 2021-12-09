@@ -29,6 +29,7 @@ class SignalQualityMonitor {
   LEDRectangles: (lcjs.RectangleFigure | undefined)[] | undefined;
   PD_THRESHOLD_VALUE: number;
   UIElement: (lcjs.UITextBox<UIBackground> & lcjs.UIElement) | undefined;
+  greenColor: lcjs.SolidFill;
 
   constructor(containerId: string) {
     this.LEDs = devices[0].LEDs;
@@ -37,6 +38,7 @@ class SignalQualityMonitor {
     this.rectangleSeries = undefined;
     this.redColor = new SolidFill().setColor(ColorRGBA(242, 67, 79));
     this.blueColor = new SolidFill().setColor(ColorRGBA(42, 171, 240));
+    this.greenColor = new SolidFill().setColor(ColorRGBA(25, 255, 100));
     this.LEDRectangles = undefined;
     this.UIElement = undefined;
     this.PD_THRESHOLD_VALUE = 2000;
@@ -89,6 +91,18 @@ class SignalQualityMonitor {
           fillStyle: new SolidFill({ color: ColorHEX('#FFF') }),
         })
       );
+  }
+
+  resetData() {
+    console.log(this.LEDRectangles);
+    this.LEDRectangles &&
+      this.LEDRectangles.forEach((rectangle) => {
+        rectangle?.setDimensions({
+          ...(rectangle.getDimensionsPositionAndSize() as lcjs.RectanglePositionAndSize),
+          height: 0,
+        });
+      });
+    console.log('Cleaned');
   }
 
   addUIElements() {
@@ -159,14 +173,24 @@ class SignalQualityMonitor {
             ...(this.LEDRectangles[
               i
             ]?.getDimensionsPositionAndSize() as lcjs.RectanglePositionAndSize),
-            height: dataPoint,
+            height:
+              i === data.length - 1 ? data[i] : data[i] - data[data.length - 1],
           });
-        this.LEDRectangles &&
+        i !== data.length - 1 &&
+          this.LEDRectangles &&
           this.LEDRectangles[i]?.setFillStyle(
-            dataPoint > 2000 ? this.blueColor : this.redColor
+            dataPoint > this.PD_THRESHOLD_VALUE ? this.blueColor : this.redColor
           );
 
-        data[0] > 1900 ? this.UIElement?.dispose() : this.UIElement?.restore();
+        i === data.length - 1 &&
+          this.LEDRectangles &&
+          this.LEDRectangles[data.length - 1]?.setFillStyle(
+            dataPoint > 350 ? this.redColor : this.greenColor
+          );
+
+        data[0] > this.PD_THRESHOLD_VALUE - 100
+          ? this.UIElement?.dispose()
+          : this.UIElement?.restore();
       });
     });
   }
