@@ -41,6 +41,7 @@ type CurrentSensor = {
     sender: any,
     recordingId: number
   ) => void;
+  startQualityMonitor: (sender: any) => void;
   pause: () => void;
   continueRecording: (sender: any) => void;
   stop: () => number;
@@ -111,6 +112,10 @@ export class DataReader implements IDataReaders {
 
   toggleEvent(data: object) {
     this.currentSensor.toggleEvent(data);
+  }
+
+  startQualityMonitor() {
+    this.currentSensor.startQualityMonitor(this.senderWindow);
   }
 
   async syncGainsWithHardware(data: string[]): Promise<any> {

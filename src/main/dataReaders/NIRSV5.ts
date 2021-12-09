@@ -54,6 +54,29 @@ export const syncGains = async (data: string[]) => {
   return response;
 };
 
+/**
+ * Spawns an instance of the NIRSV5 reader
+ */
+const spawnNIRSV5 = () => {
+  spawnedProcesses.forEach((process) => process.kill());
+  // Check if there is already a spawned process before spawning another.
+  // Spawn NIRSReader.exe
+  readUSBData = spawn(
+    path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),
+    ['test', path.join('../../../resources/drivers/nirs-v5/Test1.exe')]
+  );
+
+  readUSBData.stderr.on('data', (data: string) => {
+    console.error(`Log from NIRS Reader: ${data}`);
+  });
+  readUSBData.on('exit', () => {
+    console.log('Process Terminated');
+  });
+
+  // Push the spawned process to the spawnedProcesses array to keep track of them.
+  spawnedProcesses.push(readUSBData);
+};
+
 // Spawned processes array to keep track.
 const spawnedProcesses: any[] = [];
 
@@ -73,28 +96,13 @@ export const start = async (
   console.log('RecordingId:' + recordingId);
   lastTimeSequence = 0;
 
-  // Spawn NIRSReader.exe
-  readUSBData = spawn(
-    path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe'),
-    ['test', path.join('../../../resources/drivers/nirs-v5/Test1.exe')]
-  );
-
-  readUSBData.stderr.on('data', (data: string) => {
-    console.error(`Log from NIRS Reader: ${data}`);
-  });
-  readUSBData.on('exit', () => {
-    console.log('Process Terminated');
-  });
-
-  // Push the spawned process to the spawnedProcesses array to keep track of them.
-  spawnedProcesses.push(readUSBData);
-
   // Count variable to keep track of the readline loop
   let count = 0;
   let sendCount = 0;
   let sendArr: any[] = [];
 
   Database = new RecordingsData(recordingId);
+  spawnNIRSV5();
 
   // Read each line from reader.exe stdout.
   rl = readline
@@ -158,7 +166,7 @@ export const start = async (
         HHb: rawDataArr[2],
         THb: rawDataArr[3],
         TOI: rawDataArr[4],
-        rawValues: rawDataArr.slice(6, 12).join(','),
+        PDRawData: rawDataArr.slice(6, 12).join(','),
         LEDIntensities: rawDataArr.slice(12, 17).join(','),
         gainValues: JSON.stringify(gainValues),
         event: Object.values(events).some((event) => event === true) ? 1 : null,
@@ -196,6 +204,60 @@ export const start = async (
 };
 
 /**
+ * Starts the V5 sensor for quality check, no data will be saved
+ */
+
+export const startQualityMonitor = async (sender: any) => {
+  spawnNIRSV5();
+  let count = 0;
+  let firstSyncCount = 0;
+  let LEDPDs = [0, 0, 0, 0, 0, 0];
+
+  rl = readline
+    .createInterface({
+      input: readUSBData.stdout,
+      terminal: false,
+    })
+    .on('line', async function (line: string) {
+      if (firstSyncCount === 0) {
+        syncGains([
+          '180.00',
+          '165.00',
+          '140.00',
+          '140.00',
+          '140.00',
+          'HIGH',
+          '100',
+        ]);
+        firstSyncCount = 2;
+      }
+      const data = line.split(',');
+      const outputArr = [
+        parseInt(data[6]),
+        parseInt(data[7]),
+        parseInt(data[8]),
+        parseInt(data[9]),
+        parseInt(data[10]),
+        parseInt(data[11]),
+      ];
+
+      outputArr.forEach((data, i) => (LEDPDs[i] += data));
+
+      // Take the average of each
+
+      if (count === 50) {
+        LEDPDs.forEach((_, i) => (LEDPDs[i] = LEDPDs[i] / 50));
+        sender.send('signal-quality-monitor-data', LEDPDs);
+        console.log(LEDPDs);
+        LEDPDs.forEach((_, i) => (LEDPDs[i] = 0));
+
+        count = 0;
+      }
+      count++;
+    });
+};
+
+/**
  * Stops the spawned process, closes the readline module, and does some memory cleanup.
  * @returns `lastTimeSequence` the last time sequence saved
  */
@@ -215,7 +277,6 @@ export const stop = (): number => {
 
   // Kill all spawned processes
   spawnedProcesses.forEach((process) => process.kill());
-  readUSBData.kill();
   readUSBData = undefined;
   return lastTimeSequence;
 };
@@ -239,6 +300,7 @@ export const toggleEvent = (event: object | any) => {
 // Final object to be exported
 const nirsReader = {
   start,
+  startQualityMonitor,
   stop,
   toggleRawData,
   toggleEvent,

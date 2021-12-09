@@ -50,19 +50,22 @@ const EventsWidget = ({ setLoading, children }: any) => {
           <div className="overflow-y-auto">
             <ul className="my-4 bg-grey1 p-3 w-full rounded-md">
               <li className="w-full border-b-grey2 border-b-2 h-8 flex items-center mb-2">
-                <span className="w-2/3">Name</span>
-                <span className="w-1/3">Time</span>
+                <span className="w-1/12">#</span>
+                <span className="w-7/12">Name</span>
+                <span className="w-4/12">Time</span>
               </li>
               <div className="h-72 overflow-y-auto  overflow-x-hidden">
-                {allEvents?.map((event: any) => (
+                {allEvents?.map((event: any, i: number) => (
                   <li
-                    className="w-full h-8 flex items-center cursor-pointer"
+                    className="w-full h-8 flex items-center cursor-pointer hover:text-accent"
                     onClick={() => {
                       dispatch(setCurrentEventTimeStamp(event.timeStamp));
                     }}
+                    title={`Click to view the the event: ${event.name}`}
                   >
-                    <span className="w-2/3"> {event.name}</span>
-                    <span className="w-1/3"> {event.time}</span>
+                    <span className="w-1/12">{i + 1}.</span>
+                    <span className="w-7/12">{event.name}</span>
+                    <span className="w-4/12">{event.time}</span>
                   </li>
                 ))}
               </div>

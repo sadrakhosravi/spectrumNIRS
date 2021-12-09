@@ -38,7 +38,7 @@ ipcMain.handle(
       lastTimeStamp,
     }: RecordInit
   ) => {
-    console.log(currentRecording);
+    console.log('Reader');
     reader = new DataReader(
       patientId,
       sensorId,
@@ -53,6 +53,12 @@ ipcMain.handle(
 // Start recording
 ipcMain.on(RecordChannels.Recording, () => {
   reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
+});
+
+// Start quality monitor
+ipcMain.on(RecordChannels.QualityMonitor, (_event, active: boolean) => {
+  active && reader.startQualityMonitor();
+  !active && reader && reader.stopRecording();
 });
 
 // Stop recording

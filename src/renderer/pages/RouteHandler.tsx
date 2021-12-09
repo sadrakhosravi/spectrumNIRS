@@ -6,6 +6,9 @@ import useNavigation from '@hooks/useNavigation.hook';
 import HomePage from './Home/Home.page';
 const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
+const SignalQualityMonitorPage = React.lazy(
+  () => import('@pages/SignalQualityMonitor/SignalQualityMonitor.page')
+);
 
 // Webview
 // import ChartWebView from './ChartWebView';
@@ -23,6 +26,11 @@ const RouteHandler = () => {
     <main className="main-container">
       <Router>
         <Route exact path={AppState.HOME} component={HomePage} />
+        <Route
+          exact
+          path={AppState.SIGNAL_QUALITY_MONITOR}
+          component={SignalQualityMonitorPage}
+        />
         <Route path={AppState.RECORDING} component={Tabs} />
       </Router>
       <div

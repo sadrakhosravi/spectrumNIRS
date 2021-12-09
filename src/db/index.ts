@@ -17,8 +17,11 @@ const createDBConnection = async () => {
     subscribers: ['src/db/subscriber/**/*.ts'],
   });
 
-  connection.query('PRAGMA auto_vacuum = FULL');
+  connection.query('PRAGMA auto_vacuum = INCREMENTAL');
   connection.query('PRAGMA main.cache_size = 32000');
+  connection.query('PRAGMA synchronous = normal');
+  connection.query('PRAGMA temp_store = memory');
+  connection.query('PRAGMA mmap_size = 30000000000');
 };
 
 export default createDBConnection;

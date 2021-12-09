@@ -35,6 +35,8 @@ class ReviewChart extends Chart {
   DATA_LOADING_THRESHOLD: number;
   endOfData: boolean;
   isLoadingData: boolean;
+  NUM_OF_POINTS_TO_QUERY: number;
+  PREVIOUS_DATA_LOADING_THRESHOLD: number;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
@@ -51,7 +53,9 @@ class ReviewChart extends Chart {
     this.zoomBandChart = undefined;
     this.XMax = 3000;
     this.XMin = 0;
-    this.DATA_LOADING_THRESHOLD = 30 * 1000;
+    this.NUM_OF_POINTS_TO_QUERY = 300000;
+    this.DATA_LOADING_THRESHOLD = 60 * 1000;
+    this.PREVIOUS_DATA_LOADING_THRESHOLD = 3 * 1000;
     this.endOfData = false;
     this.isLoadingData = false;
   }
@@ -93,20 +97,19 @@ class ReviewChart extends Chart {
       data.reverse();
       this.XMax = data[data.length - 1].timeStamp;
       console.log(data[data.length - 1]);
-      this.drawDataOnCharts(data, { start: 0, end: 300000 });
+      this.drawDataOnCharts(data);
     } else {
       this.endOfData = true;
       dispatch(setIsLoadingData(false));
     }
   };
 
-  drawDataOnCharts = (data: any, _interval: { start: number; end: number }) => {
+  drawDataOnCharts = (data: any) => {
     const DATA_LENGTH = data.length;
     const dataArr: any[] = [];
     const dataArr2: any[] = [];
     const dataArr3: any[] = [];
     const dataArr4: any[] = [];
-    const events: any[] = [];
     // Using for loop for fastest possible execution
     for (let i = 0; i < DATA_LENGTH; i++) {
       const O2Hb = {
@@ -125,7 +128,6 @@ class ReviewChart extends Chart {
         x: parseInt(data[i].timeStamp),
         y: parseFloat(data[i].TOI.toFixed(2)),
       };
-      data[i].events && events.push(data[i]);
       dataArr.push(O2Hb);
       dataArr2.push(HHb);
       dataArr3.push(THb);
@@ -144,17 +146,16 @@ class ReviewChart extends Chart {
       });
 
       if (dataArr.length === 0) {
-        this.chartOptions?.addEventsToCharts(events);
-
         plottingTimer.stop();
+        this.XMin = (this.series && this.series[0].getXMin()) as number;
+        this.XMax = (this.series && this.series[0].getXMax()) as number;
+        dispatch(setIsLoadingData(false));
+        this.isLoadingData = false;
         return;
       }
-    }, 50);
+    }, 200);
 
     plottingTimer.start();
-
-    dispatch(setIsLoadingData(false));
-    this.isLoadingData = false;
   };
 
   getIntervalDataAndDraw = async (interval: { start: number; end: number }) => {
@@ -164,7 +165,7 @@ class ReviewChart extends Chart {
       recordingId,
       ...interval,
     });
-    data && this.drawDataOnCharts(data, interval);
+    data && this.drawDataOnCharts(data);
   };
 
   listenForRightArrowKey() {
@@ -174,6 +175,7 @@ class ReviewChart extends Chart {
   loadDataOnKeyPress = async (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight' && this.charts) {
       const timeDivision = this.chartOptions?.timeDivision as number;
+
       const axisX = this.charts[0].getDefaultAxisX();
       const currentInterval = axisX.getInterval();
       const newInterval = {
@@ -214,21 +216,23 @@ class ReviewChart extends Chart {
           const currentInterval =
             this.charts &&
             (this.charts[0].getDefaultAxisX().getInterval() as any);
-          if (
-            Math.abs(currentInterval.end - this.XMax) <=
-              this.DATA_LOADING_THRESHOLD &&
-            !this.endOfData
-          ) {
-            console.log(this.endOfData);
+          if (Math.abs(currentInterval.end - this.XMax) <= 0) {
             this.loadDataFromInterval();
+            this.isLoadingData = true;
+            console.log('Load Data');
           }
+
+          // if (currentInterval.start - this.XMin <= 0 && this.XMin !== 0) {
+          //   this.loadPreviousDataFromInterval();
+          //   this.isLoadingData = true;
+          //   console.log('Load Previous Data');
+          // }
         }
       });
     }
   }
 
   loadDataFromInterval = async () => {
-    this.isLoadingData = true;
     dispatch(setIsLoadingData(true));
     if (this.charts) {
       const data = await window.api.invokeIPC(
@@ -236,16 +240,40 @@ class ReviewChart extends Chart {
         {
           recordingId: getState().experimentData.currentRecording.id,
           start: this.XMax,
-          end: this.XMax + 300000,
+          end: this.XMax + this.NUM_OF_POINTS_TO_QUERY,
         }
       );
       if (data.length > 1) {
         data.reverse();
-        this.XMax = data[data.length - 1].timeStamp;
-        this.drawDataOnCharts(data, { start: 0, end: 300000 });
+        this.drawDataOnCharts(data);
       } else {
         this.isLoadingData = false;
-        this.endOfData = true;
+        dispatch(setIsLoadingData(false));
+      }
+    }
+  };
+
+  loadPreviousDataFromInterval = async () => {
+    this.isLoadingData = true;
+    dispatch(setIsLoadingData(true));
+    this.clearCharts();
+    this.setInterval(this.XMin - 30000, this.XMin);
+    console.log(this.XMin);
+    if (this.charts) {
+      const data = await window.api.invokeIPC(
+        ChartChannels.GetDataForInterval,
+        {
+          recordingId: getState().experimentData.currentRecording.id,
+          start: this.XMin - this.NUM_OF_POINTS_TO_QUERY,
+          end: this.XMin,
+        }
+      );
+      if (data.length > 1) {
+        data.reverse();
+        this.drawDataOnCharts(data);
+        console.log(data);
+      } else {
+        this.isLoadingData = false;
         dispatch(setIsLoadingData(false));
       }
     }
@@ -303,6 +331,7 @@ class ReviewChart extends Chart {
   }
 
   customizeCharts() {
+    this.dashboard?.setAnimationsEnabled(true);
     this.charts?.forEach((chart, i) => {
       // Disable rectangle zoom
       // chart.setMouseInteractionRectangleZoom(false);
@@ -314,14 +343,13 @@ class ReviewChart extends Chart {
 
       // Automatic Data Cleaning
 
-      this.series &&
-        this.series[i].setDataCleaning({ minDataPointCount: 30000 });
+      this.series && this.series[i].setDataCleaning({ minDataPointCount: 0 });
 
       this.dashboard?.setRowHeight(i, 1);
 
       chart
         .getDefaultAxisX()
-        .setInterval(0, 30000)
+        .setInterval(0, 30 * 1000)
         .setScrollStrategy(AxisScrollStrategies.regressive)
         .setMouseInteractions(false)
         .setChartInteractionZoomByWheel(false)

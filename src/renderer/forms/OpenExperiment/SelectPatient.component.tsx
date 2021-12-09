@@ -57,12 +57,12 @@ const SelectPatient = ({
   return (
     <>
       <button
-        className="w-full p-6 bg-grey2 hover:bg-grey3 cursor-pointer focus:bg-grey3 duration-150 rounded-md"
+        className="w-full bg-grey2 hover:bg-grey3 cursor-pointer focus:bg-grey3 duration-150 rounded-md"
         key={patient.id}
       >
-        <div className="flex items-center w-full gap-2">
+        <div className="flex items-center w-full gap-2 pr-4">
           <div
-            className="w-full flex items-center gap-5"
+            className="w-full h-full flex items-center gap-5 p-6 pr-2"
             onClick={() => {
               getAllRecordings(patient.id);
               setIsOpen(!isOpen);
@@ -105,11 +105,11 @@ const SelectPatient = ({
               key={recording + index}
             >
               <button
-                className="bg-grey1 hover:bg-accent px-4 py-2 w-full text-left flex items-center gap-4 rounded-sm"
+                className="bg-grey1 hover:bg-accent  w-full text-left flex items-center gap-4 rounded-sm"
                 key={recording.id}
               >
                 <div
-                  className="w-full flex items-center"
+                  className="w-full flex items-center px-4 py-2"
                   onClick={() => handleOpenRecordingButton(recording)}
                 >
                   <span className="w-[40px]">

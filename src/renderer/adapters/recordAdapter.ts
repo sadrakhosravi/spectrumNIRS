@@ -91,3 +91,12 @@ export const handlePause = () => {
   console.log(store.getState().recordState.value);
   window.api.sendIPC(RecordChannels.Base + store.getState().recordState.value);
 };
+
+/**
+ * Send a signal to the main process to start the signal quality monitor
+ */
+export const signalQualityMonitor = (active: boolean) => {
+  const sensorId = store.getState().sensorState.detectedSensor?.id;
+  window.api.invokeIPC(RecordChannels.Init, { sensorId });
+  window.api.sendIPC(RecordChannels.QualityMonitor, active);
+};

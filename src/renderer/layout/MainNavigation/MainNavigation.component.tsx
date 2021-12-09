@@ -16,6 +16,7 @@ import { ModalConstants } from 'utils/constants';
 
 // Constants
 import { AppState } from 'utils/constants';
+import SignalQualityMonitorButton from './IconButtons/SignalQualityMonitorButton.component';
 
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
@@ -38,9 +39,15 @@ const MainNavigation = () => {
           <ReviewIconButton
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />
+          <SignalQualityMonitorButton
+            onClick={() =>
+              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
+            }
+          />
         </>
       );
       break;
+
     case AppState.RECORD:
       navIcons = (
         <>
@@ -53,6 +60,11 @@ const MainNavigation = () => {
           />
           <ReviewIconButton
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
+          />
+          <SignalQualityMonitorButton
+            onClick={() =>
+              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
+            }
           />
         </>
       );
@@ -71,6 +83,32 @@ const MainNavigation = () => {
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
             isActive
           />
+          <SignalQualityMonitorButton
+            onClick={() =>
+              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
+            }
+          />
+        </>
+      );
+      break;
+    case AppState.SIGNAL_QUALITY_MONITOR:
+      navIcons = (
+        <>
+          <HomeIconButton
+            onClick={() => dispatch(changeAppState(AppState.HOME))}
+          />
+          <SignalIconButton
+            onClick={() => dispatch(changeAppState(AppState.RECORD))}
+          />
+          <ReviewIconButton
+            onClick={() => dispatch(changeAppState(AppState.REVIEW))}
+          />
+          <SignalQualityMonitorButton
+            onClick={() =>
+              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
+            }
+            isActive
+          />
         </>
       );
       break;
@@ -84,6 +122,7 @@ const MainNavigation = () => {
     <div className="main-navigation text-center">
       <div className="relative h-full">
         {navIcons}
+
         <div className="absolute bottom-0">
           <SettingsIconButton
             onClick={() =>

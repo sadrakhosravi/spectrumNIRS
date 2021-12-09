@@ -95,9 +95,9 @@ const RecentExperimentsContainer = ({
             refetch={refetch}
           />
         ))}
-      {/* {experiments.searchedExperiments.length === 0 && (
+      {experiments.searchedExperiments.length === 0 && (
         <p className="text-white opacity-30">No recent experiment found.</p>
-      )} */}
+      )}
       {children}
     </div>
   );

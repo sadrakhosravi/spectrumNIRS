@@ -66,7 +66,6 @@ class ChartClass {
       numberOfRows, //Total number of rows for the dashboard - default 8
       numberOfColumns: 2, //Full width
       container, //div id to attach to
-      disableAnimations: true,
       antialias: true,
       theme: Themes.darkGold,
     });
@@ -160,7 +159,16 @@ class ChartClass {
           .setStrokeStyle(emptyLine);
       } else {
         axisX
-          .setTickStrategy(AxisTickStrategies.Time)
+          .setTickStrategy(AxisTickStrategies.Time, (ticks) =>
+            ticks
+              .setMajorTickStyle((majorTickStyle) =>
+                majorTickStyle.setGridStrokeStyle(emptyLine)
+              )
+              .setMinorTickStyle((minorTickStyle: any) =>
+                minorTickStyle.setGridStrokeStyle(emptyLine)
+              )
+          )
+
           .setTitle('Time (hh:mm:ss)')
           .setScrollStrategy(AxisScrollStrategies.progressive);
       }

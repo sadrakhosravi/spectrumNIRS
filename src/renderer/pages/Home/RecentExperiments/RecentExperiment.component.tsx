@@ -50,9 +50,12 @@ const RecentExperiment: React.FC<IProps> = ({
     <button
       className={`${
         isActive ? 'bg-accent' : 'bg-grey2 hover:bg-grey3 '
-      } flex gap-2 items-center w-full px-3 py-5 mb-3 rounded-md duration-150 hover:cursor-pointer`}
+      } flex gap-2 items-center w-full mb-3 rounded-md duration-150 hover:cursor-pointer`}
     >
-      <div className="w-full flex" onClick={handleOpenExperimentButton}>
+      <div
+        className="w-full flex px-3 py-5"
+        onClick={handleOpenExperimentButton}
+      >
         <div className="flex w-2/3 items-center">
           <span className="inline-block mr-5">
             <img
@@ -73,6 +76,7 @@ const RecentExperiment: React.FC<IProps> = ({
         </div>
       </div>
       <DeleteButton
+        className="mr-4"
         onClick={async () => {
           await deleteExperimentAndData(experiment.id);
           refetch();

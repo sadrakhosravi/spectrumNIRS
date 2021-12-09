@@ -33,6 +33,7 @@ export const RecordChannels = {
   Base: RecordBase,
   Init: RecordBase + 'init',
   Recording: RecordBase + 'recording',
+  QualityMonitor: RecordBase + 'quality-monitor',
   Stop: RecordBase + 'stop',
   Pause: RecordBase + 'pause',
   Continue: RecordBase + 'continue',

@@ -32,7 +32,7 @@ export class RecordingsData extends BaseEntity {
   TOI: number;
 
   @Column({ type: 'text', nullable: true })
-  rawValues: string;
+  PDRawData: string;
 
   @Column({ type: 'text', nullable: true })
   LEDIntensities: string;
@@ -45,6 +45,12 @@ export class RecordingsData extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   events: string;
+
+  @Column({ type: 'text', nullable: true })
+  sensorRawData1: string;
+
+  @Column({ type: 'text', nullable: true })
+  sensorRawData2: string;
 
   @ManyToOne(() => Recordings, {
     select: false,

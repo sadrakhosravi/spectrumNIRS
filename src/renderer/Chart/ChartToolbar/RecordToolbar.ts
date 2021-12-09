@@ -9,6 +9,9 @@ import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import MarkerIcon from '@icons/marker.svg';
 import RawDataIcon from '@icons/raw-data.svg';
+import TimeDivisionIcon from '@icons/time-division.svg';
+
+// Constants
 
 // Constants
 import { RecordState } from '@utils/constants';
@@ -128,6 +131,15 @@ export const RecordToolbar = [
       chartOptions.addMarker('Event2', '#fff');
       dispatch(toggleEvent2());
     },
+  },
+  {
+    label: 'separator',
+  },
+  {
+    label: 'timeDivision',
+    tooltip: 'timeDivision',
+    icon: TimeDivisionIcon,
+    click: () => {},
   },
 ];
 

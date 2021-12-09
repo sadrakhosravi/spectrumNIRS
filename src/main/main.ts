@@ -24,13 +24,13 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
-const isDevelopment =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+// const isDevelopment =
+//   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-// Load debugger if app is in development
-if (isDevelopment) {
-  require('electron-debug')();
-}
+// // Load debugger if app is in development
+// if (isDevelopment) {
+//   require('electron-debug')();
+// }
 
 // Create the main window
 const createMainWindow = async () => {
