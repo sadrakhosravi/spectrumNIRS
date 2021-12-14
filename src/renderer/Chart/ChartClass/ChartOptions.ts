@@ -1,4 +1,13 @@
-import { ColorHEX, Dashboard, SolidFill, SolidLine } from '@arction/lcjs';
+import {
+  ColorHEX,
+  ColorRGBA,
+  Dashboard,
+  FontSettings,
+  SolidFill,
+  SolidLine,
+  UIElementBuilders,
+  UIPointableTextBox,
+} from '@arction/lcjs';
 import { setAllEvents } from '@redux/ChartSlice';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -80,11 +89,27 @@ class ChartOptions {
     const eventState = state[name.toLocaleLowerCase()];
 
     const customTick = axisX
-      .addCustomTick()
+      .addCustomTick(UIElementBuilders.PointableTextBox)
       .setValue(xValue)
       .setTextFormatter((_value: any) =>
         eventState ? `${name}:End` : `${name}:Start`
       );
+
+    customTick.setMarker((tickMarker: UIPointableTextBox) =>
+      tickMarker
+        // ^ Above type cast is necessary to access full configuration API of UIPointableTextBox
+        // Style TickMarker background fill color.
+        .setBackground((background) =>
+          background.setFillStyle(
+            new SolidFill({ color: ColorRGBA(0, 0, 0, 100) })
+          )
+        )
+        .setTextFont(
+          new FontSettings({
+            size: 14,
+          })
+        )
+    );
 
     this.charts.forEach((chart: any) => {
       const cl = chart.getDefaultAxisX().addConstantLine();
@@ -110,8 +135,9 @@ class ChartOptions {
       this.charts && this.charts[this.charts.length - 1].getDefaultAxisX();
 
     const customTick = axisX
-      .addCustomTick()
+      .addCustomTick(UIElementBuilders.AxisTick)
       .setValue(xValue)
+
       .setTextFormatter((_value: any) => name);
 
     this.charts.forEach((chart: any) => {

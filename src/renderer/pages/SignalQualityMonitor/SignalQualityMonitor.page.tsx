@@ -18,8 +18,6 @@ import { RecordChannels } from '@utils/channels';
 
 const SignalQualityMonitorPage = () => {
   const [isQualityChecking, setIsQualityChecking] = useState(false);
-  const [isFirstTime, setIsFirstTime] = useState(true);
-
   const containerId = 'signalQualityMonitorChart';
   const isSidebarActive = useAppSelector(
     (state) => state.appState.recordSidebar
@@ -36,16 +34,11 @@ const SignalQualityMonitorPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    !isFirstTime && signalQualityMonitor(isQualityChecking);
-    isFirstTime && setIsFirstTime(false);
-
-    if (!isQualityChecking) {
-      console.log('Clear Data');
-      console.log(chart);
-      chart?.resetData();
-    }
-  }, [isQualityChecking]);
+  const handleStartMonitoring = async () => {
+    const isStarted = await signalQualityMonitor(!isQualityChecking);
+    isStarted && setIsQualityChecking(true);
+    !isStarted && setIsQualityChecking(false);
+  };
 
   return (
     <div className="h-full">
@@ -67,7 +60,7 @@ const SignalQualityMonitorPage = () => {
                 icon={isQualityChecking ? PauseIcon : StartIcon}
                 text={isQualityChecking ? 'Stop' : 'Start'}
                 onClick={() => {
-                  setIsQualityChecking(!isQualityChecking);
+                  handleStartMonitoring();
                 }}
                 isActive={isQualityChecking}
               />

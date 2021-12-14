@@ -25,8 +25,13 @@ const EventsWidget = ({ setLoading, children }: any) => {
   };
 
   useEffect(() => {
-    setLoading(false);
-  }, []);
+    // Wait for all events to load
+    allEvents && setLoading(false);
+    console.log(allEvents);
+  }, [allEvents]);
+
+  console.log(allEvents);
+
   return (
     <div className="bg-grey3 h-[calc(66.7%-3rem)] rounded-b-md">
       <Header>
@@ -44,30 +49,30 @@ const EventsWidget = ({ setLoading, children }: any) => {
 
       {/** Filter Form */}
 
-      <div className="px-4 py-4">
-        <div hidden={currentTab !== 0}>
-          <h3 className="text-xl font-medium">All Events:</h3>
-          <div className="overflow-y-auto">
-            <ul className="my-4 bg-grey1 p-3 w-full rounded-md">
-              <li className="w-full border-b-grey2 border-b-2 h-8 flex items-center mb-2">
-                <span className="w-1/12">#</span>
-                <span className="w-7/12">Name</span>
-                <span className="w-4/12">Time</span>
-              </li>
-              <div className="h-72 overflow-y-auto  overflow-x-hidden">
-                {allEvents?.map((event: any, i: number) => (
-                  <li
-                    className="w-full h-8 flex items-center cursor-pointer hover:text-accent"
-                    onClick={() => {
-                      dispatch(setCurrentEventTimeStamp(event.timeStamp));
-                    }}
-                    title={`Click to view the the event: ${event.name}`}
-                  >
-                    <span className="w-1/12">{i + 1}.</span>
-                    <span className="w-7/12">{event.name}</span>
-                    <span className="w-4/12">{event.time}</span>
-                  </li>
-                ))}
+      <div className="px-4 py-4 h-full">
+        <div className="h-full" hidden={currentTab !== 0}>
+          <div className="overflow-y-auto h-full">
+            <ul className="my-4 bg-grey1 p-3 w-full rounded-md h-[calc(100%-4rem)]">
+              <div className="h-[100%] overflow-y-auto  overflow-x-hidden">
+                {allEvents?.map(
+                  (event: any, i: number) =>
+                    !event.end && (
+                      <li
+                        key={event + i}
+                        className="w-full h-10 flex items-center gap-3 cursor-pointer bg-grey2 p-4 rounded-sm border-b-[3px] border-grey1 hover:text-blue-400 hover:bg-grey1"
+                        onClick={() => {
+                          dispatch(setCurrentEventTimeStamp(event.timeStamp));
+                        }}
+                        title={`Click to view the the event: ${event.name}`}
+                      >
+                        <span className="w-6/12 text-base">{event.name}</span>
+                        <span className="w-6/12 text-base">{event.time}</span>
+                      </li>
+                    )
+                )}
+                {allEvents?.length === 0 && (
+                  <p className="text-light2">No event found</p>
+                )}
               </div>
             </ul>
           </div>
@@ -99,4 +104,4 @@ const EventsWidget = ({ setLoading, children }: any) => {
   );
 };
 
-export default withLoading(EventsWidget, 'Contacting Hardware ...');
+export default withLoading(EventsWidget, 'Loading events ...');

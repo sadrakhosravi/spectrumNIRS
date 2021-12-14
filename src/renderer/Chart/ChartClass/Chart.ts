@@ -106,9 +106,10 @@ class ChartClass {
             // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
             pattern: 'ProgressiveX',
             // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
-            regularProgressiveStep: true,
+            regularProgressiveStep: false,
           },
         })
+        .setDataCleaning({ minDataPointCount: 1 }) // Enable data cleaning by default
         .setStrokeStyle(
           new SolidLine({
             thickness: 2,

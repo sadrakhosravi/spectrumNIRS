@@ -38,10 +38,7 @@ const ChartToolbar = ({
             <IconButtonWithTooltip
               icon={option.icon}
               isActive={chartState[option.label] || false}
-              onClick={() =>
-                //@ts-ignore
-                option.click && option.click(chartOptions)
-              }
+              onClick={() => option.click && option.click(chartOptions)}
               tooltip={
                 option.tooltip === 'timeDivision' ? (
                   <TimeDivision chartOptions={chartOptions} />

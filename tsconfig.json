@@ -23,9 +23,9 @@
       "@electron/*": ["./main/*"],
       "@utils/*": ["./utils/*"]
     },
-    "target": "ES2019",
+    "target": "es2020",
     "module": "CommonJS",
-    "lib": ["dom", "ES2019", "esnext"],
+    "lib": ["dom", "es2020", "esnext"],
     "declaration": true,
     "declarationMap": true,
     "jsx": "react",

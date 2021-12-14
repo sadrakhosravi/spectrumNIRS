@@ -22,7 +22,8 @@ const OpenPatientForm = () => {
   const experimentId = useAppSelector(
     (state) => state.experimentData.currentExperiment.id
   );
-  const getAllPatients = async () => {
+
+  const getAllPatients2 = async () => {
     const allPatients = await window.api.invokeIPC(
       ExperimentChannels.getAllPatients,
       experimentId
@@ -31,9 +32,16 @@ const OpenPatientForm = () => {
   };
 
   useEffect(() => {
-    requestAnimationFrame(() => {
+    const getAllPatients = async () => {
+      const allPatients = await window.api.invokeIPC(
+        ExperimentChannels.getAllPatients,
+        experimentId
+      );
+      allPatients && setPatients(allPatients);
+    };
+    setTimeout(() => {
       getAllPatients();
-    });
+    }, 100);
   }, []);
 
   return (
@@ -44,7 +52,7 @@ const OpenPatientForm = () => {
             <SelectPatient
               patient={patient}
               key={patient.id}
-              getAllPatients={getAllPatients}
+              getAllPatients={getAllPatients2}
             />
           ))}
       </ul>

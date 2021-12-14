@@ -57,18 +57,19 @@ ipcMain.on(RecordChannels.Recording, () => {
 
 // Start quality monitor
 ipcMain.on(RecordChannels.QualityMonitor, (_event, active: boolean) => {
+  if (!reader) return;
   active && reader.startQualityMonitor();
   !active && reader && reader.stopRecording();
 });
 
 // Stop recording
 ipcMain.on(RecordChannels.Stop, () => {
-  reader.stopRecording();
+  reader && reader.stopRecording();
 });
 
 // Pause recording
 ipcMain.on(RecordChannels.Pause, () => {
-  reader.pauseRecording();
+  reader && reader.pauseRecording();
 });
 
 // Continue recording

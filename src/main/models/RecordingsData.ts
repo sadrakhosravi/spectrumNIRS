@@ -51,7 +51,7 @@ class RecordData {
         .where('recordingId = :recordingId', { recordingId })
         .andWhere('timeStamp >= :start', { start })
         .andWhere('timeStamp <= :end', { end })
-        .orderBy({ id: 'DESC' })
+        .orderBy({ id: 'ASC' })
         .getRawMany();
     } catch (error: any) {
       throw new Error(error.message);
@@ -97,7 +97,7 @@ class RecordData {
         .from('RecordingsData', '')
         .where('recordingId = :recordingId', { recordingId })
         .andWhere('event = 1')
-        .orderBy({ id: 'DESC' })
+        .orderBy({ id: 'ASC' })
         .getRawMany();
     } catch (error: any) {
       throw new Error(error.message);

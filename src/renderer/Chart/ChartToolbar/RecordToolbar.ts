@@ -7,24 +7,22 @@ import ResetZoom from '@icons/reset-zoom.svg';
 import FocusModeIcon from '@icons/focus-mode.svg';
 import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
-import MarkerIcon from '@icons/marker.svg';
 import RawDataIcon from '@icons/raw-data.svg';
 import TimeDivisionIcon from '@icons/time-division.svg';
 
 // Constants
-
-// Constants
 import { RecordState } from '@utils/constants';
-import { DialogBoxChannels } from '@utils/channels';
 
 // Adapters
 import { handlePause, handleRecord } from '@adapters/recordAdapter';
 import ChartOptions from '../ChartClass/ChartOptions';
 
-// Store
-import { dispatch, getState } from '@redux/store';
+// State
+import { dispatch } from '@redux/store';
+import { toggleRawData } from '@redux/ChartSlice';
 
-import { toggleRawData, toggleHypoxia, toggleEvent2 } from '@redux/ChartSlice';
+// Events
+import { events } from '@electron/configs/events';
 
 export const RecordToolbar = [
   {
@@ -92,46 +90,7 @@ export const RecordToolbar = [
   {
     label: 'separator',
   },
-  {
-    label: `hypoxia`,
-    tooltip: 'Hypoxia Event',
-    icon: MarkerIcon,
-    click: (chartOptions: ChartOptions) => {
-      const recordState = getState().recordState.value;
-      if (recordState === 'idle') {
-        window.api.invokeIPC(DialogBoxChannels.MessageBox, {
-          title: 'Error',
-          type: 'error',
-          message: 'No Recording Found',
-          detail: 'Please start a recording first',
-        });
-        return;
-      }
-      chartOptions.addMarker('Hypoxia', '#007ACD');
-      setTimeout(() => {
-        dispatch(toggleHypoxia());
-      }, 0);
-    },
-  },
-  {
-    label: `event2`,
-    tooltip: 'Event 2',
-    icon: MarkerIcon,
-    click: (chartOptions: ChartOptions) => {
-      const recordState = getState().recordState.value;
-      if (recordState === 'idle') {
-        window.api.invokeIPC(DialogBoxChannels.MessageBox, {
-          title: 'Error',
-          type: 'error',
-          message: 'No Recording Found',
-          detail: 'Please start a recording first',
-        });
-        return;
-      }
-      chartOptions.addMarker('Event2', '#fff');
-      dispatch(toggleEvent2());
-    },
-  },
+  ...events,
   {
     label: 'separator',
   },

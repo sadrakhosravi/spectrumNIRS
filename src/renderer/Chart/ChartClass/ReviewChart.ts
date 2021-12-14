@@ -17,11 +17,13 @@ import {
   ZoomBandChart,
 } from '@arction/lcjs';
 import ChartOptions from './ChartOptions';
+import WorkerManager from 'workers/WorkerManager';
 import { getState, dispatch } from '@redux/store';
 import { setIsLoadingData } from '@redux/AppStateSlice';
 
 import { ChartChannels } from '@utils/channels';
 import AccurateTimer from '@electron/helpers/accurateTimer';
+import { setAllEvents } from '@redux/ChartSlice';
 
 class ReviewChart extends Chart {
   numberOfRows: number;
@@ -94,7 +96,6 @@ class ReviewChart extends Chart {
       end: 300000,
     });
     if (data.length !== 0) {
-      data.reverse();
       this.XMax = data[data.length - 1].timeStamp;
       console.log(data[data.length - 1]);
       this.drawDataOnCharts(data);
@@ -244,7 +245,6 @@ class ReviewChart extends Chart {
         }
       );
       if (data.length > 1) {
-        data.reverse();
         this.drawDataOnCharts(data);
       } else {
         this.isLoadingData = false;
@@ -269,7 +269,6 @@ class ReviewChart extends Chart {
         }
       );
       if (data.length > 1) {
-        data.reverse();
         this.drawDataOnCharts(data);
         console.log(data);
       } else {
@@ -280,11 +279,25 @@ class ReviewChart extends Chart {
   };
 
   loadAllEvents = async () => {
-    const data = await window.api.invokeIPC(
+    const events = await window.api.invokeIPC(
       ChartChannels.GetAllEvents,
       getState().experimentData.currentRecording.id
     );
-    console.log(data);
+
+    // If any events found, send them to the worker to
+    // return a sorted list with the start and end of each event
+    if (events.length > 0) {
+      const eventsWorker = WorkerManager.startEventsWorker();
+      eventsWorker.postMessage(events);
+      eventsWorker.onmessage = ({ data }) => {
+        dispatch(setAllEvents(data));
+        console.log(data);
+        eventsWorker.terminate();
+        return;
+      };
+    }
+
+    dispatch(setAllEvents([]));
   };
 
   createZoomBandChart() {

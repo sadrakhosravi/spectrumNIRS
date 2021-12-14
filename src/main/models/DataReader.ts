@@ -92,7 +92,7 @@ export class DataReader implements IDataReaders {
   }
 
   stopRecording() {
-    this.currentSensor.stop();
+    this.currentSensor && this.currentSensor.stop();
     this.lastTimeStamp = 0;
   }
 

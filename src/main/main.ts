@@ -60,6 +60,7 @@ const createMainWindow = async () => {
     webPreferences: {
       nativeWindowOpen: false,
       sandbox: false,
+      nodeIntegrationInWorker: true,
       partition: 'persist:spectrum',
       webgl: true,
       contextIsolation: true,

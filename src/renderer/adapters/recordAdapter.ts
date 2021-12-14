@@ -95,8 +95,21 @@ export const handlePause = () => {
 /**
  * Send a signal to the main process to start the signal quality monitor
  */
-export const signalQualityMonitor = (active: boolean) => {
+export const signalQualityMonitor = async (active: boolean) => {
   const sensorId = store.getState().sensorState.detectedSensor?.id;
+  console.log(sensorId);
+  if (sensorId === undefined) {
+    await window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+      title: 'No Sensor Found',
+      type: 'error',
+      message: 'No Sensor was detected on the system',
+      detail: 'Please attach a sensor and try again',
+    });
+
+    return false;
+  }
   window.api.invokeIPC(RecordChannels.Init, { sensorId });
   window.api.sendIPC(RecordChannels.QualityMonitor, active);
+
+  return true;
 };
