@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Patients } from './Patients';
 
-@Entity()
+@Entity({ name: 'experiments' })
 export class Experiments extends BaseEntity {
   @OneToMany(() => Patients, (patients) => patients.experiment)
   @PrimaryGeneratedColumn()
@@ -32,4 +32,4 @@ export class Experiments extends BaseEntity {
   public updatedAt: Date;
 }
 
-exports.Experiments = Experiments;
+export default Experiments;

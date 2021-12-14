@@ -1,6 +1,8 @@
 import { getConnection } from 'typeorm';
-import { RecordingsEntity } from '@electron/paths';
-const { Recordings } = require(RecordingsEntity);
+// import { RecordingsEntity } from '@electron/paths';
+// const { Recordings } = require(RecordingsEntity);
+
+import Recordings from 'db/entity/Recordings';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';

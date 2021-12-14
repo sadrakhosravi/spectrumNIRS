@@ -32,19 +32,15 @@ export default merge(baseConfig, {
 
   target: ['web', 'electron-renderer'],
 
-  entry: [
-    'core-js',
-    'regenerator-runtime/runtime',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
-  ],
+  entry: {
+    main: path.join(webpackPaths.srcRendererPath, 'index.tsx'),
+  },
 
   output: {
     path: webpackPaths.distRendererPath,
     publicPath: './',
-    filename: 'renderer.js',
-    library: {
-      type: 'umd',
-    },
+    filename: '[name].bundle.js',
+    chunkFilename: '[name].bundle.js',
   },
 
   module: {
@@ -61,7 +57,6 @@ export default merge(baseConfig, {
               importLoaders: 1,
             },
           },
-          'sass-loader',
           {
             loader: 'postcss-loader',
             options: {
@@ -70,12 +65,18 @@ export default merge(baseConfig, {
               },
             },
           },
+          'sass-loader',
         ],
         include: /\.module\.s?(c|a)ss$/,
       },
       {
         test: /\.s?(a|c)ss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+          'postcss-loader',
+        ],
         exclude: /\.module\.s?(c|a)ss$/,
       },
       //Font Loader

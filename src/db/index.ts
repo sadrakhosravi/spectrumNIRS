@@ -1,4 +1,8 @@
 import { createConnection } from 'typeorm';
+import Experiments from './entity/Experiments';
+import Patients from './entity/Patients';
+import Recordings from './entity/Recordings';
+import RecordingsData from './entity/RecordingsData';
 
 import path from 'path';
 process.env.TZ = 'America/Vancouver'; // here is the magical line
@@ -12,7 +16,7 @@ const createDBConnection = async () => {
     database: path.join(databasePath, 'mydb.db'),
     synchronize: true,
     logging: false,
-    entities: [path.join(__dirname, './entity/*.ts')],
+    entities: [Experiments, Patients, Recordings, RecordingsData],
     migrations: ['src/db/migration/**/*.ts'],
     subscribers: ['src/db/subscriber/**/*.ts'],
   });

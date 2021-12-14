@@ -69,11 +69,7 @@ class ChartClass {
       antialias: true,
       theme: Themes.darkGold,
     });
-    dashboard.setBackgroundFillStyle(
-      new SolidFill({
-        color: ColorHEX('#0d0c0c'),
-      })
-    );
+
     dashboard.setColumnWidth(0, 1);
     dashboard.setColumnWidth(1, 11);
     return dashboard;
@@ -169,10 +165,25 @@ class ChartClass {
                 minorTickStyle.setGridStrokeStyle(emptyLine)
               )
           )
-
           .setTitle('Time (hh:mm:ss)')
           .setScrollStrategy(AxisScrollStrategies.progressive);
       }
+
+      axisY.setTickStrategy(AxisTickStrategies.Numeric, (ticks) =>
+        ticks
+          .setMajorTickStyle((majorTickStyle) =>
+            majorTickStyle.setGridStrokeStyle(
+              new SolidLine({
+                thickness: -1,
+                fillStyle: new SolidFill({ color: ColorHEX('#1e1e1e') }),
+              })
+            )
+          )
+          .setMinorTickStyle((minorTickStyle: any) =>
+            minorTickStyle.setGridStrokeStyle(emptyLine)
+          )
+      );
+
       // Remove all chart titles
       if (i === 0) {
         chart.setTitle('Sensor Data');

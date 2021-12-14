@@ -15,7 +15,7 @@ import {
 import { Patients } from './Patients';
 import { RecordingsData } from './RecordingsData';
 
-@Entity()
+@Entity({ name: 'recordings' })
 export class Recordings extends BaseEntity {
   @OneToMany(() => RecordingsData, (recordingsData) => recordingsData.recording)
   @PrimaryGeneratedColumn()
@@ -42,4 +42,4 @@ export class Recordings extends BaseEntity {
   @UpdateDateColumn()
   public updatedAt: Date;
 }
-exports.Recordings = Recordings;
+export default Recordings;

@@ -13,7 +13,7 @@ import {
 import { Experiments } from './Experiments';
 import { Recordings } from './Recordings';
 
-@Entity()
+@Entity({ name: 'patients' })
 export class Patients extends BaseEntity {
   @OneToMany(() => Recordings, (recordings) => recordings.patient)
   @PrimaryGeneratedColumn()
@@ -38,4 +38,4 @@ export class Patients extends BaseEntity {
   public updatedAt: Date;
 }
 
-exports.Patients = Patients;
+export default Patients;

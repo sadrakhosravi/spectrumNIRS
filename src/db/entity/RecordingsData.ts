@@ -8,10 +8,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-
 import { Recordings } from './Recordings';
 
-@Entity()
+@Entity({ name: 'recordings_data' })
 export class RecordingsData extends BaseEntity {
   @PrimaryGeneratedColumn({ select: false })
   id: number;
@@ -59,4 +58,4 @@ export class RecordingsData extends BaseEntity {
   recording: Recordings;
 }
 
-exports.RecordingsData = RecordingsData;
+export default RecordingsData;

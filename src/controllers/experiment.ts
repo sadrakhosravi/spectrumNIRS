@@ -57,19 +57,19 @@ ipcMain.handle(
 ipcMain.handle(
   ExperimentChannels.deleteExperiment,
   async (_event, experimentId: number) =>
-    await Experiment.deleteData(experimentId, 'Experiments')
+    await Experiment.deleteData(experimentId, 'experiments')
 );
 
 // Delete the selected patient and all its data
 ipcMain.handle(
   ExperimentChannels.deletePatient,
   async (_event, patientId: number) =>
-    await Experiment.deleteData(patientId, 'Patients')
+    await Experiment.deleteData(patientId, 'patients')
 );
 
 // Delete the selected recordings and all its data
 ipcMain.handle(
   ExperimentChannels.deleteRecording,
   async (_event, recordingId: number) =>
-    await Experiment.deleteData(recordingId, 'Recordings')
+    await Experiment.deleteData(recordingId, 'recordings')
 );

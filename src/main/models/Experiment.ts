@@ -1,8 +1,8 @@
 import { getConnection } from 'typeorm';
-import { ExperimentsEntity, PatientsEntity } from '@electron/paths';
+
 import createDBConnection from 'db';
-const { Experiments } = require(ExperimentsEntity);
-const { Patients } = require(PatientsEntity);
+import Experiments from 'db/entity/Experiments';
+import Patients from 'db/entity/Patients';
 
 type ExpData = {
   experiment: any;
@@ -60,7 +60,7 @@ export class Experiment {
     await getConnection()
       .createQueryBuilder()
       .select()
-      .from('Experiments', '')
+      .from(Experiments, '')
       .limit(limit)
       .orderBy({
         updatedAt: 'DESC',
@@ -74,7 +74,7 @@ export class Experiment {
   public static updateExperiment = async (experimentId: number) =>
     await getConnection()
       .createQueryBuilder()
-      .update('Experiments')
+      .update(Experiments)
       .set({ updatedAt: new Date() })
       .where('id = :id', { id: experimentId })
       .execute();
@@ -86,7 +86,7 @@ export class Experiment {
    */
   public static deleteData = async (
     id: number,
-    table: 'Experiments' | 'Patients' | 'Recordings'
+    table: 'experiments' | 'patients' | 'recordings'
   ) => {
     const deleted = await getConnection()
       .createQueryBuilder()

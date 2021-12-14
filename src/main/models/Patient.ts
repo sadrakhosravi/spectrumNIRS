@@ -1,7 +1,6 @@
 import { getConnection } from 'typeorm';
-import { PatientsEntity } from '@electron/paths';
-const { Patients } = require(PatientsEntity);
-
+// import { PatientsEntity } from '@electron/paths';
+import Patients from 'db/entity/Patients';
 // Interfaces
 import { INewPatientData } from 'interfaces/interfaces';
 

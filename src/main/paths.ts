@@ -19,16 +19,16 @@ export const databaseEntitiesPath =
     ? path.resolve(__dirname, '../db/entity')
     : path.resolve(__dirname);
 
-export const ExperimentsEntity = path.resolve(
-  databaseEntitiesPath,
-  'Experiments'
-);
-export const PatientsEntity = path.resolve(databaseEntitiesPath, 'Patients');
-export const RecordingsEntity = path.resolve(
-  databaseEntitiesPath,
-  'Recordings'
-);
-export const RecordingsDataEntity = path.resolve(
-  databaseEntitiesPath,
-  'RecordingsData'
-);
+// export const ExperimentsEntity = path.resolve(
+//   databaseEntitiesPath,
+//   'Experiments'
+// );
+// export const PatientsEntity = path.resolve(databaseEntitiesPath, 'Patients');
+// export const RecordingsEntity = path.resolve(
+//   databaseEntitiesPath,
+//   'Recordings'
+// );
+// export const RecordingsDataEntity = path.resolve(
+//   databaseEntitiesPath,
+//   'RecordingsData'
+// );
