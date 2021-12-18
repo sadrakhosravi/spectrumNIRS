@@ -21,6 +21,7 @@ import {
   UIBackground,
   LineSeries,
   VisibleTicks,
+  customTheme,
 } from '@arction/lcjs';
 // import ChartOptions from './ChartOptions';
 // Import data-generators from 'xydata'-library.
@@ -62,12 +63,25 @@ class ChartClass {
 
   // Chart dashboard
   createDashboard(numberOfRows: number, container: string): Dashboard {
+    const fillStyle = new SolidFill({
+      color: ColorHEX('#111'),
+    });
+
+    const seriesFillStyle = new SolidFill({
+      color: ColorHEX('#000'),
+    });
+
+    const spectrumTheme = customTheme(Themes.darkGold, {
+      panelBackgroundFillStyle: fillStyle,
+      seriesBackgroundFillStyle: seriesFillStyle,
+    });
+
     const dashboard = lightningChart().Dashboard({
       numberOfRows, //Total number of rows for the dashboard - default 8
       numberOfColumns: 2, //Full width
       container, //div id to attach to
       antialias: true,
-      theme: Themes.darkGold,
+      theme: spectrumTheme,
     });
 
     dashboard.setColumnWidth(0, 1);

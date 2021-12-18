@@ -28,30 +28,32 @@ const WidgetsContainer = ({
   };
 
   return (
-    <>
+    <div className="h-[calc(100%-1px)]">
       {isSidebarActive && (
-        <div className="h-[calc(100%-1px)] relative pb-3">
-          {type === ChartType.RECORD && (
-            <>
-              <Filter />
-              <Intensities />
-            </>
-          )}
-          {type === ChartType.REVIEW && (
-            <>
-              <EventsWidget />
-            </>
-          )}
-
+        <>
+          {' '}
+          <div className="h-[calc(100%-2rem)] relative pb-3 grid grid-flow-row grid-rows-5 gap-5">
+            {type === ChartType.RECORD && (
+              <>
+                <Filter />
+                <Intensities />
+              </>
+            )}
+            {type === ChartType.REVIEW && (
+              <>
+                <EventsWidget />
+              </>
+            )}
+          </div>
           <button
             className="absolute bottom-1 left-2 w-full h-8 text-light2 hover:text-white"
             onClick={handleHideSidebarClick}
           >
             Hide Sidebar
           </button>
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
 };
 

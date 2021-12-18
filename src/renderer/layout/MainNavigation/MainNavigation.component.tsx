@@ -16,7 +16,7 @@ import { ModalConstants } from 'utils/constants';
 
 // Constants
 import { AppState } from 'utils/constants';
-import SignalQualityMonitorButton from './IconButtons/SignalQualityMonitorButton.component';
+import ProbeCalibrationButton from './IconButtons/ProbeCalibrationButton';
 
 const MainNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
@@ -39,10 +39,8 @@ const MainNavigation = () => {
           <ReviewIconButton
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />
-          <SignalQualityMonitorButton
-            onClick={() =>
-              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
-            }
+          <ProbeCalibrationButton
+            onClick={() => dispatch(changeAppState(AppState.PROBE_CALIBRATION))}
           />
         </>
       );
@@ -61,10 +59,8 @@ const MainNavigation = () => {
           <ReviewIconButton
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />
-          <SignalQualityMonitorButton
-            onClick={() =>
-              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
-            }
+          <ProbeCalibrationButton
+            onClick={() => dispatch(changeAppState(AppState.PROBE_CALIBRATION))}
           />
         </>
       );
@@ -83,15 +79,13 @@ const MainNavigation = () => {
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
             isActive
           />
-          <SignalQualityMonitorButton
-            onClick={() =>
-              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
-            }
+          <ProbeCalibrationButton
+            onClick={() => dispatch(changeAppState(AppState.PROBE_CALIBRATION))}
           />
         </>
       );
       break;
-    case AppState.SIGNAL_QUALITY_MONITOR:
+    case AppState.PROBE_CALIBRATION:
       navIcons = (
         <>
           <HomeIconButton
@@ -103,10 +97,8 @@ const MainNavigation = () => {
           <ReviewIconButton
             onClick={() => dispatch(changeAppState(AppState.REVIEW))}
           />
-          <SignalQualityMonitorButton
-            onClick={() =>
-              dispatch(changeAppState(AppState.SIGNAL_QUALITY_MONITOR))
-            }
+          <ProbeCalibrationButton
+            onClick={() => dispatch(changeAppState(AppState.PROBE_CALIBRATION))}
             isActive
           />
         </>

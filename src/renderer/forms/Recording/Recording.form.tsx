@@ -41,11 +41,7 @@ const RecordingForm = () => {
 
   // Handle form submit
   const onSubmit = (formData: FormData) => {
-    const samplingRate = parseInt(formData.sensor.samplingRate);
-    const channels = formData.sensor.channels.split(', ');
     const currentSensor = devices[sensor];
-    currentSensor.samplingRate = samplingRate;
-    currentSensor.channels = channels;
     newRecording(formData.recording);
     setSensorStatus(currentSensor);
   };
@@ -116,23 +112,6 @@ const RecordingForm = () => {
               ))}
             </div>
           </RadioGroup>
-          <h3 className="mt-4 py-2 text-xl">Sensor settings:</h3>
-          <label className="text-sm inline-block w-1/2 mt-2 pr-2">
-            <span className="block pb-1">Sampling Rate:</span>
-            <InputField
-              defaultValue={devices[sensor].samplingRate}
-              type="number"
-              register={register('sensor.samplingRate')}
-            />
-          </label>
-          <label className="text-sm inline-block w-1/2 mt-2 pl-2">
-            <span className="block pb-1">Channels:</span>
-            <InputField
-              defaultValue={devices[sensor].channels.join(', ')}
-              type="text"
-              register={register('sensor.channels')}
-            />
-          </label>
 
           <SubmitButton text="Create Recording" />
         </form>

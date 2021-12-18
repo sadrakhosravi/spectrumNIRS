@@ -40,7 +40,7 @@ export default merge(baseConfig, {
     path: webpackPaths.distRendererPath,
     publicPath: './',
     filename: '[name].bundle.js',
-    chunkFilename: '[name].bundle.js',
+    chunkFilename: '[name].chunk.js',
   },
 
   module: {
@@ -104,6 +104,9 @@ export default merge(baseConfig, {
   },
 
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
     minimize: true,
     minimizer: [
       new TerserPlugin({

@@ -79,6 +79,8 @@ export const newRecording = async (data: INewRecordingData) => {
     ExperimentChannels.NewRecording,
     data
   );
+
+  console.log(newRecording);
   dispatch(resetRecordingData());
   dispatch(setRecordingData(newRecording));
   dispatch(setInitialState());

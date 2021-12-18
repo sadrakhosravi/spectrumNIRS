@@ -46,10 +46,10 @@ export class RecordingsData extends BaseEntity {
   events: string;
 
   @Column({ type: 'text', nullable: true })
-  sensorRawData1: string;
+  sensor2RawData: string;
 
   @Column({ type: 'text', nullable: true })
-  sensorRawData2: string;
+  sensor3RawData: string;
 
   @ManyToOne(() => Recordings, {
     select: false,

@@ -1,11 +1,25 @@
+'use strict';
 /**
  * This worker takes an array of events passed on to it and return an array
  * containing the start and the end of each event
  */
 
-const dayjs = require('dayjs');
-const duration = require('dayjs/plugin/duration');
-dayjs.extend(duration);
+/**
+ * Converts milliseconds to time format
+ * @param {number} duration - Duration in milliseconds
+ * @returns Time in HH:mm:ss.ms format
+ */
+const msToTime = (duration) => {
+  var seconds = Math.floor((duration / 1000) % 60),
+    minutes = Math.floor((duration / (1000 * 60)) % 60),
+    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  hours = hours < 10 ? '0' + hours : hours;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  seconds = seconds < 10 ? '0' + seconds : seconds;
+
+  return hours + ':' + minutes + ':' + seconds;
+};
 
 // Listen for messages from the main thread
 self.onmessage = ({ data }) => {
@@ -18,7 +32,7 @@ const sortEvents = (data) => {
   const allEvents = ['hypoxia', 'event2'];
 
   // Array used to send the final sorted events to be added to the graph
-  eventsArr = [];
+  const eventsArr = [];
 
   // Keeps track of the current on/off events
   const currentEvent = {};
@@ -28,7 +42,7 @@ const sortEvents = (data) => {
     currentEvent[event] = false;
   });
 
-  console.time('startEvent');
+  console.time('startEvent'); // TODO: ONLY FOR DEBUGGING
 
   const dataLength = data.length;
   // Using for loop for maximum performance
@@ -44,7 +58,7 @@ const sortEvents = (data) => {
           ...data[i],
           name: event[0].toUpperCase() + event.substring(1) + ' Stop',
           end: true,
-          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          time: msToTime(data[i].timeStamp),
         });
       }
 
@@ -56,7 +70,7 @@ const sortEvents = (data) => {
           ...data[i],
           name: event[0].toUpperCase() + event.substring(1) + ' Stop',
           end: true,
-          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          time: msToTime(data[i].timeStamp),
         });
       }
 
@@ -70,14 +84,14 @@ const sortEvents = (data) => {
         eventsArr.push({
           ...data[i],
           name: event[0].toUpperCase() + event.substring(1),
-          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          time: msToTime(data[i].timeStamp),
         });
         currentEvent[event] = true;
       }
     });
   }
 
-  console.timeEnd('startEvent');
+  console.timeEnd('startEvent'); // TODO: ONLY FOR DEBUGGING
 
   return eventsArr;
 };

@@ -42,7 +42,7 @@ const WindowButtons = () => {
       />
       <img
         src={isMaximized ? Restore : Maximize}
-        title="Restore"
+        title={isMaximized ? 'Restore' : 'Maximize'}
         className="window-button hover:bg-accent"
         alt="Maximize/Restore"
         onClick={() => window.api.sendIPC('window:restore')}

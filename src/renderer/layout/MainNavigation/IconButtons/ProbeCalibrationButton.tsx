@@ -3,7 +3,7 @@ import React from 'react';
 // Tooltip
 import Tooltip from '@components/Tooltip/Tooltip.component';
 
-const SignalQualityMonitorButton = (props: any) => {
+const ProbeCalibrationButton = (props: any) => {
   const { isActive, onClick } = props;
   // Check if the button is active and set the styling accordingly
   let activeClass;
@@ -14,7 +14,7 @@ const SignalQualityMonitorButton = (props: any) => {
   }
 
   return (
-    <Tooltip text="Signal Quality Monitor" placement="right">
+    <Tooltip text="Probe Calibration" placement="right">
       <button
         type="button"
         className={`icon-button ${activeClass}`}
@@ -35,4 +35,4 @@ const SignalQualityMonitorButton = (props: any) => {
   );
 };
 
-export default SignalQualityMonitorButton;
+export default ProbeCalibrationButton;

@@ -15,6 +15,16 @@ import { resolveHtmlPath } from './util';
 import createDBConnection from '../db/index';
 // Import controllers
 import '../controllers';
+import { autoUpdater } from 'electron-updater';
+
+export default class AppUpdater {
+  constructor() {
+    const log = require('electron-log');
+    log.transports.file.level = 'debug';
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;

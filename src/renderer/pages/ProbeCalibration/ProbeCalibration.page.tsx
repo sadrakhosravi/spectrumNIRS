@@ -5,7 +5,7 @@ import { setRecordSidebar } from '@redux/AppStateSlice';
 import WidgetsContainer from '@chart/Widgets/WidgetsContainer.component';
 
 // Chart
-import SignalQualityMonitor from '@chart/ChartClass/SignalQualityMonitorChart';
+import ProbeCalibrationChart from '@chart/ChartClass/ProbeCalibrationChart';
 
 // Constants
 import { ChartType } from '@utils/constants';
@@ -16,16 +16,16 @@ import StartIcon from '@icons/start.svg';
 import PauseIcon from '@icons/pause.svg';
 import { RecordChannels } from '@utils/channels';
 
-const SignalQualityMonitorPage = () => {
+const ProbeCalibrationPage = () => {
   const [isQualityChecking, setIsQualityChecking] = useState(false);
-  const containerId = 'signalQualityMonitorChart';
+  const containerId = 'probeCalibrationChart';
   const isSidebarActive = useAppSelector(
     (state) => state.appState.recordSidebar
   );
   const dispatch = useAppDispatch();
-  let chart: SignalQualityMonitor | undefined;
+  let chart: ProbeCalibrationChart | undefined;
   useEffect(() => {
-    chart = new SignalQualityMonitor(containerId);
+    chart = new ProbeCalibrationChart(containerId);
     chart.createSignalMonitorChart();
 
     return () => {
@@ -36,8 +36,8 @@ const SignalQualityMonitorPage = () => {
 
   const handleStartMonitoring = async () => {
     const isStarted = await signalQualityMonitor(!isQualityChecking);
-    isStarted && setIsQualityChecking(true);
-    !isStarted && setIsQualityChecking(false);
+    isStarted && chart?.resetData();
+    isStarted && setIsQualityChecking(!isQualityChecking);
   };
 
   return (
@@ -68,7 +68,7 @@ const SignalQualityMonitorPage = () => {
           </div>
         </div>
         <div
-          className={`h-full mt-6 ${
+          className={`h-calc(100%-2rem) mt-6 ${
             isSidebarActive
               ? 'w-[325px]'
               : 'w-[20px] bg-grey1 hover:bg-accent hover:cursor-pointer'
@@ -81,4 +81,4 @@ const SignalQualityMonitorPage = () => {
     </div>
   );
 };
-export default SignalQualityMonitorPage;
+export default ProbeCalibrationPage;

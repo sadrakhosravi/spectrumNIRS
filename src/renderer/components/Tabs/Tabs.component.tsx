@@ -1,63 +1,85 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 
-// Tabs
-import { Tabs } from './Tabs';
+import IconText from '@components/MicroComponents/IconText/IconText.component';
 
-// Components
-import TabItem from '@components/Tabs/TabItem.component';
-import Clock from '@components/Clock/Clock.component';
+const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
+  const [activeTab, setActiveTab] = useState(0);
 
-// Redux
-import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
-import { changeAppState, setReviewTabInNewWindow } from '@redux/AppStateSlice';
+  if (!Array.isArray(children)) {
+    const { label } = children.props;
 
-// Constants
-import { ReviewTabChannels } from '@utils/channels';
-
-// Recording and review tabs
-const TabsContainer = () => {
-  const appState = useAppSelector((state) => state.appState);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    window.api.onIPCData(
-      ReviewTabChannels.IsNewWindowOpened,
-      (_event, data: boolean) => {
-        dispatch(setReviewTabInNewWindow(data));
-      }
+    return (
+      <>
+        <div className="h-40px bg-grey1">
+          <Tabs.Button
+            label={label}
+            isActive={true}
+            onClick={() => {}}
+            key={label}
+          />
+        </div>
+        <div>{children}</div>
+      </>
     );
-    const reviewTab = document.getElementById('Review');
-    const handleRightClick = () => {
-      window.api.sendIPC(
-        ReviewTabChannels.ContextMenu,
-        appState.reviewTabInNewWindow
-      );
-    };
-    reviewTab?.addEventListener('contextmenu', handleRightClick);
-
-    return () => {
-      reviewTab?.removeEventListener('contextmenu', handleRightClick);
-    };
-  }, []);
+  }
 
   return (
-    <>
-      <div className="w-full bg-dark h-40px pl-4 grid grid-flow-col auto-cols-max items-center relative">
-        {Tabs.map((tab) => (
-          <TabItem
-            name={tab.name}
-            icon={tab.icon}
-            isActive={tab.isActive(appState.value)}
-            onClick={() => dispatch(changeAppState(tab.path))}
-            key={tab.name}
-          />
-        ))}
-        <div className="absolute right-8">
-          <Clock />
-        </div>
+    <div className="h-full">
+      <div className="flex">
+        {Array.isArray(children) &&
+          children.map((child, i) => {
+            const { label } = child.props;
+            return (
+              <Tabs.Button
+                label={label}
+                isActive={activeTab === i}
+                onClick={() => setActiveTab(i)}
+                key={label + i}
+              />
+            );
+          })}
       </div>
-    </>
+      <div className="h-full">
+        {Array.isArray(children) &&
+          children.map((child, i) => activeTab === i && child)}
+      </div>
+    </div>
+  );
+};
+export default Tabs;
+
+type TabProps = {
+  label: string;
+  children: JSX.Element | JSX.Element[];
+};
+
+Tabs.Tab = ({ label, children }: TabProps) => {
+  return (
+    <div className="slideLeft my-3 px-3 h-[calc(100%-2rem)]" id={label}>
+      {children}
+    </div>
   );
 };
 
-export default TabsContainer;
+type ButtonProps = {
+  label: string;
+  onClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  isActive?: boolean;
+};
+
+Tabs.Button = ({ label, isActive = false, onClick }: ButtonProps) => {
+  const tabColor = isActive
+    ? `bg-grey3 z-10 border-accent hover:border-accent`
+    : `bg-grey1 border-grey1 hover:bg-grey2 hover:border-grey2 z-0`;
+
+  return (
+    <button
+      type="button"
+      className={`w-1/2 px-3 h-40px border-t-4 grid grid-flow-col auto-cols-max items-center transition duration-100 ${tabColor}`}
+      onClick={onClick}
+      id={label}
+    >
+      <IconText text={label} />
+    </button>
+  );
+};

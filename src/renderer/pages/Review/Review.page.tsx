@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { setReviewSidebar } from '@redux/AppStateSlice';

@@ -66,7 +66,8 @@ class ChartOptions {
           currentInterval.start + this.timeDivision,
           0,
           true
-        );
+        )
+        .release();
     }
   }
 

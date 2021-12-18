@@ -72,6 +72,7 @@ export const ChartChannels = {
   StreamData: ChartBase + 'stream-data',
   Event: ChartBase + 'event',
   ExportAll: ChartBase + 'export-all',
+  GetExportRange: ChartBase + 'get-export-range',
 };
 
 // User Settings

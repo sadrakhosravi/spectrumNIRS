@@ -34,7 +34,7 @@ export class Recordings extends BaseEntity {
   settings: JSON;
 
   @ManyToOne(() => Patients, { onDelete: 'CASCADE' })
-  patient: Patients;
+  patient: Patients | number;
 
   @CreateDateColumn()
   public createdAt: Date;

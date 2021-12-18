@@ -6,8 +6,15 @@ import ExportDB from '@electron/models/ExportDB';
 // Constants
 import { ChartChannels } from '@utils/channels';
 
-ipcMain.handle(ChartChannels.ExportAll, async (_event, recordingId: number) => {
-  console.log('Export');
-  const dbExport = new ExportDB(1);
-  return await dbExport.exportToTextFile(recordingId);
-});
+ipcMain.handle(
+  ChartChannels.ExportAll,
+  async (_event, { recordingId, type }) => {
+    return await ExportDB.exportToFile(recordingId, type);
+  }
+);
+
+ipcMain.handle(
+  ChartChannels.GetExportRange,
+  async (_event, recordingId) =>
+    await ExportDB.findRangeOfExportData(recordingId)
+);

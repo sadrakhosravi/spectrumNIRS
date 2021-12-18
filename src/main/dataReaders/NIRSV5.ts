@@ -116,16 +116,6 @@ export const start = async (
 
       // Reset the previous time
       if (count === 0) {
-        // Synchronize gain on start
-        syncGains([
-          '180.00',
-          '165.00',
-          '140.00',
-          '140.00',
-          '140.00',
-          'HIGH',
-          '100',
-        ]);
         timeSequence += prevTime;
         count = 2;
       }
@@ -210,7 +200,6 @@ export const start = async (
 export const startQualityMonitor = async (sender: any) => {
   spawnNIRSV5();
   let count = 0;
-  let firstSyncCount = 0;
   let LEDPDs = [0, 0, 0, 0, 0, 0];
 
   rl = readline
@@ -219,18 +208,6 @@ export const startQualityMonitor = async (sender: any) => {
       terminal: false,
     })
     .on('line', async function (line: string) {
-      if (firstSyncCount === 0) {
-        syncGains([
-          '180.00',
-          '165.00',
-          '140.00',
-          '140.00',
-          '140.00',
-          'HIGH',
-          '100',
-        ]);
-        firstSyncCount = 2;
-      }
       const data = line.split(',');
       const outputArr = [
         parseInt(data[6]),

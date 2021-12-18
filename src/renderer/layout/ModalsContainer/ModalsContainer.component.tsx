@@ -7,6 +7,7 @@ import IsLoadingModal from '@components/Modals/LoadingModal.component';
 import NewRecording from '@forms/Recording/Recording.component';
 import OpenExperiment from '@forms/OpenExperiment/OpenExperiment.component';
 import OpenPatient from '@forms/OpenExperiment/OpenPatient.component';
+import ExportModal from '@forms/Export/ExportModal.component';
 
 const ModalsContainer = (): JSX.Element => {
   return (
@@ -16,6 +17,7 @@ const ModalsContainer = (): JSX.Element => {
       <NewRecording />
       <OpenExperiment />
       <OpenPatient />
+      <ExportModal />
       <IsLoadingModal />
     </>
   );

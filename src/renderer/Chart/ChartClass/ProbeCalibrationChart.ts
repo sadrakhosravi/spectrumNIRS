@@ -18,7 +18,7 @@ const {
   UIElementBuilders,
 } = lcjs;
 
-class SignalQualityMonitor {
+class ProbeCalibrationChart {
   containerId: string;
   LEDs: string[];
   chart: undefined | ChartXY<PointMarker, UIBackground>;
@@ -49,7 +49,7 @@ class SignalQualityMonitor {
       .ChartXY({
         container: this.containerId,
       })
-      .setTitle('Signal Quality Monitor')
+      .setTitle('Probe Calibration')
       .setTitleMarginBottom(10)
       .setAutoCursorMode(AutoCursorModes.disabled)
       .setMouseInteractions(false);
@@ -157,7 +157,7 @@ class SignalQualityMonitor {
     axisX
       .addCustomTick(UIElementBuilders.AxisTick)
       .setValue(count + width / 2)
-      .setTextFormatter(() => 'Ambient Light')
+      .setTextFormatter(() => 'Ambient')
       .setGridStrokeLength(0);
 
     LEDRectangles.push(ambient);
@@ -202,4 +202,4 @@ class SignalQualityMonitor {
   }
 }
 
-export default SignalQualityMonitor;
+export default ProbeCalibrationChart;

@@ -18,6 +18,8 @@ const reviewTabNewWindow = async () => {
     darkTheme: true,
     frame: true,
     roundedCorners: true,
+    autoHideMenuBar: true,
+
     webPreferences: {
       partition: 'persist:spectrum',
       devTools: true,

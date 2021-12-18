@@ -1,8 +1,8 @@
 import { getConnection } from 'typeorm';
 
 import createDBConnection from 'db';
-import Experiments from 'db/entity/Experiments';
-import Patients from 'db/entity/Patients';
+import { Experiments } from 'db/entity/Experiments';
+import { Patients } from 'db/entity/Patients';
 
 type ExpData = {
   experiment: any;
@@ -21,8 +21,6 @@ export class Experiment {
     const { experiment, patient } = data;
 
     try {
-      // console.log(newExperiment);
-
       const _newExperiment = new Experiments();
       Object.assign(_newExperiment, experiment);
       const newExperiment = await _newExperiment.save();

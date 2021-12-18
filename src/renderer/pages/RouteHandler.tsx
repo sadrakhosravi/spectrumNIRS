@@ -6,14 +6,14 @@ import useNavigation from '@hooks/useNavigation.hook';
 import HomePage from './Home/Home.page';
 const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
-const SignalQualityMonitorPage = React.lazy(
-  () => import('@pages/SignalQualityMonitor/SignalQualityMonitor.page')
+const ProbeCalibrationPage = React.lazy(
+  () => import('@pages/ProbeCalibration/ProbeCalibration.page')
 );
 
 // Webview
 // import ChartWebView from './ChartWebView';
 // Components
-import Tabs from '@components/Tabs/Tabs.component';
+import Tabs from '@components/Tabs/AppTabs.component';
 
 // Constants
 import { AppState } from '@utils/constants';
@@ -28,8 +28,8 @@ const RouteHandler = () => {
         <Route exact path={AppState.HOME} component={HomePage} />
         <Route
           exact
-          path={AppState.SIGNAL_QUALITY_MONITOR}
-          component={SignalQualityMonitorPage}
+          path={AppState.PROBE_CALIBRATION}
+          component={ProbeCalibrationPage}
         />
         <Route path={AppState.RECORDING} component={Tabs} />
       </Router>
@@ -37,10 +37,8 @@ const RouteHandler = () => {
         className="fit-to-container absolute top-[40px] left-0 w-full h-full"
         hidden={!location.pathname.includes('recording')}
       >
-        <RecordPage />
+        <Route path={AppState.RECORD} component={RecordPage} />
         <Route path={AppState.REVIEW} component={ReviewPage} />
-
-        {/* <ChartWebView /> */}
       </div>
     </main>
   );

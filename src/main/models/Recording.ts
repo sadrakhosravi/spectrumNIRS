@@ -1,8 +1,5 @@
 import { getConnection } from 'typeorm';
-// import { RecordingsEntity } from '@electron/paths';
-// const { Recordings } = require(RecordingsEntity);
-
-import Recordings from 'db/entity/Recordings';
+import { Recordings } from 'db/entity/Recordings';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
@@ -27,17 +24,18 @@ export class Recording implements IRecording {
     data: INewRecordingData
   ): Promise<any> => {
     try {
-      const _newRecording = await new Recordings();
+      const _newRecording = new Recordings();
       Object.assign(_newRecording, data);
       const newRecording = await _newRecording.save();
 
+      console.log(newRecording);
       return {
         ...newRecording,
         createdAt: newRecording.createdAt.toString(),
         updatedAt: newRecording.updatedAt.toString(),
       };
     } catch (error: any) {
-      throw new Error(error.message);
+      console.log('Error RECORDING:' + error.message);
     }
   };
 
@@ -50,7 +48,7 @@ export class Recording implements IRecording {
       return await getConnection()
         .createQueryBuilder()
         .select()
-        .from('Recordings', '')
+        .from(Recordings, '')
         .where('patientId = :patientId', { patientId })
         .orderBy({
           updatedAt: 'DESC',

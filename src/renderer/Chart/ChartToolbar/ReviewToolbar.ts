@@ -6,13 +6,9 @@ import FocusModeIcon from '@icons/focus-mode.svg';
 import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import RawDataIcon from '@icons/raw-data.svg';
-import ExportTxtIcon from '@icons/export-txt.svg';
+import ExportIcon from '@icons/export-data.svg';
+
 import TimeDivisionIcon from '@icons/time-division.svg';
-
-import toast from 'react-hot-toast';
-
-// Constants
-import { ChartChannels, DialogBoxChannels } from '@utils/channels';
 
 // Adapters
 import ChartOptions from '../ChartClass/ChartOptions';
@@ -20,6 +16,9 @@ import ChartOptions from '../ChartClass/ChartOptions';
 // Store
 import { dispatch, getState } from '@redux/store';
 import { toggleRawData } from '@redux/ChartSlice';
+import { openModal } from '@redux/ModalStateSlice';
+import { ModalConstants } from '@utils/constants';
+import { DialogBoxChannels } from '@utils/channels';
 
 export const ReviewToolbar = [
   {
@@ -89,8 +88,8 @@ export const ReviewToolbar = [
   },
   {
     label: `exporttxt`,
-    tooltip: 'Export Text File',
-    icon: ExportTxtIcon,
+    tooltip: 'Export To File (Text / Excel)',
+    icon: ExportIcon,
     click: async () => {
       const recordingId = getState().experimentData.currentRecording.id;
 
@@ -105,13 +104,15 @@ export const ReviewToolbar = [
         return;
       }
 
-      const result = window.api.invokeIPC(ChartChannels.ExportAll, recordingId);
+      dispatch(openModal(ModalConstants.EXPORT_FORM));
 
-      toast.promise(result, {
-        loading: 'Exporting Data',
-        error: 'Export Failed!',
-        success: 'Export Completed!',
-      });
+      // const result = window.api.invokeIPC(ChartChannels.ExportAll, recordingId);
+
+      // toast.promise(result, {
+      //   loading: 'Exporting Data',
+      //   error: 'Export Failed!',
+      //   success: 'Export Completed!',
+      // });
     },
   },
   {

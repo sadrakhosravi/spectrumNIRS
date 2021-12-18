@@ -21,9 +21,13 @@ export const SensorSlice = createSlice({
     setSelectedSensor: (state, action) => {
       state.selectedSensor = action.payload;
     },
+    setSensorIntensities: (state, { payload }: { payload: number[] }) => {
+      state.selectedSensor.intensities = payload;
+    },
   },
 });
 
-export const { setDetectedSensor, setSelectedSensor } = SensorSlice.actions;
+export const { setDetectedSensor, setSelectedSensor, setSensorIntensities } =
+  SensorSlice.actions;
 
 export default SensorSlice.reducer;

@@ -6,7 +6,7 @@ export enum AppState {
   REVIEW = '/main/recording/review',
   RECORD_TAB = '/tabs/recording/record',
   REVIEW_TAB = '/tabs/recording/review',
-  SIGNAL_QUALITY_MONITOR = '/main/signal-quality-monitor',
+  PROBE_CALIBRATION = '/main/signal-quality-monitor',
 }
 
 // Record state
@@ -26,6 +26,7 @@ export enum ModalConstants {
   OPEN_PATIENT = 'open-patient',
   GENERALMODAL = 'general-modal',
   EXPERIMENTSETTINGS = 'experiment-settings',
+  EXPORT_FORM = 'export-form',
 }
 
 // Chart types available

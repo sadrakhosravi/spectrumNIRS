@@ -209,3 +209,20 @@ input[type]:focus-visible {
     font-size: 90%;
   }
 }
+
+/** Animations **/
+
+.slideLeft {
+  animation: slideLeft 0.3s forwards;
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(15px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}

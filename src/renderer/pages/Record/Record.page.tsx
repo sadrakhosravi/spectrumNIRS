@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Main area components
