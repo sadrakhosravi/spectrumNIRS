@@ -1,8 +1,8 @@
 {
   "name": "electron-react-boilerplate",
   "productName": "SpectrumNIRS",
-  "version": "0.2.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
+  "version": "0.2.0-nightly.20211218",
+  "description": "Spectrum NIRS data acquisition software",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -96,8 +96,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "Sadra Khosravi",
+      "repo": "spectrumNIRS"
     }
   },
   "repository": {
@@ -111,26 +111,21 @@
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    },
-    {
-      "name": "John Tran",
-      "email": "jptran318@gmail.com",
-      "url": "https://github.com/jooohhn"
+      "name": "Sadra Khosravi",
+      "email": "sadrakh@outlook.com",
+      "url": "https://github.com/sadrakhosravi"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/sadrakhosravi/spectrumNIRS/issues"
   },
   "keywords": [
     "NIRS",
     "Spectrum",
     "SpectrumNIRS"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/sadrakhosravi/spectrumNIRS/",
   "jest": {
     "testURL": "http://localhost/",
     "testEnvironment": "jsdom",
