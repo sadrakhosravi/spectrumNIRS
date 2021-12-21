@@ -17,15 +17,6 @@ import createDBConnection from '../db/index';
 import '../controllers';
 import { autoUpdater } from 'electron-updater';
 
-export default class AppUpdater {
-  constructor() {
-    const log = require('electron-log');
-    log.transports.file.level = 'debug';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
 
@@ -119,6 +110,13 @@ app.on('activate', async () => {
   // Create main window
   await app.whenReady();
   await createMainWindow();
+
+  // autoUpdater.checkForUpdatesAndNotify();
+  const isUpdate = await autoUpdater.checkForUpdates();
+  console.log(isUpdate);
+  autoUpdater.on('update-available', () => {
+    console.log('UPDATE AVAILABLE');
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

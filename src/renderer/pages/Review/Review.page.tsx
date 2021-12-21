@@ -14,8 +14,8 @@ import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component'
 import { ChartType } from 'utils/constants';
 
 const Review = () => {
-  const [reviewChartLoaded, setReviewChartLoaded] = useState(false);
-
+  const [isHidden, setIsHidden] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const location = useLocation();
 
   const dispatch = useAppDispatch();
@@ -31,16 +31,19 @@ const Review = () => {
   );
 
   useEffect(() => {
-    !reviewChartLoaded &&
-      location.pathname === '/main/recording/review' &&
-      setReviewChartLoaded(true);
+    setTimeout(() => {
+      setIsHidden(true);
+      setFirstLoad(false);
+    }, 800);
+  }, []);
+
+  useEffect(() => {
+    location.pathname.includes('review') && setIsHidden(false);
+    !location.pathname.includes('review') && !firstLoad && setIsHidden(true);
   }, [location]);
 
   return (
-    <div
-      className="h-full"
-      hidden={location.pathname.includes('review') ? false : true}
-    >
+    <div className="h-full" hidden={isHidden}>
       {!isNewWindow && (
         <div className={`absolute top-0 left-0 h-full w-full flex`}>
           <div
@@ -50,11 +53,7 @@ const Review = () => {
                 : 'w-[calc(100%-20px)]'
             }`}
           >
-            <ReviewChart
-              reviewChartLoaded={reviewChartLoaded}
-              recordState={recordState}
-              type={ChartType.REVIEW}
-            />
+            <ReviewChart recordState={recordState} type={ChartType.REVIEW} />
           </div>
           <div
             className={`h-full ${

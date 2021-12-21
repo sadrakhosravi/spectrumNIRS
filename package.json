@@ -10,6 +10,7 @@
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
+    "publish": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish always",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts && opencollective-postinstall",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
     "compiledb": "tsc ./src/db/entity/Experiments.ts && tsc ./src/db/entity/Patients.ts && tsc ./src/db/entity/Recordings.ts && tsc ./src/db/entity/RecordingsData.ts",
@@ -36,7 +37,7 @@
   },
   "build": {
     "productName": "Spectrum",
-    "appId": "biosensing.SpectrumNIRS",
+    "appId": "com.ibl.spectrumNIRS",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -96,18 +97,19 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "Sadra Khosravi",
+      "token": "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",
+      "owner": "sadrakhosravi",
       "repo": "spectrumNIRS"
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/sadrakhosravi/spectrumNIRS.git"
   },
   "author": {
     "name": "Sadra Khosravi + Electron React Boilerplate Maintainers",
     "email": "sadrakh@outlook.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "url": "https://sadrakhosravi.com"
   },
   "contributors": [
     {
@@ -231,7 +233,7 @@
   "dependencies": {
     "@arction/lcjs": "^3.3.0",
     "@headlessui/react": "^1.4.2",
-    "@reduxjs/toolkit": "^1.6.2",
+    "@reduxjs/toolkit": "^1.7.1",
     "@tippyjs/react": "^4.2.6",
     "crypto-browserify": "^3.12.0",
     "dayjs": "^1.10.7",
@@ -242,8 +244,8 @@
     "enhanced-resolve": "^5.8.3",
     "history": "4.x.x",
     "node-abi": "^3.5.0",
-    "react": "^18.0.0-rc.0",
-    "react-dom": "^18.0.0-rc.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-hook-form": "^7.20.4",
     "react-hot-toast": "^2.1.1",
     "react-redux": "^7.2.6",

@@ -14,7 +14,6 @@ import { ChartType } from 'utils/constants';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
-  recordChartLoaded: boolean;
   setLoading: any;
   children: JSX.Element[];
 };
@@ -22,7 +21,6 @@ type ChartProps = {
 // Prepares and enders the chart
 const RecordChart = ({
   type,
-  recordChartLoaded,
   setLoading,
   children,
 }: ChartProps): JSX.Element => {
@@ -82,7 +80,7 @@ const RecordChart = ({
       chart = undefined;
       chartRef.current = null;
     };
-  }, [recordChartLoaded]);
+  }, []);
 
   useEffect(() => {
     setNewData(true);
@@ -104,17 +102,19 @@ const RecordChart = ({
 
   // Adjust chart width and height on sidebar resize
   useEffect(() => {
-    requestAnimationFrame(() => {
-      const container = document.getElementById(containerId) as HTMLElement;
-      const { offsetWidth, offsetHeight } = container;
+    location.pathname === '/main/recording/record' &&
+      requestAnimationFrame(() => {
+        const container = document.getElementById(containerId) as HTMLElement;
+        const { offsetWidth, offsetHeight } = container;
 
-      chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
-      chartRef.current && chartRef.current?.dashboard?.setHeight(offsetHeight);
+        chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
+        chartRef.current &&
+          chartRef.current?.dashboard?.setHeight(offsetHeight);
 
-      container.style.overflowX = 'hidden';
-      container.style.overflowY = 'hidden';
-    });
-  }, [recordSidebar, windowResized]);
+        container.style.overflowX = 'hidden';
+        container.style.overflowY = 'hidden';
+      });
+  }, [recordSidebar, windowResized, location]);
 
   return (
     <>
@@ -123,8 +123,7 @@ const RecordChart = ({
       )}
 
       <div
-        hidden={false}
-        className="absolute top-0 left-0 h-[calc(100%-50px)]"
+        className="absolute top-0 left-0 h-[calc(100%-50px)] z-20"
         id={containerId}
       />
       {children}

@@ -18,7 +18,7 @@ import { ModalConstants } from 'utils/constants';
 import { AppState } from 'utils/constants';
 import ProbeCalibrationButton from './IconButtons/ProbeCalibrationButton';
 
-const MainNavigation = () => {
+const MainNavigation = (): JSX.Element => {
   const appState = useSelector((state: any) => state.appState.value);
 
   const dispatch = useDispatch();

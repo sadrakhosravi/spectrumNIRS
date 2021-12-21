@@ -15,7 +15,7 @@ const Clock = () => {
     };
   }, []);
 
-  return <p className="text-2xl">{timeState}</p>;
+  return <p className="text-2xl absolute right-4 top-[42px]">{timeState}</p>;
 };
 
 export default Clock;

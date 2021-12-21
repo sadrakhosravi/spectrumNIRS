@@ -39,6 +39,7 @@ class RecordChart extends Chart {
     this.series = this.createSeriesForEachChart(this.charts);
     this.synchronizeXAxis(this.charts);
     this.customizeChart(this.charts);
+    this.customizeRecordCharts();
     this.uiList(this.charts, this.dashboard);
     this.customCursor(this.dashboard, this.charts, this.series);
     this.chartOptions = new ChartOptions(
@@ -129,9 +130,14 @@ class RecordChart extends Chart {
       );
   };
 
-  customizeCharts() {
+  customizeRecordCharts() {
     this.charts &&
-      this.charts.forEach((_chart, i) => {
+      this.charts.forEach((chart, i) => {
+        const axisX = chart.getDefaultAxisX();
+        axisX.setMouseInteractions(false);
+
+        chart.setMouseInteractionPan(false);
+
         this.series && this.series[i].setDataCleaning({ minDataPointCount: 1 });
       });
   }

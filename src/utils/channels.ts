@@ -75,6 +75,15 @@ export const ChartChannels = {
   GetExportRange: ChartBase + 'get-export-range',
 };
 
+// ProbeSetting Channels
+const ProbeBase = 'probe:';
+export const ProbeChannels = {
+  NewProbe: ProbeBase + 'new-probe',
+  GetProbeSettings: ProbeBase + 'get-probe-settings',
+  GetProbeIntensities: ProbeBase + 'get-probe-intensities',
+  UpdateProbeIntensities: ProbeBase + 'update-intensities',
+};
+
 // User Settings
 const UserSettings = 'user-settings:';
 export const UserSettingsChannels = {

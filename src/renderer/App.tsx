@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   HashRouter as Router,
   Switch,
@@ -14,26 +14,37 @@ import './App.css';
 import { AppState } from '@utils/constants';
 
 //Component import
-import LoadingIndicator from '@components/LoadingIndicator/LoadingIndicator.component';
+import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
 
 import TitleBar from './layout/TitleBar/TitleBar.component';
 import BottomBar from './layout/BottomBar/BottomBar.component';
 import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 
+import FirstLoader from '@components/Loaders/FirstLoader.component';
+
+const Clock = React.lazy(() => import('@components/Clock/Clock.component'));
+
 const ModalsContainer = React.lazy(
   () => import('@layout/ModalsContainer/ModalsContainer.component')
 );
-import RouteHandler from '@pages/RouteHandler';
+
+const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
 
 // Pages
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
-// Test
-// import ReviewWebView from '@pages/Review/ReviewWebView';
-
 const App = () => {
+  const [firstLoader, setFirstLoader] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setFirstLoader(false);
+    }, 1000);
+  }, []);
+
   return (
     <div className="relative h-full w-full">
+      {firstLoader && <FirstLoader />}
       <Router>
         <React.Suspense
           fallback={<LoadingIndicator loadingMessage="Initializing..." />}
@@ -42,6 +53,7 @@ const App = () => {
           <Route path="/main" component={MainNavigation} />
           <Route path="/main" component={BottomBar} />
           <Route path="/main" component={TitleBar} />
+          <Route path="/main" component={Clock} />
           <Route path="/main" component={ModalsContainer} />
           <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
           <Route

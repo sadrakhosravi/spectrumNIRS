@@ -7,3 +7,4 @@ import './reviewTab';
 import './dialogBox';
 import './usbDetection';
 import './chart';
+import './probes';

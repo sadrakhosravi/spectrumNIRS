@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import {
   createStateSyncMiddleware,
-  initStateWithPrevTab,
+  initMessageListener,
   withReduxStateSync,
 } from 'redux-state-sync';
 
@@ -33,7 +33,9 @@ type AllReducers = typeof reducers;
 const reducersWithStateSync: AllReducers = withReduxStateSync(reducers) as any;
 
 const config = {
-  blacklist: ['appState/setReviewTabInNewWindow', 'chartState/toggleRawData'],
+  channel: 'SpectrumTabSync',
+  predicate: (action: any) =>
+    action.type !== 'appState/setReviewTabInNewWindow',
 };
 
 const middlewares = [
@@ -48,7 +50,7 @@ const store = configureStore({
 });
 
 // Redux sync state between tabs
-initStateWithPrevTab(store);
+initMessageListener(store);
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

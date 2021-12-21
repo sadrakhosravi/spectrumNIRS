@@ -380,6 +380,8 @@ class ReviewChart extends Chart {
     this.charts = null;
     this.series = null;
     window.removeEventListener('keydown', this.loadDataOnKeyPress);
+    dispatch(setAllEvents([]));
+    dispatch(setIsLoadingData(false));
   }
 
   // Clears the series and custom ticks

@@ -1,6 +1,7 @@
 import path from 'path';
 import { BrowserWindow, dialog, ipcMain, Menu, screen } from 'electron';
 import { ReviewTabChannels } from '../utils/channels';
+import { resolveHtmlPath } from '../main/util';
 
 let reviewWindow: BrowserWindow | null;
 
@@ -19,7 +20,6 @@ const reviewTabNewWindow = async () => {
     frame: true,
     roundedCorners: true,
     autoHideMenuBar: true,
-
     webPreferences: {
       partition: 'persist:spectrum',
       devTools: true,
@@ -31,7 +31,12 @@ const reviewTabNewWindow = async () => {
   newReviewWindow.setBounds(displays[1].bounds);
   newReviewWindow.maximize();
   newReviewWindow.show();
-  await newReviewWindow.loadURL('http://localhost:1212#/tabs/recording/review');
+
+  const reviewWindowPath =
+    resolveHtmlPath('index.html') + '#/tabs/recording/review';
+  console.log(reviewWindowPath);
+  newReviewWindow.loadURL(reviewWindowPath);
+
   return newReviewWindow;
 };
 

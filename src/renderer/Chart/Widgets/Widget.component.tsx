@@ -8,7 +8,7 @@ type WidgetProps = {
 const Widget = ({ span = '2', children }: WidgetProps) => {
   return (
     <div
-      className={`bg-grey3 rounded-md`}
+      className={`bg-grey3 rounded-b-md overflow-x-hidden`}
       style={{ gridRow: `span ${span} / span ${span}` }}
     >
       {children}

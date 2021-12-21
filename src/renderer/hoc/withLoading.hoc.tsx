@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Components
-import LoadingIndicator from '@components/LoadingIndicator/LoadingIndicator.component';
+import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
 
 /** */
 const withLoading = (

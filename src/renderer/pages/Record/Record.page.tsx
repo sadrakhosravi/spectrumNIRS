@@ -13,7 +13,8 @@ import { ChartType } from 'utils/constants';
 import { setRecordSidebar } from '@redux/AppStateSlice';
 
 const RecordPage = () => {
-  const [recordChartLoaded, setRecordChartLoaded] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const recordState = useAppSelector(
     (state) => state.experimentData.currentRecording
   );
@@ -24,18 +25,21 @@ const RecordPage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (recordChartLoaded !== true) {
-      location.pathname === '/main/recording/record' &&
-        setRecordChartLoaded(true);
-      console.log('LOCATION CHANGE');
-    }
+    setTimeout(() => {
+      setIsHidden(true);
+      setFirstLoad(false);
+    }, 200);
+  }, []);
+
+  useEffect(() => {
+    location.pathname === '/main/recording/record' && setIsHidden(false);
+    location.pathname !== '/main/recording/record' &&
+      !firstLoad &&
+      setIsHidden(true);
   }, [location]);
 
   return (
-    <div
-      className="h-full"
-      hidden={location.pathname === '/main/recording/record' ? false : true}
-    >
+    <div className="h-full" hidden={isHidden}>
       <div className={`absolute top-0 left-0 h-full w-full flex`}>
         <div
           className={`h-full relative ${
@@ -44,11 +48,7 @@ const RecordPage = () => {
               : 'w-[calc(100%-20px)]'
           }`}
         >
-          <RecordChart
-            recordState={recordState}
-            recordChartLoaded={recordChartLoaded}
-            type={ChartType.RECORD}
-          />
+          <RecordChart recordState={recordState} type={ChartType.RECORD} />
         </div>
         <div
           className={`h-full ${
@@ -58,7 +58,7 @@ const RecordPage = () => {
           }`}
           onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
         >
-          <WidgetsContainer type={ChartType.RECORD} />
+          {!isHidden && <WidgetsContainer type={ChartType.RECORD} />}
         </div>
       </div>
     </div>

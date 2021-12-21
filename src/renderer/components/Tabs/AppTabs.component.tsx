@@ -5,7 +5,6 @@ import { Tabs } from './Tabs';
 
 // Components
 import TabItem from '@components/Tabs/TabItem.component';
-import Clock from '@components/Clock/Clock.component';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
@@ -52,9 +51,7 @@ const TabsContainer = () => {
             key={tab.name}
           />
         ))}
-        <div className="absolute right-8">
-          <Clock />
-        </div>
+        <div className="absolute right-8"></div>
       </div>
     </>
   );

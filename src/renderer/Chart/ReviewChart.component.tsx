@@ -13,7 +13,6 @@ import { ChartType } from 'utils/constants';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
-  reviewChartLoaded: any;
   recordState: any;
   setLoading?: any;
   children?: JSX.Element | JSX.Element[];
@@ -73,7 +72,7 @@ const ReviewChart = ({
       chart = undefined;
       chartRef.current = null;
     };
-  }, [recordState]);
+  }, []);
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -96,6 +95,11 @@ const ReviewChart = ({
     console.log(currentTimeStamp);
     chartRef.current?.setInterval(currentTimeStamp);
   }, [currentTimeStamp]);
+
+  useEffect(() => {
+    chartRef.current?.clearCharts();
+    chartRef.current?.loadInitialData();
+  }, [recordState]);
 
   return (
     <>
