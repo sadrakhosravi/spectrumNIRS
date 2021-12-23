@@ -124,10 +124,10 @@ export const start = async (
       // Used direct array element access instead of a loop for the fastest possible calculation
       const rawDataArr = [
         timeSequence,
-        parseFloat(data[1]),
-        parseFloat(data[2]),
-        parseFloat(data[3]),
-        parseFloat(data[4]),
+        (parseFloat(data[1]) / 1000) * -1,
+        (parseFloat(data[2]) / 100) * -1,
+        (parseFloat(data[3]) / 1000) * -1,
+        parseFloat(data[4]) - 60,
         parseInt(data[5]),
         parseInt(data[6]),
         parseInt(data[7]),

@@ -6,6 +6,7 @@ import {
   setPatientData,
   setRecordingData,
   resetRecordingData,
+  resetExperimentData,
 } from '@redux/ExperimentDataSlice';
 import { setSelectedSensor } from '@redux/SensorStateSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
@@ -134,10 +135,15 @@ export const deleteExperimentAndData = async (
   // Operation was cancelled
   if (confirmation2 === 1) return;
 
+  // Send data to controller
   const dataDeleted = window.api.invokeIPC(
     ExperimentChannels.deleteExperiment,
     experimentId
   );
+
+  // Check if the experiment that is being deleted is currently open and close it
+  const currentExperimentId = getState().experimentData.currentExperiment.id;
+  currentExperimentId === experimentId && dispatch(resetExperimentData());
 
   toast.dismiss();
   toast.promise(dataDeleted, {

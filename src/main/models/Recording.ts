@@ -4,19 +4,7 @@ import { Recordings } from 'db/entity/Recordings';
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
 
-// TODO: Add interfaces for the data parameters.
-export interface IRecording {}
-
-/**
- * Recording logic
- */
-export class Recording implements IRecording {
-  currentRecording: any;
-
-  constructor(currentRecording: any) {
-    this.currentRecording = currentRecording;
-  }
-
+export class Recording {
   /**
    * Creates a new recording record in the database.
    */

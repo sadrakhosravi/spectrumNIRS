@@ -17,7 +17,6 @@ import { RecordingsData } from './RecordingsData';
 
 @Entity({ name: 'recordings' })
 export class Recordings extends BaseEntity {
-  @OneToMany(() => RecordingsData, (recordingsData) => recordingsData.recording)
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -126,7 +126,9 @@ const SelectPatient = ({
                   onClick={async () => {
                     await deleteRecordingAndData(recording.id, recording.name);
                     // Refresh the list
-                    getAllRecordings(patient.id);
+                    setTimeout(() => {
+                      getAllRecordings(patient.id);
+                    }, 300);
                   }}
                   title="Delete Recording and its Data"
                 />
