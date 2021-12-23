@@ -41,7 +41,7 @@ const TabsContainer = () => {
 
   return (
     <>
-      <div className="w-full bg-dark h-40px pl-4 grid grid-flow-col auto-cols-max items-center relative">
+      <div className="w-full h-40px pl-4 grid grid-flow-col auto-cols-max items-center relative">
         {Tabs.map((tab) => (
           <TabItem
             name={tab.name}

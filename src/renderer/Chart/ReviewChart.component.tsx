@@ -26,7 +26,6 @@ const ReviewChart = ({
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
-
   const sensorState = useAppSelector(
     (state) => state.sensorState.selectedSensor
   );
@@ -35,6 +34,9 @@ const ReviewChart = ({
   );
   const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
   const windowResized = useAppSelector((state) => state.appState.windowResized);
+  const windowMaximized = useAppSelector(
+    (state) => state.appState.windowMaximized
+  );
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
 
@@ -74,7 +76,7 @@ const ReviewChart = ({
     };
   }, []);
 
-  useEffect(() => {
+  const resetChartSize = () => {
     requestAnimationFrame(() => {
       const container = document.getElementById(containerId) as HTMLElement;
       const { offsetWidth, offsetHeight } = container;
@@ -85,20 +87,23 @@ const ReviewChart = ({
       container.style.overflowX = 'hidden';
       container.style.overflowY = 'hidden';
     });
-  }, [reviewSidebar, windowResized]);
+  };
 
   useEffect(() => {
-    chartLoaded && chartRef.current && chartRef.current.loadInitialData();
-  }, [chartLoaded]);
+    resetChartSize();
+  }, [reviewSidebar, windowResized, windowMaximized]);
 
   useEffect(() => {
-    console.log(currentTimeStamp);
     chartRef.current?.setInterval(currentTimeStamp);
   }, [currentTimeStamp]);
 
   useEffect(() => {
-    chartRef.current?.clearCharts();
-    chartRef.current?.loadInitialData();
+    recordState.id === -1 && chartRef.current?.clearCharts();
+    recordState.id !== -1 &&
+      requestAnimationFrame(() => {
+        chartRef.current?.loadInitialData();
+        resetChartSize();
+      });
   }, [recordState]);
 
   return (

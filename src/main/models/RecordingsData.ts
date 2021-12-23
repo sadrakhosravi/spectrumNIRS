@@ -2,6 +2,7 @@
 import AccurateTimer from '@electron/helpers/accurateTimer';
 import { getConnection } from 'typeorm';
 import RecordingsData from 'db/entity/RecordingsData';
+import { ChartChannels } from '@utils/channels';
 
 class RecordData {
   recordingId: number;
@@ -66,7 +67,7 @@ class RecordData {
   ) => {
     try {
       let offset = 0;
-      let LIMIT = 3000;
+      let LIMIT = 10000;
       let data = [];
       const dataStream = new AccurateTimer(async () => {
         data = await getConnection()
@@ -82,9 +83,9 @@ class RecordData {
           dataStream.stop();
           return;
         }
-        sender.send('test:stream-data', data);
+        sender.send(ChartChannels.StreamData, data);
         offset += LIMIT;
-      }, 50);
+      }, 350);
       dataStream.start();
     } catch (error: any) {
       throw new Error(error.message);

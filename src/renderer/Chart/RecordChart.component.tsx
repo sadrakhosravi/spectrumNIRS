@@ -34,6 +34,9 @@ const RecordChart = ({
     (state) => state.experimentData.currentRecording.id
   );
   const windowResized = useAppSelector((state) => state.appState.windowResized);
+  const windowMaximized = useAppSelector(
+    (state) => state.appState.windowMaximized
+  );
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
   const channels = (sensorState && sensorState.channels) || ['No Channels'];
   const samplingRate = (sensorState && sensorState.samplingRate) || 100;
@@ -100,21 +103,23 @@ const RecordChart = ({
     }
   }, [newData, location]);
 
+  const resetChartSize = () => {
+    requestAnimationFrame(() => {
+      const container = document.getElementById(containerId) as HTMLElement;
+      const { offsetWidth, offsetHeight } = container;
+
+      chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
+      chartRef.current && chartRef.current?.dashboard?.setHeight(offsetHeight);
+
+      container.style.overflowX = 'hidden';
+      container.style.overflowY = 'hidden';
+    });
+  };
+
   // Adjust chart width and height on sidebar resize
   useEffect(() => {
-    location.pathname === '/main/recording/record' &&
-      requestAnimationFrame(() => {
-        const container = document.getElementById(containerId) as HTMLElement;
-        const { offsetWidth, offsetHeight } = container;
-
-        chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
-        chartRef.current &&
-          chartRef.current?.dashboard?.setHeight(offsetHeight);
-
-        container.style.overflowX = 'hidden';
-        container.style.overflowY = 'hidden';
-      });
-  }, [recordSidebar, windowResized, location]);
+    location.pathname === '/main/recording/record' && resetChartSize();
+  }, [recordSidebar, windowResized, windowMaximized, location]);
 
   return (
     <>

@@ -23,7 +23,6 @@ const RouteHandler = () => {
   const [firstLoad, setFirstLoad] = useState(true);
 
   const location = useLocation();
-  console.log(location);
   useNavigation();
 
   useEffect(() => {
@@ -55,7 +54,7 @@ const RouteHandler = () => {
           hidden={isHidden}
         >
           <RecordPage />
-          <ReviewPage />
+          <Route path={AppState.REVIEW} component={ReviewPage} />
         </div>
       </React.Suspense>
     </main>

@@ -6,7 +6,7 @@ export enum AppState {
   REVIEW = '/main/recording/review',
   RECORD_TAB = '/tabs/recording/record',
   REVIEW_TAB = '/tabs/recording/review',
-  PROBE_CALIBRATION = '/main/signal-quality-monitor',
+  PROBE_CALIBRATION = '/main/probe-calibration',
 }
 
 // Record state

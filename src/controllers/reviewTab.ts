@@ -34,7 +34,6 @@ const reviewTabNewWindow = async () => {
 
   const reviewWindowPath =
     resolveHtmlPath('index.html') + '#/tabs/recording/review';
-  console.log(reviewWindowPath);
   newReviewWindow.loadURL(reviewWindowPath);
 
   return newReviewWindow;

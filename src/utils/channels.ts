@@ -91,3 +91,14 @@ export const UserSettingsChannels = {
   GetSetting: UserSettings + 'get-settings',
   RemoveSetting: UserSettings + 'remove-settings',
 };
+
+// Updater
+const Updater = 'updater:';
+export const UpdaterChannels = {
+  CheckForUpdate: Updater + 'check-for-update',
+  UpdateAvailable: Updater + 'update-available',
+  DownloadUpdate: Updater + 'download-update',
+  DownloadingUpdate: Updater + 'update-downloading',
+  UpdateDownloaded: Updater + 'update-downloaded',
+  InstallUpdate: Updater + 'update-install',
+};

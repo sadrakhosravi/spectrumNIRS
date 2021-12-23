@@ -30,7 +30,7 @@ export default merge(baseConfig, {
 
   mode: 'production',
 
-  target: ['web'],
+  target: ['web', 'electron-renderer'],
 
   entry: {
     main: path.join(webpackPaths.srcRendererPath, 'index.tsx'),
@@ -38,7 +38,7 @@ export default merge(baseConfig, {
 
   output: {
     path: webpackPaths.distRendererPath,
-    publicPath: '/',
+    publicPath: './',
     filename: '[name].bundle.js',
     chunkFilename: '[name].chunk.js',
   },
@@ -104,6 +104,9 @@ export default merge(baseConfig, {
   },
 
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
     minimize: true,
     minimizer: [
       new TerserPlugin({

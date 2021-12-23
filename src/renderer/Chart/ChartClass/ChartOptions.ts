@@ -21,8 +21,15 @@ class ChartOptions {
   customTicks: any[];
   constantLines: any[];
   timeDivision: number;
+  isReview: boolean;
 
-  constructor(channels: string[], dashboard: any, charts: any, series: any) {
+  constructor(
+    channels: string[],
+    dashboard: any,
+    charts: any,
+    series: any,
+    isReview: boolean = false
+  ) {
     this.channels = channels;
     this.dashboard = dashboard;
     this.charts = charts;
@@ -30,6 +37,15 @@ class ChartOptions {
     this.customTicks = [];
     this.constantLines = [];
     this.timeDivision = 30 * 1000; // Time in milliseconds - default 30s
+    this.isReview = isReview;
+  }
+
+  /**
+   * Gets if the currentChart options is for the review tab
+   * @returns true if this chart options is for review chart or false otherwise
+   */
+  getIsReview() {
+    return this.isReview;
   }
 
   /**
@@ -51,6 +67,14 @@ class ChartOptions {
   }
 
   /**
+   * Gets the current time division in milliseconds `default: 30s`
+   * @returns current time division in milliseconds
+   */
+  getTimeDivision() {
+    return this.timeDivision;
+  }
+
+  /**
    * Sets the new time division to be used for the related chart
    * @param newTimeDivision - New time division to be set in milliseconds
    */
@@ -59,24 +83,17 @@ class ChartOptions {
     if (this.charts) {
       const currentInterval = this.charts[0].getDefaultAxisX().getInterval();
       console.log(currentInterval);
-      this.charts[0]
-        .getDefaultAxisX()
-        .setInterval(
-          currentInterval.start,
-          currentInterval.start + this.timeDivision,
-          0,
-          true
-        )
-        .release();
-    }
-  }
+      const axisX = this.charts[0].getDefaultAxisX();
 
-  /**
-   * Gets the current time division in milliseconds `default: 30s`
-   * @returns current time division in milliseconds
-   */
-  getTimeDivision() {
-    return this.timeDivision;
+      axisX.setInterval(
+        currentInterval.start,
+        currentInterval.start + this.timeDivision,
+        0,
+        true
+      );
+
+      !this.isReview && axisX.release();
+    }
   }
 
   addMarker(name: string, color: string) {

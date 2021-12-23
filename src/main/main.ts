@@ -11,11 +11,12 @@
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import 'reflect-metadata';
-import { resolveHtmlPath } from './util';
+// import { resolveHtmlPath } from './util';
 import createDBConnection from '../db/index';
 // Import controllers
 import '../controllers';
-import { autoUpdater } from 'electron-updater';
+// import { resolveHtmlPath } from './util';
+import updater from './updater';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -73,8 +74,8 @@ const createMainWindow = async () => {
   });
   mainWindow.setBackgroundColor('#1E1E1E');
   mainWindow.maximize();
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
-  // mainWindow.loadURL('http://localhost:1212');
+  // mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL('http://localhost:1212');
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {
@@ -82,7 +83,7 @@ const createMainWindow = async () => {
     mainWindow?.webContents.send('window:unmaximize');
   });
 
-  mainWindow.on('resize', () => {
+  mainWindow.on('resized', () => {
     mainWindow?.webContents.send('window:resize');
   });
 
@@ -111,12 +112,11 @@ app.on('activate', async () => {
   await app.whenReady();
   await createMainWindow();
 
-  // autoUpdater.checkForUpdatesAndNotify();
-  const isUpdate = await autoUpdater.checkForUpdates();
-  console.log(isUpdate);
-  autoUpdater.on('update-available', () => {
-    console.log('UPDATE AVAILABLE');
-  });
+  setTimeout(async () => {
+    await updater();
+  }, 2000);
+
+  console.log('test');
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

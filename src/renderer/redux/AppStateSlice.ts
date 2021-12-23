@@ -4,6 +4,7 @@ import { AppState } from 'utils/constants';
 type AppStateSlice = {
   value: AppState;
   windowResized: number;
+  windowMaximized: boolean;
   recordChartLoaded: boolean;
   reviewChartLoaded: boolean;
   recordSidebar: boolean;
@@ -16,6 +17,7 @@ type AppStateSlice = {
 const initialState: AppStateSlice = {
   value: AppState.HOME,
   windowResized: 0,
+  windowMaximized: true,
   recordChartLoaded: false,
   reviewChartLoaded: false,
   recordSidebar: true,
@@ -34,6 +36,9 @@ export const AppStateSlice = createSlice({
     },
     setWindowResized: (state, { payload }: { payload: number }) => {
       state.windowResized = payload;
+    },
+    setWindowMaximized: (state, { payload }: { payload: boolean }) => {
+      state.windowMaximized = payload;
     },
     setRecordChartLoaded: (state, { payload }: { payload: boolean }) => {
       state.recordChartLoaded = payload;
@@ -62,6 +67,7 @@ export const AppStateSlice = createSlice({
 export const {
   changeAppState,
   setWindowResized,
+  setWindowMaximized,
   setRecordChartLoaded,
   setReviewChartLoaded,
   setRecordSidebar,

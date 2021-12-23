@@ -1,12 +1,13 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.4.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "name": "spectrum-nirs",
+  "productName": "SpectrumNIRS",
+  "version": "0.2.0-nightly.20211222-10",
+  "description": "Spectrum NIRS data acquisition software",
   "main": "./dist/main/main.js",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Sadra Khosravi",
+    "email": "sadrakh@outlook.com",
+    "url": "https://github.com/sadrakhosravi"
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
@@ -17,7 +18,6 @@
   "dependencies": {
     "better-sqlite3": "^7.4.5",
     "typeorm": "^0.2.41",
-    "usb": "^1.9.1",
     "usb-detection": "^4.13.0"
   }
 }

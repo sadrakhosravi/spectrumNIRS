@@ -19,8 +19,8 @@ import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
 import TitleBar from './layout/TitleBar/TitleBar.component';
 import BottomBar from './layout/BottomBar/BottomBar.component';
 import MainNavigation from './layout/MainNavigation/MainNavigation.component';
-
 import FirstLoader from '@components/Loaders/FirstLoader.component';
+import UpdaterUI from '@components/Updater/UpdaterUI.Component';
 
 const Clock = React.lazy(() => import('@components/Clock/Clock.component'));
 
@@ -28,16 +28,18 @@ const ModalsContainer = React.lazy(
   () => import('@layout/ModalsContainer/ModalsContainer.component')
 );
 
-const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
-
 // Pages
+const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 const App = () => {
   const [firstLoader, setFirstLoader] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
+    window.api.onIPCData('update-spectrum', (_, data) => {
+      console.log(data);
+    });
+    setTimeout(async () => {
       setFirstLoader(false);
     }, 1000);
   }, []);
@@ -49,13 +51,18 @@ const App = () => {
         <React.Suspense
           fallback={<LoadingIndicator loadingMessage="Initializing..." />}
         >
+          <Route path="/main" component={TitleBar} />
           <Route path="/main" component={RouteHandler} />
           <Route path="/main" component={MainNavigation} />
           <Route path="/main" component={BottomBar} />
-          <Route path="/main" component={TitleBar} />
           <Route path="/main" component={Clock} />
           <Route path="/main" component={ModalsContainer} />
-          <Route exact path={AppState.REVIEW_TAB} component={ReviewPage} />
+          <Route exact path={AppState.REVIEW_TAB}>
+            <div className="h-full py-1">
+              <ReviewPage />
+            </div>
+          </Route>
+
           <Route
             path={'/main'}
             render={() => (
@@ -63,7 +70,8 @@ const App = () => {
                 position="bottom-right"
                 containerClassName="mb-6"
                 toastOptions={{
-                  className: 'bg-grey2 text-white rounded-md',
+                  style: { background: '#333333', color: '#fff' },
+                  className: 'text-white rounded-md',
                   duration: 5000,
                 }}
               />
@@ -72,6 +80,7 @@ const App = () => {
           <Switch>
             <Route exact path="/" render={() => <Redirect to="/main" />} />
           </Switch>
+          <UpdaterUI />
         </React.Suspense>
       </Router>
     </div>

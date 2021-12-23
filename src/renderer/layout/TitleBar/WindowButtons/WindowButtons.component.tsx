@@ -1,27 +1,27 @@
 //Contains minimize, restore/maximize, and close button for the titlebar.
 
-import React, { useEffect, useState } from 'react';
-import { useAppDispatch } from '@redux/hooks/hooks';
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Icons
 import Minimize from '@icons/minimize.svg';
 import Restore from '@icons/restore.svg';
 import Close from '@icons/close.svg';
 import Maximize from '@icons/maximize.svg';
-import { setWindowResized } from '@redux/AppStateSlice';
+import { setWindowMaximized, setWindowResized } from '@redux/AppStateSlice';
 
 const WindowButtons = () => {
-  const [isMaximized, setIsMaximized] = useState(true);
+  const isWindowMaximized = useAppSelector(
+    (state) => state.appState.windowMaximized
+  );
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     window.api.onIPCData('window:unmaximize', () => {
-      setIsMaximized(false);
+      dispatch(setWindowMaximized(false));
     });
     window.api.onIPCData('window:maximize', () => {
-      console.log('Maximize');
-
-      setIsMaximized(true);
+      dispatch(setWindowMaximized(true));
     });
   }, []);
 
@@ -29,6 +29,8 @@ const WindowButtons = () => {
     window.api.onIPCData('window:resize', () => {
       dispatch(setWindowResized(Math.random()));
     });
+
+    return () => window.api.removeListeners('window:resize');
   }, []);
 
   return (
@@ -41,8 +43,8 @@ const WindowButtons = () => {
         onClick={() => window.api.sendIPC('window:minimize')}
       />
       <img
-        src={isMaximized ? Restore : Maximize}
-        title={isMaximized ? 'Restore' : 'Maximize'}
+        src={isWindowMaximized ? Restore : Maximize}
+        title={isWindowMaximized ? 'Restore' : 'Maximize'}
         className="window-button hover:bg-accent"
         alt="Maximize/Restore"
         onClick={() => window.api.sendIPC('window:restore')}

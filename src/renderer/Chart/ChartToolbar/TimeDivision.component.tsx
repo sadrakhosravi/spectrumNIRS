@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const TimeDivision = ({ chartOptions }: any) => {
-  const timeDivisions = ['1s', '5s', '10s', '30s'];
+  const timeDivisions = ['5s', '10s', '30s', '60s', '300s'];
   const [activeTime, setActiveTime] = useState(
     timeDivisions[timeDivisions.length - 1]
   );

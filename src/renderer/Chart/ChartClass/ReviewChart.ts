@@ -22,7 +22,6 @@ import { getState, dispatch } from '@redux/store';
 import { setIsLoadingData } from '@redux/AppStateSlice';
 
 import { ChartChannels } from '@utils/channels';
-import AccurateTimer from '@electron/helpers/accurateTimer';
 import { setAllEvents } from '@redux/ChartSlice';
 
 class ReviewChart extends Chart {
@@ -75,14 +74,14 @@ class ReviewChart extends Chart {
       this.channels,
       this.dashboard,
       this.charts,
-      this.series
+      this.series,
+      true
     );
     this.customizeCharts();
     this.createZoomBandChart();
     this.listenForRightArrowKey();
     this.synchronizeXAxis(this.charts);
     this.customizeZoomBandChart();
-    this.checkIntervalChange();
     this.loadAllEvents();
   }
 
@@ -90,19 +89,11 @@ class ReviewChart extends Chart {
     dispatch(setIsLoadingData(true));
     const recordingId = getState().experimentData?.currentRecording?.id;
     if (!recordingId) return;
-    const data = await window.api.invokeIPC(ChartChannels.GetDataForInterval, {
-      recordingId,
-      start: 0,
-      end: 300000,
-    });
-    if (data.length !== 0) {
-      this.XMax = data[data.length - 1].timeStamp;
-      console.log(data[data.length - 1]);
+    await window.api.sendIPC(ChartChannels.StreamData, recordingId);
+
+    window.api.onIPCData(ChartChannels.StreamData, (_event, data) => {
       this.drawDataOnCharts(data);
-    } else {
-      this.endOfData = true;
-      dispatch(setIsLoadingData(false));
-    }
+    });
   };
 
   drawDataOnCharts = (data: any) => {
@@ -111,6 +102,8 @@ class ReviewChart extends Chart {
     const dataArr2: any[] = [];
     const dataArr3: any[] = [];
     const dataArr4: any[] = [];
+    console.time('calc1');
+
     // Using for loop for fastest possible execution
     for (let i = 0; i < DATA_LENGTH; i++) {
       const O2Hb = {
@@ -135,45 +128,31 @@ class ReviewChart extends Chart {
       dataArr4.push(TOI);
     }
 
-    const plottingTimer = new AccurateTimer(() => {
-      requestAnimationFrame(() => {
-        this.series && this.series[0].add(dataArr.splice(0, 10000));
-        this.series && this.series[1].add(dataArr2.splice(0, 10000));
-        this.series && this.series[2].add(dataArr3.splice(0, 10000));
-        this.series && this.series[3].add(dataArr4.splice(0, 10000));
-      });
-      requestAnimationFrame(() => {
-        this.charts?.forEach((chart) => chart.getDefaultAxisY().fit());
-      });
+    console.timeEnd('calc1');
 
-      if (dataArr.length === 0) {
-        plottingTimer.stop();
-        this.XMin = (this.series && this.series[0].getXMin()) as number;
-        this.XMax = (this.series && this.series[0].getXMax()) as number;
-        dispatch(setIsLoadingData(false));
-        this.isLoadingData = false;
-        return;
-      }
-    }, 200);
+    this.series && this.series[0].add(dataArr.splice(0, 10000));
+    this.series && this.series[1].add(dataArr2.splice(0, 10000));
+    this.series && this.series[2].add(dataArr3.splice(0, 10000));
+    this.series && this.series[3].add(dataArr4.splice(0, 10000));
 
-    plottingTimer.start();
-  };
-
-  getIntervalDataAndDraw = async (interval: { start: number; end: number }) => {
-    const recordingId = getState().experimentData?.currentRecording?.id;
-    if (!recordingId) return;
-    const data = await window.api.invokeIPC(ChartChannels.GetDataForInterval, {
-      recordingId,
-      ...interval,
+    requestAnimationFrame(() => {
+      this.charts?.forEach((chart) => chart.getDefaultAxisY().fit());
     });
-    data && this.drawDataOnCharts(data);
+
+    if (dataArr.length === 0) {
+      this.XMin = (this.series && this.series[0].getXMin()) as number;
+      this.XMax = (this.series && this.series[0].getXMax()) as number;
+      dispatch(setIsLoadingData(false));
+      this.isLoadingData = false;
+      return;
+    }
   };
 
   listenForRightArrowKey() {
-    window.addEventListener('keydown', this.loadDataOnKeyPress);
+    window.addEventListener('keydown', this.handleKeyPress);
   }
 
-  loadDataOnKeyPress = async (event: KeyboardEvent) => {
+  handleKeyPress = async (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight' && this.charts) {
       const timeDivision = this.chartOptions?.timeDivision as number;
 
@@ -206,77 +185,6 @@ class ReviewChart extends Chart {
         .setInterval(start, end || start + timeDivision, 0, true);
     }
   }
-
-  checkIntervalChange() {
-    let previousIntervalStart = 0;
-    if (this.charts) {
-      this.charts[0].getDefaultAxisX().onScaleChange((start, _end) => {
-        // Prevent redundant calls if the interval start is the same
-        if (start !== previousIntervalStart && !this.isLoadingData) {
-          previousIntervalStart = start;
-          const currentInterval =
-            this.charts &&
-            (this.charts[0].getDefaultAxisX().getInterval() as any);
-          if (Math.abs(currentInterval.end - this.XMax) <= 0) {
-            this.loadDataFromInterval();
-            this.isLoadingData = true;
-            console.log('Load Data');
-          }
-
-          // if (currentInterval.start - this.XMin <= 0 && this.XMin !== 0) {
-          //   this.loadPreviousDataFromInterval();
-          //   this.isLoadingData = true;
-          //   console.log('Load Previous Data');
-          // }
-        }
-      });
-    }
-  }
-
-  loadDataFromInterval = async () => {
-    dispatch(setIsLoadingData(true));
-    if (this.charts) {
-      const data = await window.api.invokeIPC(
-        ChartChannels.GetDataForInterval,
-        {
-          recordingId: getState().experimentData.currentRecording.id,
-          start: this.XMax,
-          end: this.XMax + this.NUM_OF_POINTS_TO_QUERY,
-        }
-      );
-      if (data.length > 1) {
-        this.drawDataOnCharts(data);
-      } else {
-        this.isLoadingData = false;
-        dispatch(setIsLoadingData(false));
-      }
-    }
-  };
-
-  loadPreviousDataFromInterval = async () => {
-    this.isLoadingData = true;
-    dispatch(setIsLoadingData(true));
-    this.clearCharts();
-    this.setInterval(this.XMin - 30000, this.XMin);
-    console.log(this.XMin);
-    if (this.charts) {
-      const data = await window.api.invokeIPC(
-        ChartChannels.GetDataForInterval,
-        {
-          recordingId: getState().experimentData.currentRecording.id,
-          start: this.XMin - this.NUM_OF_POINTS_TO_QUERY,
-          end: this.XMin,
-        }
-      );
-      if (data.length > 1) {
-        this.drawDataOnCharts(data);
-        console.log(data);
-      } else {
-        this.isLoadingData = false;
-        dispatch(setIsLoadingData(false));
-      }
-    }
-  };
 
   loadAllEvents = async () => {
     const events = await window.api.invokeIPC(
@@ -326,7 +234,7 @@ class ReviewChart extends Chart {
     );
     this.zoomBandChart
       ?.getDefaultAxisX()
-      .setTickStrategy(AxisTickStrategies.Time);
+      .setTickStrategy(AxisTickStrategies.Empty);
 
     let count = 0;
     this.zoomBandChart?.setSeriesStyle((series) => {
@@ -344,7 +252,7 @@ class ReviewChart extends Chart {
   }
 
   customizeCharts() {
-    this.dashboard?.setAnimationsEnabled(true);
+    this.dashboard?.setAnimationsEnabled(false);
     this.charts?.forEach((chart, i) => {
       // Disable rectangle zoom
       // chart.setMouseInteractionRectangleZoom(false);
@@ -370,7 +278,7 @@ class ReviewChart extends Chart {
 
       chart.getDefaultAxisY().setScrollStrategy(AxisScrollStrategies.fitting);
     });
-    this.dashboard?.setRowHeight(4, 0.7);
+    this.dashboard?.setRowHeight(4, 0.5);
   }
 
   cleanup() {
@@ -379,7 +287,8 @@ class ReviewChart extends Chart {
     this.dashboard?.dispose();
     this.charts = null;
     this.series = null;
-    window.removeEventListener('keydown', this.loadDataOnKeyPress);
+    window.removeEventListener('keydown', this.handleKeyPress);
+    window.api.removeListeners(ChartChannels.StreamData);
     dispatch(setAllEvents([]));
     dispatch(setIsLoadingData(false));
   }

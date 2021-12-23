@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React from 'react';
 
 import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { setReviewSidebar } from '@redux/AppStateSlice';
@@ -14,15 +13,10 @@ import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component'
 import { ChartType } from 'utils/constants';
 
 const Review = () => {
-  const [isHidden, setIsHidden] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const location = useLocation();
-
   const dispatch = useAppDispatch();
   const isSidebarActive = useAppSelector(
     (state) => state.appState.reviewSidebar
   );
-
   const isNewWindow = useAppSelector(
     (state) => state.appState.reviewTabInNewWindow
   );
@@ -30,20 +24,8 @@ const Review = () => {
     (state) => state.experimentData.currentRecording
   );
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsHidden(true);
-      setFirstLoad(false);
-    }, 800);
-  }, []);
-
-  useEffect(() => {
-    location.pathname.includes('review') && setIsHidden(false);
-    !location.pathname.includes('review') && !firstLoad && setIsHidden(true);
-  }, [location]);
-
   return (
-    <div className="h-full" hidden={isHidden}>
+    <div className="h-full">
       {!isNewWindow && (
         <div className={`absolute top-0 left-0 h-full w-full flex`}>
           <div

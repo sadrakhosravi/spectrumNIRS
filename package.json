@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "spectrum-nirs",
   "productName": "SpectrumNIRS",
-  "version": "0.2.0-nightly.20211218",
+  "version": "0.2.0-nightly.20211222-3",
   "description": "Spectrum NIRS data acquisition software",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -38,7 +38,7 @@
   "build": {
     "productName": "Spectrum",
     "appId": "com.ibl.spectrumNIRS",
-    "asar": true,
+    "asar": false,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
       "dist",
@@ -83,7 +83,7 @@
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Data Acquisition Software"
     },
     "directories": {
       "app": "release/app",
@@ -95,19 +95,21 @@
       "./resources/**",
       "./src/db/entity/**"
     ],
-    "publish": {
-      "provider": "github",
-      "token": "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",
-      "owner": "sadrakhosravi",
-      "repo": "spectrumNIRS"
-    }
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "sadrakhosravi",
+        "token": "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",
+        "repo": "spectrumNIRS"
+      }
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sadrakhosravi/spectrumNIRS.git"
   },
   "author": {
-    "name": "Sadra Khosravi + Electron React Boilerplate Maintainers",
+    "name": "Sadra Khosravi",
     "email": "sadrakh@outlook.com",
     "url": "https://sadrakhosravi.com"
   },
@@ -237,6 +239,7 @@
     "@tippyjs/react": "^4.2.6",
     "crypto-browserify": "^3.12.0",
     "dayjs": "^1.10.7",
+    "dotenv": "^10.0.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.1",
     "electron-store": "7.0.0",
