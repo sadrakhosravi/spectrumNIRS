@@ -87,7 +87,7 @@ const SelectPatient = ({
           </div>
           <DeleteButton
             onClick={async () => {
-              await deletePatientAndData(patient.id);
+              await deletePatientAndData(patient.id, patient.name);
               getAllPatients();
             }}
             title="Delete Patient and its Data"
@@ -124,7 +124,7 @@ const SelectPatient = ({
                 </div>
                 <DeleteButton
                   onClick={async () => {
-                    await deleteRecordingAndData(recording.id);
+                    await deleteRecordingAndData(recording.id, recording.name);
                     // Refresh the list
                     getAllRecordings(patient.id);
                   }}

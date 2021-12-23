@@ -70,15 +70,20 @@ const RecentExperiment: React.FC<IProps> = ({
           </span>
         </div>
         <div className="flex w-1/3 items-center justify-end mr-1">
-          <p className="text-light text-base">
-            Saved: {saved.toString().split(' ')[0]}
-          </p>
+          <span className="text-right">
+            <p className="text-light text-sm">
+              Last Saved: {saved.toString().split(', ')[0]}
+            </p>
+            <p className="text-light text-sm">
+              Time: {saved.toString().split(', ')[1]}
+            </p>
+          </span>
         </div>
       </div>
       <DeleteButton
         className="mr-4"
         onClick={async () => {
-          await deleteExperimentAndData(experiment.id);
+          await deleteExperimentAndData(experiment.id, experiment.name);
           refetch();
         }}
         title="Delete Experiment and its Data"

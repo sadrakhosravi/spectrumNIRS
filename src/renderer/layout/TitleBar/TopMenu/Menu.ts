@@ -1,10 +1,13 @@
 import { version } from '~/package.json';
+import toast from 'react-hot-toast';
+
 // Actions
 import { openModal } from '@redux/ModalStateSlice';
+import { resetExperimentData } from '@redux/ExperimentDataSlice';
 
 // Constants
 import { ModalConstants } from '@utils/constants';
-import { DialogBoxChannels } from '@utils/channels';
+import { DialogBoxChannels, UpdaterChannels } from '@utils/channels';
 
 import store from '@redux/store';
 const { dispatch, getState } = store;
@@ -14,13 +17,21 @@ export const TopMenu = [
     label: 'File',
     submenu: [
       {
-        label: 'Open',
+        label: 'Open Experiment',
         click: () => {
           dispatch(openModal(ModalConstants.OPEN_EXPERIMENT));
         },
       },
       {
-        label: 'Close',
+        label: 'Close Experiment',
+        click: () => {
+          const noExperimentOpened =
+            getState().experimentData.currentExperiment.id === -1;
+          if (noExperimentOpened) return;
+
+          dispatch(resetExperimentData());
+          toast.success('Experiment closed.', { duration: 3000 });
+        },
       },
       {
         label: 'Exit',
@@ -69,13 +80,7 @@ export const TopMenu = [
       },
       {
         label: 'Check for Updates',
-        click: () =>
-          window.api.invokeIPC(DialogBoxChannels.MessageBox, {
-            title: 'No updates available',
-            message: 'No updates available',
-            detail: 'No updates currently available, please check back later.',
-            type: 'info',
-          }),
+        click: () => window.api.sendIPC(UpdaterChannels.CheckForUpdate),
       },
     ],
   },

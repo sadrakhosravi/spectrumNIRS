@@ -1,5 +1,5 @@
 import { autoUpdater } from 'electron-updater';
-import { BrowserWindow, ipcMain } from 'electron';
+import { BrowserWindow, ipcMain, app } from 'electron';
 const log = require('electron-log');
 
 // Channels
@@ -16,7 +16,7 @@ const updater = async () => {
   const focusedWindow = BrowserWindow.getFocusedWindow() as BrowserWindow;
 
   // Check for update on the first open
-  autoUpdater.checkForUpdates();
+  app.isPackaged && autoUpdater.checkForUpdates();
 
   // Checking for update
   autoUpdater.on('checking-for-update', (info) => {
@@ -33,9 +33,7 @@ const updater = async () => {
 
   // Update not available, send to UI
   autoUpdater.on('update-not-available', (info) => {
-    log.info(info);
-
-    focusedWindow.webContents.send('update-spectrum', info);
+    focusedWindow.webContents.send(UpdaterChannels.NoUpdateAvailable, info);
   });
 
   // Update error, send to UI
@@ -68,6 +66,11 @@ const updater = async () => {
 
   // Install update on command from the UI
   ipcMain.on(UpdaterChannels.InstallUpdate, () => autoUpdater.quitAndInstall());
+
+  // Check for update
+  ipcMain.on(UpdaterChannels.CheckForUpdate, () =>
+    autoUpdater.checkForUpdates()
+  );
 };
 
 export default updater;

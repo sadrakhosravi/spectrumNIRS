@@ -73,7 +73,12 @@ export class Experiment {
     await getConnection()
       .createQueryBuilder()
       .update(Experiments)
-      .set({ updatedAt: new Date() })
+      .set({
+        updatedAt: new Date(),
+        lastUpdate: new Date().toLocaleString('en-US', {
+          hour12: false,
+        }),
+      })
       .where('id = :id', { id: experimentId })
       .execute();
 

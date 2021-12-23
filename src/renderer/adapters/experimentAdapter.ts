@@ -95,16 +95,19 @@ export const newRecording = async (data: INewRecordingData) => {
  * Deleted the selected experiment and its relevant data
  * @param experimentId - The id of the experiment to be deleted
  */
-export const deleteExperimentAndData = async (experimentId: number) => {
+export const deleteExperimentAndData = async (
+  experimentId: number,
+  experimentName: string = 'experiment'
+) => {
   // Confirm user selection before deleting data permanently
   const confirmation = await window.api.invokeIPC(
     DialogBoxChannels.MessageBoxSync,
     {
       title: 'Confirm your selection',
       type: 'warning',
-      message: 'Deleting Experiment and All its Data!',
+      message: `Deleting "${experimentName}" and all its data!`,
       detail:
-        'Are you sure you want to delete this experiment and all its data. This is a permanent action!',
+        'Are you sure you want to delete this experiment and all its data?',
       buttons: ['Confirm', 'Cancel'],
       defaultId: 1,
       noLink: true,
@@ -113,6 +116,23 @@ export const deleteExperimentAndData = async (experimentId: number) => {
 
   // Operation was cancelled
   if (confirmation === 1) return;
+
+  const confirmation2 = await window.api.invokeIPC(
+    DialogBoxChannels.MessageBoxSync,
+    {
+      title: 'Confirm your selection',
+      type: 'warning',
+      message: 'This is a permanent action!',
+      detail:
+        'If you continue, your data will be deleted permanently and cannot be restored!',
+      buttons: ['Confirm', 'Cancel'],
+      defaultId: 1,
+      noLink: true,
+    }
+  );
+
+  // Operation was cancelled
+  if (confirmation2 === 1) return;
 
   const dataDeleted = window.api.invokeIPC(
     ExperimentChannels.deleteExperiment,
@@ -133,16 +153,18 @@ export const deleteExperimentAndData = async (experimentId: number) => {
  * Deleted the selected experiment and its relevant data
  * @param patientId - The id of the experiment to be deleted
  */
-export const deletePatientAndData = async (patientId: number) => {
+export const deletePatientAndData = async (
+  patientId: number,
+  patientName: string = 'patient'
+) => {
   // Confirm user selection before deleting data permanently
   const confirmation = await window.api.invokeIPC(
     DialogBoxChannels.MessageBoxSync,
     {
       title: 'Confirm your selection',
       type: 'warning',
-      message: 'Deleting Patient and All its Data!',
-      detail:
-        'Are you sure you want to delete this patient and all its data. This is a permanent action!',
+      message: `Deleting "${patientName}" and all its data!`,
+      detail: `Are you sure you want to delete and all its data. This is a permanent action!`,
       buttons: ['Confirm', 'Cancel'],
       defaultId: 1,
       noLink: true,
@@ -151,6 +173,22 @@ export const deletePatientAndData = async (patientId: number) => {
 
   // Operation was cancelled
   if (confirmation === 1) return;
+
+  const confirmation2 = await window.api.invokeIPC(
+    DialogBoxChannels.MessageBoxSync,
+    {
+      title: 'Confirm your selection',
+      type: 'warning',
+      message: 'This is a permanent action!',
+      detail:
+        'If you continue, your data will be deleted permanently and cannot be restored!',
+      buttons: ['Confirm', 'Cancel'],
+      defaultId: 1,
+      noLink: true,
+    }
+  );
+  // Operation was cancelled
+  if (confirmation2 === 1) return;
 
   const dataDeleted = window.api.invokeIPC(
     ExperimentChannels.deletePatient,
@@ -171,16 +209,18 @@ export const deletePatientAndData = async (patientId: number) => {
  * Deleted the selected recording and its relevant data
  * @param recordingId - The id of the recording to be deleted
  */
-export const deleteRecordingAndData = async (recordingId: number) => {
+export const deleteRecordingAndData = async (
+  recordingId: number,
+  recordingName: string = 'recording'
+) => {
   // Confirm user selection before deleting data permanently
   const confirmation = await window.api.invokeIPC(
     DialogBoxChannels.MessageBoxSync,
     {
       title: 'Confirm your selection',
       type: 'warning',
-      message: 'Deleting Recording Data!',
-      detail:
-        'Are you sure you want to delete this recording and its data. This is a permanent action!',
+      message: `Deleting "${recordingName}" and all its data!`,
+      detail: `Are you sure you want to delete  and its data. This is a permanent action!`,
       buttons: ['Confirm', 'Cancel'],
       defaultId: 1,
       noLink: true,
@@ -189,6 +229,22 @@ export const deleteRecordingAndData = async (recordingId: number) => {
 
   // Operation was cancelled
   if (confirmation === 1) return;
+
+  const confirmation2 = await window.api.invokeIPC(
+    DialogBoxChannels.MessageBoxSync,
+    {
+      title: 'Confirm your selection',
+      type: 'warning',
+      message: 'This is a permanent action!',
+      detail:
+        'If you continue, your data will be deleted permanently and cannot be restored!',
+      buttons: ['Confirm', 'Cancel'],
+      defaultId: 1,
+      noLink: true,
+    }
+  );
+  // Operation was cancelled
+  if (confirmation2 === 1) return;
 
   const dataDeleted = window.api.invokeIPC(
     ExperimentChannels.deleteRecording,

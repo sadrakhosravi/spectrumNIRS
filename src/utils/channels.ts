@@ -101,4 +101,5 @@ export const UpdaterChannels = {
   DownloadingUpdate: Updater + 'update-downloading',
   UpdateDownloaded: Updater + 'update-downloaded',
   InstallUpdate: Updater + 'update-install',
+  NoUpdateAvailable: Updater + 'no-update-available',
 };

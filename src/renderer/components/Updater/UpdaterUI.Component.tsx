@@ -79,7 +79,31 @@ const UpdaterUI = () => {
       );
     });
 
-    console.log('Updater');
+    window.api.onIPCData(UpdaterChannels.NoUpdateAvailable, (_, data) => {
+      toast(
+        (t) => (
+          <div className="">
+            <h3 className="text-xl text-accent font-semibold">
+              No update available
+            </h3>
+            <p className="text-base my-1 mb-2">
+              There are currently no updated available. Please check back later.
+            </p>
+            <BorderButton text="Dismiss" onClick={() => toast.dismiss(t.id)} />
+          </div>
+        ),
+        { duration: 10000 }
+      );
+      console.log(data);
+    });
+
+    // Remove listeners on component unmount
+    return () => {
+      window.api.removeListeners(UpdaterChannels.UpdateAvailable);
+      window.api.removeListeners(UpdaterChannels.DownloadingUpdate);
+      window.api.removeListeners(UpdaterChannels.UpdateDownloaded);
+      window.api.removeListeners(UpdaterChannels.NoUpdateAvailable);
+    };
   }, []);
 
   return <div></div>;

@@ -6,6 +6,8 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
   UpdateDateColumn,
 } from 'typeorm';
 import { Patients } from './Patients';
@@ -25,11 +27,24 @@ export class Experiments extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @CreateDateColumn({ type: 'datetime' })
-  public createdAt: Date;
+  @Column({ type: 'text', nullable: true })
+  lastUpdate: string;
 
   @UpdateDateColumn({ type: 'datetime' })
   public updatedAt: Date;
+
+  @BeforeInsert()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
+  @BeforeUpdate()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
 }
 
 export default Experiments;

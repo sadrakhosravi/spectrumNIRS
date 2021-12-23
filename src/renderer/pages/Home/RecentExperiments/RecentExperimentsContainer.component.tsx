@@ -67,6 +67,8 @@ const RecentExperimentsContainer = ({
       });
   };
 
+  console.log(experiments);
+
   return (
     <div className="bg-grey1 h-full p-6 rounded-md overflow-y-auto">
       <div className="flex gap-2 items-center w-full mb-5">
@@ -88,7 +90,7 @@ const RecentExperimentsContainer = ({
           <RecentExperiment
             title={experiment.name}
             description={experiment.description}
-            saved={experiment.updatedAt}
+            saved={experiment.lastUpdate}
             key={experiment.id}
             isActive={experiment.id === currentExperimentId}
             experiment={experiment}
