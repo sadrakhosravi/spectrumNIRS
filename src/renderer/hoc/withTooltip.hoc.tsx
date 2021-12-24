@@ -20,6 +20,7 @@ const withTooltip = (
         <Tippy
           placement={tooltipPosition || 'bottom'}
           delay={[0, 0]}
+          duration={[0, 0]}
           content={tooltipText || props.tooltip}
           interactive={props.interactive || false}
         >

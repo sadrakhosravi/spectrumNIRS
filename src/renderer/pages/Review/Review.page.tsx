@@ -4,10 +4,10 @@ import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
 import { setReviewSidebar } from '@redux/AppStateSlice';
 
 // Main area components
-import ReviewChart from 'renderer/Chart/ReviewChart.component';
+import ReviewChart from 'renderer/charts/ReviewChart.component';
 
 // Sidebar components
-import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
+import WidgetsContainer from 'renderer/widgets/WidgetsContainer.component';
 
 // Constants
 import { ChartType } from 'utils/constants';

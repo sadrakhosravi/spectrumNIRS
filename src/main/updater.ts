@@ -68,8 +68,9 @@ const updater = async () => {
   ipcMain.on(UpdaterChannels.InstallUpdate, () => autoUpdater.quitAndInstall());
 
   // Check for update
-  ipcMain.on(UpdaterChannels.CheckForUpdate, () =>
-    autoUpdater.checkForUpdates()
+  ipcMain.on(
+    UpdaterChannels.CheckForUpdate,
+    () => app.isPackaged && autoUpdater.checkForUpdates()
   );
 };
 

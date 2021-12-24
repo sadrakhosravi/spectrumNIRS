@@ -7,6 +7,7 @@
       "@assets/*": ["../assets/*"],
       "@img/*": ["../assets/img/*"],
       "@icons/*": ["../assets/icons/*"],
+      "@lib/*": ["./lib/*"],
       "@components/*": ["./renderer/components/*"],
       "@pages/*": ["./renderer/pages/*"],
       "@layout/*": ["./renderer/layout/*"],

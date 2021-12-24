@@ -1,6 +1,5 @@
 // Data Readers
 import NIRSV5 from '../dataReaders/NIRSV5';
-import Recording from './Recording';
 import { CurrentRecording } from 'controllers/recording';
 
 export interface IDataReaders {
@@ -60,7 +59,6 @@ export class DataReader implements IDataReaders {
   currentSensor: CurrentSensor;
   dataReader: any[] = [NIRSV5];
   lastTimeStamp: number;
-  Recording: Recording;
   senderWindow: Electron.WebContents;
   currentRecording: CurrentRecording;
 
@@ -78,7 +76,6 @@ export class DataReader implements IDataReaders {
     this.currentRecording = currentRecording;
     this.senderWindow = senderWindow;
     this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
-    this.Recording = new Recording();
     this.lastTimeStamp = lastTimeStamp;
   }
 

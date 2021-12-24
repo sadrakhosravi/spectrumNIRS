@@ -2,13 +2,17 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 //Components
-import Filter from './Filter/Filter.component';
-import Intensities from './Gain/Intensities.component';
-import { setRecordSidebar, setReviewSidebar } from '@redux/AppStateSlice';
+import Filter from './ProbeCalibrationWidgets/Filter.component';
+import Intensities from './ProbeCalibrationWidgets/Intensities.component';
+import {
+  setProbeCalibrationSidebar,
+  setRecordSidebar,
+  setReviewSidebar,
+} from '@redux/AppStateSlice';
 
 // Constants
 import { ChartType } from '@utils/constants';
-import EventsWidget from './Events/Events.widget';
+import EventsWidget from './ReviewWidgets/Events.widget';
 
 //The container for each widget to be rendered in
 const WidgetsContainer = ({
@@ -25,10 +29,12 @@ const WidgetsContainer = ({
   const handleHideSidebarClick = () => {
     type === ChartType.RECORD && dispatch(setRecordSidebar(false));
     type === ChartType.REVIEW && dispatch(setReviewSidebar(false));
+    type === ChartType.PROBE_CALIBRATION &&
+      dispatch(setProbeCalibrationSidebar(false));
   };
 
   return (
-    <div className="h-[calc(100%-1px)]">
+    <div className="h-[calc(100%-1px)] pl-2 border-l-2 border-white border-opacity-5">
       {isSidebarActive && (
         <>
           {' '}
@@ -36,13 +42,18 @@ const WidgetsContainer = ({
             {type === ChartType.RECORD && (
               <>
                 <Filter />
-                <Intensities />
               </>
             )}
             {type === ChartType.REVIEW && (
               <>
                 <EventsWidget />
+                <EventsWidget />
               </>
+            )}
+            {type === ChartType.PROBE_CALIBRATION && (
+              <div className="mt-2">
+                <Intensities />
+              </div>
             )}
           </div>
           <button

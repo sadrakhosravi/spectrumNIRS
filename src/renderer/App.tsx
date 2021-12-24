@@ -21,6 +21,7 @@ import BottomBar from './layout/BottomBar/BottomBar.component';
 import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 import FirstLoader from '@components/Loaders/FirstLoader.component';
 import UpdaterUI from '@components/Updater/UpdaterUI.Component';
+import RecordingIndicator from '@components/Indicators/RecordingIndicator.component';
 
 const Clock = React.lazy(() => import('@components/Clock/Clock.component'));
 
@@ -57,6 +58,7 @@ const App = () => {
           <Route path="/main" component={BottomBar} />
           <Route path="/main" component={Clock} />
           <Route path="/main" component={ModalsContainer} />
+          <Route path="/main" component={RecordingIndicator} />
           <Route exact path={AppState.REVIEW_TAB}>
             <div className="h-full py-1">
               <ReviewPage />

@@ -4,10 +4,10 @@ import { useSelector, useDispatch } from 'react-redux';
 
 // Components
 import HomeIconButton from './IconButtons/HomeIconButton.component';
-import SignalIconButton from './IconButtons/SignalIconButton.component';
+import RecordIconButton from './IconButtons/RecordIconButton.component';
 import ReviewIconButton from './IconButtons/ReviewIconButton.component';
 import SettingsIconButton from './IconButtons/SettingsIconButton.component';
-import ExperimentSettings from 'renderer/ExperimentSettings/ExperimentSettings.component';
+import ExperimentSettings from 'renderer/settings/ExperimentSettings.component';
 
 // State
 import { changeAppState } from '@redux/AppStateSlice';
@@ -33,7 +33,7 @@ const MainNavigation = (): JSX.Element => {
             onClick={() => dispatch(changeAppState(AppState.HOME))}
             isActive
           />
-          <SignalIconButton
+          <RecordIconButton
             onClick={() => dispatch(changeAppState(AppState.RECORD))}
           />
           <ReviewIconButton
@@ -52,7 +52,7 @@ const MainNavigation = (): JSX.Element => {
           <HomeIconButton
             onClick={() => dispatch(changeAppState(AppState.HOME))}
           />
-          <SignalIconButton
+          <RecordIconButton
             onClick={() => dispatch(changeAppState(AppState.RECORD))}
             isActive
           />
@@ -72,7 +72,7 @@ const MainNavigation = (): JSX.Element => {
           <HomeIconButton
             onClick={() => dispatch(changeAppState(AppState.HOME))}
           />
-          <SignalIconButton
+          <RecordIconButton
             onClick={() => dispatch(changeAppState(AppState.RECORD))}
           />
           <ReviewIconButton
@@ -91,7 +91,7 @@ const MainNavigation = (): JSX.Element => {
           <HomeIconButton
             onClick={() => dispatch(changeAppState(AppState.HOME))}
           />
-          <SignalIconButton
+          <RecordIconButton
             onClick={() => dispatch(changeAppState(AppState.RECORD))}
           />
           <ReviewIconButton

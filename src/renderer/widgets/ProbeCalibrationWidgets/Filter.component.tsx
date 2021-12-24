@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Widget from '../Widget.component';
+import Widget from '../../components/Widget/Widget.component';
 import Tabs from '@components/Tabs/Tabs.component';
 
 //Renders the filter widget on the sidebar

@@ -3,7 +3,7 @@ import React from 'react';
 // Tooltip
 import Tooltip from '@components/Tooltip/Tooltip.component';
 
-const SignalIconButton = (props: any) => {
+const RecordIconButton = (props: any) => {
   const { isActive, onClick } = props;
   // Check if the button is active and set the styling accordingly
   let activeClass;
@@ -35,4 +35,4 @@ const SignalIconButton = (props: any) => {
   );
 };
 
-export default SignalIconButton;
+export default RecordIconButton;

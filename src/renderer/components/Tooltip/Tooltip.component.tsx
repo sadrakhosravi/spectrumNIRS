@@ -16,7 +16,12 @@ const Tooltip: React.FC<IProps> = (props) => {
   if (tooltip === true) {
     return (
       <React.Suspense fallback={'Loading ...'}>
-        <Tippy placement={placement} delay={[0, 0]} content={text}>
+        <Tippy
+          placement={placement}
+          delay={[0, 0]}
+          duration={[0, 0]}
+          content={text}
+        >
           {props.children}
         </Tippy>
       </React.Suspense>

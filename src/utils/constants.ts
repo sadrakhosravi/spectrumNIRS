@@ -33,6 +33,7 @@ export enum ModalConstants {
 export enum ChartType {
   RECORD = 'record',
   REVIEW = 'review',
+  PROBE_CALIBRATION = 'probeCalibration',
 }
 
 // Redux Thunk status

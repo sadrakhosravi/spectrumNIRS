@@ -10,7 +10,7 @@ const PrimaryButton = ({ text, onClick }: ButtonProps) => {
     <button
       onClick={onClick}
       type="button"
-      className="inline-block px-4 py-2 text-sm border border-transparent rounded-md bg-accent border-accent hover:bg-opacity-80 active:bg-opacity-100 transition"
+      className="inline-block px-4 py-2 text-sm border border-transparent rounded-md bg-accent border-accent hover:bg-opacity-80 active:bg-opacity-100 "
     >
       {text}
     </button>

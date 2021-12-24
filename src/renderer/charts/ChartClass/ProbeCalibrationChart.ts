@@ -1,8 +1,10 @@
 import lcjs, {
   ChartXY,
   ColorHEX,
+  customTheme,
   PointMarker,
   SolidLine,
+  Themes,
   UIBackground,
   UIDraggingModes,
 } from '@arction/lcjs';
@@ -45,9 +47,24 @@ class ProbeCalibrationChart {
   }
 
   createSignalMonitorChart() {
+    const fillStyle = new SolidFill({
+      color: ColorHEX('#111'),
+    });
+
+    const seriesFillStyle = new SolidFill({
+      color: ColorHEX('#000'),
+    });
+
+    const spectrumTheme = customTheme(Themes.darkGold, {
+      panelBackgroundFillStyle: fillStyle,
+      seriesBackgroundFillStyle: seriesFillStyle,
+    });
     this.chart = lightningChart()
       .ChartXY({
         container: this.containerId,
+        disableAnimations: true,
+        antialias: true,
+        theme: spectrumTheme,
       })
       .setTitle('Probe Calibration')
       .setTitleMarginBottom(10)

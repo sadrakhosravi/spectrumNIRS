@@ -108,19 +108,19 @@ class ReviewChart extends Chart {
     for (let i = 0; i < DATA_LENGTH; i++) {
       const O2Hb = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].O2Hb.toFixed(2)),
+        y: parseFloat(data[i].O2Hb),
       };
       const HHb = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].HHb.toFixed(2)),
+        y: parseFloat(data[i].HHb),
       };
       const THb = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].THb.toFixed(2)),
+        y: parseFloat(data[i].THb),
       };
       const TOI = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].TOI.toFixed(2)),
+        y: parseFloat(data[i].TOI),
       };
       dataArr.push(O2Hb);
       dataArr2.push(HHb);

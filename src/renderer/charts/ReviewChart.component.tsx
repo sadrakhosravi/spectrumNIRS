@@ -5,7 +5,7 @@ import { useAppSelector } from '@redux/hooks/hooks';
 import withLoading from '@hoc/withLoading.hoc';
 
 // Components
-import ReviewChartClass from 'renderer/Chart/ChartClass/ReviewChart';
+import ReviewChartClass from 'renderer/charts/ChartClass/ReviewChart';
 import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants

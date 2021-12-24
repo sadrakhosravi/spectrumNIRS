@@ -2,7 +2,7 @@
 import hypoxiaIcon from '@icons/hypoxia.svg';
 import MarkerIcon from '@icons/marker.svg';
 // Modules
-import ChartOptions from '@chart/ChartClass/ChartOptions';
+import ChartOptions from 'renderer/charts/ChartClass/ChartOptions';
 
 // State
 import { toggleEvent2, toggleHypoxia } from '@redux/ChartSlice';

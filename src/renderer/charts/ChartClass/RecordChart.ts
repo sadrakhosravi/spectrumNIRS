@@ -83,19 +83,19 @@ class RecordChart extends Chart {
     for (let i = 0; i < DATA_LENGTH; i++) {
       const O2Hb = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].O2Hb.toFixed(2)),
+        y: parseFloat(data[i].O2Hb),
       };
       const HHb = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].HHb.toFixed(2)),
+        y: parseFloat(data[i].HHb),
       };
       const THb = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].THb.toFixed(2)),
+        y: parseFloat(data[i].THb),
       };
       const TOI = {
         x: parseInt(data[i].timeStamp),
-        y: parseFloat(data[i].TOI.toFixed(2)),
+        y: parseFloat(data[i].TOI),
       };
       dataArr.push(O2Hb);
       dataArr2.push(HHb);
@@ -159,6 +159,17 @@ class RecordChart extends Chart {
       chart.getDefaultAxisX().setInterval(0, 30000);
     });
     this.chartOptions?.clearCharts();
+
+    this.charts?.forEach((chart) => {
+      const axisX = chart.getDefaultAxisX();
+      const axisY = chart.getDefaultAxisY();
+
+      axisX.setInterval(
+        0,
+        (this.chartOptions as ChartOptions).getTimeDivision()
+      );
+      axisY.setInterval(0, 10);
+    });
   }
 }
 

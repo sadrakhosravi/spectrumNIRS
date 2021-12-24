@@ -7,7 +7,7 @@ import withLoading from '@hoc/withLoading.hoc';
 
 //Components
 import Tabs from '@components/Tabs/Tabs.component';
-import Widget from '../Widget.component';
+import Widget from '../../components/Widget/Widget.component';
 import { setSensorIntensities } from '@redux/SensorStateSlice';
 
 // Icons

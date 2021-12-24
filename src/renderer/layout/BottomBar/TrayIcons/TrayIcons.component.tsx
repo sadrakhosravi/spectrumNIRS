@@ -12,7 +12,7 @@ import DataIcon from '@icons/raw-data.svg';
 
 // Components
 import Separator from '@components/Separator/Separator.component';
-import TrayIconButtons from '../TrayIconButton/TrayIconButton.component';
+import TrayIconButtons from './TrayIconButton.component';
 
 // Constants
 import { USBDetectionChannels } from '@utils/channels';
@@ -151,7 +151,7 @@ const TrayIcons = () => {
   }
 
   return (
-    <footer className="text-right col-span-9 h-30px">
+    <div className="text-right col-span-9 h-30px">
       <div className="grid grid-flow-col items-center justify-end pb-2">
         {experimentButton}
         {patientButton}
@@ -168,7 +168,7 @@ const TrayIcons = () => {
           interactive
         />
       </div>
-    </footer>
+    </div>
   );
 };
 

@@ -23,7 +23,7 @@ type RecordInit = {
 };
 
 // Store
-let reader: DataReader;
+let reader: DataReader | undefined;
 
 // Select the sensor
 ipcMain.handle(
@@ -38,7 +38,6 @@ ipcMain.handle(
       lastTimeStamp,
     }: RecordInit
   ) => {
-    console.log('Reader');
     reader = new DataReader(
       patientId,
       sensorId,
@@ -52,7 +51,7 @@ ipcMain.handle(
 
 // Start recording
 ipcMain.on(RecordChannels.Recording, () => {
-  reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
+  reader && reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
 });
 
 // Start quality monitor
@@ -60,6 +59,7 @@ ipcMain.on(RecordChannels.QualityMonitor, (_event, active: boolean) => {
   if (!reader) return;
   active && reader.startQualityMonitor();
   !active && reader && reader.stopRecording();
+  reader = undefined;
 });
 
 // Stop recording
@@ -74,8 +74,7 @@ ipcMain.on(RecordChannels.Pause, () => {
 
 // Continue recording
 ipcMain.on(RecordChannels.Continue, () => {
-  console.log('Continue');
-  reader.continueRecording();
+  reader && reader.continueRecording();
 });
 
 // Display Raw Data
@@ -119,5 +118,5 @@ ipcMain.on(
 
 // Hypoxia Event
 ipcMain.on(ChartChannels.Event, (_event, data: Object) => {
-  reader.toggleEvent(data);
+  reader && reader.toggleEvent(data);
 });

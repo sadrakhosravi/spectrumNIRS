@@ -31,7 +31,6 @@ input[type]:focus-visible {
   height: 40px;
   display: inline-block;
   padding: 0px 15px;
-  transition: 0.15s ease;
   -webkit-app-region: no-drag;
 }
 
@@ -73,7 +72,6 @@ input[type]:focus-visible {
   padding: 0.5rem 0;
   margin-bottom: 0.5rem;
   border-left: 5px solid #333;
-  transition: 0.15s ease;
 }
 
 .icon-button svg {
@@ -81,7 +79,6 @@ input[type]:focus-visible {
   margin-right: auto;
   padding-right: 5px;
   fill: #7f7f7f;
-  transition: 0.15s ease;
 }
 
 .icon-button:hover svg {
@@ -225,4 +222,9 @@ input[type]:focus-visible {
     transform: translateX(0px);
     opacity: 1;
   }
+}
+
+/* In order for tailwindCSS to include dynamically selected classes from react a dummy class is defined */
+.dummy1 {
+  @apply bg-green-300 bg-rose-300 bg-violet-300 bg-green-600 bg-rose-600 bg-violet-600 text-green-800 text-rose-800 text-violet-800;
 }

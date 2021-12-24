@@ -37,7 +37,7 @@ const IconTextButton: React.FC<IProps> = (props) => {
         disabled || activeStyle
       } ${
         text ? 'px-4' : 'px-3 bg-grey1 active:bg-accent'
-      } w-full py-2 grid grid-flow-col auto-cols-max items-center transition relative duration-100 rounded-md`}
+      } w-full py-2 grid grid-flow-col auto-cols-max items-center relative rounded-md`}
       onClick={onClick}
     >
       <IconText text={text || undefined} icon={icon} />

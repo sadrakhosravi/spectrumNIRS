@@ -3,10 +3,10 @@ import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Main area components
-import RecordChart from 'renderer/Chart/RecordChart.component';
+import RecordChart from 'renderer/charts/RecordChart.component';
 
 // Sidebar components
-import WidgetsContainer from 'renderer/Chart/Widgets/WidgetsContainer.component';
+import WidgetsContainer from 'renderer/widgets/WidgetsContainer.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
