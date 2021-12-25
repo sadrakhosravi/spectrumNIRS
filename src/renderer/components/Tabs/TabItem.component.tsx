@@ -12,7 +12,7 @@ type TabItems = {
 const TabItem = ({ name, icon, isActive, onClick }: TabItems) => {
   const tabColor = isActive
     ? `bg-grey1 z-10 border-accent hover:border-accent`
-    : `border-dark2 hover:bg-grey2 hover:border-grey2 z-0`;
+    : `border-dark hover:bg-grey2 hover:border-grey2 z-0`;
 
   return (
     <button

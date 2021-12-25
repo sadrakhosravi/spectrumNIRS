@@ -8,7 +8,7 @@ import withTooltip from '@hoc/withTooltip.hoc';
 import SensorIcon from '@icons/sensor.svg';
 import PatientIcon from '@icons/user-checked.svg';
 import ExperimentIcon from '@icons/experiment.svg';
-import DataIcon from '@icons/raw-data.svg';
+import RecordingIcon from '@icons/recording.svg';
 
 // Components
 import Separator from '@components/Separator/Separator.component';
@@ -141,7 +141,7 @@ const TrayIcons = () => {
         {SeparatorBar}
 
         <TrayIconWithTooltip
-          icon={DataIcon}
+          icon={RecordingIcon}
           text={`Recording: ${experimentData.currentRecording.name}`}
           tooltip={recordingTooltip}
           interactive

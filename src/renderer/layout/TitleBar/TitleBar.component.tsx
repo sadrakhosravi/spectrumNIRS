@@ -14,7 +14,7 @@ const TitleBar = () => {
   const experimentData = useSelector((state: any) => state.experimentData);
 
   return (
-    <header className="header w-full header-container relative items-center grid grid-cols-3 bg-grey1 z-50 ">
+    <header className="window-drag h-[30px] w-full relative items-center grid grid-cols-3 bg-grey1 z-50 ">
       <div className="h-full items-center align-middle">
         <div className="grid items-center grid-flow-col auto-cols-max h-full ">
           <div>
@@ -26,7 +26,11 @@ const TitleBar = () => {
         </div>
       </div>
       <div>
-        <p className="text-center">{experimentData.currentExperiment.name}</p>
+        <p className="text-center text-base text-white text-opacity-80">
+          {experimentData.currentExperiment.name &&
+            experimentData.currentExperiment.name + ' -'}{' '}
+          <span className="text-white text-opacity-50">Spectrum</span>
+        </p>
       </div>
       <WindowButtons />
     </header>

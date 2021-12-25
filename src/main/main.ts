@@ -17,6 +17,7 @@ import createDBConnection from '../db/index';
 import '../controllers';
 // import { resolveHtmlPath } from './util';
 import updater from './updater';
+import { resolveHtmlPath } from './util';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -49,6 +50,9 @@ const createMainWindow = async () => {
   const { width, height } = primaryDisplay.workAreaSize;
   const { x, y } = primaryDisplay.bounds;
 
+  // Disable menu for the entire application
+  // Menu.setApplicationMenu(false)
+
   mainWindow = await new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
@@ -60,11 +64,9 @@ const createMainWindow = async () => {
     darkTheme: true,
     frame: false,
     webPreferences: {
-      nativeWindowOpen: false,
-      sandbox: false,
+      nativeWindowOpen: true,
       nodeIntegrationInWorker: true,
       partition: 'persist:spectrum',
-      webgl: true,
       contextIsolation: true,
       nodeIntegration: false,
       preload: path.join(__dirname, 'preload.js'),
@@ -74,8 +76,7 @@ const createMainWindow = async () => {
   });
   mainWindow.setBackgroundColor('#1E1E1E');
   mainWindow.maximize();
-  // mainWindow.loadURL(resolveHtmlPath('index.html'));
-  mainWindow.loadURL('http://localhost:1212');
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {

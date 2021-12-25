@@ -6,6 +6,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --title-bar-size: 30px;
+  --main-navigation-size: 45px;
+}
+
 body {
   overflow-y: hidden;
 }
@@ -26,9 +31,13 @@ input[type]:focus-visible {
   @apply ring-2 ring-accent;
 }
 
+.calc-height {
+  height: calc(100% + 0px);
+}
+
 .window-button {
-  width: 48px;
-  height: 40px;
+  width: 46px;
+  height: var(--title-bar-size);
   display: inline-block;
   padding: 0px 15px;
   -webkit-app-region: no-drag;
@@ -38,40 +47,31 @@ input[type]:focus-visible {
   cursor: pointer;
 }
 
-.header {
+.header,
+.window-drag {
   -webkit-app-region: drag;
 }
 
-.top-menu {
+.top-menu,
+.no-drag {
   -webkit-app-region: no-drag;
-}
-
-.main-navigation {
-  position: fixed;
-  top: 40px;
-  left: 0;
-  height: calc(100% - 70px);
-  width: 60px;
-  background-color: #333;
 }
 
 .main-container {
   position: absolute;
-  top: 40px;
-  left: 60px;
-  width: calc(100% - 60px);
-  height: calc(100% - 70px);
-  max-height: calc(100% - 70px);
-  margin-left: auto;
+  top: var(--title-bar-size);
+  left: var(--main-navigation-size);
+  width: calc(100% - var(--main-navigation-size));
+  height: calc(100% - var(--title-bar-size) * 2);
   overflow-y: hidden;
   overflow-x: hidden;
 }
 
 .icon-button {
-  width: 4rem;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-  border-left: 5px solid #333;
+  width: var(--main-navigation-size);
+  padding: 0.3rem 0;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid #333;
 }
 
 .icon-button svg {
@@ -86,7 +86,7 @@ input[type]:focus-visible {
 }
 
 .icon-button-active {
-  border-left: 5px solid #fff;
+  border-left: 4px solid #fff;
 }
 
 .icon-button-active svg {
@@ -215,8 +215,8 @@ input[type]:focus-visible {
 
 @keyframes slideLeft {
   0% {
-    transform: translateX(15px);
-    opacity: 0;
+    transform: translateX(12px);
+    opacity: 0.3;
   }
   100% {
     transform: translateX(0px);

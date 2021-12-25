@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch } from '@redux/hooks/hooks';
-import { setPatientData, setRecordingData } from '@redux/ExperimentDataSlice';
-import { closeModal } from '@redux/ModalStateSlice';
+import {
+  setPatientData,
+  setRecordingData,
+  resetPatientData,
+} from '@redux/ExperimentDataSlice';
+import { closeModal, openModal } from '@redux/ModalStateSlice';
 import {
   deleteRecordingAndData,
   deletePatientAndData,
@@ -9,14 +13,17 @@ import {
 
 // Components
 import DeleteButton from '@components/Buttons/DeleteButton.component';
+import BorderIconButton from '@components/Buttons/BorderIconButton.component';
 
 // Icons
 import PatientIcon from '@icons/user-checked.svg';
 import ArrowDownIcon from '@icons/arrow-down.svg';
-import RecordingIcon from '@icons/raw-data.svg';
+import RecordingIcon from '@icons/recording.svg';
+import NewRecordingIcon from '@icons/new-file.svg';
 
 // Constants
 import { ExperimentChannels } from '@utils/channels';
+import { ModalConstants } from '@utils/constants';
 
 type PatientData = {
   createdAt: string;
@@ -53,6 +60,10 @@ const SelectPatient = ({
     dispatch(setRecordingData(recording));
     dispatch(closeModal());
   };
+
+  useEffect(() => {
+    isOpen ? dispatch(setPatientData(patient)) : dispatch(resetPatientData());
+  }, [isOpen]);
 
   return (
     <>
@@ -95,7 +106,7 @@ const SelectPatient = ({
         </div>
       </button>
       <div
-        className="w-full -mt-1 p-6 bg-grey3 pt-6 border-t-2 border-grey1 text-left"
+        className="w-full -mt-1 px-6 pt-6 pb-20 bg-grey3  border-t-2 border-grey1 text-left"
         hidden={!isOpen}
       >
         {recordings &&
@@ -143,7 +154,18 @@ const SelectPatient = ({
             </span>
           </p>
         )}
+
+        <div className="absolute bottom-4 right-6">
+          <BorderIconButton
+            tooltip="Create a recording for this patient"
+            icon={NewRecordingIcon}
+            onClick={() => {
+              dispatch(openModal(ModalConstants.NEWRECORDING));
+            }}
+          />
+        </div>
       </div>
+
       <div className="mb-6"></div>
     </>
   );

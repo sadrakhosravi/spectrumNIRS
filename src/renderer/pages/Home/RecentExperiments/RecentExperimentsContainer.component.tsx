@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@redux/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
 
 // Components
@@ -11,7 +11,12 @@ import withLoading from '@hoc/withLoading.hoc';
 import withTooltip from '@hoc/withTooltip.hoc';
 
 // Icons
-import UpdateIcon from '@icons/update.svg';
+import RefreshIcon from '@icons/refresh.svg';
+import NewFileIcon from '@icons/new-file.svg';
+import { openModal } from '@redux/ModalStateSlice';
+
+// Constants
+import { ModalConstants } from '@utils/constants';
 
 const IconButtonWithTooltip = withTooltip(IconButton);
 
@@ -39,6 +44,7 @@ const RecentExperimentsContainer = ({
   const currentExperimentId = useAppSelector(
     (state) => state.experimentData.currentExperiment.id
   );
+  const dispatch = useAppDispatch();
 
   const { data, isLoading, refetch } = useGetRecentExperimentsQuery(numOfExps);
 
@@ -67,8 +73,6 @@ const RecentExperimentsContainer = ({
       });
   };
 
-  console.log(experiments);
-
   return (
     <div className="bg-grey1 h-full p-6 rounded-md overflow-y-auto">
       <div className="flex gap-2 items-center w-full mb-5">
@@ -79,9 +83,16 @@ const RecentExperimentsContainer = ({
         />
         <span className="h-40px w-12">
           <IconButtonWithTooltip
-            icon={UpdateIcon}
+            icon={RefreshIcon}
             tooltip={'Refresh List'}
             onClick={refetch}
+          />
+        </span>
+        <span className="h-40px w-12">
+          <IconButtonWithTooltip
+            icon={NewFileIcon}
+            tooltip={'New Experiment'}
+            onClick={() => dispatch(openModal(ModalConstants.NEWEXPERIMENT))}
           />
         </span>
       </div>

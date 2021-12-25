@@ -34,6 +34,7 @@ export default merge(baseConfig, {
 
   entry: {
     main: path.join(webpackPaths.srcRendererPath, 'index.tsx'),
+    settings: path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
   },
 
   output: {
@@ -143,7 +144,8 @@ export default merge(baseConfig, {
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+      chunks: ['main'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'index.ejs'),
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -151,6 +153,20 @@ export default merge(baseConfig, {
       },
       isBrowser: false,
       isDevelopment: process.env.NODE_ENV !== 'production',
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('settings.html'),
+      chunks: ['settings'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'settings.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
     }),
   ],
 });

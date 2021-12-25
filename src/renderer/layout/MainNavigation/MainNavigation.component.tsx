@@ -111,7 +111,7 @@ const MainNavigation = (): JSX.Element => {
   }
 
   return (
-    <div className="main-navigation text-center">
+    <div className="absolute top-30px left-0 w-[45px] h-[calc(100%-60px)] bg-grey2 text-center">
       <div className="relative h-full">
         {navIcons}
 

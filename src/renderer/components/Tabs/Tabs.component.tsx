@@ -9,8 +9,8 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
     const { label } = children.props;
 
     return (
-      <>
-        <div className="h-40px bg-grey1">
+      <div className="h-full border-[1.5px] border-white border-opacity-20 rounded-md">
+        <div className="h-10 bg-grey1">
           <Tabs.Button
             label={label}
             isActive={true}
@@ -18,13 +18,13 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
             key={label}
           />
         </div>
-        <div>{children}</div>
-      </>
+        <div className="bg-grey3 h-[calc(100%-2.5rem)] py-2">{children}</div>
+      </div>
     );
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full border-[1.5px] border-white border-opacity-20 rounded-md">
       <div className="flex">
         {Array.isArray(children) &&
           children.map((child, i) => {
@@ -39,7 +39,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
             );
           })}
       </div>
-      <div className="h-full">
+      <div className="bg-grey3 h-[calc(100%-2.5rem)] py-2 rounded-b-md">
         {Array.isArray(children) &&
           children.map((child, i) => activeTab === i && child)}
       </div>
@@ -55,7 +55,7 @@ type TabProps = {
 
 Tabs.Tab = ({ label, children }: TabProps) => {
   return (
-    <div className="slideLeft my-3 px-3 h-[calc(100%-2rem)]" id={label}>
+    <div className="slideLeft px-3 " id={label}>
       {children}
     </div>
   );
@@ -69,13 +69,13 @@ type ButtonProps = {
 
 Tabs.Button = ({ label, isActive = false, onClick }: ButtonProps) => {
   const tabColor = isActive
-    ? `bg-grey3 z-10 border-accent hover:border-accent`
-    : `bg-grey1 border-grey1 hover:bg-grey2 hover:border-grey2 z-0`;
+    ? `bg-grey3 z-10 border-0`
+    : `bg-grey1 hover:bg-grey2 z-0 `;
 
   return (
     <button
       type="button"
-      className={`w-1/2 px-3 h-40px border-t-4 grid grid-flow-col auto-cols-max items-center transition duration-100 ${tabColor}`}
+      className={`w-1/2 px-3 h-10 flex items-center border-r-2 border-white border-opacity-20 ${tabColor} last:border-r-0`}
       onClick={onClick}
       id={label}
     >

@@ -17,27 +17,31 @@ import { ModalConstants } from '@utils/constants';
 const HomePage = () => {
   const dispatch = useAppDispatch();
   return (
-    <div id="testing123" className="h-full mx-auto pt-12 lg:w-5/6 xl:w-4/6">
-      <HeadingText />
-      <div className="grid grid-cols-5 mt-10 h-full gap-10">
-        <div className="col-span-3 h-3/4">
-          <RecentExperiments />
-        </div>
-        <div className="col-span-2">
-          <LargeIconTextButton
-            icon={NewFileIcon}
-            title="New Experiment"
-            description="Create a new experiment"
-            onClick={() => {
-              dispatch(openModal(ModalConstants.NEWEXPERIMENT));
-            }}
-          />
-          <LargeIconTextButton
-            icon={OpenFileIcon}
-            title="Open Experiment"
-            description="Open an experiment file or project"
-            onClick={() => dispatch(openModal(ModalConstants.OPEN_EXPERIMENT))}
-          />
+    <div className="h-full flex items-center justify-center">
+      <div className="lg:w-5/6 xl:w-4/6 relative ">
+        <HeadingText />
+        <div className="grid grid-cols-5 gap-10 mt-10">
+          <div className="col-span-3 h-[550px] pb-2">
+            <RecentExperiments numOfExps={6} />
+          </div>
+          <div className="col-span-2">
+            <LargeIconTextButton
+              icon={NewFileIcon}
+              title="New Experiment"
+              description="Create a new experiment"
+              onClick={() => {
+                dispatch(openModal(ModalConstants.NEWEXPERIMENT));
+              }}
+            />
+            <LargeIconTextButton
+              icon={OpenFileIcon}
+              title="Open Experiment"
+              description="Open an experiment file or project"
+              onClick={() =>
+                dispatch(openModal(ModalConstants.OPEN_EXPERIMENT))
+              }
+            />
+          </div>
         </div>
       </div>
     </div>

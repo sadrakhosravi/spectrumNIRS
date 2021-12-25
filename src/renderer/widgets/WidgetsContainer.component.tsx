@@ -34,7 +34,7 @@ const WidgetsContainer = ({
   };
 
   return (
-    <div className="h-[calc(100%-1px)] pl-2 border-l-2 border-white border-opacity-5">
+    <div className="h-[calc(100%-1px)] pl-2 ">
       {isSidebarActive && (
         <>
           {' '}
@@ -47,7 +47,6 @@ const WidgetsContainer = ({
             {type === ChartType.REVIEW && (
               <>
                 <EventsWidget />
-                <EventsWidget />
               </>
             )}
             {type === ChartType.PROBE_CALIBRATION && (
@@ -57,7 +56,7 @@ const WidgetsContainer = ({
             )}
           </div>
           <button
-            className="absolute bottom-1 left-2 w-full h-8 text-light2 hover:text-white"
+            className="absolute bottom-2 left-2 w-full h-8 text-light2 hover:text-white"
             onClick={handleHideSidebarClick}
           >
             Hide Sidebar

@@ -84,6 +84,29 @@ const EventsWidget = ({ setLoading, children }: any) => {
             </form>
           </div>
         </Tabs.Tab>
+        <Tabs.Tab label="Actions">
+          <div className="slideLeft">
+            <h3 className="text-xl font-medium">Jump to:</h3>
+            <form
+              onSubmit={handleSubmit(onTimeFormSubmit)}
+              className="flex gap-4 items-center mt-4 "
+            >
+              <span className="w-1/4">Time(s)</span>
+              <span className="w-full">
+                <InputField
+                  type="number"
+                  register={register('time', { required: true })}
+                />
+              </span>
+              <button
+                className="w-1/4 text-right opacity-60 hover:opacity-100"
+                type="submit"
+              >
+                <img src={LoadIcon} className="h-40px" title="Load Data" />
+              </button>
+            </form>
+          </div>
+        </Tabs.Tab>
       </Tabs>
 
       {children}

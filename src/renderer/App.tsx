@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/main" component={RouteHandler} />
           <Route path="/main" component={MainNavigation} />
           <Route path="/main" component={BottomBar} />
-          <Route path="/main" component={Clock} />
+          <Route path="/dasdasd" component={Clock} />
           <Route path="/main" component={ModalsContainer} />
           <Route path="/main" component={RecordingIndicator} />
           <Route exact path={AppState.REVIEW_TAB}>

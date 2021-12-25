@@ -53,15 +53,15 @@ const RecentExperiment: React.FC<IProps> = ({
       } flex gap-2 items-center w-full mb-3 rounded-md hover:cursor-pointer`}
     >
       <div
-        className="w-full flex px-3 py-5"
+        className="w-full flex px-3 py-4"
         onClick={handleOpenExperimentButton}
       >
         <div className="flex w-2/3 items-center">
           <span className="inline-block mr-5">
             <img
-              className="my-auto"
+              className="opacity-80"
               src={RecentFileIcon}
-              width="48px"
+              width="42px"
               alt="File"
             />
           </span>

@@ -10,7 +10,7 @@ const BorderButton: React.FC<IProps> = ({ text, onClick }) => {
     <button
       onClick={onClick}
       type="button"
-      className="inline-block px-4 py-2 text-sm border rounded-md border-white  hover:bg-accent hover:border-accent"
+      className="inline-block px-4 py-2 text-sm border-[1.5px] rounded-md border-white  hover:bg-accent hover:border-accent"
     >
       {text}
     </button>

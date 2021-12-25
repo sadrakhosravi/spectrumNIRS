@@ -71,9 +71,20 @@ class ChartClass {
       color: ColorHEX('#000'),
     });
 
+    const textFillStyle = new SolidFill({
+      color: ColorHEX('#fff'),
+    });
+
+    const titleFillStyle = new SolidFill({
+      color: ColorHEX('#7f7f7f'),
+    });
+
     const spectrumTheme = customTheme(Themes.darkGold, {
       panelBackgroundFillStyle: fillStyle,
       seriesBackgroundFillStyle: seriesFillStyle,
+      uiTextFillStyle: textFillStyle,
+      axisTitleFillStyle: textFillStyle,
+      chartTitleFillStyle: titleFillStyle,
     });
 
     const dashboard = lightningChart().Dashboard({
@@ -134,6 +145,14 @@ class ChartClass {
 
   // Remove unused elements from each chart
   customizeChart(charts: ChartXY<PointMarker, UIBackground>[]) {
+    this.dashboard.setSplitterStyle((solidLine: any) =>
+      solidLine.setThickness(3)
+    );
+
+    this.dashboard.setSplitterStyleHighlight((solidLine: any) =>
+      solidLine.setThickness(5)
+    );
+
     charts.forEach((chart, i) => {
       const axisX = chart.getDefaultAxisX();
       const axisY = chart.getDefaultAxisY();

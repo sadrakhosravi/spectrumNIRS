@@ -8,3 +8,4 @@ import './dialogBox';
 import './usbDetection';
 import './chart';
 import './probes';
+import './settingsWindow';
