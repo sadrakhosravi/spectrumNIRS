@@ -84,8 +84,8 @@ const TrayIcons = () => {
         {sensorState.detectedSensor && (
           <>
             <p>Name: {sensorState.detectedSensor?.name}</p>
-            <p>Channels: {sensorState.detectedSensor?.channels.toString()}</p>
-            <p>Rate: {sensorState.detectedSensor?.samplingRate} samples/s</p>
+            <p>Channels: </p>
+            <p>Rate: 100 samples/s</p>
           </>
         )}
       </div>
@@ -159,10 +159,10 @@ const TrayIcons = () => {
         {SeparatorBar}
         <TrayIconWithTooltip
           icon={SensorIcon}
-          text={`Sensor: ${
+          text={`${
             sensorState.detectedSensor?.name
-              ? `${sensorState.detectedSensor.name} ✅`
-              : 'Not Connected ❌'
+              ? `Sensor(s): ${sensorState.detectedSensor.name} ✅`
+              : 'No Sensor Found ❌'
           }`}
           tooltip={sensorTooltip}
           interactive

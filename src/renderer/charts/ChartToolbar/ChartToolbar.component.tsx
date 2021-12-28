@@ -30,7 +30,7 @@ const ChartToolbar = ({
   const toolbarMenu = type === ChartType.RECORD ? RecordToolbar : ReviewToolbar;
 
   return (
-    <div className="w-full bg-grey1 px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-6 items-center relative">
+    <div className="w-full bg-[#252526] px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-6 items-center relative drop-shadow-xl border-b-1 border-grey5 z-40">
       <div className="grid grid-flow-col col-span-4 auto-cols-max items-center gap-1">
         {toolbarMenu.map((option, index) => {
           if (option.label === 'separator') return <Separator key={index} />;

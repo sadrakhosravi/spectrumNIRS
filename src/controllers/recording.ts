@@ -59,7 +59,6 @@ ipcMain.on(RecordChannels.QualityMonitor, (_event, active: boolean) => {
   if (!reader) return;
   active && reader.startQualityMonitor();
   !active && reader && reader.stopRecording();
-  reader = undefined;
 });
 
 // Stop recording
@@ -83,11 +82,11 @@ ipcMain.on(RecordChannels.RawData, () => {
 });
 
 // Gain Sync
-ipcMain.handle(
-  RecordChannels.SyncGain,
-  async (_event, data: string[]) =>
-    reader && (await reader.syncGainsWithHardware(data))
-);
+ipcMain.handle(RecordChannels.SyncGain, async (_event, data: string[]) => {
+  console.log('CONTROLLER' + data);
+  console.log(reader);
+  await reader?.syncGainsWithHardware(data);
+});
 
 // Checks if the current recording has data and sends the data back to the chart.
 ipcMain.handle(

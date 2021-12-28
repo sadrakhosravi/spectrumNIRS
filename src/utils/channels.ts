@@ -79,6 +79,7 @@ export const ChartChannels = {
 const ProbeBase = 'probe:';
 export const ProbeChannels = {
   NewProbe: ProbeBase + 'new-probe',
+  SelectProbe: ProbeBase + 'select-probe',
   GetProbeSettings: ProbeBase + 'get-probe-settings',
   GetProbeIntensities: ProbeBase + 'get-probe-intensities',
   UpdateProbeIntensities: ProbeBase + 'update-intensities',

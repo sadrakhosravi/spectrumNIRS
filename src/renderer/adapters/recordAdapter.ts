@@ -108,7 +108,7 @@ export const signalQualityMonitor = async (active: boolean) => {
 
     return false;
   }
-  window.api.invokeIPC(RecordChannels.Init, { sensorId });
+  await window.api.invokeIPC(RecordChannels.Init, { sensorId });
   window.api.sendIPC(RecordChannels.QualityMonitor, active);
 
   return true;

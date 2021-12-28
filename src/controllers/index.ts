@@ -6,6 +6,6 @@ import './recording';
 import './reviewTab';
 import './dialogBox';
 import './usbDetection';
-import './chart';
 import './probes';
+import './chart';
 import './settingsWindow';

@@ -4,10 +4,15 @@ import {
   BaseEntity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  BeforeInsert,
+  BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import Sensor from './Sensors';
 
 @Entity({ name: 'probes' })
 export class Probes extends BaseEntity {
@@ -18,37 +23,45 @@ export class Probes extends BaseEntity {
   name: string;
 
   @Column({ type: 'text' })
-  LEDs: string;
+  intensities: string;
+
+  @Column({ type: 'text' })
+  preGain: string;
 
   @Column({ type: 'int' })
-  defaultSamplingRate: number;
+  gain: number;
 
-  @Column({ type: 'int', nullable: true })
-  savedSamplingRate: number;
+  @Column({ type: 'int' })
+  samplingRate: number;
 
-  @Column({ type: 'text', nullable: true })
-  defaultIntensities: string;
-
-  @Column({ type: 'text', nullable: true })
-  savedIntensities: string;
+  @Column({ type: 'tinyint', nullable: true })
+  isDefault: number;
 
   @Column({ type: 'text', nullable: true })
-  defaultGain: string;
+  lastUpdate: string;
 
-  @Column({ type: 'text', nullable: true })
-  defaultChannels: string;
-
-  @Column({ type: 'text', nullable: true })
-  savedChannels: string;
-
-  @Column({ type: 'text', nullable: true })
-  driver: string;
+  @ManyToOne((type) => Sensor, (sensor) => sensor.probes, { cascade: true })
+  @JoinColumn() // this decorator is optional for @ManyToOne, but required for @OneToOne
+  sensor: number;
 
   @CreateDateColumn({ type: 'datetime' })
   public createdAt: Date;
 
   @UpdateDateColumn({ type: 'datetime' })
   public updatedAt: Date;
+
+  @BeforeInsert()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
+  @BeforeUpdate()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
 }
 
 export default Probes;

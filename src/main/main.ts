@@ -11,8 +11,6 @@
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import 'reflect-metadata';
-// import { resolveHtmlPath } from './util';
-import createDBConnection from '../db/index';
 // Import controllers
 import '../controllers';
 // import { resolveHtmlPath } from './util';
@@ -26,6 +24,9 @@ if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
+
+// Force high performance gpu
+app.commandLine.appendSwitch('--force_high_performance_gpu', 'true');
 
 // const isDevelopment =
 //   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
@@ -104,8 +105,6 @@ app.on('activate', async () => {
 });
 
 (async () => {
-  createDBConnection();
-
   // Set dark theme by default - Light theme will be added in the next versions
   nativeTheme.themeSource = 'dark';
 

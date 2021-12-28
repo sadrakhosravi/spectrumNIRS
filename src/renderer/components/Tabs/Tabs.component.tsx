@@ -9,7 +9,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
     const { label } = children.props;
 
     return (
-      <div className="h-full border-[1.5px] border-white border-opacity-20 rounded-md">
+      <div className="h-full border-1">
         <div className="h-10 bg-grey1">
           <Tabs.Button
             label={label}
@@ -24,8 +24,8 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
   }
 
   return (
-    <div className="h-full border-[1.5px] border-white border-opacity-20 rounded-md">
-      <div className="flex">
+    <div className="h-full border-1 rounded-md">
+      <div className="flex rounded-md">
         {Array.isArray(children) &&
           children.map((child, i) => {
             const { label } = child.props;
@@ -39,7 +39,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
             );
           })}
       </div>
-      <div className="bg-grey3 h-[calc(100%-2.5rem)] py-2 rounded-b-md">
+      <div className="bg-grey3 h-[calc(100%-2.5rem)] py-2">
         {Array.isArray(children) &&
           children.map((child, i) => activeTab === i && child)}
       </div>

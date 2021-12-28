@@ -77,7 +77,7 @@ const RecentExperimentsContainer = ({
     <div className="bg-grey1 h-full p-6 rounded-md overflow-y-auto">
       <div className="flex gap-2 items-center w-full mb-5">
         <input
-          className="bg-light text-dark h-40px px-3 placeholder-grey1 rounded-sm w-full"
+          className="bg-light text-dark h-40px px-3 placeholder-grey1 rounded-sm w-full focus:ring-2 focus:ring-accent"
           placeholder="Search recent experiments ..."
           onChange={handleChange}
         />

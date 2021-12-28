@@ -57,6 +57,8 @@ class ChartOptions {
     this.dashboard.setRowHeight(2, 1);
     this.dashboard.setRowHeight(3, 1);
     this.dashboard.setRowHeight(4, 0.7);
+    this.dashboard.setColumnWidth(0, 1);
+    this.dashboard.setColumnWidth(1, 11);
   }
 
   /**

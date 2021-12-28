@@ -92,6 +92,7 @@ class ReviewChart extends Chart {
     await window.api.sendIPC(ChartChannels.StreamData, recordingId);
 
     window.api.onIPCData(ChartChannels.StreamData, (_event, data) => {
+      data.reverse();
       this.drawDataOnCharts(data);
     });
   };
@@ -129,15 +130,10 @@ class ReviewChart extends Chart {
     }
 
     console.timeEnd('calc1');
-
     this.series && this.series[0].add(dataArr.splice(0, 10000));
     this.series && this.series[1].add(dataArr2.splice(0, 10000));
     this.series && this.series[2].add(dataArr3.splice(0, 10000));
     this.series && this.series[3].add(dataArr4.splice(0, 10000));
-
-    requestAnimationFrame(() => {
-      this.charts?.forEach((chart) => chart.getDefaultAxisY().fit());
-    });
 
     if (dataArr.length === 0) {
       this.XMin = (this.series && this.series[0].getXMin()) as number;
@@ -302,6 +298,17 @@ class ReviewChart extends Chart {
       chart.getDefaultAxisX().setInterval(0, 30000);
     });
     this.chartOptions?.clearCharts();
+
+    this.charts?.forEach((chart) => {
+      const axisX = chart.getDefaultAxisX();
+      const axisY = chart.getDefaultAxisY();
+
+      axisX.setInterval(
+        0,
+        (this.chartOptions as ChartOptions).getTimeDivision()
+      );
+      axisY.setInterval(0, 10);
+    });
   }
 }
 

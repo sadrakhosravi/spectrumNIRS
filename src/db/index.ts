@@ -3,21 +3,26 @@ import Experiments from './entity/Experiments';
 import Patients from './entity/Patients';
 import Recordings from './entity/Recordings';
 import RecordingsData from './entity/RecordingsData';
+import Sensors from './entity/Sensors';
 import Probes from './entity/Probes';
 
-import path from 'path';
-process.env.TZ = 'America/Vancouver'; // here is the magical line
-
 // Paths
-import { databasePath } from '../main/paths';
+import { databaseFile } from '../main/paths';
 
 const createDBConnection = async () => {
   const connection = await createConnection({
     type: 'better-sqlite3',
-    database: path.join(databasePath, 'mydb.db'),
+    database: databaseFile,
     synchronize: true,
     logging: false,
-    entities: [Experiments, Patients, Recordings, RecordingsData, Probes],
+    entities: [
+      Experiments,
+      Patients,
+      Recordings,
+      RecordingsData,
+      Sensors,
+      Probes,
+    ],
     migrations: ['src/db/migration/**/*.ts'],
     subscribers: ['src/db/subscriber/**/*.ts'],
   });

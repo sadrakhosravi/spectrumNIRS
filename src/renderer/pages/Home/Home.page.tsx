@@ -18,10 +18,10 @@ const HomePage = () => {
   const dispatch = useAppDispatch();
   return (
     <div className="h-full flex items-center justify-center">
-      <div className="lg:w-5/6 xl:w-4/6 relative ">
+      <div className="lg:w-5/6 xl:w-4/6 relative">
         <HeadingText />
-        <div className="grid grid-cols-5 gap-10 mt-10">
-          <div className="col-span-3 h-[550px] pb-2">
+        <div className="grid grid-cols-5 gap-10 mt-10 ">
+          <div className="col-span-3 h-[550px] pb-4">
             <RecentExperiments numOfExps={6} />
           </div>
           <div className="col-span-2">

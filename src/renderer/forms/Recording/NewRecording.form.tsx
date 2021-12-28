@@ -21,8 +21,8 @@ import { newRecording, setSensorStatus } from '@adapters/experimentAdapter';
 // Icon
 import SensorIcon from '@icons/sensor.svg';
 
-const RecordingForm = () => {
-  const [sensor, setSensor] = useState(0);
+const NewRecordingForm = () => {
+  const [sensor, setSensor] = useState(1);
   const { register, handleSubmit } = useForm();
 
   const detectedSensor = useAppSelector(
@@ -41,7 +41,7 @@ const RecordingForm = () => {
 
   // Handle form submit
   const onSubmit = (formData: FormData) => {
-    const currentSensor = devices[sensor];
+    const currentSensor = devices[sensor - 1];
     newRecording(formData.recording);
     setSensorStatus(currentSensor);
   };
@@ -119,4 +119,4 @@ const RecordingForm = () => {
     </div>
   );
 };
-export default RecordingForm;
+export default NewRecordingForm;

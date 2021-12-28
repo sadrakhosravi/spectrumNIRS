@@ -1,26 +1,30 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import usbDetect from 'usb-detection';
-
+import { getConnection } from 'typeorm';
+import Sensors from 'db/entity/Sensors';
 import { devices } from '@electron/configs/devices';
 import { USBDetectionChannels } from '../utils/channels';
 
 // Starts listening for insert/remove events of USB devices.
 usbDetect.startMonitoring();
 
-type ConnectedDevice = {
-  id: number;
-  name: string;
-  samplingRate: number;
-  channels: string[];
-  driverName: string;
-};
+const getAvailableSensorsFromDb = async () =>
+  await getConnection()
+    .createQueryBuilder()
+    .select()
+    .from(Sensors, '')
+    .getRawMany();
 
-const checkConnectedDevice = (device: any): null | ConnectedDevice => {
+const checkConnectedDevice = async (
+  device: any
+): Promise<null | typeof devices[0]> => {
   // If the device is not available return null.
   if (!device) return null;
 
+  const sensors = await getAvailableSensorsFromDb();
+
   // Check if any of the sensors are available in the list.
-  const connectedSensor = devices.filter((sensor) =>
+  const connectedSensor = sensors.filter((sensor) =>
     sensor.driverName?.includes(device.deviceName.split(' ')[0])
   );
 
@@ -35,7 +39,7 @@ const checkConnectedDevice = (device: any): null | ConnectedDevice => {
  * Sends the sensor status to every available page
  * @param sensorStatus Status of the sensor to be sent
  */
-const sendDataToUI = (sensorStatus: null | ConnectedDevice) => {
+const sendDataToUI = (sensorStatus: null | typeof devices[0]) => {
   // Send the result to the UI.
   const windows = BrowserWindow.getAllWindows();
   windows.forEach((window) => {
@@ -44,18 +48,18 @@ const sendDataToUI = (sensorStatus: null | ConnectedDevice) => {
 };
 
 // Detect USB insert
-usbDetect.on('add', function (device: any) {
+usbDetect.on('add', async (device: any) => {
   // Check if the connected device is a sensor.
-  const sensorStatus = checkConnectedDevice(device);
+  const sensorStatus = await checkConnectedDevice(device);
 
   // Send the result to the UI.
   sendDataToUI(sensorStatus);
 });
 
 // Detect USB insert
-usbDetect.on('remove', function (device: any) {
+usbDetect.on('remove', async (device: any) => {
   // Check if the removed device is a sensor.
-  const sensorStatus = checkConnectedDevice(device);
+  const sensorStatus = await checkConnectedDevice(device);
   const isNIRSV5 = sensorStatus ? null : sensorStatus;
   // Send the result to the UI.
   sendDataToUI(isNIRSV5);
@@ -74,6 +78,6 @@ ipcMain.handle(USBDetectionChannels.CHECK_USB, async () => {
   );
 
   // Check if the device is connected and send the result.
-  const sensorStatus = checkConnectedDevice(checkForNIRSV5[0]);
+  const sensorStatus = await checkConnectedDevice(checkForNIRSV5[0]);
   return sensorStatus;
 });

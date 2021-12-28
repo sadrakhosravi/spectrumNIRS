@@ -34,7 +34,7 @@ class ProbeCalibrationChart {
   greenColor: lcjs.SolidFill;
 
   constructor(containerId: string) {
-    this.LEDs = devices[0].LEDs;
+    this.LEDs = new Array(devices[0].LEDs).fill('LED');
     this.containerId = containerId;
     this.chart = undefined;
     this.rectangleSeries = undefined;

@@ -10,6 +10,7 @@ import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
+import ChartLayout, { ChartContainer } from './ChartContainer.component';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -21,7 +22,6 @@ type ChartProps = {
 // Prepares and enders the chart
 const ReviewChart = ({
   type,
-  recordState,
   setLoading,
   children,
 }: ChartProps): JSX.Element => {
@@ -37,8 +37,10 @@ const ReviewChart = ({
   const windowMaximized = useAppSelector(
     (state) => state.appState.windowMaximized
   );
-  const channels = (sensorState && sensorState.channels) || ['No Channels'];
-  const samplingRate = (sensorState && sensorState.samplingRate) || 100;
+  const channels = (sensorState && sensorState.defaultChannels) || [
+    'No Channels',
+  ];
+  const samplingRate = (sensorState && sensorState.defaultSamplingRate) || 100;
 
   const containerId = 'reviewChart';
   const chartRef = useRef<ReviewChartClass | null>(null);
@@ -58,6 +60,7 @@ const ReviewChart = ({
       );
 
       chart.createReviewChart();
+      chart.loadInitialData();
 
       // Keep a ref to the chart
       chartRef.current = chart as any;
@@ -97,31 +100,27 @@ const ReviewChart = ({
     chartRef.current?.setInterval(currentTimeStamp);
   }, [currentTimeStamp]);
 
-  useEffect(() => {
-    recordState.id === -1 && chartRef.current?.clearCharts();
-    recordState.id !== -1 &&
-      requestAnimationFrame(() => {
-        chartRef.current?.loadInitialData();
-        resetChartSize();
-      });
-  }, [recordState]);
+  // useEffect(() => {
+  //   recordState.id === -1 && chartRef.current?.clearCharts();
+  //   recordState.id !== -1 &&
+  //     setTimeout(() => {
+  //       chartRef.current?.loadInitialData();
+  //     }, 300);
+  // }, [recordState]);
 
   return (
-    <>
+    <ChartLayout>
       {chartLoaded && chartRef.current?.chartOptions && (
         <ChartToolbar
           chartOptions={chartRef.current.chartOptions}
           type={type}
         />
       )}
-
-      <div
-        key={containerId}
-        className="absolute top-0 left-0 w-full h-[calc(100%-50px)]"
-        id={containerId}
-      />
-      {children}
-    </>
+      <ChartContainer>
+        <div className="h-[2000px]" id={containerId} />
+        {children}
+      </ChartContainer>
+    </ChartLayout>
   );
 };
 

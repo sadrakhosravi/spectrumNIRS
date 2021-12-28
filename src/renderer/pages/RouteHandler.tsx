@@ -10,11 +10,6 @@ const ProbeCalibrationPage = React.lazy(
   () => import('@pages/ProbeCalibration/ProbeCalibration.page')
 );
 
-// Webview
-// import ChartWebView from './ChartWebView';
-// Components
-import Tabs from '@components/Tabs/AppTabs.component';
-
 // Constants
 import { AppState } from '@utils/constants';
 
@@ -47,12 +42,8 @@ const RouteHandler = () => {
             path={AppState.PROBE_CALIBRATION}
             component={ProbeCalibrationPage}
           />
-          <Route path={AppState.RECORDING} component={Tabs} />
         </Router>
-        <div
-          className="fit-to-container absolute top-[40px] left-0 w-full h-full"
-          hidden={isHidden}
-        >
+        <div className="w-full h-full" hidden={isHidden}>
           <RecordPage />
           <Route path={AppState.REVIEW} component={ReviewPage} />
         </div>

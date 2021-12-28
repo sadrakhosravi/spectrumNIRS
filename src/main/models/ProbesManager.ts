@@ -1,78 +1,60 @@
 import { getConnection } from 'typeorm';
-import { Probes } from 'db/entity/Probes';
+import Probes from 'db/entity/Probes';
+import DatabaseError from './DatabaseError';
 
-export class ProbesManager {
+class ProbeManager {
   currentProbeId: number;
-
-  constructor() {
-    this.currentProbeId = 1;
+  constructor(probeId: number) {
+    this.currentProbeId = probeId;
   }
 
   /**
-   * Creates a new probe in the database
-   * @param data - New intensities array
-   * @returns the newly created probe object
+   * Gets the current's probe intensities
+   * @returns Current probe's intensities or an empty array if non found
    */
-  newProbe = async (data: any) => {
+  getIntensities = async (): Promise<object | undefined> => {
     try {
-      const _newProbe = new Probes();
-      Object.assign(_newProbe, data);
-      const newProbe = await _newProbe.save();
-
-      return newProbe;
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
-
-  /**
-   * Gets the current probe intensity from the database
-   * @returns
-   */
-  getIntensities = async () => {
-    try {
-      const probe = await getConnection()
+      const probeConfigs = await getConnection()
         .createQueryBuilder()
-        .select()
+        .select(['sensors.LEDs', 'intensities', 'defaultIntensities'])
         .from(Probes, '')
-        .where('id = :id', { id: this.currentProbeId })
-        .getRawOne<Probes>();
+        .leftJoin('sensors', 'sensors')
+        .where('probes.id = :id', { id: this.currentProbeId })
+        .getRawOne();
 
-      if (probe) {
-        const defaultIntensities = probe.defaultIntensities
+      return {
+        intensities: probeConfigs.intensities
           .split(',')
-          .map((intensity) => parseInt(intensity));
-        const savedIntensities = probe.savedIntensities
-          ?.split(',')
-          .map((intensity) => parseInt(intensity));
-
-        const LEDs = probe.LEDs.split(',');
-
-        return { defaultIntensities, savedIntensities, LEDs };
-      }
-      return null;
-    } catch (error: any) {
-      throw new Error(error.message);
+          .map((item: any) => parseInt(item)),
+        defaultIntensities: probeConfigs.defaultIntensities
+          .split(',')
+          .map((item: any) => parseInt(item)),
+      };
+    } catch (error) {
+      new DatabaseError(error);
+      return undefined;
     }
   };
 
   /**
-   * Update the current probe intensity
-   * @param intensities - New intensities array
-   * @returns
+   * Saves the current probe's intensities in the database
+   * @param intensities - Intensities
    */
-  updateIntensities = async (intensities: number[] | string[]) => {
+  updateIntensity = async (intensities: number[]) => {
     try {
       return await getConnection()
         .createQueryBuilder()
         .update(Probes)
-        .set({ savedIntensities: intensities.join(',') })
+        .set({ intensities: intensities.join(',') })
         .where('id = :id', { id: this.currentProbeId })
         .execute();
-    } catch (error: any) {
-      throw new Error(error.message);
+    } catch (error) {
+      new DatabaseError(error);
+      return undefined;
     }
   };
+
+  setCurrentProbe = async () => {};
 }
 
-export default ProbesManager;
+export default ProbeManager;

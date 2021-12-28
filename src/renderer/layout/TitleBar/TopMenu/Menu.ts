@@ -1,30 +1,31 @@
+import { dispatch, getState } from '@redux/store';
 import { version } from '~/package.json';
 import toast from 'react-hot-toast';
 
 // Actions
 import { openModal } from '@redux/ModalStateSlice';
 import { resetExperimentData } from '@redux/ExperimentDataSlice';
+import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Constants
-import { ModalConstants } from '@utils/constants';
+import { ModalConstants, RecordState } from '@utils/constants';
 import { DialogBoxChannels, UpdaterChannels } from '@utils/channels';
-
-import store from '@redux/store';
-const { dispatch, getState } = store;
 
 export const TopMenu = [
   {
     label: 'File',
     submenu: [
       {
-        label: 'Open Experiment',
+        label: 'Open',
         click: () => {
           dispatch(openModal(ModalConstants.OPEN_EXPERIMENT));
         },
       },
       {
-        label: 'Close Experiment',
+        label: 'Close',
         click: () => {
+          dispatch(changeRecordState(RecordState.IDLE));
+
           const noExperimentOpened =
             getState().experimentData.currentExperiment.id === -1;
           if (noExperimentOpened) return;

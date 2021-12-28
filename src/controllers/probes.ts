@@ -1,26 +1,25 @@
 import { ipcMain } from 'electron';
 import { ProbeChannels } from '@utils/channels';
-
-// Models
 import ProbeManager from '../main/models/ProbesManager';
 
-const probeManager = new ProbeManager();
-
-// Update probe intensities
-ipcMain.handle(
-  ProbeChannels.UpdateProbeIntensities,
-  async (_event, intensities: string[]) =>
-    await probeManager.updateIntensities(intensities)
-);
+const probe = new ProbeManager(1);
 
 // Create a new probe
-ipcMain.handle(
-  ProbeChannels.NewProbe,
-  async (_event, data: any) => await probeManager.newProbe(data)
-);
+ipcMain.handle(ProbeChannels.NewProbe, async (_event) => {});
+
+// Selects the current probe
+ipcMain.handle(ProbeChannels.SelectProbe, async (_event) => {
+  probe.setCurrentProbe();
+});
 
 // Get the current probe intensities
 ipcMain.handle(
   ProbeChannels.GetProbeIntensities,
-  async () => await probeManager.getIntensities()
+  async () => await probe.getIntensities()
+);
+
+// Update probe intensities
+ipcMain.handle(
+  ProbeChannels.UpdateProbeIntensities,
+  async (_event, intensities) => await probe.updateIntensity(intensities)
 );

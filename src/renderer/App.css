@@ -20,6 +20,13 @@ div {
   position: relative;
 }
 
+img {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
@@ -67,6 +74,22 @@ input[type]:focus-visible {
   overflow-x: hidden;
 }
 
+.border-1 {
+  @apply border-[1px] border-grey5;
+}
+
+.border-bottom-1 {
+  @apply border-b-[1px] border-grey5;
+}
+
+.border-light {
+  @apply border-[1px] border-white border-opacity-10;
+}
+
+.border-bottom-light {
+  @apply border-b-[1px] border-white border-opacity-10;
+}
+
 .icon-button {
   width: var(--main-navigation-size);
   padding: 0.3rem 0;
@@ -91,10 +114,6 @@ input[type]:focus-visible {
 
 .icon-button-active svg {
   fill: white;
-}
-
-.fit-to-container {
-  height: calc(100% - 40px);
 }
 
 .custom-height {
@@ -198,6 +217,32 @@ input[type]:focus-visible {
 /* set button(top and bottom of the scrollbar) */
 ::-webkit-scrollbar-button {
   display: none;
+}
+
+.chart-scrollbar::-webkit-scrollbar {
+  @apply border-1 border-grey5;
+  width: 16px;
+}
+
+.chart-scrollbar::-webkit-scrollbar-track {
+  @apply bg-dark;
+}
+
+/* scrollbar itself */
+.chart-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3a3a3a;
+  border-radius: 1px;
+  border: none;
+  width: 12px;
+}
+/* scrollbar itself */
+.chart-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #555555;
+}
+
+/* scrollbar itself */
+.chart-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: #707070;
 }
 
 /** Custom media queries */

@@ -75,7 +75,7 @@ export class DataReader implements IDataReaders {
     this.isRawData = isRawData;
     this.currentRecording = currentRecording;
     this.senderWindow = senderWindow;
-    this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
+    this.currentSensor = this.dataReader[this.sensor - 1]; // Selects the sensor
     this.lastTimeStamp = lastTimeStamp;
   }
 
@@ -116,6 +116,7 @@ export class DataReader implements IDataReaders {
   }
 
   async syncGainsWithHardware(data: string[]): Promise<any> {
+    console.log('DATA FROM READER: ' + data);
     return await this.currentSensor.syncGains(data);
   }
 }

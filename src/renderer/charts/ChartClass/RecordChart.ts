@@ -134,6 +134,7 @@ class RecordChart extends Chart {
     this.charts &&
       this.charts.forEach((chart, i) => {
         const axisX = chart.getDefaultAxisX();
+
         axisX.setMouseInteractions(false);
 
         chart.setMouseInteractionPan(false);

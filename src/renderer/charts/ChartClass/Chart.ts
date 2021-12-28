@@ -20,8 +20,10 @@ import {
   PointMarker,
   UIBackground,
   LineSeries,
-  VisibleTicks,
   customTheme,
+  FontSettings,
+  emptyTick,
+  UIPanel,
 } from '@arction/lcjs';
 // import ChartOptions from './ChartOptions';
 // Import data-generators from 'xydata'-library.
@@ -44,6 +46,7 @@ class ChartClass {
   TOILegend: any;
   containerId: string;
   ChartOptions: any;
+  UIPanel: null | UIPanel;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
@@ -59,16 +62,17 @@ class ChartClass {
     this.seriesLineColorArr = ['#E3170A', '#00FFFF', '#ABFF4F', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
     this.TOILegend = null;
     this.ChartOptions = null;
+    this.UIPanel = null;
   }
 
   // Chart dashboard
   createDashboard(numberOfRows: number, container: string): Dashboard {
-    const fillStyle = new SolidFill({
-      color: ColorHEX('#111'),
-    });
+    // const fillStyle = new SolidFill({
+    //   color: ColorHEX('#111'),
+    // });
 
     const seriesFillStyle = new SolidFill({
-      color: ColorHEX('#000'),
+      color: ColorHEX('#0a0a0a'),
     });
 
     const textFillStyle = new SolidFill({
@@ -79,12 +83,23 @@ class ChartClass {
       color: ColorHEX('#7f7f7f'),
     });
 
+    const axisStyle = new SolidLine({
+      thickness: 1,
+      fillStyle: new SolidFill({ color: ColorHEX('#525252') }),
+    });
+
     const spectrumTheme = customTheme(Themes.darkGold, {
-      panelBackgroundFillStyle: fillStyle,
+      panelBackgroundFillStyle: seriesFillStyle,
       seriesBackgroundFillStyle: seriesFillStyle,
       uiTextFillStyle: textFillStyle,
       axisTitleFillStyle: textFillStyle,
       chartTitleFillStyle: titleFillStyle,
+      axisStyle: axisStyle,
+      uiTickStrokeStyle: axisStyle,
+      uiBackgroundStrokeStyle: emptyLine,
+      lcjsBackgroundStrokeStyle: emptyLine,
+      panelBackgroundStrokeStyle: emptyLine,
+      uiTickTextFillStyle: titleFillStyle,
     });
 
     const dashboard = lightningChart().Dashboard({
@@ -145,18 +160,24 @@ class ChartClass {
 
   // Remove unused elements from each chart
   customizeChart(charts: ChartXY<PointMarker, UIBackground>[]) {
-    this.dashboard.setSplitterStyle((solidLine: any) =>
-      solidLine.setThickness(3)
+    this.dashboard.setSplitterStyle(
+      new SolidLine({
+        thickness: 3,
+        fillStyle: new SolidFill({ color: ColorHEX('#222') }),
+      })
     );
 
-    this.dashboard.setSplitterStyleHighlight((solidLine: any) =>
-      solidLine.setThickness(5)
+    this.dashboard.setSplitterStyleHighlight(
+      () =>
+        new SolidLine({
+          thickness: 5,
+          fillStyle: new SolidFill({ color: ColorHEX('#333') }),
+        })
     );
 
     charts.forEach((chart, i) => {
       const axisX = chart.getDefaultAxisX();
       const axisY = chart.getDefaultAxisY();
-
       // Set the Y axis to be fitting to the data
       axisY.setScrollStrategy(AxisScrollStrategies.fitting);
 
@@ -166,23 +187,7 @@ class ChartClass {
       // Remove X Axis on all charts except the last one
       if (i !== charts.length - 1) {
         axisX
-          .setTickStrategy(AxisTickStrategies.Time, (ticks) =>
-            ticks
-              .setMajorTickStyle((majorTicks) =>
-                majorTicks
-                  .setLabelFillStyle(emptyFill)
-                  .setTickStyle(emptyLine)
-                  .setTickLength(0)
-                  .setTickPadding(0)
-              )
-              .setMinorTickStyle((minorTicks: VisibleTicks) =>
-                minorTicks
-                  .setLabelFillStyle(emptyFill)
-                  .setTickStyle(emptyLine)
-                  .setTickLength(0)
-                  .setTickPadding(0)
-              )
-          )
+
           .setStrokeStyle(emptyLine)
           .setScrollStrategy(AxisScrollStrategies.progressive)
           .setTickStrategy(AxisTickStrategies.Empty)
@@ -195,7 +200,11 @@ class ChartClass {
                 majorTickStyle.setGridStrokeStyle(emptyLine)
               )
               .setMinorTickStyle((minorTickStyle: any) =>
-                minorTickStyle.setGridStrokeStyle(emptyLine)
+                minorTickStyle
+                  .setGridStrokeStyle(emptyLine)
+                  .setLabelFillStyle(
+                    new SolidFill({ color: ColorHEX('#f7f7f7') })
+                  )
               )
           )
           .setTitle('Time (hh:mm:ss)')
@@ -205,37 +214,48 @@ class ChartClass {
       axisY.setTickStrategy(AxisTickStrategies.Numeric, (ticks) =>
         ticks
           .setMajorTickStyle((majorTickStyle) =>
-            majorTickStyle.setGridStrokeStyle(
-              new SolidLine({
-                thickness: -1,
-                fillStyle: new SolidFill({ color: ColorHEX('#1e1e1e') }),
-              })
-            )
+            majorTickStyle
+              .setGridStrokeStyle(emptyLine)
+              .setLabelFillStyle(new SolidFill({ color: ColorHEX('#f7f7f7') }))
           )
-          .setMinorTickStyle((minorTickStyle: any) =>
-            minorTickStyle.setGridStrokeStyle(emptyLine)
-          )
+          .setMinorTickStyle(emptyTick)
       );
 
       // Remove all chart titles
-      if (i === 0) {
-        chart.setTitle('Sensor Data');
-      } else {
-        chart.setTitleFillStyle(emptyFill);
-      }
+      chart.setTitleFillStyle(emptyFill);
 
       // Align Y axes of stacked charts.
       chart.getDefaultAxisY().setThickness(50);
 
       // Disable default auto cursor.
       chart.setAutoCursorMode(AutoCursorModes.disabled);
+
+      // Padding
+      chart.setPadding(10);
+
+      chart.setMouseInteractionWheelZoom(false);
+      chart.setMouseInteractionsWhileScrolling(false);
+
+      // Set AxisY Units
+      axisY.setTitle('Units');
+      axisX.setTitleFont(
+        new FontSettings({
+          size: 12,
+        })
+      );
+      axisY.setTitleFont(
+        new FontSettings({
+          size: 12,
+        })
+      );
+      chart.setPadding({ left: 40 });
     });
   }
 
   uiList(charts: ChartXY<PointMarker, UIBackground>[], dashboard: Dashboard) {
-    charts.forEach((chart, i) => {
-      const axisX = chart.getDefaultAxisX();
-      const axisY = chart.getDefaultAxisY();
+    charts.forEach((_chart, i) => {
+      // const axisX = chart.getDefaultAxisX();
+      // const axisY = chart.getDefaultAxisY();
       const panel = dashboard.createUIPanel({
         columnIndex: 0,
         rowIndex: i,
@@ -243,26 +263,22 @@ class ChartClass {
 
       const legendLayout = panel
         .addUIElement(UILayoutBuilders.Column)
-        .setPosition(
-          translatePoint(
-            {
-              x: 0,
-              y: axisY.getInterval().end,
-            },
-            { x: axisX, y: axisY },
-            chart.uiScale
-          )
-        )
-        .setOrigin(UIOrigins.LeftTop)
+        .setOrigin(UIOrigins.Center)
+        .setMargin({ top: -10 })
         .setMouseInteractions(false)
         .setBackground((bg: any) =>
           bg.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
         );
 
+      panel.onResize((_chart, width, height) => {
+        height < 100 || width < 80
+          ? legendLayout.dispose()
+          : legendLayout.restore();
+      });
+
       if (this.channels[i] === 'TOI') {
         legendLayout
           .addElement(UIElementBuilders.TextBox)
-          .setMargin({ top: 15 })
           .setText(this.channels[i])
           .setTextFont((font: any) => font.setSize(16));
 

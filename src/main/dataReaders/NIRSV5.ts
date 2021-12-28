@@ -37,6 +37,7 @@ const gainValues = {
  * Sends the gains given from the UI to the driver
  */
 export const syncGains = async (data: string[]) => {
+  console.log(data);
   const mySocket = new net.Socket();
   mySocket.connect(DRIVER_SOCKET_PORT, DRIVER_SOCKET_IP, function () {
     console.log('Connection Established');
@@ -225,7 +226,6 @@ export const startQualityMonitor = async (sender: any) => {
       if (count === 50) {
         LEDPDs.forEach((_, i) => (LEDPDs[i] = LEDPDs[i] / 50));
         sender.send('signal-quality-monitor-data', LEDPDs);
-        console.log(LEDPDs);
         LEDPDs.forEach((_, i) => (LEDPDs[i] = 0));
 
         count = 0;

@@ -2,7 +2,7 @@ import React from 'react';
 
 // Components
 import Modal from '@components/Modals/Modal.component';
-import RecordingForm from './Recording.form';
+import RecordingForm from './NewRecording.form';
 
 // Constants
 import { ModalConstants } from 'utils/constants';

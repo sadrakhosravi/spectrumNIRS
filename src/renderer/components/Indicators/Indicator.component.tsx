@@ -9,7 +9,7 @@ const Indicator = ({ text, color = 'green' }: IndicatorProps) => {
   return (
     <>
       <div
-        className={`absolute flex items-center px-3 py-1 top-[7px] right-[200px] gap-2 z-50 bg-${color}-300 rounded-sm animate-pulse `}
+        className={`absolute flex items-center px-3 h-[30px] top-[0px] right-[200px] gap-2 z-50 bg-${color}-300  animate-pulse `}
       >
         <span className={`w-3 h-3 rounded-full bg-${color}-600`}></span>
         <span className={`text-sm text-${color}-800`}>{text}</span>

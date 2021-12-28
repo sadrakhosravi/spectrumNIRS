@@ -50,7 +50,7 @@ const RecentExperiment: React.FC<IProps> = ({
     <button
       className={`${
         isActive ? 'bg-accent' : 'bg-grey2 hover:bg-grey3 '
-      } flex gap-2 items-center w-full mb-3 rounded-md hover:cursor-pointer`}
+      } flex gap-2 items-center w-full mb-3 rounded-md hover:cursor-pointer active:ring-2 active:ring-accent`}
     >
       <div
         className="w-full flex px-3 py-4"

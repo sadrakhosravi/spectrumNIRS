@@ -42,6 +42,7 @@ module.exports = {
         grey2: '#333333',
         grey3: '#272727',
         grey4: '#7f7f7f',
+        grey5: '#323232',
         dark: '#1E1E1E',
         dark2: '#111111',
         black: '#000000',
@@ -54,6 +55,10 @@ module.exports = {
         'chart-3': '#00FFFF',
         'chart-4': '#FFFFFF',
       },
+      borderWidth: {
+        1: '1px',
+      },
+
       margin: {
         0.1: '0.2rem',
       },

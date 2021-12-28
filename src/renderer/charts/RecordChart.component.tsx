@@ -11,6 +11,7 @@ import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
+import ChartLayout, { ChartContainer } from './ChartContainer.component';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -38,8 +39,10 @@ const RecordChart = ({
     (state) => state.appState.windowMaximized
   );
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
-  const channels = (sensorState && sensorState.channels) || ['No Channels'];
-  const samplingRate = (sensorState && sensorState.samplingRate) || 100;
+  const channels = (sensorState && sensorState.defaultChannels) || [
+    'No Channels',
+  ];
+  const samplingRate = (sensorState && sensorState.defaultSamplingRate) || 100;
   const containerId = 'recordChart';
   const chartRef = useRef<RecordChartClass | null>(null);
 
@@ -112,7 +115,7 @@ const RecordChart = ({
       chartRef.current && chartRef.current?.dashboard?.setHeight(offsetHeight);
 
       container.style.overflowX = 'hidden';
-      container.style.overflowY = 'hidden';
+      container.style.overflowY = 'auto';
     });
   };
 
@@ -122,17 +125,15 @@ const RecordChart = ({
   }, [recordSidebar, windowResized, windowMaximized, location]);
 
   return (
-    <>
+    <ChartLayout>
       {chartState && (
         <ChartToolbar chartOptions={chartState.chartOptions} type={type} />
       )}
-
-      <div
-        className="absolute top-0 left-0 h-[calc(100%-50px)] z-20"
-        id={containerId}
-      />
-      {children}
-    </>
+      <ChartContainer>
+        <div className="overflow-y-auto h-full" id={containerId} />
+        {children}
+      </ChartContainer>
+    </ChartLayout>
   );
 };
 
