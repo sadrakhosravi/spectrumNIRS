@@ -9,7 +9,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
     const { label } = children.props;
 
     return (
-      <div className="h-full border-1">
+      <div className="h-full border-primary">
         <div className="h-10 bg-grey1">
           <Tabs.Button
             label={label}
@@ -24,7 +24,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
   }
 
   return (
-    <div className="h-full border-1 rounded-md">
+    <div className="h-full border-primary rounded-md">
       <div className="flex rounded-md">
         {Array.isArray(children) &&
           children.map((child, i) => {

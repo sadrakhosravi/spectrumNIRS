@@ -10,8 +10,6 @@ import App from './App';
 const container = document.getElementById('root') as HTMLDivElement;
 container.innerHTML = '';
 
-// Create a root
-
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

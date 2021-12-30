@@ -12,6 +12,8 @@ import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 // Constants
 import { ChartType } from 'utils/constants';
 import ChartLayout, { ChartContainer } from './ChartContainer.component';
+import useContextMenu from '@hooks/useContextMenu';
+import ContextMenu from '@components/Menu/ContextMenu.component';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -108,11 +110,14 @@ const RecordChart = ({
 
   const resetChartSize = () => {
     requestAnimationFrame(() => {
-      const container = document.getElementById(containerId) as HTMLElement;
+      const container = document.getElementById(
+        containerId
+      ) as HTMLCanvasElement;
       const { offsetWidth, offsetHeight } = container;
 
       chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
-      chartRef.current && chartRef.current?.dashboard?.setHeight(offsetHeight);
+      chartRef.current &&
+        chartRef.current?.dashboard?.setHeight(offsetHeight - 2);
 
       container.style.overflowX = 'hidden';
       container.style.overflowY = 'auto';
@@ -124,14 +129,20 @@ const RecordChart = ({
     location.pathname === '/main/recording/record' && resetChartSize();
   }, [recordSidebar, windowResized, windowMaximized, location]);
 
+  useContextMenu(
+    containerId,
+    <ContextMenu items={[{ label: 'test', value: 'test' }]} />
+  );
+
   return (
     <ChartLayout>
       {chartState && (
         <ChartToolbar chartOptions={chartState.chartOptions} type={type} />
       )}
       <ChartContainer>
-        <div className="overflow-y-auto h-full" id={containerId} />
-        {children}
+        <div className="h-full w-full pointer-events-auto" id={containerId}>
+          {children}
+        </div>
       </ChartContainer>
     </ChartLayout>
   );

@@ -1,7 +1,7 @@
 class DatabaseError extends Error {
   constructor(error: any) {
     super();
-    throw new Error(error.message);
+    console.log('DATABASE ERROR: ' + error.message);
   }
 }
 

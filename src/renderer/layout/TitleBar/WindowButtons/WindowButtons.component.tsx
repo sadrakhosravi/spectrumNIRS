@@ -34,11 +34,11 @@ const WindowButtons = () => {
   }, []);
 
   return (
-    <span className="text-right items-center">
+    <span className="text-right items-center window-drag">
       <img
         src={Minimize}
         title="Minimize"
-        className="window-button hover:bg-accent"
+        className="window-button hover:bg-accent "
         alt="Minimize"
         onClick={() => window.api.sendIPC('window:minimize')}
       />

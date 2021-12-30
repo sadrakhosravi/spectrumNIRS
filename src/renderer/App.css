@@ -6,6 +6,26 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .border-primary {
+    @apply border-[1px] border-white border-opacity-[0.12];
+  }
+}
+
+.font-larger {
+  font-size: 120%;
+}
+
+.font-larger .text-sm {
+  font-size: 16px !important;
+}
+
+.font-inherit {
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+}
+
 :root {
   --title-bar-size: 30px;
   --main-navigation-size: 45px;
@@ -48,6 +68,7 @@ input[type]:focus-visible {
   display: inline-block;
   padding: 0px 15px;
   -webkit-app-region: no-drag;
+  pointer-events: all;
 }
 
 .window-button:hover {
@@ -72,10 +93,6 @@ input[type]:focus-visible {
   height: calc(100% - var(--title-bar-size) * 2);
   overflow-y: hidden;
   overflow-x: hidden;
-}
-
-.border-1 {
-  @apply border-[1px] border-grey5;
 }
 
 .border-bottom-1 {

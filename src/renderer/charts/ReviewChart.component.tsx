@@ -23,6 +23,7 @@ type ChartProps = {
 const ReviewChart = ({
   type,
   setLoading,
+  recordState,
   children,
 }: ChartProps): JSX.Element => {
   const [chartLoaded, setChartLoaded] = useState(false);
@@ -60,7 +61,7 @@ const ReviewChart = ({
       );
 
       chart.createReviewChart();
-      chart.loadInitialData();
+      requestAnimationFrame(() => chart?.loadData());
 
       // Keep a ref to the chart
       chartRef.current = chart as any;
@@ -100,13 +101,10 @@ const ReviewChart = ({
     chartRef.current?.setInterval(currentTimeStamp);
   }, [currentTimeStamp]);
 
-  // useEffect(() => {
-  //   recordState.id === -1 && chartRef.current?.clearCharts();
-  //   recordState.id !== -1 &&
-  //     setTimeout(() => {
-  //       chartRef.current?.loadInitialData();
-  //     }, 300);
-  // }, [recordState]);
+  useEffect(() => {
+    recordState.id === -1 && chartRef.current?.clearCharts();
+    recordState.id !== -1 && chartRef.current?.loadData();
+  }, [recordState]);
 
   return (
     <ChartLayout>
@@ -117,7 +115,7 @@ const ReviewChart = ({
         />
       )}
       <ChartContainer>
-        <div className="h-[2000px]" id={containerId} />
+        <div className="h-full pointer-events-auto" id={containerId} />
         {children}
       </ChartContainer>
     </ChartLayout>

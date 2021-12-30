@@ -1,14 +1,19 @@
 import lcjs, {
   ChartXY,
   ColorHEX,
-  customTheme,
   PointMarker,
   SolidLine,
-  Themes,
   UIBackground,
   UIDraggingModes,
+  VisibleTicks,
 } from '@arction/lcjs';
 import { devices } from '@electron/configs/devices';
+import {
+  spectrumTheme,
+  uiMinorTickFont,
+  uiMajorTickFont,
+  textFillStyle,
+} from './Chart';
 
 const {
   lightningChart,
@@ -47,18 +52,6 @@ class ProbeCalibrationChart {
   }
 
   createSignalMonitorChart() {
-    const fillStyle = new SolidFill({
-      color: ColorHEX('#111'),
-    });
-
-    const seriesFillStyle = new SolidFill({
-      color: ColorHEX('#000'),
-    });
-
-    const spectrumTheme = customTheme(Themes.darkGold, {
-      panelBackgroundFillStyle: fillStyle,
-      seriesBackgroundFillStyle: seriesFillStyle,
-    });
     this.chart = lightningChart()
       .ChartXY({
         container: this.containerId,
@@ -104,10 +97,24 @@ class ProbeCalibrationChart {
       .setMouseInteractions(false)
       .setStrokeStyle(
         new SolidLine({
-          thickness: 4,
-          fillStyle: new SolidFill({ color: ColorHEX('#FFF') }),
+          thickness: 2,
+          fillStyle: new SolidFill({ color: ColorHEX('#7f7f7f') }),
         })
       );
+
+    axisY.setTickStrategy(AxisTickStrategies.Numeric, (tick) =>
+      tick
+        .setMajorTickStyle((majorTick) =>
+          majorTick
+            .setLabelFont(uiMajorTickFont)
+            .setLabelFillStyle(textFillStyle)
+        )
+        .setMinorTickStyle((minorTick: VisibleTicks) =>
+          minorTick
+            .setLabelFont(uiMinorTickFont)
+            .setLabelFillStyle(textFillStyle)
+        )
+    );
   }
 
   resetData() {

@@ -75,6 +75,7 @@ const createMainWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
   });
+
   mainWindow.setBackgroundColor('#1E1E1E');
   mainWindow.maximize();
   mainWindow.loadURL(resolveHtmlPath('index.html'));

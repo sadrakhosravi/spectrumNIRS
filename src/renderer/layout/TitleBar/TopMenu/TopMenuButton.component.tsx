@@ -13,11 +13,7 @@ const TopMenuButton = ({ label, onClick }: TopMenuButtonProps) => {
   return (
     <Menu.Button className="h-full z-0 hover:bg-grey3 " onClick={onClick}>
       {({ open }) => (
-        <div
-          className={`${
-            open && 'bg-grey3'
-          } px-3 h-full flex items-center text-base`}
-        >
+        <div className={`${open && 'bg-grey3'} px-3 h-full flex items-center`}>
           {label}
         </div>
       )}

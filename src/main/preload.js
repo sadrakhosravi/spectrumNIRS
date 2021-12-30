@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('api', {
   dirname: () => __dirname,
   // Send channels
   sendIPC: (channel, args) => ipcRenderer.send(channel, args),
+  sendSyncIPC: (channel, args) => ipcRenderer.sendSync(channel, args),
   invokeIPC: (channel, args) => ipcRenderer.invoke(channel, args),
 
   // Receive channels

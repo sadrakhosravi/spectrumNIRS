@@ -24,12 +24,69 @@ import {
   FontSettings,
   emptyTick,
   UIPanel,
+  Axis,
+  VisibleTicks,
 } from '@arction/lcjs';
-// import ChartOptions from './ChartOptions';
-// Import data-generators from 'xydata'-library.
 
+import msToTime from '@utils/msToTime';
 // Constants
 import { ChartType } from 'utils/constants';
+
+const seriesFillStyle = new SolidFill({
+  color: ColorHEX('#0a0a0a'),
+});
+
+const darkFillStyle = new SolidFill({
+  color: ColorHEX('#222'),
+});
+
+export const textFillStyle = new SolidFill({
+  color: ColorHEX('#fff'),
+});
+
+const titleFillStyle = new SolidFill({
+  color: ColorHEX('#7f7f7f'),
+});
+
+const axisStyle = new SolidLine({
+  thickness: 1,
+  fillStyle: new SolidFill({ color: ColorHEX('#525252') }),
+});
+
+const fontStyle = new FontSettings({
+  size: 14,
+  family: 'Inter, Arial, sans-serif',
+});
+
+export const spectrumTheme = customTheme(Themes.darkGold, {
+  panelBackgroundFillStyle: seriesFillStyle,
+  seriesBackgroundFillStyle: seriesFillStyle,
+  uiTextFillStyle: textFillStyle,
+  axisTitleFillStyle: textFillStyle,
+  chartTitleFillStyle: titleFillStyle,
+  axisStyle: axisStyle,
+  uiTickStrokeStyle: axisStyle,
+  uiBackgroundStrokeStyle: emptyLine,
+  lcjsBackgroundStrokeStyle: emptyLine,
+  panelBackgroundStrokeStyle: emptyLine,
+  uiTickTextFillStyle: titleFillStyle,
+  customTickGridStrokeStyle: axisStyle,
+  uiFont: fontStyle,
+  uiPointableTextBoxFillStyle: darkFillStyle,
+  uiPointableTextBoxStrokeStyle: emptyLine,
+});
+
+export const uiMinorTickFont = new FontSettings({
+  size: 10,
+  family: 'Inter, Arial, sans-serif',
+  style: 'normal',
+});
+
+export const uiMajorTickFont = new FontSettings({
+  size: 12,
+  family: 'Inter, Arial, sans-serif',
+  style: 'normal',
+});
 
 class ChartClass {
   channelCount: number;
@@ -47,9 +104,11 @@ class ChartClass {
   containerId: string;
   ChartOptions: any;
   UIPanel: null | UIPanel;
+  xAxisChart: null | ChartXY<PointMarker, UIBackground>;
+  axisX: null | Axis;
 
   constructor(
-    channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
+    channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4', 'Ch5'],
     type: ChartType.RECORD | ChartType.REVIEW,
     samplingRate: number,
     containerId: string
@@ -57,6 +116,8 @@ class ChartClass {
     this.channels = channels || ['No Channel'];
     this.channelCount = channels.length;
     this.type = type;
+    this.xAxisChart = null;
+    this.axisX = null;
     this.samplingRate = samplingRate;
     this.containerId = containerId;
     this.seriesLineColorArr = ['#E3170A', '#00FFFF', '#ABFF4F', '#FFFFFF']; //Colors for each series: ['red','yellow','cyan', 'white']
@@ -71,60 +132,52 @@ class ChartClass {
     //   color: ColorHEX('#111'),
     // });
 
-    const seriesFillStyle = new SolidFill({
-      color: ColorHEX('#0a0a0a'),
-    });
-
-    const textFillStyle = new SolidFill({
-      color: ColorHEX('#fff'),
-    });
-
-    const titleFillStyle = new SolidFill({
-      color: ColorHEX('#7f7f7f'),
-    });
-
-    const axisStyle = new SolidLine({
-      thickness: 1,
-      fillStyle: new SolidFill({ color: ColorHEX('#525252') }),
-    });
-
-    const spectrumTheme = customTheme(Themes.darkGold, {
-      panelBackgroundFillStyle: seriesFillStyle,
-      seriesBackgroundFillStyle: seriesFillStyle,
-      uiTextFillStyle: textFillStyle,
-      axisTitleFillStyle: textFillStyle,
-      chartTitleFillStyle: titleFillStyle,
-      axisStyle: axisStyle,
-      uiTickStrokeStyle: axisStyle,
-      uiBackgroundStrokeStyle: emptyLine,
-      lcjsBackgroundStrokeStyle: emptyLine,
-      panelBackgroundStrokeStyle: emptyLine,
-      uiTickTextFillStyle: titleFillStyle,
-    });
-
     const dashboard = lightningChart().Dashboard({
-      numberOfRows, //Total number of rows for the dashboard - default 8
+      numberOfRows: numberOfRows + 1, //Total number of rows for the dashboard - default 8
       numberOfColumns: 2, //Full width
       container, //div id to attach to
       antialias: true,
       theme: spectrumTheme,
+      devicePixelRatio: true,
+      lineAntiAlias: true,
     });
 
     dashboard.setColumnWidth(0, 1);
     dashboard.setColumnWidth(1, 11);
+
+    for (let i = 0; i < numberOfRows + 1; i += 1) {
+      if (i === 0) {
+        dashboard.setRowHeight(0, 0.25);
+      } else {
+        dashboard.setRowHeight(i, 1);
+      }
+    }
+    dashboard.setRowHeight(5, 0.5);
+
     return dashboard;
   }
 
   // Create chart per each channel
   createChartPerChannel(channels: string[], dashboard: Dashboard) {
+    // Create X Axis
+    this.xAxisChart = dashboard.createChartXY({
+      rowIndex: 0,
+      columnIndex: 1,
+      defaultAxisX: {
+        opposite: true,
+      },
+    });
+
     // Create an array containing all the charts that is being created
     const charts = channels.map((_channel, i) => {
-      const chart = dashboard
+      let chart: ChartXY<PointMarker, UIBackground>;
+      chart = dashboard
         .createChartXY({
-          rowIndex: i,
+          rowIndex: i + 1,
           columnIndex: 1,
         })
         .setPadding({ bottom: 10, top: 10, right: 10 });
+
       return chart;
     });
     return charts;
@@ -148,7 +201,7 @@ class ChartClass {
         .setDataCleaning({ minDataPointCount: 1 }) // Enable data cleaning by default
         .setStrokeStyle(
           new SolidLine({
-            thickness: 2,
+            thickness: 1.25,
             fillStyle: new SolidFill({
               color: ColorHEX(this.seriesLineColorArr[i]),
             }),
@@ -162,7 +215,7 @@ class ChartClass {
   customizeChart(charts: ChartXY<PointMarker, UIBackground>[]) {
     this.dashboard.setSplitterStyle(
       new SolidLine({
-        thickness: 3,
+        thickness: 2,
         fillStyle: new SolidFill({ color: ColorHEX('#222') }),
       })
     );
@@ -170,53 +223,43 @@ class ChartClass {
     this.dashboard.setSplitterStyleHighlight(
       () =>
         new SolidLine({
-          thickness: 5,
+          thickness: 4,
           fillStyle: new SolidFill({ color: ColorHEX('#333') }),
         })
     );
 
-    charts.forEach((chart, i) => {
+    charts.forEach((chart) => {
       const axisX = chart.getDefaultAxisX();
       const axisY = chart.getDefaultAxisY();
       // Set the Y axis to be fitting to the data
       axisY.setScrollStrategy(AxisScrollStrategies.fitting);
+      axisY.setThickness(65);
 
       // Set Interval to 30s
       axisX.setInterval(0, 30000);
+      axisX
+        .setThickness(0)
+        .setStrokeStyle(emptyLine)
+        .setScrollStrategy(AxisScrollStrategies.progressive)
+        .setTickStrategy(AxisTickStrategies.Empty)
+        .setStrokeStyle(emptyLine);
 
-      // Remove X Axis on all charts except the last one
-      if (i !== charts.length - 1) {
-        axisX
+      axisY.setInterval(-50, 50);
 
-          .setStrokeStyle(emptyLine)
-          .setScrollStrategy(AxisScrollStrategies.progressive)
-          .setTickStrategy(AxisTickStrategies.Empty)
-          .setStrokeStyle(emptyLine);
-      } else {
-        axisX
-          .setTickStrategy(AxisTickStrategies.Time, (ticks) =>
-            ticks
-              .setMajorTickStyle((majorTickStyle) =>
-                majorTickStyle.setGridStrokeStyle(emptyLine)
-              )
-              .setMinorTickStyle((minorTickStyle: any) =>
-                minorTickStyle
-                  .setGridStrokeStyle(emptyLine)
-                  .setLabelFillStyle(
-                    new SolidFill({ color: ColorHEX('#f7f7f7') })
-                  )
-              )
-          )
-          .setTitle('Time (hh:mm:ss)')
-          .setScrollStrategy(AxisScrollStrategies.progressive);
-      }
+      const uiMajorTickFont = new FontSettings({
+        size: 10,
+        family: 'Inter, Arial, sans-serif',
+        style: 'normal',
+      });
 
       axisY.setTickStrategy(AxisTickStrategies.Numeric, (ticks) =>
         ticks
           .setMajorTickStyle((majorTickStyle) =>
             majorTickStyle
+
               .setGridStrokeStyle(emptyLine)
               .setLabelFillStyle(new SolidFill({ color: ColorHEX('#f7f7f7') }))
+              .setLabelFont(uiMajorTickFont)
           )
           .setMinorTickStyle(emptyTick)
       );
@@ -224,20 +267,16 @@ class ChartClass {
       // Remove all chart titles
       chart.setTitleFillStyle(emptyFill);
 
-      // Align Y axes of stacked charts.
-      chart.getDefaultAxisY().setThickness(50);
-
       // Disable default auto cursor.
       chart.setAutoCursorMode(AutoCursorModes.disabled);
 
       // Padding
-      chart.setPadding(10);
+      chart.setPadding({ top: 5, bottom: 5 });
 
       chart.setMouseInteractionWheelZoom(false);
       chart.setMouseInteractionsWhileScrolling(false);
 
       // Set AxisY Units
-      axisY.setTitle('Units');
       axisX.setTitleFont(
         new FontSettings({
           size: 12,
@@ -248,8 +287,57 @@ class ChartClass {
           size: 12,
         })
       );
-      chart.setPadding({ left: 40 });
     });
+  }
+
+  customizeXAxis() {
+    if (this.xAxisChart) {
+      this.xAxisChart.setTitleFillStyle(emptyFill);
+      this.xAxisChart.setPadding({ top: 0, bottom: 0, right: 10, left: 10 });
+
+      const [axisX, axisY] = this.xAxisChart.getDefaultAxes();
+      this.axisX = axisX;
+
+      // Y Axis
+      axisY.setThickness(65);
+      axisY.setTickStrategy(AxisTickStrategies.Empty);
+      axisY
+        .setStrokeStyle(emptyLine)
+        .setScrollStrategy(AxisScrollStrategies.progressive)
+        .setTickStrategy(AxisTickStrategies.Empty)
+        .setStrokeStyle(emptyLine);
+
+      const uiMinorTickFont = new FontSettings({
+        size: 10,
+        family: 'Inter, Arial, sans-serif',
+        style: 'normal',
+      });
+
+      const uiMajorTickFont = new FontSettings({
+        size: 12,
+        family: 'Inter, Arial, sans-serif',
+        style: 'normal',
+      });
+
+      // X Axis
+      axisX.setThickness(35);
+      axisX.setStrokeStyle(emptyLine);
+      axisX.setTickStrategy(AxisTickStrategies.Time, (visibleTick) =>
+        visibleTick
+          .setMajorTickStyle((majorTick) =>
+            majorTick
+              .setGridStrokeStyle(emptyLine)
+              .setLabelFillStyle(new SolidFill({ color: ColorHEX('#f7f7f7') }))
+              .setLabelFont(uiMajorTickFont)
+          )
+          .setMinorTickStyle((minorTick: VisibleTicks) =>
+            minorTick
+              .setGridStrokeStyle(emptyLine)
+              .setLabelFillStyle(new SolidFill({ color: ColorHEX('#f7f7f7') }))
+              .setLabelFont(uiMinorTickFont)
+          )
+      );
+    }
   }
 
   uiList(charts: ChartXY<PointMarker, UIBackground>[], dashboard: Dashboard) {
@@ -258,7 +346,7 @@ class ChartClass {
       // const axisY = chart.getDefaultAxisY();
       const panel = dashboard.createUIPanel({
         columnIndex: 0,
-        rowIndex: i,
+        rowIndex: i + 1,
       });
 
       const legendLayout = panel
@@ -270,28 +358,15 @@ class ChartClass {
           bg.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
         );
 
-      panel.onResize((_chart, width, height) => {
-        height < 100 || width < 80
-          ? legendLayout.dispose()
-          : legendLayout.restore();
-      });
-
       if (this.channels[i] === 'TOI') {
         legendLayout
           .addElement(UIElementBuilders.TextBox)
           .setText(this.channels[i])
           .setTextFont((font: any) => font.setSize(16));
-
-        this.TOILegend = legendLayout
-          .addElement(UIElementBuilders.TextBox)
-          .setText('-')
-          .setMargin({ top: 5, bottom: 0 })
-          .setTextFont((font: any) => font.setSize(24));
       } else {
         legendLayout
           .addElement(UIElementBuilders.TextBox)
           .setText(this.channels[i])
-          .setMargin({ top: 15 })
           .setTextFont((font: any) => font.setSize(16));
       }
 
@@ -312,12 +387,56 @@ class ChartClass {
         .setText(this.samplingRate.toString() + ' samples/s')
         .setTextFont((font: any) => font.setSize(9))
         .setMargin({ top: 10 });
+
+      if (this.channels[i] === 'TOI') {
+        this.TOILegend = legendLayout
+          .addElement(UIElementBuilders.TextBox)
+          .setText('-')
+          .setMargin({ top: 5, bottom: 0 })
+          .setTextFont((font: any) => font.setSize(24));
+      }
+
+      const legendLayoutSmall = panel
+        .addUIElement(UILayoutBuilders.Column)
+        .setOrigin(UIOrigins.Center)
+        .setMargin({ top: -10 })
+        .setMouseInteractions(false)
+        .setBackground((bg: any) =>
+          bg.setFillStyle(emptyFill).setStrokeStyle(emptyLine)
+        );
+      legendLayoutSmall
+        .addElement(UIElementBuilders.CheckBox)
+        .setText('')
+        .setMargin({ top: 5 })
+        .setBackground((background: any) =>
+          background.setFillStyle(
+            new SolidFill({
+              color: ColorHEX(this.seriesLineColorArr[i]),
+            })
+          )
+        );
+      legendLayoutSmall.dispose();
+
+      panel.onResize((_chart, width, height) => {
+        requestAnimationFrame(() => {
+          if (height < 100 || width < 80) {
+            legendLayout.dispose();
+            legendLayoutSmall.restore();
+          } else {
+            legendLayoutSmall.dispose();
+            legendLayout.restore();
+          }
+        });
+      });
     });
   }
 
   // Synchronizes all X axis to have the same interval/move at the same time
   synchronizeXAxis(charts: ChartXY<PointMarker, UIBackground>[]) {
     const syncedAxes = charts.map((chart) => chart.getDefaultAxisX());
+    const xAxis = (this.xAxisChart &&
+      this.xAxisChart.getDefaultAxisX()) as Axis;
+    syncedAxes.unshift(xAxis);
     synchronizeAxisIntervals(...syncedAxes);
   }
 
@@ -356,11 +475,11 @@ class ChartClass {
         .addElement(resultTableTextBuilder);
     });
 
-    const tickX = charts[charts.length - 1].getDefaultAxisX().addCustomTick();
+    const tickX = (this.xAxisChart?.getDefaultAxisX() as Axis).addCustomTick();
 
     const ticksX: any[] = [];
     charts.forEach((chart: any, i: any) => {
-      if (i !== charts.length - 1) {
+      if (i !== charts.length) {
         ticksX.push(
           chart
             .getDefaultAxisX()
@@ -451,7 +570,9 @@ class ChartClass {
 
         // Format result table text.
         rowX.setText(
-          `Time: ${axisX.formatValue(nearestDataPoints[i].location.x)}`
+          `Time: ${msToTime(
+            parseFloat(axisX.formatValue(nearestDataPoints[i].location.x))
+          )}`
         );
         rowsY.forEach((rowY: any, i: number) => {
           rowY.setText(

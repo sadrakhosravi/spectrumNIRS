@@ -17,6 +17,12 @@ declare namespace api {
   function sendIPC(channel: string, args?: any | any[]): void;
 
   /**
+   * Send a message to the main process via channel and expect a result synchronously.
+   * This action will block the renderer process
+   */
+  function sendSyncIPC(channel: string, args?: any | any[]): void;
+
+  /**
    * Send a message to the main process along with arguments via `channel` and expect a result
    * asynchronously
    */

@@ -19,7 +19,7 @@ const LargeIconTextButton = ({
   return (
     <button
       type="button"
-      className="bg-grey1 p-5 mb-5 w-full grid grid-flow-col auto-cols-max gap-6 items-center hover:bg-accent rounded-md"
+      className="bg-grey1 p-5 mb-5 w-full grid grid-flow-col auto-cols-max gap-6 items-center hover:bg-accent rounded-md border-primary"
       onClick={onClick}
     >
       <div>

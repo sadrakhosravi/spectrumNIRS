@@ -38,6 +38,7 @@ module.exports = {
       colors: {
         light: '#C4C4C4',
         light2: '#7F7F7F',
+        grey0: '#5D5D5D',
         grey1: '#3D3D3D',
         grey2: '#333333',
         grey3: '#272727',
@@ -48,6 +49,8 @@ module.exports = {
         black: '#000000',
         white: '#FFFFFF',
         accent: '#007ACD',
+        current: '#007ACD',
+
         'accent-hover': '#0084de',
         red: 'red',
         'chart-1': '#E3170A',
@@ -83,6 +86,10 @@ module.exports = {
   },
   variants: {
     extend: {
+      ringWidth: ['focus-visible'],
+      ringColor: ['focus-visible'],
+      ringOffsetWidth: ['focus-visible'],
+      ringOffsetColor: ['focus-visible'],
       backgroundColor: ['active'],
     },
   },

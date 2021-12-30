@@ -37,6 +37,7 @@ class RecordChart extends Chart {
     this.dashboard = this.createDashboard(this.numberOfRows, this.containerId);
     this.charts = this.createChartPerChannel(this.channels, this.dashboard);
     this.series = this.createSeriesForEachChart(this.charts);
+    this.customizeXAxis();
     this.synchronizeXAxis(this.charts);
     this.customizeChart(this.charts);
     this.customizeRecordCharts();
@@ -134,10 +135,7 @@ class RecordChart extends Chart {
     this.charts &&
       this.charts.forEach((chart, i) => {
         const axisX = chart.getDefaultAxisX();
-
-        axisX.setMouseInteractions(false);
-
-        chart.setMouseInteractionPan(false);
+        console.log(axisX);
 
         this.series && this.series[i].setDataCleaning({ minDataPointCount: 1 });
       });

@@ -19,6 +19,7 @@ const withTooltip = (
       return (
         <Tippy
           placement={tooltipPosition || 'bottom'}
+          className="text-base"
           delay={[0, 0]}
           duration={[0, 0]}
           content={tooltipText || props.tooltip}

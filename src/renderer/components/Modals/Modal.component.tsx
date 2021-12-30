@@ -65,7 +65,7 @@ const Modal: React.FC<IProps> = (props) => {
               </span>
 
               <div
-                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 shadow-xl rounded-md ${largeStyles}`}
+                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 border-primary shadow-xl rounded-md ${largeStyles}`}
               >
                 <Dialog.Title as="h1" className="text-3xl font-bold">
                   {title}

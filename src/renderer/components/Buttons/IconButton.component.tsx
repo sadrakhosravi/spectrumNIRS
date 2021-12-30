@@ -11,12 +11,12 @@ const IconButton = ({ icon, onClick, isActive }: IProps): JSX.Element => {
   return (
     <button
       type="button"
-      className={`px-2 py-1 h-full active:bg-accent rounded-md ${
-        isActive ? 'bg-accent' : 'hover:bg-grey2'
+      className={`px-2 py-1.5 ring-accent active:ring-2 rounded-md bg-grey2 border-primary transition-colors duration-150 ${
+        isActive ? 'bg-accent' : 'hover:bg-grey0'
       }`}
       onClick={onClick}
     >
-      <img src={icon} width="30px" alt="Icon" />
+      <img src={icon} className="w-6" alt="Icon" />
     </button>
   );
 };

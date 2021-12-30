@@ -17,7 +17,7 @@ const SubMenuItem = ({ label, onClick }: SubMenuItemProps): JSX.Element => {
           type="button"
           className={`${
             active ? 'bg-accent' : ''
-          } text-white py-0.5 mb-0.5 px-6 w-full text-left text-base`}
+          } text-white py-0.5 mb-0.5 px-6 w-full text-left`}
           onClick={onClick}
         >
           {label}

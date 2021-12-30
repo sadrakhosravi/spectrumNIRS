@@ -14,7 +14,7 @@ const BottomBar = () => {
   const isLoadingData = useAppSelector((state) => state.appState.isLoadingData);
   return (
     <>
-      <footer className="fixed bottom-0 left-0 px-2 h-30px w-full grid grid-cols-12 items-center bg-accent text-base z-50">
+      <footer className="fixed bottom-0 left-0 px-2 h-30px w-full grid grid-cols-12 items-center bg-accent z-50">
         <div className="ml-2 col-span-3 flex items-center">
           <p className="mr-6">Version: {version}</p>
           {isLoadingData && (

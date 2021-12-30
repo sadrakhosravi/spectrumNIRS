@@ -1,5 +1,4 @@
 // import db from 'db/models/index';
-import AccurateTimer from '@electron/helpers/accurateTimer';
 import { getConnection } from 'typeorm';
 import RecordingsData from 'db/entity/RecordingsData';
 import { ChartChannels } from '@utils/channels';
@@ -66,27 +65,18 @@ class RecordData {
     sender: any
   ) => {
     try {
-      let offset = 0;
-      let LIMIT = 10000;
-      let data = [];
-      const dataStream = new AccurateTimer(async () => {
-        data = await getConnection()
-          .createQueryBuilder()
-          .select()
-          .from(RecordingsData, '')
-          .where('recordingId = :recordingId', { recordingId })
-          .orderBy({ id: 'ASC' })
-          .limit(LIMIT)
-          .offset(offset)
-          .getRawMany();
-        if (data.length === 0) {
-          dataStream.stop();
-          return;
-        }
-        sender.send(ChartChannels.StreamData, data);
-        offset += LIMIT;
-      }, 350);
-      dataStream.start();
+      console.time('querydb');
+      const data = await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(RecordingsData, '')
+        .where('recordingId = :recordingId', { recordingId })
+        .orderBy({ id: 'ASC' })
+        .getRawMany();
+      console.timeEnd('querydb');
+      console.log(data.length);
+
+      sender.send(ChartChannels.StreamData, data);
     } catch (error: any) {
       throw new Error(error.message);
     }

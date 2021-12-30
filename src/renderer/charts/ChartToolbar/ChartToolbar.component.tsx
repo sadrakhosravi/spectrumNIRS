@@ -8,6 +8,7 @@ import IconButton from '@components/Buttons/IconButton.component';
 import IconTextButton from '@components/Buttons/IconTextButton.component';
 import withTooltip from '@hoc/withTooltip.hoc';
 import TimeDivision from './TimeDivision.component';
+import TimeDiv from './TimeDiv.component';
 
 // Constants
 import { ChartType } from '@utils/constants';
@@ -52,6 +53,7 @@ const ChartToolbar = ({
             />
           );
         })}
+        <TimeDiv />
       </div>
 
       {/* Stop Start Button */}
