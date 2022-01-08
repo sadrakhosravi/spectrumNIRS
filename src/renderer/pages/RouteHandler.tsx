@@ -4,7 +4,7 @@ import useNavigation from '@hooks/useNavigation.hook';
 
 // Pages
 import HomePage from './Home/Home.page';
-const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
+// const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 const ProbeCalibrationPage = React.lazy(
   () => import('@pages/ProbeCalibration/ProbeCalibration.page')
@@ -44,7 +44,7 @@ const RouteHandler = () => {
           />
         </Router>
         <div className="w-full h-full" hidden={isHidden}>
-          <RecordPage />
+          {/* <RecordPage /> */}
           <Route path={AppState.REVIEW} component={ReviewPage} />
         </div>
       </React.Suspense>

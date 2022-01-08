@@ -1,5 +1,5 @@
 // Data Readers
-import NIRSV5 from '../dataReaders/NIRSV5';
+import NIRSV5 from './nirsv5';
 import { CurrentRecording } from 'controllers/recording';
 
 export interface IDataReaders {

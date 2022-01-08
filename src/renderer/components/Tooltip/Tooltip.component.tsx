@@ -18,9 +18,11 @@ const Tooltip: React.FC<IProps> = (props) => {
       <React.Suspense fallback={'Loading ...'}>
         <Tippy
           placement={placement}
-          className="font-inherit text-white"
-          delay={[0, 0]}
-          duration={[0, 0]}
+          className="font-inherit text-white border-primary drop-shadow-md
+          bg-grey3
+          "
+          delay={[300, 0]}
+          duration={[150, 0]}
           content={text}
         >
           {props.children}

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import toast from 'react-hot-toast';
-import PrimaryButton from '@components/Buttons/PrimaryButton.component';
+import Button from '@components/Buttons/Button.component';
 import BorderButton from '@components/Buttons/BorderButton.component';
 
 // Constants
@@ -32,10 +32,7 @@ const UpdaterUI = () => {
               or text file before updating.
             </p>
             <div className="flex justify-end gap-2">
-              <PrimaryButton
-                text="Download update"
-                onClick={() => downloadUpdate()}
-              />
+              <Button text="Download update" onClick={() => downloadUpdate()} />
               <BorderButton
                 text="Dismiss"
                 onClick={() => toast.dismiss(t.id)}
@@ -64,10 +61,7 @@ const UpdaterUI = () => {
               your work!
             </p>
             <div className="flex justify-end gap-2">
-              <PrimaryButton
-                text="Install update"
-                onClick={() => installUpdate()}
-              />
+              <Button text="Install update" onClick={() => installUpdate()} />
               <BorderButton
                 text="Dismiss"
                 onClick={() => toast.dismiss(t.id)}

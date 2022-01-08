@@ -11,12 +11,10 @@ import { deleteExperimentAndData } from '@adapters/experimentAdapter';
 // Icons
 import RecentFileIcon from '@icons/recent-file.svg';
 
-// Components
-import ButtonTitleDescription from '@components/MicroComponents/ButtonTitleDescription/ButtonTitleDescription.component';
-import DeleteButton from '@components/Buttons/DeleteButton.component';
 // Constants
 import { ModalConstants, RecordState } from '@utils/constants';
 import { ExperimentChannels } from '@utils/channels';
+import IconTextButtonWithTimeStamp from '@components/Buttons/IconTextButtonWithTimeStamp.component';
 
 interface IProps {
   title: string;
@@ -47,48 +45,19 @@ const RecentExperiment: React.FC<IProps> = ({
   };
 
   return (
-    <button
-      className={`${
-        isActive ? 'bg-accent' : 'bg-grey2 hover:bg-grey3 '
-      } flex gap-2 items-center w-full mb-3 rounded-md hover:cursor-pointer border-primary active:ring-2 active:ring-accent`}
-    >
-      <div
-        className="w-full flex px-3 py-4"
-        onClick={handleOpenExperimentButton}
-      >
-        <div className="flex w-2/3 items-center">
-          <span className="inline-block mr-5">
-            <img
-              className="opacity-80"
-              src={RecentFileIcon}
-              width="42px"
-              alt="File"
-            />
-          </span>
-          <span className="inline-block">
-            <ButtonTitleDescription title={title} description={description} />
-          </span>
-        </div>
-        <div className="flex w-1/3 items-center justify-end mr-1">
-          <span className="text-right">
-            <p className="text-light text-sm">
-              Last Saved: {saved.toString().split(', ')[0]}
-            </p>
-            <p className="text-light text-sm">
-              Time: {saved.toString().split(', ')[1]}
-            </p>
-          </span>
-        </div>
-      </div>
-      <DeleteButton
-        className="mr-4"
-        onClick={async () => {
-          await deleteExperimentAndData(experiment.id, experiment.name);
-          refetch();
-        }}
-        title="Delete Experiment and its Data"
-      />
-    </button>
+    <IconTextButtonWithTimeStamp
+      isActive={isActive}
+      onClick={handleOpenExperimentButton}
+      icon={RecentFileIcon}
+      text={title}
+      description={description}
+      time={saved}
+      deleteOnClick={async () => {
+        await deleteExperimentAndData(experiment.id, experiment.name);
+        refetch();
+      }}
+      className="py-2"
+    />
   );
 };
 

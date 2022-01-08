@@ -1,4 +1,3 @@
-import path from 'path';
 import { BrowserWindow, ipcMain } from 'electron';
 import { resolveHtmlPath } from '../main/util';
 
@@ -15,10 +14,9 @@ const settingsWindow = async () => {
     parent: mainWindow,
     webPreferences: {
       partition: 'persist:spectrum',
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: true,
+      contextIsolation: false,
       devTools: true,
-      preload: path.join(__dirname, '../main/preload.js'),
       backgroundThrottling: false,
     },
   });

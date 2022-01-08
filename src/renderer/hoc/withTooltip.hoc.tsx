@@ -19,9 +19,9 @@ const withTooltip = (
       return (
         <Tippy
           placement={tooltipPosition || 'bottom'}
-          className="text-base"
-          delay={[0, 0]}
-          duration={[0, 0]}
+          className="text-base text-white border-primary drop-shadow-md bg-grey3"
+          delay={[300, 0]}
+          duration={[150, 0]}
           content={tooltipText || props.tooltip}
           interactive={props.interactive || false}
         >

@@ -8,7 +8,7 @@ import {
   resetRecordingData,
   resetExperimentData,
 } from '@redux/ExperimentDataSlice';
-import { setSelectedSensor } from '@redux/SensorStateSlice';
+import { setCurrentProbe } from '@redux/SensorStateSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
 import { setInitialState } from '@redux/ChartSlice';
 import { changeRecordState } from '@redux/RecordStateSlice';
@@ -90,6 +90,7 @@ export const newRecording = async (data: INewRecordingData) => {
     recordState !== RecordState.PAUSED &&
     window.api.sendIPC(RecordChannels.Stop);
   dispatch(changeRecordState(RecordState.IDLE));
+  dispatch(closeModal());
 };
 
 /**
@@ -269,7 +270,7 @@ export const deleteRecordingAndData = async (
  * Sets the currentSensor data in the ExperimentData state
  * @param data Sensor data object (id and name)
  */
-export const setSensorStatus = (data: {}) => {
+export const setSensorStatus = (data: any) => {
   const { detectedSensor } = getState().sensorState;
 
   // Check if the detected and selected sensors match
@@ -282,7 +283,7 @@ export const setSensorStatus = (data: {}) => {
         'The sensor you have selected was not detected on your system. In order to start a recording, you need to attach the sensor first',
     });
   }
-  dispatch(setSelectedSensor(data));
+  dispatch(setCurrentProbe(data));
   dispatch(closeModal());
   dispatch(changeAppState(AppState.RECORD));
 };

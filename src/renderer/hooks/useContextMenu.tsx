@@ -15,18 +15,26 @@ const useContextMenu = (containerId: string, Menu?: any) => {
     const x = event.clientX;
     const y = event.clientY;
 
-    const menu = document.getElementById('contextMenu') as HTMLElement;
-    menu.style.top = y + 5 + 'px';
-    menu.style.left = x + 5 + 'px';
+    ReactDOM.render(Menu, contextMenuContainer);
 
-    if (isOpen === false) {
-      console.log('Already Opened');
+    const mainContainer = document.getElementById('root') as HTMLDivElement;
+    const menu = document.getElementById('contextMenuList') as HTMLElement;
+
+    const mainContainerSize = mainContainer.getBoundingClientRect();
+    const menuSize = menu.getBoundingClientRect();
+
+    if (y + menuSize.height + 30 >= mainContainerSize.height - 10) {
+      menu.style.top = y - menuSize.height + 'px';
+    } else {
+      menu.style.top = y + 'px';
+    }
+    if (x + menuSize.width + 30 >= mainContainerSize.width - 10) {
+      menu.style.left = x - menuSize.width + 'px';
+    } else {
+      menu.style.left = x + 'px';
     }
 
-    console.log('CONTEXT MENU');
     setIsOpen(true);
-
-    ReactDOM.render(Menu, contextMenuContainer);
   };
 
   const handleClick = (_event: MouseEvent) => {

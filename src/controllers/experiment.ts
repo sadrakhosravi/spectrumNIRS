@@ -2,12 +2,14 @@ import { ipcMain } from 'electron';
 import { ExperimentChannels } from '@utils/channels';
 
 // Models
-import Experiment from '../main/models/Experiment';
+import ExperimentModel from '../main/models/Experiment';
 import Patient from '../main/models/Patient';
 import Recording from '../main/models/Recording';
 
 // Interfaces
 import { INewPatientData } from 'interfaces/interfaces';
+
+const Experiment = new ExperimentModel();
 
 // Creates a new experiment record with one patient in the database
 ipcMain.handle(ExperimentChannels.NewExp, async (_event, data: any) => {

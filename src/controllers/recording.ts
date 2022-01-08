@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 
 // Models
-import DataReader from '../main/models/DataReader';
+import DataReader from '../main/devices/DeviceReader';
 import RecordingsData from '@electron/models/RecordingsData';
 
 // Constants

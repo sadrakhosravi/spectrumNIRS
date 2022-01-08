@@ -38,6 +38,7 @@ export const AppStateSlice = createSlice({
     },
     setWindowResized: (state, { payload }: { payload: number }) => {
       state.windowResized = payload;
+      console.log(payload);
     },
     setWindowMaximized: (state, { payload }: { payload: boolean }) => {
       state.windowMaximized = payload;

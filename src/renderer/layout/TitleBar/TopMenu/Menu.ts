@@ -35,6 +35,16 @@ export const TopMenu = [
         },
       },
       {
+        label: 'separator',
+        click: () => {},
+      },
+      {
+        label: 'Reload',
+        click: () => {
+          window.location.reload();
+        },
+      },
+      {
         label: 'Exit',
         click: () => {
           window.api.window.close();
@@ -62,6 +72,23 @@ export const TopMenu = [
           getState().experimentData.currentPatient.name
             ? dispatch(openModal(ModalConstants.NEWRECORDING))
             : dispatch(openModal(ModalConstants.NEWEXPERIMENT)),
+      },
+    ],
+  },
+  {
+    label: 'Probe',
+    submenu: [
+      {
+        label: 'Select Probe',
+        click: () => {
+          dispatch(openModal(ModalConstants.SELECT_PROBE));
+        },
+      },
+      {
+        label: 'New Probe',
+        click: () => {
+          dispatch(openModal(ModalConstants.NEW_PROBE));
+        },
       },
     ],
   },

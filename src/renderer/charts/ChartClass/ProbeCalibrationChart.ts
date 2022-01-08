@@ -13,7 +13,7 @@ import {
   uiMinorTickFont,
   uiMajorTickFont,
   textFillStyle,
-} from './Chart';
+} from './methods/ChartTheme';
 
 const {
   lightningChart,

@@ -1,11 +1,15 @@
 // Controllers
-import './startup';
-import './window';
-import './experiment';
-import './recording';
-import './reviewTab';
-import './dialogBox';
-import './usbDetection';
-import './probes';
-import './chart';
-import './settingsWindow';
+import startup from './startup';
+(async () => {
+  await startup();
+  await import('./window');
+  await import('./experiment');
+  await import('./recording');
+  await import('./reviewTab');
+  await import('./dialogBox');
+  await import('./usbDetection');
+  await import('./probes');
+  await import('./chart');
+  await import('./settingsWindow');
+  await import('./others');
+})();

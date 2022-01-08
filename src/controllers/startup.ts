@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { ipcMain } from 'electron';
-import Store from 'electron-store';
+import Store from '@electron/models/Store';
 import createDBConnection from '../db/index';
 import firstRun from './firstRun';
 
@@ -8,7 +8,7 @@ import firstRun from './firstRun';
 import { databaseFile, databasePath, settingsPath } from '../main/paths';
 import { UserSettingsChannels } from '../utils/channels';
 
-(async () => {
+const startup = async () => {
   try {
     // Check if the spectrum files and folders exist
     if (
@@ -26,19 +26,15 @@ import { UserSettingsChannels } from '../utils/channels';
   // Create connection
   await createDBConnection();
 
-  const userSettings = new Store({
-    name: 'user-settings',
-    fileExtension: 'json',
-    cwd: settingsPath,
-  });
-
   ipcMain.handle(UserSettingsChannels.AddSetting, (_event, { key, value }) =>
-    userSettings.set(key, value)
+    Store.set(key, value)
   );
   ipcMain.handle(UserSettingsChannels.GetSetting, (_event, key) =>
-    userSettings.get(key)
+    Store.get(key)
   );
   ipcMain.handle(UserSettingsChannels.RemoveSetting, (_event, key) =>
-    userSettings.delete(key)
+    Store.delete(key)
   );
-})();
+};
+
+export default startup;

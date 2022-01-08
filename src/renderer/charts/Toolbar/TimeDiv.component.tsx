@@ -25,7 +25,7 @@ const TimeDiv = () => {
   return (
     <ButtonMenu text={timeDivisions[0].label} icon={TimeDivisionIcon}>
       {timeDivisions.map((timeDiv) => (
-        <ButtonMenuItem text={timeDiv.label} />
+        <ButtonMenuItem text={timeDiv.label} key={timeDiv.label + 'timeDiv'} />
       ))}
     </ButtonMenu>
   );

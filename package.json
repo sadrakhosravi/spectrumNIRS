@@ -207,6 +207,7 @@
     "identity-obj-proxy": "^3.0.0",
     "lint-staged": "^11.2.6",
     "mini-css-extract-plugin": "^2.4.3",
+    "node-loader": "^2.0.0",
     "opencollective-postinstall": "^2.0.3",
     "postcss": "^8.4.3",
     "postcss-loader": "^6.2.1",
@@ -233,7 +234,8 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@arction/lcjs": "^3.3.0",
+    "@arction/lcjs": "^3.3.3",
+    "@electron/remote": "^2.0.1",
     "@headlessui/react": "^1.4.2",
     "@reduxjs/toolkit": "^1.7.1",
     "@tippyjs/react": "^4.2.6",
@@ -247,6 +249,7 @@
     "enhanced-resolve": "^5.8.3",
     "history": "4.x.x",
     "node-abi": "^3.5.0",
+    "path-browserify": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.20.4",

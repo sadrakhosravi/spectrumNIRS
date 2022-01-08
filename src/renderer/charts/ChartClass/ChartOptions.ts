@@ -52,7 +52,7 @@ class ChartOptions {
    * Resets the height of each chart back to default equal heights
    */
   resetChartsHeight() {
-    this.dashboard.setRowHeight(0, 0.25);
+    this.dashboard.setRowHeight(0, 0.3);
     this.dashboard.setRowHeight(1, 1);
     this.dashboard.setRowHeight(2, 1);
     this.dashboard.setRowHeight(3, 1);
@@ -231,6 +231,20 @@ class ChartOptions {
     this.constantLines.forEach((constantLine: any) => {
       constantLine.dispose();
     });
+  }
+
+  public memoryCleanup() {
+    this.constantLines.forEach((line) => line.dispose());
+    this.customTicks.forEach((tick) => tick.dispose());
+
+    //@ts-ignore
+    this.dashboard = undefined;
+    this.charts = undefined;
+    this.series = undefined;
+    //@ts-ignore
+    this.customTicks = undefined;
+    //@ts-ignore
+    this.constantLines = undefined;
   }
 }
 

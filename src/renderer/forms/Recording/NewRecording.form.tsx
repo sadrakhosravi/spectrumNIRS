@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
 import { useForm } from 'react-hook-form';
 import { RadioGroup } from '@headlessui/react';
@@ -16,18 +16,28 @@ import DateField from '@components/Form/DateField.component';
 import TextAreaField from '@components/Form/TextAreaField.component';
 
 // Adapters
-import { newRecording, setSensorStatus } from '@adapters/experimentAdapter';
+import { newRecording } from '@adapters/experimentAdapter';
 
 // Icon
 import SensorIcon from '@icons/sensor.svg';
+import { ProbeChannels } from '@utils/channels';
 
 const NewRecordingForm = () => {
+  const [_probes, setProbes] = useState(null);
   const [sensor, setSensor] = useState(1);
   const { register, handleSubmit } = useForm();
 
   const detectedSensor = useAppSelector(
     (state) => state.sensorState.detectedSensor
   );
+
+  useEffect(() => {
+    (async () => {
+      const allProbes = await window.api.invokeIPC(ProbeChannels.GetAllDevices);
+      console.log(allProbes);
+      setProbes(allProbes);
+    })();
+  }, []);
 
   // Sets the current sensor state to the global experimentData current sensor state
 
@@ -41,9 +51,7 @@ const NewRecordingForm = () => {
 
   // Handle form submit
   const onSubmit = (formData: FormData) => {
-    const currentSensor = devices[sensor - 1];
     newRecording(formData.recording);
-    setSensorStatus(currentSensor);
   };
 
   return (
@@ -74,7 +82,7 @@ const NewRecordingForm = () => {
             />
           </label>
 
-          <h3 className="mt-4 py-2 text-xl">Select a sensor:</h3>
+          <h3 className="mt-4 py-2 text-xl">Select a device:</h3>
           <RadioGroup value={sensor} onChange={setSensor}>
             <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
             <div className="grid grid-cols-2 gap-6">

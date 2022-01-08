@@ -9,6 +9,7 @@ import { Menu } from '@headlessui/react';
 // Import top menu and submenu item containers.
 import TopMenuButton from './TopMenuButton.component';
 import SubMenuItem from '@components/Menu/SubMenuItem.component';
+import MenuSeparator from '@components/Separator/MenuSeparator.component';
 
 const TopMenuContainer = (): JSX.Element => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,13 +25,17 @@ const TopMenuContainer = (): JSX.Element => {
               onClick={() => setIsMenuOpen(true)}
             />
             <Menu.Items className="absolute w-72 mt-0 origin-bottom-left z-50 bg-grey3 shadow-xl py-2">
-              {menuItem.submenu.map((submenu) => (
-                <SubMenuItem
-                  label={submenu.label}
-                  onClick={submenu.click || undefined}
-                  key={submenu.label}
-                />
-              ))}
+              {menuItem.submenu.map((submenu, i) =>
+                submenu.label === 'separator' ? (
+                  <MenuSeparator key={i + 'top-menu'} />
+                ) : (
+                  <SubMenuItem
+                    label={submenu.label}
+                    onClick={submenu.click || undefined}
+                    key={submenu.label}
+                  />
+                )
+              )}
             </Menu.Items>
           </Menu>
         ))}

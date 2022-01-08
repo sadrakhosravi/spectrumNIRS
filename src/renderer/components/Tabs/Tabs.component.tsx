@@ -50,7 +50,7 @@ export default Tabs;
 
 type TabProps = {
   label: string;
-  children: JSX.Element | JSX.Element[];
+  children: JSX.Element | JSX.Element[] | React.ReactChildren;
 };
 
 Tabs.Tab = ({ label, children }: TabProps) => {
@@ -75,7 +75,7 @@ Tabs.Button = ({ label, isActive = false, onClick }: ButtonProps) => {
   return (
     <button
       type="button"
-      className={`w-1/2 px-3 h-10 flex items-center border-r-2 border-white border-opacity-20 ${tabColor} last:border-r-0`}
+      className={`w-1/3 px-3 h-10 flex items-center border-r-2 border-white border-opacity-20 ${tabColor} last:border-r-0`}
       onClick={onClick}
       id={label}
     >

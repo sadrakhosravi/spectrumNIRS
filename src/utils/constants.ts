@@ -22,6 +22,8 @@ export enum ModalConstants {
   NEWEXPERIMENT = 'new-experiment',
   NEWPATIENT = 'new-patient',
   NEWRECORDING = 'new-recording',
+  SELECT_PROBE = 'select-probe',
+  NEW_PROBE = 'new-probe',
   OPEN_EXPERIMENT = 'open-experiment',
   OPEN_PATIENT = 'open-patient',
   GENERALMODAL = 'general-modal',

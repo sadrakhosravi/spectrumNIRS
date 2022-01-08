@@ -35,10 +35,10 @@ export class Recordings extends BaseEntity {
   @ManyToOne(() => Patients, { onDelete: 'CASCADE' })
   patient: Patients | number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   public createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ select: false })
   public updatedAt: Date;
 }
 export default Recordings;

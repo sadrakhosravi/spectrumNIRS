@@ -53,7 +53,7 @@ export const handleRecord = async () => {
   // Get the information to the be sent to the controller
   const patientId = experimentData.currentPatient.id;
   const { currentRecording } = experimentData;
-  const sensorId = sensorState.selectedSensor.id;
+  const sensorId = sensorState?.currentProbe?.id as number;
   const isRawData = chartState.rawdata;
 
   // Check record state and decide accordingly

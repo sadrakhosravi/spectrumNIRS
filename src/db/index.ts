@@ -3,7 +3,6 @@ import Experiments from './entity/Experiments';
 import Patients from './entity/Patients';
 import Recordings from './entity/Recordings';
 import RecordingsData from './entity/RecordingsData';
-import Sensors from './entity/Sensors';
 import Probes from './entity/Probes';
 
 // Paths
@@ -15,14 +14,7 @@ const createDBConnection = async () => {
     database: databaseFile,
     synchronize: true,
     logging: false,
-    entities: [
-      Experiments,
-      Patients,
-      Recordings,
-      RecordingsData,
-      Sensors,
-      Probes,
-    ],
+    entities: [Experiments, Patients, Recordings, RecordingsData, Probes],
     migrations: ['src/db/migration/**/*.ts'],
     subscribers: ['src/db/subscriber/**/*.ts'],
   });

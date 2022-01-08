@@ -15,6 +15,7 @@ import { AppState } from '@utils/constants';
 
 //Component import
 import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
+import LoadStates from 'renderer/startup/loadStates';
 
 import TitleBar from './layout/TitleBar/TitleBar.component';
 import BottomBar from './layout/BottomBar/BottomBar.component';
@@ -83,6 +84,7 @@ const App = () => {
             <Route exact path="/" render={() => <Redirect to="/main" />} />
           </Switch>
           <UpdaterUI />
+          <LoadStates />
         </React.Suspense>
       </Router>
     </div>

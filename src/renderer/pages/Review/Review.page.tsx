@@ -7,7 +7,7 @@ import { setReviewSidebar } from '@redux/AppStateSlice';
 import ReviewChart from 'renderer/charts/ReviewChart.component';
 
 // Sidebar components
-import WidgetsContainer from 'renderer/widgets/WidgetsContainer.component';
+// import WidgetsContainer from 'renderer/widgets/WidgetsContainer.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
@@ -19,9 +19,6 @@ const Review = () => {
   );
   const isNewWindow = useAppSelector(
     (state) => state.appState.reviewTabInNewWindow
-  );
-  const recordState = useAppSelector(
-    (state) => state.experimentData.currentRecording
   );
 
   return (
@@ -35,7 +32,7 @@ const Review = () => {
                 : 'w-[calc(100%-20px)]'
             }`}
           >
-            <ReviewChart recordState={recordState} type={ChartType.REVIEW} />
+            <ReviewChart type={ChartType.REVIEW} />
           </div>
           <div
             className={`h-full ${
@@ -45,7 +42,7 @@ const Review = () => {
             }`}
             onClick={() => !isSidebarActive && dispatch(setReviewSidebar(true))}
           >
-            <WidgetsContainer type={ChartType.REVIEW} />
+            {/* <WidgetsContainer type={ChartType.REVIEW} /> */}
           </div>
         </div>
       )}

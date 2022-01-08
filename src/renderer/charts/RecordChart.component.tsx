@@ -7,13 +7,13 @@ import withLoading from '@hoc/withLoading.hoc';
 
 // Components
 import RecordChartClass from './ChartClass/RecordChart';
-import ChartToolbar from './ChartToolbar/ChartToolbar.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
 import ChartLayout, { ChartContainer } from './ChartContainer.component';
 import useContextMenu from '@hooks/useContextMenu';
 import ContextMenu from '@components/Menu/ContextMenu.component';
+import { getState } from '@redux/store';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -30,21 +30,16 @@ const RecordChart = ({
   const [chartState, setChartState] = useState<null | RecordChartClass>(null);
   const [newData, setNewData] = useState(false);
   const location = useLocation();
-  const sensorState = useAppSelector(
-    (state) => state.sensorState.selectedSensor
+  const currentProbe = useAppSelector(
+    (state) => state.sensorState.currentProbe
   );
   const recordingId = useAppSelector(
     (state) => state.experimentData.currentRecording.id
   );
-  const windowResized = useAppSelector((state) => state.appState.windowResized);
-  const windowMaximized = useAppSelector(
-    (state) => state.appState.windowMaximized
-  );
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
-  const channels = (sensorState && sensorState.defaultChannels) || [
-    'No Channels',
-  ];
-  const samplingRate = (sensorState && sensorState.defaultSamplingRate) || 100;
+  const recordingState = useAppSelector((state) => state.recordState.value);
+
+  const samplingRate = (currentProbe && currentProbe.samplingRate) || 100;
   const containerId = 'recordChart';
   const chartRef = useRef<RecordChartClass | null>(null);
 
@@ -53,6 +48,8 @@ const RecordChart = ({
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useEffect(() => {
     requestAnimationFrame(() => {
+      const channels =
+        getState().sensorState.currentProbe?.device.defaultChannels;
       if (!chart) {
         console.log('RECORD CHARTTT');
 
@@ -88,11 +85,11 @@ const RecordChart = ({
       chart = undefined;
       chartRef.current = null;
     };
-  }, []);
+  }, [currentProbe?.id]);
 
   useEffect(() => {
     setNewData(true);
-    chartRef.current?.clearCharts();
+    chartRef.current?.clearData();
   }, [recordingId]);
 
   console.log(newData);
@@ -110,35 +107,42 @@ const RecordChart = ({
 
   const resetChartSize = () => {
     requestAnimationFrame(() => {
-      const container = document.getElementById(
-        containerId
-      ) as HTMLCanvasElement;
-      const { offsetWidth, offsetHeight } = container;
-
-      chartRef.current && chartRef.current?.dashboard?.setWidth(offsetWidth);
-      chartRef.current &&
-        chartRef.current?.dashboard?.setHeight(offsetHeight - 2);
-
-      container.style.overflowX = 'hidden';
-      container.style.overflowY = 'auto';
+      chartRef.current?.dashboard.engine.layout();
     });
   };
 
   // Adjust chart width and height on sidebar resize
   useEffect(() => {
-    location.pathname === '/main/recording/record' && resetChartSize();
-  }, [recordSidebar, windowResized, windowMaximized, location]);
+    location.pathname === '/main/recording/record' &&
+      setTimeout(() => {
+        resetChartSize();
+      }, 1);
+  }, [recordSidebar, location]);
+
+  useEffect(() => {
+    console.log('recordState Change');
+  }, [recordingState]);
 
   useContextMenu(
     containerId,
-    <ContextMenu items={[{ label: 'test', value: 'test' }]} />
+    <ContextMenu
+      items={[
+        { label: 'Auto Scale', value: 'test' },
+        { label: 'separator', value: '' },
+        { label: 'Channel Settings', value: '' },
+        { label: 'separator', value: '' },
+        {
+          label: 'Maximize Channel',
+          value: '',
+        },
+        { label: 'Reset Channel Heights', value: '' },
+      ]}
+    />
   );
 
   return (
     <ChartLayout>
-      {chartState && (
-        <ChartToolbar chartOptions={chartState.chartOptions} type={type} />
-      )}
+      {chartState && null}
       <ChartContainer>
         <div className="h-full w-full pointer-events-auto" id={containerId}>
           {children}

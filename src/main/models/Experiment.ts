@@ -12,11 +12,16 @@ type ExpData = {
 /**
  * Experiment settings and logic
  */
-export class Experiment {
+export class ExperimentModel {
+  currentExperiment: undefined;
+  constructor() {
+    this.currentExperiment = undefined;
+  }
+
   /**
    * Creates a new experiment with one patient in the database
    */
-  public static async createExperiment(data: ExpData): Promise<any> {
+  async createExperiment(data: ExpData): Promise<any> {
     console.log('New Experiment DB');
     const { experiment, patient } = data;
 
@@ -52,9 +57,7 @@ export class Experiment {
    * Fetches recent experiments from the db based on the `limit`
    * @param limit - Number of recent experiments to get
    */
-  public static getRecentExperiments = async (
-    limit: number
-  ): Promise<Object[]> =>
+  getRecentExperiments = async (limit: number): Promise<Object[]> =>
     await getConnection()
       .createQueryBuilder()
       .select()
@@ -69,7 +72,7 @@ export class Experiment {
    * Updates the given experiment
    * @param experimentId - The id of the experiment to update
    */
-  public static updateExperiment = async (experimentId: number) =>
+  updateExperiment = async (experimentId: number) =>
     await getConnection()
       .createQueryBuilder()
       .update(Experiments)
@@ -87,7 +90,7 @@ export class Experiment {
    * @param id - Id of the record to be deleted
    * @param table - name of the table
    */
-  public static deleteData = async (
+  deleteData = async (
     id: number,
     table: 'experiments' | 'patients' | 'recordings'
   ) => {
@@ -105,4 +108,4 @@ export class Experiment {
   };
 }
 
-export default Experiment;
+export default ExperimentModel;

@@ -1,12 +1,5 @@
 import { ChartType } from '@utils/constants';
 import Chart from './Chart';
-import {
-  ChartXY,
-  Dashboard,
-  LineSeries,
-  PointMarker,
-  UIBackground,
-} from '@arction/lcjs';
 import ChartOptions from './ChartOptions';
 import { ChartChannels } from '@utils/channels';
 import { getState, dispatch } from '@redux/store';
@@ -14,10 +7,7 @@ import { setPreviousData } from '@redux/ExperimentDataSlice';
 
 class RecordChart extends Chart {
   numberOfRows: number;
-  dashboard: null | Dashboard;
-  charts: null | ChartXY<PointMarker, UIBackground>[];
-  series: null | LineSeries[];
-  chartOptions: null | ChartOptions;
+  chartOptions: undefined | ChartOptions;
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
     type: ChartType.RECORD | ChartType.REVIEW,
@@ -26,23 +16,14 @@ class RecordChart extends Chart {
   ) {
     super(channels, type, samplingRate, containerId);
     this.numberOfRows = this.channels.length;
-    this.dashboard = null;
-    this.charts = null;
-    this.series = null;
-    this.chartOptions = null;
+    this.chartOptions = undefined;
   }
 
   // Creates the record chart
   createRecordChart() {
-    this.dashboard = this.createDashboard(this.numberOfRows, this.containerId);
-    this.charts = this.createChartPerChannel(this.channels, this.dashboard);
-    this.series = this.createSeriesForEachChart(this.charts);
-    this.customizeXAxis();
+    this.createDashboard(this.numberOfRows, this.containerId);
     this.synchronizeXAxis(this.charts);
-    this.customizeChart(this.charts);
     this.customizeRecordCharts();
-    this.uiList(this.charts, this.dashboard);
-    this.customCursor(this.dashboard, this.charts, this.series);
     this.chartOptions = new ChartOptions(
       this.channels,
       this.dashboard,
@@ -52,7 +33,15 @@ class RecordChart extends Chart {
   }
 
   listenForData() {
+    type Data = {
+      x: number;
+      y: number;
+    };
     let count = 0;
+    let O2Hb: Data[] = [];
+    let HHb: Data[] = [];
+    let THb: Data[] = [];
+    let TOI: Data[] = [];
 
     window.api.onIPCData('data:reader-record', (_event, data) => {
       // Change TOI value every 15 samples (based on 100samples/s)
@@ -60,16 +49,19 @@ class RecordChart extends Chart {
         this.TOILegend.setText(Math.round(data[data.length - 1][4]).toString());
         count = 0;
       }
-      count++;
+
+      for (let i = 0; i < data.length; i += 1) {
+        O2Hb.push({ x: data[i][0], y: data[i][1] });
+        HHb.push({ x: data[i][0], y: data[i][2] });
+        THb.push({ x: data[i][0], y: data[i][3] });
+        TOI.push({ x: data[i][0], y: data[i][4] });
+      }
+
       requestAnimationFrame(() => {
-        data.forEach((dataPoint: any) => {
-          if (this.series) {
-            this.series[0].add({ x: dataPoint[0], y: dataPoint[1] });
-            this.series[1].add({ x: dataPoint[0], y: dataPoint[2] });
-            this.series[2].add({ x: dataPoint[0], y: dataPoint[3] });
-            this.series[3].add({ x: dataPoint[0], y: dataPoint[4] });
-          }
-        });
+        this.series[0].add(O2Hb.splice(0, O2Hb.length - 1));
+        this.series[1].add(HHb.splice(0, HHb.length - 1));
+        this.series[2].add(THb.splice(0, THb.length - 1));
+        this.series[3].add(TOI.splice(0, TOI.length - 1));
       });
     });
   }
@@ -143,32 +135,15 @@ class RecordChart extends Chart {
 
   cleanup() {
     console.log('Destroy Chart');
-    this.chartOptions = null;
-    this.dashboard?.dispose();
-    this.charts = null;
-    this.series = null;
+    window.api.removeListeners('data:reader-record');
+    this.memoryCleanup();
+    this.chartOptions = undefined;
   }
 
   // Clears the series and custom ticks
-  clearCharts() {
-    this.series?.forEach((series: any) => {
-      series.clear();
-    });
-    this.charts?.forEach((chart: any) => {
-      chart.getDefaultAxisX().setInterval(0, 30000);
-    });
+  clearData() {
+    this.clearCharts();
     this.chartOptions?.clearCharts();
-
-    this.charts?.forEach((chart) => {
-      const axisX = chart.getDefaultAxisX();
-      const axisY = chart.getDefaultAxisY();
-
-      axisX.setInterval(
-        0,
-        (this.chartOptions as ChartOptions).getTimeDivision()
-      );
-      axisY.setInterval(0, 10);
-    });
   }
 }
 

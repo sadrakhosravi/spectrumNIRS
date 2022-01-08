@@ -7,10 +7,10 @@
   "resolved" "https://registry.npmjs.org/@arction/eventer/-/eventer-1.0.1.tgz"
   "version" "1.0.1"
 
-"@arction/lcjs@^3.3.0":
-  "integrity" "sha512-Y6gx9rKrwb52j1UIXZLTa3QYVblEWteDPZQ4b4VbqxhO1tIZhIvaS+DWWu+P94YGtLwrt3ypGHHed2lIFUvVLQ=="
-  "resolved" "https://registry.npmjs.org/@arction/lcjs/-/lcjs-3.3.0.tgz"
-  "version" "3.3.0"
+"@arction/lcjs@^3.3.3":
+  "integrity" "sha512-oiAm3rM7VWQA7dznhpDE0biYv3lEeZoBiBNw4sa24vjUK7ljQqrLN6AuFb4S4sWUd8jZjPHX8mSF4wn2ihf/Xg=="
+  "resolved" "https://registry.npmjs.org/@arction/lcjs/-/lcjs-3.3.3.tgz"
+  "version" "3.3.3"
   dependencies:
     "@arction/eventer" "^1.0.1"
     "earcut" "^2.2.2"
@@ -378,6 +378,11 @@
   optionalDependencies:
     "global-agent" "^2.0.2"
     "global-tunnel-ng" "^2.7.1"
+
+"@electron/remote@^2.0.1":
+  "integrity" "sha512-bGX4/yB2bPZwXm1DsxgoABgH0Cz7oFtXJgkerB8VrStYdTyvhGAULzNLRn9rVmeAuC3VUDXaXpZIlZAZHpsLIA=="
+  "resolved" "https://registry.npmjs.org/@electron/remote/-/remote-2.0.1.tgz"
+  "version" "2.0.1"
 
 "@electron/universal@1.0.5":
   "integrity" "sha512-zX9O6+jr2NMyAdSkwEUlyltiI4/EBLu2Ls/VD3pUQdi3cAYeYfdQnT2AJJ38HE4QxLccbU13LSpccw1IWlkyag=="
@@ -3834,7 +3839,7 @@
     "lodash.isequal" "^4.5.0"
     "semver" "^7.3.5"
 
-"electron@^15.3.0", "electron@>=12.0.0":
+"electron@^15.3.0", "electron@>= 10.0.0-beta.1", "electron@>=12.0.0":
   "integrity" "sha512-YLzaKCFmSniNlz9+NUTNs7ssPyDc+bYOCYZ0b/D6DjVkOeIFz4SR8EYKqlOc8TcqlDNu18BbWqz6zbJPyAAURg=="
   "resolved" "https://registry.npmjs.org/electron/-/electron-15.3.0.tgz"
   "version" "15.3.0"
@@ -7004,6 +7009,13 @@
   "resolved" "https://registry.npmjs.org/node-int64/-/node-int64-0.4.0.tgz"
   "version" "0.4.0"
 
+"node-loader@^2.0.0":
+  "integrity" "sha512-I5VN34NO4/5UYJaUBtkrODPWxbobrE4hgDqPrjB25yPkonFhCmZ146vTH+Zg417E9Iwoh1l/MbRs1apc5J295Q=="
+  "resolved" "https://registry.npmjs.org/node-loader/-/node-loader-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "loader-utils" "^2.0.0"
+
 "node-modules-regexp@^1.0.0":
   "integrity" "sha1-jZ2+KJZKSsVxLpExZCEHxx6Q7EA="
   "resolved" "https://registry.npmjs.org/node-modules-regexp/-/node-modules-regexp-1.0.0.tgz"
@@ -7429,6 +7441,11 @@
   dependencies:
     "no-case" "^3.0.4"
     "tslib" "^2.0.3"
+
+"path-browserify@^1.0.1":
+  "integrity" "sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g=="
+  "resolved" "https://registry.npmjs.org/path-browserify/-/path-browserify-1.0.1.tgz"
+  "version" "1.0.1"
 
 "path-exists@^3.0.0":
   "integrity" "sha1-zg6+ql94yxiSXqfYENe1mwEP1RU="

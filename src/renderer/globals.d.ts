@@ -82,3 +82,6 @@ declare namespace api {
     reviewTab: () => void;
   };
 }
+
+// global.d.ts
+declare module '*.css';

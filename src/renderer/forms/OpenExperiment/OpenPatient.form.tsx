@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 import { openModal } from '@redux/ModalStateSlice';
 
 // Components
-import SelectPatient from './SelectPatient.component';
+import SelectPatient from './SelectPatient.modal';
 
 // Icons
 import NewPatientIcon from '@icons/new-user.svg';

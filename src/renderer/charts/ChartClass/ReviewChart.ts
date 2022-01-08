@@ -1,23 +1,20 @@
 import { ChartType } from '@utils/constants';
 import Chart from './Chart';
 import {
-  AutoCursorModes,
-  Axis,
   AxisScrollStrategies,
-  AxisTickStrategies,
   Band,
   ChartXY,
-  ColorHEX,
-  ColorRGBA,
-  Dashboard,
   emptyFill,
   // emptyFill,
   LineSeries,
   PointMarker,
-  SolidFill,
-  SolidLine,
+  translatePoint,
   UIBackground,
 } from '@arction/lcjs';
+
+// Methods
+import zoomBandChart from './methods/ZoomBandChart';
+
 import ChartOptions from './ChartOptions';
 import WorkerManager from 'workers/WorkerManager';
 import { getState, dispatch } from '@redux/store';
@@ -25,19 +22,16 @@ import { setIsLoadingData } from '@redux/AppStateSlice';
 
 import { ChartChannels } from '@utils/channels';
 import { setAllEvents } from '@redux/ChartSlice';
-import AccurateTimer from '@electron/helpers/accurateTimer';
-import { Token } from '@arction/eventer';
+import { setReviewChartPositions } from '@redux/ReviewChartSlice';
 
 class ReviewChart extends Chart {
   numberOfRows: number;
-  dashboard: null | Dashboard;
-  charts: null | ChartXY<PointMarker, UIBackground>[];
-  series: null | LineSeries[];
-  chartOptions: null | ChartOptions;
+  chartOptions: undefined | ChartOptions;
   isLoadingData: boolean;
   zoomBandChart: undefined | ChartXY<PointMarker, UIBackground>;
-  zoomBandChartSeries: undefined | LineSeries[];
+  zoomBandChartSeries!: LineSeries[];
   zoomBandBand: undefined | Band;
+  allData: any[];
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4', 'Ch5'],
@@ -47,27 +41,19 @@ class ReviewChart extends Chart {
   ) {
     super(channels, type, samplingRate, containerId);
     this.numberOfRows = this.channels.length + 1;
-    this.dashboard = null;
-    this.charts = null;
-    this.series = null;
-    this.chartOptions = null;
+    this.chartOptions = undefined;
     this.zoomBandChart = undefined;
-    this.zoomBandChartSeries = undefined;
     this.zoomBandBand = undefined;
     this.isLoadingData = false;
+    this.allData = [];
   }
 
   /**
    * Creates the review chart and all its options/customizations
    */
   createReviewChart() {
-    this.dashboard = this.createDashboard(this.numberOfRows, this.containerId);
-    this.charts = this.createChartPerChannel(this.channels, this.dashboard);
-    this.series = this.createSeriesForEachChart(this.charts);
+    this.createDashboard(this.numberOfRows, this.containerId);
     this.synchronizeXAxis(this.charts);
-    this.customizeChart(this.charts);
-    this.uiList(this.charts, this.dashboard);
-    this.customCursor(this.dashboard, this.charts, this.series);
     this.chartOptions = new ChartOptions(
       this.channels,
       this.dashboard,
@@ -76,13 +62,65 @@ class ReviewChart extends Chart {
       true
     );
     this.customizeCharts();
-    this.createZoomBandChart();
+    this.zoomBandChart = zoomBandChart.bind(this)();
     this.listenForKeyPress();
-    this.customizeXAxis();
     this.synchronizeXAxis(this.charts);
-    this.customizeZoomBandChart();
-    this.loadAllEvents();
-    this.syncAxisXandZoomBandChart();
+    // setTimeout(() => {
+    //   this.loadAllEvents();
+    // }, 1000);
+    this.sendChartPositions();
+  }
+
+  /**
+   * Gets the all the dashboard's chart channel positions.
+   * @returns - Array of chart channel positions
+   */
+  private getChartPositions() {
+    const chartPos: any[] = [];
+    this.charts.forEach((chart, i) => {
+      // Get each chart position needed for aligning the ChannelUI elements
+      // Get the top left corner
+      const posEngine = translatePoint(
+        { x: 0, y: 0 },
+        chart.uiScale,
+        chart.engine.scale
+      );
+      const posDocument = chart.engine.engineLocation2Client(
+        posEngine.x,
+        posEngine.y
+      );
+
+      const posEngine2 = translatePoint(
+        { x: 100, y: 100 },
+        chart.uiScale,
+        chart.engine.scale
+      );
+      const posDocument2 = chart.engine.engineLocation2Client(
+        posEngine2.x,
+        posEngine2.y
+      );
+
+      const height = Math.abs(posDocument2.y - posDocument.y) + 3;
+      const width = Math.abs(posDocument2.x - posDocument.x);
+      chartPos[i] = { x: posDocument.x, y: posDocument2.y, height, width };
+    });
+    return chartPos;
+  }
+
+  sendChartPositions() {
+    // Send the initial chart position on creation
+    requestAnimationFrame(() => {
+      dispatch(setReviewChartPositions(this.getChartPositions()));
+    });
+
+    // Listen for chart resize and send to the state
+    // Using only one chart for reference event because it trigger
+    // all the other charts in the dashboard
+    this.charts[0].onResize(() => {
+      requestAnimationFrame(() => {
+        dispatch(setReviewChartPositions(this.getChartPositions()));
+      });
+    });
   }
 
   /**
@@ -90,15 +128,32 @@ class ReviewChart extends Chart {
    * @returns - If no data found.
    */
   loadData = async () => {
-    dispatch(setIsLoadingData(true));
-    const recordingId = getState().experimentData?.currentRecording?.id;
-    if (!recordingId) return;
-    await window.api.sendIPC(ChartChannels.StreamData, recordingId);
-
-    window.api.onIPCData(ChartChannels.StreamData, (_event, data) => {
+    const databasePath = await window.api.invokeIPC('get-database-path');
+    const databaseWorker = WorkerManager.startDatabaseWorker();
+    databaseWorker.postMessage(databasePath);
+    databaseWorker.onmessage = ({ data }) => {
       console.log(data);
-      this.drawDataOnCharts(data);
-    });
+      databaseWorker.terminate();
+    };
+
+    dispatch(setIsLoadingData(true));
+    console.log('LOAD DATA');
+    const recordingId = getState().experimentData?.currentRecording?.id;
+
+    if (recordingId === -1 || !recordingId) {
+      dispatch(dispatch(setIsLoadingData(false)));
+      return;
+    }
+    // window.api.sendIPC(ChartChannels.StreamData, recordingId);
+    // window.api.onIPCData(ChartChannels.StreamData, (_event, data: number[]) => {
+    //   console.log(data);
+    //   if (data.length === 0) {
+    //     dispatch(dispatch(setIsLoadingData(false)));
+    //     console.log(this.allData);
+    //   }
+    //   this.allData.push(data);
+    //   this.drawDataOnCharts(data);
+    // });
   };
 
   /**
@@ -117,19 +172,19 @@ class ReviewChart extends Chart {
     // Using for loop for fastest possible execution
     for (let i = 0; i < DATA_LENGTH; i++) {
       const O2Hb = {
-        x: parseInt(data[i].timeStamp),
+        x: parseInt(data[i].x),
         y: parseFloat(data[i].O2Hb),
       };
       const HHb = {
-        x: parseInt(data[i].timeStamp),
+        x: parseInt(data[i].x),
         y: parseFloat(data[i].HHb),
       };
       const THb = {
-        x: parseInt(data[i].timeStamp),
+        x: parseInt(data[i].x),
         y: parseFloat(data[i].THb),
       };
       const TOI = {
-        x: parseInt(data[i].timeStamp),
+        x: parseInt(data[i].x),
         y: parseFloat(data[i].TOI),
       };
       dataArr.push(O2Hb);
@@ -139,32 +194,27 @@ class ReviewChart extends Chart {
     }
 
     console.timeEnd('calc1');
-    const drawTimer = new AccurateTimer(() => {
-      requestAnimationFrame(() => {
-        this.series && this.series[0].add(dataArr.slice(0, 10000));
-        this.series && this.series[1].add(dataArr2.slice(0, 10000));
-        this.series && this.series[2].add(dataArr3.slice(0, 10000));
-        this.series && this.series[3].add(dataArr4.slice(0, 10000));
+    requestAnimationFrame(() => {
+      console.time('appendTimer');
+      this.series[0].add(dataArr);
+      this.series[1].add(dataArr2);
+      this.series[2].add(dataArr3);
+      this.series[3].add(dataArr4);
+      this.zoomBandChartSeries[0].add(dataArr);
+      this.zoomBandChartSeries[1].add(dataArr2);
+      this.zoomBandChartSeries[2].add(dataArr3);
+      this.zoomBandChartSeries[3].add(dataArr4);
 
-        requestAnimationFrame(() => {
-          this.zoomBandChartSeries &&
-            this.zoomBandChartSeries[0].add(dataArr.splice(0, 10000));
-          this.zoomBandChartSeries &&
-            this.zoomBandChartSeries[1].add(dataArr2.splice(0, 10000));
-          this.zoomBandChartSeries &&
-            this.zoomBandChartSeries[2].add(dataArr3.splice(0, 10000));
-          this.zoomBandChartSeries &&
-            this.zoomBandChartSeries[3].add(dataArr4.splice(0, 10000));
-        });
+      dataArr.length = 0;
+      dataArr2.length = 0;
+      dataArr3.length = 0;
+      dataArr4.length = 0;
+      console.timeEnd('appendTimer');
+    });
 
-        if (dataArr.length === 0) {
-          drawTimer.stop();
-          dispatch(setIsLoadingData(false));
-          this.isLoadingData = false;
-        }
-      });
-    }, 50);
-    drawTimer.start();
+    data.length = 0;
+    dispatch(setIsLoadingData(false));
+    this.isLoadingData = false;
   };
 
   /**
@@ -193,14 +243,19 @@ class ReviewChart extends Chart {
     }
 
     if (event.key === 'ArrowLeft' && this.charts) {
-      const timeDivision = this.chartOptions?.timeDivision as number;
-      const axisX = this.charts[0].getDefaultAxisX();
-      const currentInterval = axisX.getInterval();
-      const newInterval = {
-        start: currentInterval.start - timeDivision,
-        end: currentInterval.end - timeDivision,
-      };
-      this.setInterval(newInterval.start, newInterval.end);
+      const test = this.series[0].add({ x: 1000, y: 10 });
+      console.log(test);
+      setTimeout(() => {
+        test.dispose();
+      }, 3000);
+      // const timeDivision = this.chartOptions?.timeDivision as number;
+      // const axisX = this.charts[0].getDefaultAxisX();
+      // const currentInterval = axisX.getInterval();
+      // const newInterval = {
+      //   start: currentInterval.start - timeDivision,
+      //   end: currentInterval.end - timeDivision,
+      // };
+      // this.setInterval(newInterval.start, newInterval.end);
     }
   };
 
@@ -245,139 +300,6 @@ class ReviewChart extends Chart {
   };
 
   /**
-   * Creates the ZoomBandChart and its series.
-   */
-  createZoomBandChart() {
-    this.zoomBandChart = this.dashboard?.createChartXY({
-      rowIndex: this.numberOfRows,
-      columnIndex: 1,
-    });
-
-    this.zoomBandChartSeries = this.series?.map((_, i) => {
-      return (this.zoomBandChart as ChartXY<PointMarker, UIBackground>)
-        .addLineSeries({
-          dataPattern: {
-            // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
-            pattern: 'ProgressiveX',
-            // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
-            regularProgressiveStep: false,
-          },
-        })
-        .setDataCleaning(undefined)
-        .setStrokeStyle(
-          new SolidLine({
-            thickness: 1.25,
-            fillStyle: new SolidFill({
-              color: ColorHEX(this.seriesLineColorArr[i]),
-            }),
-          })
-        );
-    });
-  }
-
-  /**
-   * Customizes the styles and functionality of ZoomBandChart.
-   */
-  customizeZoomBandChart() {
-    const zoomBandChart = this.zoomBandChart as ChartXY<
-      PointMarker,
-      UIBackground
-    >;
-    const [axisX, axisY] = zoomBandChart.getDefaultAxes();
-
-    // Customize Y Axis
-    axisY.setTickStrategy(AxisTickStrategies.Empty);
-    axisY.setScrollStrategy(AxisScrollStrategies.fitting);
-    axisY.setThickness(65);
-    axisY.setMouseInteractions(false);
-
-    // Customize X Axis
-    axisX.setTickStrategy(AxisTickStrategies.Empty);
-    axisX.setScrollStrategy(AxisScrollStrategies.fitting);
-
-    // Customize Chart
-    zoomBandChart.setTitleFillStyle(emptyFill);
-    zoomBandChart.setAutoCursorMode(AutoCursorModes.disabled);
-    zoomBandChart.setMouseInteractionRectangleFit(false);
-    zoomBandChart.setMouseInteractionsWhileScrolling(false);
-    zoomBandChart.setMouseInteractionRectangleZoom(false);
-    zoomBandChart.setMouseInteractionPan(false);
-
-    // Customize Band
-    const band = axisX.addBand();
-    this.zoomBandBand = band;
-
-    band.setFillStyle(new SolidFill({ color: ColorRGBA(255, 255, 255, 25) }));
-    band.setStrokeStyle(
-      new SolidLine({
-        thickness: 2,
-        fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255, 45) }),
-      })
-    );
-
-    let bandValueStart = 0;
-    let bandValueEnd = 30000;
-
-    band.setValueStart(bandValueStart);
-    band.setValueEnd(bandValueEnd);
-
-    let valueChangeToken: Token;
-
-    // Add listener on mouse enter to prevent an infinite loop because of
-    // The same listener on the axisXChart
-
-    band.onMouseEnter(() => {
-      valueChangeToken = band.onValueChange((_, start, end) => {
-        this.xAxisChart?.getDefaultAxisX().setInterval(start, end, false, true);
-        bandValueStart = start;
-        bandValueEnd = end;
-      });
-    });
-
-    // Cleanup listener on mouse leave
-    band.onMouseLeave(() => {
-      band.offValueChange(valueChangeToken);
-    });
-
-    // Add jump to a point on click
-    zoomBandChart.onSeriesBackgroundMouseClick(() => {
-      const { location } = zoomBandChart.solveNearest() as any;
-      const bandValueMiddle = (bandValueEnd - bandValueStart) / 2;
-      band.setValueStart(location.x - bandValueMiddle);
-      band.setValueEnd(location.x + bandValueMiddle);
-      this.xAxisChart
-        ?.getDefaultAxisX()
-        .setInterval(location.x - 30000, location.x + 30000, false, true);
-    });
-  }
-
-  /**
-   * Synchronizes the channel intervals with the ZoomBandChart
-   */
-  syncAxisXandZoomBandChart() {
-    const axisX = this.axisX as Axis;
-    const band = this.zoomBandBand as Band;
-
-    let scaleChangeToken: Token;
-
-    // Add listener on mouse enter to prevent an infinite loop because of
-    // The same listener on the ZommBandBand.
-    axisX.onAxisInteractionAreaMouseEnter(() => {
-      scaleChangeToken = axisX.onScaleChange((start, end) => {
-        requestAnimationFrame(() => {
-          band.setValueStart(start);
-          band.setValueEnd(end);
-        });
-      });
-    });
-
-    // Cleanup listener on mouse leave
-    axisX.onAxisInteractionAreaMouseLeave(() => {
-      axisX.offScaleChange(scaleChangeToken);
-    });
-  }
-
-  /**
    * Customizes the style and functionality of all channels
    */
   customizeCharts() {
@@ -411,38 +333,39 @@ class ReviewChart extends Chart {
    * Cleanup of the chart to free up resources
    */
   cleanup() {
-    console.log('Destroy Chart');
-    this.chartOptions = null;
-    this.dashboard?.dispose();
-    this.charts = null;
-    this.series = null;
     window.removeEventListener('keydown', this.handleKeyPress);
     window.api.removeListeners(ChartChannels.StreamData);
+
     dispatch(setAllEvents([]));
     dispatch(setIsLoadingData(false));
+    this.zoomBandChartSeries.forEach((series) => series.dispose());
+
+    console.log('Destroy Chart');
+    this.memoryCleanup();
+    this.chartOptions?.memoryCleanup();
+    //@ts-ignore
+    this.chartOptions = undefined;
+    //@ts-ignore
+    this.zoomBandChartSeries = undefined;
+    this.zoomBandBand = undefined;
   }
 
   /**
    * Clears the chart and all its custom ticks and options
    */
   clearCharts() {
-    this.series?.forEach((series: any) => {
-      series.clear();
-    });
-    this.charts?.forEach((chart: any) => {
-      chart.getDefaultAxisX().setInterval(0, 30000);
-    });
+    this.series?.forEach((series) => series.clear());
+    this.zoomBandChartSeries?.forEach((series) => series.clear());
     this.chartOptions?.clearCharts();
 
-    this.charts?.forEach((chart) => {
-      const axisX = chart.getDefaultAxisX();
-      const axisY = chart.getDefaultAxisY();
+    this.xAxisChart.getDefaultAxisX()?.setInterval(0, 30000, false, true);
+    this.zoomBandChart?.getDefaultAxisX().setInterval(0, 30000, false, true);
+    this.zoomBandBand?.setValueStart(0);
+    this.zoomBandBand?.setValueEnd(30000);
 
-      axisX.setInterval(
-        0,
-        (this.chartOptions as ChartOptions).getTimeDivision()
-      );
-      axisY.setInterval(0, 10);
+    this.charts?.forEach((chart) => {
+      const axisY = chart.getDefaultAxisY();
+      axisY.setInterval(-50, 50);
     });
   }
 }

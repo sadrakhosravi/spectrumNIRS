@@ -72,10 +72,11 @@ const Modal: React.FC<IProps> = (props) => {
                 </Dialog.Title>
 
                 <button
-                  className="absolute right-4 top-4 p-2"
+                  className="absolute right-4 top-4 p-2 opacity-70 hover:opacity-100"
+                  title="Close"
                   onClick={handleClose}
                 >
-                  <img src={CloseIcon} width="44px" alt="CloseIcon" />
+                  <img src={CloseIcon} width="32px" alt="CloseIcon" />
                 </button>
 
                 <div className="mt-10">{props.children}</div>

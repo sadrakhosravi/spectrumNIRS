@@ -42,7 +42,7 @@ export default merge(baseConfig, {
 
   mode: 'development',
 
-  target: ['web', 'electron-renderer'],
+  target: 'electron-renderer',
 
   entry: {
     main: [
@@ -59,9 +59,6 @@ export default merge(baseConfig, {
     path: webpackPaths.distRendererPath,
     publicPath: '/',
     filename: '[name].dev.js',
-    library: {
-      type: 'umd',
-    },
   },
 
   module: {
