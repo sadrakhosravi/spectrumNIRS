@@ -4,10 +4,13 @@ import useNavigation from '@hooks/useNavigation.hook';
 
 // Pages
 import HomePage from './Home/Home.page';
-// const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
+const RecordPage = React.lazy(() => import('@pages/Record/Record.page'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 const ProbeCalibrationPage = React.lazy(
   () => import('@pages/ProbeCalibration/ProbeCalibration.page')
+);
+const ExportServerPage = React.lazy(
+  () => import('@pages/ExportServer/ExportServer.page')
 );
 
 // Constants
@@ -33,20 +36,26 @@ const RouteHandler = () => {
   }, [location]);
 
   return (
-    <main className="main-container">
+    <main className="main-container flex">
       <React.Suspense fallback={'Loading ...'}>
         <Router>
           <Route exact path={AppState.HOME} component={HomePage} />
           <Route
             exact
+            path={AppState.EXPORT_SERVER}
+            component={ExportServerPage}
+          />
+          <Route
+            exact
             path={AppState.PROBE_CALIBRATION}
             component={ProbeCalibrationPage}
           />
+
+          <div className="w-full h-full" hidden={isHidden}>
+            <Route path={AppState.RECORD} component={RecordPage} />
+            <Route path={AppState.REVIEW} component={ReviewPage} />
+          </div>
         </Router>
-        <div className="w-full h-full" hidden={isHidden}>
-          {/* <RecordPage /> */}
-          <Route path={AppState.REVIEW} component={ReviewPage} />
-        </div>
       </React.Suspense>
     </main>
   );

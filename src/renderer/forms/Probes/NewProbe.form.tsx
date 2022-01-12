@@ -4,7 +4,7 @@ import { RadioGroup } from '@headlessui/react';
 
 // Components
 import SubmitButton from '@components/Form/SubmitButton.component';
-import IconTextButtonWithTimeStamp from '@components/Buttons/IconTextButtonWithTimeStamp.component';
+import ListButton from '@components/Buttons/ListButton';
 
 import { ProbeChannels } from '@utils/channels';
 
@@ -111,7 +111,7 @@ const NewProbeForm = () => {
             <>
               <h3 className="mt-4 py-2 text-xl">Select a Probe:</h3>
               {probes.map((probe: any) => (
-                <IconTextButtonWithTimeStamp
+                <ListButton
                   text={
                     probe.name + `${probe.isDefault === 1 ? ' (Default)' : ''}`
                   }

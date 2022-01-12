@@ -116,7 +116,6 @@ export class DataReader implements IDataReaders {
   }
 
   async syncGainsWithHardware(data: string[]): Promise<any> {
-    console.log('DATA FROM READER: ' + data);
     return await this.currentSensor.syncGains(data);
   }
 }

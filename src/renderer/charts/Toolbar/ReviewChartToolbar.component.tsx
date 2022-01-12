@@ -15,6 +15,7 @@ import { ChartType } from '@utils/constants';
 import { useAppSelector } from '@redux/hooks/hooks';
 import { useChartContext } from 'renderer/context/ChartProvider';
 import ChartOptions from '../ChartClass/ChartOptions';
+import ToolbarContainer from '@components/Toolbar/ToolbarContainer.component';
 
 // Buttons with tooltip
 const IconButtonWithTooltip = withTooltip(IconButton);
@@ -34,11 +35,11 @@ const ReviewChartToolbar = ({
   return (
     <>
       {reviewChart && (
-        <div className="w-full bg-[#252526] px-2 max-h-[50px] h-[50px] grid gap-3 grid-flow-col grid-cols-6 items-center relative drop-shadow-xl border-b-1 border-grey5 z-40">
+        <ToolbarContainer>
           <div className="grid grid-flow-col col-span-4 auto-cols-max items-center gap-1">
             {toolbarMenu.map((option, index) => {
               if (option.label === 'separator')
-                return <Separator key={index} />;
+                return <Separator orientation="vertical" key={index} />;
               return (
                 <IconButtonWithTooltip
                   icon={option.icon}
@@ -91,10 +92,10 @@ const ReviewChartToolbar = ({
                   ))}
             </div>
           </div>
-        </div>
+        </ToolbarContainer>
       )}
     </>
   );
 };
 
-export default React.memo(ReviewChartToolbar);
+export default ReviewChartToolbar;

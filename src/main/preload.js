@@ -11,6 +11,8 @@ window.api = {
   // Receive channels
   onIPCData: (channel, func) =>
     ipcRenderer.on(channel, (event, ...args) => func(event, ...args)),
+  onceIPC: (channel, func) =>
+    ipcRenderer.once(channel, (event, ...args) => func(event, ...args)),
 
   // Remove Listeners
   removeListeners: (channel) => {

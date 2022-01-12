@@ -9,7 +9,7 @@ import ChevronDownIcon from '@icons/chevron-down.svg';
 
 type ColorPickerProps = {
   color: string;
-  setColor: React.Dispatch<React.SetStateAction<string>>;
+  setColor: (color: string) => void;
 };
 
 const ColorPicker = ({ color = '#FFF', setColor }: ColorPickerProps) => {

@@ -1,4 +1,5 @@
 import { ChartType } from '@utils/constants';
+
 import Chart from './Chart';
 import {
   AxisScrollStrategies,
@@ -8,7 +9,6 @@ import {
   // emptyFill,
   LineSeries,
   PointMarker,
-  translatePoint,
   UIBackground,
 } from '@arction/lcjs';
 
@@ -19,7 +19,6 @@ import ChartOptions from './ChartOptions';
 import WorkerManager from 'workers/WorkerManager';
 import { getState, dispatch } from '@redux/store';
 import { setIsLoadingData } from '@redux/AppStateSlice';
-
 import { ChartChannels } from '@utils/channels';
 import { setAllEvents } from '@redux/ChartSlice';
 import { setReviewChartPositions } from '@redux/ReviewChartSlice';
@@ -32,6 +31,7 @@ class ReviewChart extends Chart {
   zoomBandChartSeries!: LineSeries[];
   zoomBandBand: undefined | Band;
   allData: any[];
+  drawAnimationFrameId: undefined | number;
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4', 'Ch5'],
@@ -46,6 +46,7 @@ class ReviewChart extends Chart {
     this.zoomBandBand = undefined;
     this.isLoadingData = false;
     this.allData = [];
+    this.drawAnimationFrameId = undefined;
   }
 
   /**
@@ -71,42 +72,6 @@ class ReviewChart extends Chart {
     this.sendChartPositions();
   }
 
-  /**
-   * Gets the all the dashboard's chart channel positions.
-   * @returns - Array of chart channel positions
-   */
-  private getChartPositions() {
-    const chartPos: any[] = [];
-    this.charts.forEach((chart, i) => {
-      // Get each chart position needed for aligning the ChannelUI elements
-      // Get the top left corner
-      const posEngine = translatePoint(
-        { x: 0, y: 0 },
-        chart.uiScale,
-        chart.engine.scale
-      );
-      const posDocument = chart.engine.engineLocation2Client(
-        posEngine.x,
-        posEngine.y
-      );
-
-      const posEngine2 = translatePoint(
-        { x: 100, y: 100 },
-        chart.uiScale,
-        chart.engine.scale
-      );
-      const posDocument2 = chart.engine.engineLocation2Client(
-        posEngine2.x,
-        posEngine2.y
-      );
-
-      const height = Math.abs(posDocument2.y - posDocument.y) + 3;
-      const width = Math.abs(posDocument2.x - posDocument.x);
-      chartPos[i] = { x: posDocument.x, y: posDocument2.y, height, width };
-    });
-    return chartPos;
-  }
-
   sendChartPositions() {
     // Send the initial chart position on creation
     requestAnimationFrame(() => {
@@ -130,10 +95,15 @@ class ReviewChart extends Chart {
   loadData = async () => {
     const databasePath = await window.api.invokeIPC('get-database-path');
     const databaseWorker = WorkerManager.startDatabaseWorker();
-    databaseWorker.postMessage(databasePath);
+    const buffMemLength = new SharedArrayBuffer(1024 * 480);
+
+    databaseWorker.postMessage({ dbPath: databasePath, arr: buffMemLength });
+
     databaseWorker.onmessage = ({ data }) => {
-      console.log(data);
-      databaseWorker.terminate();
+      console.timeEnd('threadStart');
+      this.drawAnimationFrameId = requestAnimationFrame(() => {
+        this.series.forEach((series) => series.addArrayY(data, 10, 0));
+      });
     };
 
     dispatch(setIsLoadingData(true));
@@ -243,19 +213,14 @@ class ReviewChart extends Chart {
     }
 
     if (event.key === 'ArrowLeft' && this.charts) {
-      const test = this.series[0].add({ x: 1000, y: 10 });
-      console.log(test);
-      setTimeout(() => {
-        test.dispose();
-      }, 3000);
-      // const timeDivision = this.chartOptions?.timeDivision as number;
-      // const axisX = this.charts[0].getDefaultAxisX();
-      // const currentInterval = axisX.getInterval();
-      // const newInterval = {
-      //   start: currentInterval.start - timeDivision,
-      //   end: currentInterval.end - timeDivision,
-      // };
-      // this.setInterval(newInterval.start, newInterval.end);
+      const timeDivision = this.chartOptions?.timeDivision as number;
+      const axisX = this.charts[0].getDefaultAxisX();
+      const currentInterval = axisX.getInterval();
+      const newInterval = {
+        start: currentInterval.start - timeDivision,
+        end: currentInterval.end - timeDivision,
+      };
+      this.setInterval(newInterval.start, newInterval.end);
     }
   };
 
@@ -288,12 +253,13 @@ class ReviewChart extends Chart {
     if (events.length > 0) {
       const eventsWorker = WorkerManager.startEventsWorker();
       eventsWorker.postMessage(events);
-      eventsWorker.onmessage = ({ data }) => {
-        dispatch(setAllEvents(data));
-        console.log(data);
-        eventsWorker.terminate();
-        return;
-      };
+      // eventsWorker.onmessage = ({ data }) => {
+      //   dispatch(setAllEvents(data));
+      //   console.log(data);
+      //   eventsWorker.terminate();
+      //   return;
+      // };
+      eventsWorker.terminate();
     }
 
     dispatch(setAllEvents([]));
@@ -334,11 +300,17 @@ class ReviewChart extends Chart {
    */
   cleanup() {
     window.removeEventListener('keydown', this.handleKeyPress);
+    console.log(this.drawAnimationFrameId);
+    this.drawAnimationFrameId &&
+      window.cancelAnimationFrame(this.drawAnimationFrameId);
     window.api.removeListeners(ChartChannels.StreamData);
 
     dispatch(setAllEvents([]));
     dispatch(setIsLoadingData(false));
-    this.zoomBandChartSeries.forEach((series) => series.dispose());
+    this.zoomBandChartSeries.forEach((series) => {
+      series.clear();
+      series.dispose();
+    });
 
     console.log('Destroy Chart');
     this.memoryCleanup();

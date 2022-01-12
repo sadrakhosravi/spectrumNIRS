@@ -16,8 +16,10 @@ import IsLoadingReducer from '@redux/IsLoadingSlice';
 import ExperimentDataReducer from '@redux/ExperimentDataSlice';
 import ChartSliceReducer from './ChartSlice';
 import ProbeStateReducer from './ProbeState';
+import RecordChartReducer from './RecordChartSlice';
 import ReviewChartReducer from './ReviewChartSlice';
 import RecordingSettingsReducer from './RecordingSettings';
+import ExportServerReducer from './ExportServerSlice';
 import { experimentsApi } from './api/experimentsApi';
 
 const reducers = combineReducers({
@@ -29,8 +31,10 @@ const reducers = combineReducers({
   experimentData: ExperimentDataReducer,
   chartState: ChartSliceReducer,
   probeState: ProbeStateReducer,
+  recordChartState: RecordChartReducer,
   reviewChartState: ReviewChartReducer,
   recordingSettingsState: RecordingSettingsReducer,
+  exportServerState: ExportServerReducer,
   [experimentsApi.reducerPath]: experimentsApi.reducer,
 });
 

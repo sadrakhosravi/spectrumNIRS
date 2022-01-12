@@ -30,7 +30,7 @@ export default merge(baseConfig, {
 
   mode: 'production',
 
-  target: ['web', 'electron-renderer'],
+  target: 'electron-renderer',
 
   entry: {
     main: path.join(webpackPaths.srcRendererPath, 'index.tsx'),
@@ -133,7 +133,7 @@ export default merge(baseConfig, {
     }),
 
     new MiniCssExtractPlugin({
-      filename: 'style.css',
+      filename: '[name].css',
     }),
 
     new BundleAnalyzerPlugin({

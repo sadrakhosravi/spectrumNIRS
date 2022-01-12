@@ -11,11 +11,11 @@
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import 'reflect-metadata';
-// Import controllers
-import '../controllers';
-// import { resolveHtmlPath } from './util';
 import updater from './updater';
 import { resolveHtmlPath } from './util';
+
+// Import controllers
+import startControllers from 'controllers';
 
 // Define mainWindow
 let mainWindow: BrowserWindow | null = null;
@@ -54,7 +54,7 @@ const createMainWindow = async () => {
   // Disable menu for the entire application
   // Menu.setApplicationMenu(false)
 
-  mainWindow = await new BrowserWindow({
+  mainWindow = new BrowserWindow({
     minHeight: 800,
     minWidth: 1200,
     backgroundColor: '#1E1E1E',
@@ -78,13 +78,11 @@ const createMainWindow = async () => {
     icon: getAssetPath('icon.png'),
   });
 
-  mainWindow.setBackgroundColor('#1E1E1E');
   mainWindow.maximize();
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {
-    console.log('Maximized');
     mainWindow?.webContents.send('window:unmaximize');
   });
 
@@ -94,18 +92,17 @@ const createMainWindow = async () => {
 
   // Maximize event
   mainWindow.on('maximize', () => {
-    console.log('Maximized');
     mainWindow?.webContents.send('window:maximize');
   });
 
   return mainWindow;
 };
 
-app.on('activate', async () => {
-  if (!mainWindow) {
-    createMainWindow();
-  }
-});
+// app.on('activate', async () => {
+//   if (!mainWindow) {
+//     createMainWindow();
+//   }
+// });
 
 (async () => {
   // Set dark theme by default - Light theme will be added in the next versions
@@ -114,12 +111,11 @@ app.on('activate', async () => {
   // Create main window
   await app.whenReady();
   await createMainWindow();
+  await startControllers();
 
   setTimeout(async () => {
     await updater();
   }, 2000);
-
-  console.log('test');
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

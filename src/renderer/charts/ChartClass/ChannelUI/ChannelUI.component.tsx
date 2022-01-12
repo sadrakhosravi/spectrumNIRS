@@ -48,18 +48,19 @@ const ChannelUI = ({
 
   return (
     <>
-      {chartPos.height && chartPos.height > 10 && (
+      {chartPos?.height && chartPos.height > 10 && (
         <>
           <div
             className="fixed bg-dark2 border-b-[3px] border-r-[3px] border-[#222] p-2 flex"
             style={{
               top: chartPos.y + 'px',
-              left: chartPos.x - 100 + 'px',
+              left: chartPos.x - 130 + 'px',
               height: chartPos.height + 'px',
-              width: '100px',
+              width: '130px',
             }}
           >
             <SignalLabelAndSettings
+              chart={chart}
               name={name}
               color={color}
               chartPos={chartPos}
@@ -84,15 +85,15 @@ const ChannelUI = ({
             )}
           </div>
           <div
-            className="fixed flex items-center justify-center -rotate-90 z-10"
+            className="fixed flex items-center justify-center z-10"
             style={{
               top: chartPos.y + 'px',
               left: chartPos.x + 'px',
               height: chartPos.height + 'px',
-              width: '25px',
+              width: '15px',
             }}
           >
-            mV
+            <p className="-rotate-90 text-xs w-[10px]">Units</p>
           </div>
         </>
       )}

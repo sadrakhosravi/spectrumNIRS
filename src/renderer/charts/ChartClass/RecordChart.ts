@@ -1,22 +1,27 @@
+import { getState, dispatch } from '@redux/store';
 import { ChartType } from '@utils/constants';
 import Chart from './Chart';
 import ChartOptions from './ChartOptions';
 import { ChartChannels } from '@utils/channels';
-import { getState, dispatch } from '@redux/store';
 import { setPreviousData } from '@redux/ExperimentDataSlice';
+import { setRecordChartPositions } from '@redux/RecordChartSlice';
 
 class RecordChart extends Chart {
   numberOfRows: number;
   chartOptions: undefined | ChartOptions;
   constructor(
-    channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4'],
+    containerId: string,
     type: ChartType.RECORD | ChartType.REVIEW,
-    samplingRate: number,
-    containerId: string
+    channels = getState().sensorState.currentProbe?.device.defaultChannels || [
+      'No Channels',
+    ],
+    samplingRate = getState().sensorState.currentProbe?.samplingRate || 100
   ) {
     super(channels, type, samplingRate, containerId);
     this.numberOfRows = this.channels.length;
     this.chartOptions = undefined;
+
+    console.log(getState().sensorState.currentProbe?.samplingRate);
   }
 
   // Creates the record chart
@@ -30,6 +35,24 @@ class RecordChart extends Chart {
       this.charts,
       this.series
     );
+    this.sendChartPositions();
+  }
+
+  sendChartPositions() {
+    // Send the initial chart position on creation
+    requestAnimationFrame(() => {
+      console.log(this.getChartPositions());
+      dispatch(setRecordChartPositions(this.getChartPositions()));
+    });
+
+    // Listen for chart resize and send to the state
+    // Using only one chart for reference event because it trigger
+    // all the other charts in the dashboard
+    this.charts[0].onResize(() => {
+      requestAnimationFrame(() => {
+        dispatch(setRecordChartPositions(this.getChartPositions()));
+      });
+    });
   }
 
   listenForData() {
@@ -125,10 +148,7 @@ class RecordChart extends Chart {
 
   customizeRecordCharts() {
     this.charts &&
-      this.charts.forEach((chart, i) => {
-        const axisX = chart.getDefaultAxisX();
-        console.log(axisX);
-
+      this.charts.forEach((_chart, i) => {
         this.series && this.series[i].setDataCleaning({ minDataPointCount: 1 });
       });
   }
@@ -136,7 +156,10 @@ class RecordChart extends Chart {
   cleanup() {
     console.log('Destroy Chart');
     window.api.removeListeners('data:reader-record');
+    this.clearData();
     this.memoryCleanup();
+    this.chartOptions?.memoryCleanup();
+    //@ts-ignore
     this.chartOptions = undefined;
   }
 

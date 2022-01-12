@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 import { useGetRecentExperimentsQuery } from '@redux/api/experimentsApi';
 
 // Components
+import Container from '@components/Containers/Container.component';
 import RecentExperiment from './RecentExperiment.component';
 import IconButton from '@components/Buttons/IconButton.component';
 
@@ -74,7 +75,7 @@ const RecentExperimentsContainer = ({
   };
 
   return (
-    <div className="bg-grey1 h-full p-6 rounded-md overflow-y-auto border-primary">
+    <Container>
       <div className="flex gap-2 items-center w-full mb-5">
         <input
           className="bg-light text-dark h-40px px-3 placeholder-grey1 rounded-sm w-full focus:ring-2 focus:ring-accent"
@@ -112,7 +113,7 @@ const RecentExperimentsContainer = ({
         <p className="text-white opacity-30">No recent experiment found.</p>
       )}
       {children}
-    </div>
+    </Container>
   );
 };
 

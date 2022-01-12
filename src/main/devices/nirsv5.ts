@@ -5,7 +5,7 @@ import RecordingsData from '@electron/models/RecordingsData';
 import net from 'net';
 
 const path = require('path');
-const readline = require('readline');
+import readline from 'readline';
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
 
 // Socket for connecting to the driver
@@ -37,7 +37,7 @@ const gainValues = {
  * Sends the gains given from the UI to the driver
  */
 export const syncGains = async (data: string[]) => {
-  console.log(data);
+  console.log(data.join(','));
   const mySocket = new net.Socket();
   mySocket.connect(DRIVER_SOCKET_PORT, DRIVER_SOCKET_IP, function () {
     console.log('Connection Established');
@@ -109,6 +109,7 @@ export const start = async (
   rl = readline
     .createInterface({
       input: readUSBData.stdout,
+      output: process.stdout,
       terminal: false,
     })
     .on('line', async function (line: string) {
@@ -225,7 +226,7 @@ export const startQualityMonitor = async (sender: any) => {
 
       if (count === 50) {
         LEDPDs.forEach((_, i) => (LEDPDs[i] = LEDPDs[i] / 50));
-        sender.send('signal-quality-monitor-data', LEDPDs);
+        sender.send('probe-calibration-data', LEDPDs);
         LEDPDs.forEach((_, i) => (LEDPDs[i] = 0));
 
         count = 0;

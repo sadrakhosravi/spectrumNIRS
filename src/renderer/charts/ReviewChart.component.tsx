@@ -96,11 +96,6 @@ const ReviewChart = ({
   useEffect(() => {
     resetChartSize();
   }, [reviewSidebar, windowResized, windowMaximized]);
-  console.log('TEST');
-
-  useEffect(() => {
-    console.log('resized');
-  }, [reviewSidebar]);
 
   useEffect(() => {
     chartRef.current?.setInterval(currentTimeStamp);
@@ -118,7 +113,7 @@ const ReviewChart = ({
     <ChartLayout>
       {chartLoaded && <ChartToolbar type={type} />}
 
-      <ChartContainer chart={chartRef.current}>
+      <ChartContainer type={ChartType.REVIEW}>
         <div className="h-full pointer-events-auto" id={containerId} />
         {children}
       </ChartContainer>

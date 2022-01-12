@@ -10,6 +10,7 @@
       "@lib/*": ["./lib/*"],
       "@components/*": ["./renderer/components/*"],
       "@pages/*": ["./renderer/pages/*"],
+      "@sidebar/*": ["./renderer/sidebar/*"],
       "@layout/*": ["./renderer/layout/*"],
       "@forms/*": ["./renderer/forms/*"],
       "@microComp/*": ["./renderer/components/MicroComponents/*"],

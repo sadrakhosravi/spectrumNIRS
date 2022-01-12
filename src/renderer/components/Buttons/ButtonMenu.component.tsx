@@ -7,29 +7,36 @@ import ChevronDownIcon from '@icons/chevron-down.svg';
 type ButtonMenuProps = {
   text?: string;
   icon?: string;
+  className?: string;
+  width?: string;
   children: JSX.Element | JSX.Element[];
 };
 
-const ButtonMenu = ({ text, icon, children }: ButtonMenuProps) => {
+const ButtonMenu = ({
+  text,
+  icon,
+  className = '',
+  width,
+  children,
+}: ButtonMenuProps) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
       {({ open }) => (
         <>
-          <div>
-            <Menu.Button
-              as="button"
-              className={`inline-flex gap-1 justify-center items-center w-full text-sm font-medium px-2 py-1.5 text-white bg-grey2 hover:bg-grey1 border-primary rounded-md  duration-150 active:ring-2 active:ring-accent ${
-                open && 'ring-2 ring-accent'
-              }`}
-            >
-              {icon && <img src={icon} className="w-6" />}
-              {text && text}
-              <img
-                className={`ml-1 duration-150 w-3 ${open && 'rotate-180'}`}
-                src={ChevronDownIcon}
-              />
-            </Menu.Button>
-          </div>
+          <Menu.Button
+            as="button"
+            className={`inline-flex gap-1 items-center justify-between w-full text-sm font-medium px-2 py-1.5 text-white bg-grey2 hover:bg-grey1 border-primary rounded-md  duration-150 active:ring-2 active:ring-accent ${
+              open && 'ring-2 ring-accent'
+            } ${className}`}
+            style={{ width }}
+          >
+            {icon && <img src={icon} className="w-6" />}
+            {text && text}
+            <img
+              className={`ml-1 duration-150 w-3 ${open && 'rotate-180'}`}
+              src={ChevronDownIcon}
+            />
+          </Menu.Button>
           <Transition
             as={React.Fragment}
             enter="transition ease-out duration-75"
@@ -39,7 +46,10 @@ const ButtonMenu = ({ text, icon, children }: ButtonMenuProps) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 min-w-[10rem] mt-1 origin-top-right p-1.5 bg-grey3 border-primary text-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items
+              className="absolute right-0 min-w-[10rem] mt-1 origin-top-right p-1.5 bg-grey3 border-primary text-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40"
+              style={{ width }}
+            >
               {children}
             </Menu.Items>
           </Transition>

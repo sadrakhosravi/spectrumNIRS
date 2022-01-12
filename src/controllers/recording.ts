@@ -23,7 +23,7 @@ type RecordInit = {
 };
 
 // Store
-let reader: DataReader | undefined;
+export let reader: DataReader | undefined;
 
 // Select the sensor
 ipcMain.handle(

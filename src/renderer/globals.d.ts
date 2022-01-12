@@ -20,7 +20,7 @@ declare namespace api {
    * Send a message to the main process via channel and expect a result synchronously.
    * This action will block the renderer process
    */
-  function sendSyncIPC(channel: string, args?: any | any[]): void;
+  function sendSyncIPC(channel: string, args?: any | any[]): any;
 
   /**
    * Send a message to the main process along with arguments via `channel` and expect a result
@@ -33,6 +33,15 @@ declare namespace api {
    * `listener(event, args...)`.
    */
   function onIPCData(
+    channel: string,
+    listener: (event: Electron.IpcRendererEvent, args: any[] | any) => void
+  ): void;
+
+  /**
+   *Adds a one time listener function for the event. This listener is invoked only
+   * the next time a message is sent to channel, after which it is removed.
+   */
+  function onceIPC(
     channel: string,
     listener: (event: Electron.IpcRendererEvent, args: any[] | any) => void
   ): void;

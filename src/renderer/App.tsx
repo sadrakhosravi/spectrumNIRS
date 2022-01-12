@@ -15,14 +15,14 @@ import { AppState } from '@utils/constants';
 
 //Component import
 import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
-import LoadStates from 'renderer/startup/loadStates';
+import useLoadState from 'renderer/startup/useLoadStates';
 
 import TitleBar from './layout/TitleBar/TitleBar.component';
 import BottomBar from './layout/BottomBar/BottomBar.component';
 import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 import FirstLoader from '@components/Loaders/FirstLoader.component';
 import UpdaterUI from '@components/Updater/UpdaterUI.Component';
-import RecordingIndicator from '@components/Indicators/RecordingIndicator.component';
+import IndicatorContainer from '@components/Indicators/IndicatorContainer.component';
 
 const Clock = React.lazy(() => import('@components/Clock/Clock.component'));
 
@@ -35,6 +35,7 @@ const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
 const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 const App = () => {
+  useLoadState();
   const [firstLoader, setFirstLoader] = useState(true);
 
   useEffect(() => {
@@ -54,12 +55,13 @@ const App = () => {
           fallback={<LoadingIndicator loadingMessage="Initializing..." />}
         >
           <Route path="/main" component={TitleBar} />
-          <Route path="/main" component={RouteHandler} />
           <Route path="/main" component={MainNavigation} />
           <Route path="/main" component={BottomBar} />
+          <Route path="/main" component={RouteHandler} />
+
           <Route path="/dasdasd" component={Clock} />
           <Route path="/main" component={ModalsContainer} />
-          <Route path="/main" component={RecordingIndicator} />
+          <Route path="/main" component={IndicatorContainer} />
           <Route exact path={AppState.REVIEW_TAB}>
             <div className="h-full py-1">
               <ReviewPage />
@@ -84,7 +86,6 @@ const App = () => {
             <Route exact path="/" render={() => <Redirect to="/main" />} />
           </Switch>
           <UpdaterUI />
-          <LoadStates />
         </React.Suspense>
       </Router>
     </div>

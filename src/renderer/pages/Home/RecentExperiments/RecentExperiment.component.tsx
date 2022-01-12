@@ -14,7 +14,7 @@ import RecentFileIcon from '@icons/recent-file.svg';
 // Constants
 import { ModalConstants, RecordState } from '@utils/constants';
 import { ExperimentChannels } from '@utils/channels';
-import IconTextButtonWithTimeStamp from '@components/Buttons/IconTextButtonWithTimeStamp.component';
+import ListButton from '@components/Buttons/ListButton';
 
 interface IProps {
   title: string;
@@ -45,7 +45,7 @@ const RecentExperiment: React.FC<IProps> = ({
   };
 
   return (
-    <IconTextButtonWithTimeStamp
+    <ListButton
       isActive={isActive}
       onClick={handleOpenExperimentButton}
       icon={RecentFileIcon}

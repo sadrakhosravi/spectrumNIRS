@@ -21,7 +21,7 @@ const initialState: InitialState = {
  * State to determine whether the app is recording data, paused, continued recording, or idle(not recording)
  */
 export const ReviewChartSlice = createSlice({
-  name: 'chartChannelUI',
+  name: 'reviewChartSlice',
   initialState,
   reducers: {
     setReviewChartPositions: (

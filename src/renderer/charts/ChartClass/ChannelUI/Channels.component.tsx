@@ -1,17 +1,21 @@
 import React from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
+import { useChartContext } from 'renderer/context/ChartProvider';
 
-import ReviewChart from '../ReviewChart';
-import RecordChart from '../RecordChart';
 import ChannelUI from './ChannelUI.component';
 
+// Constants
+import { ChartType } from '@utils/constants';
+
 type ChannelUIProps = {
-  chart: ReviewChart | RecordChart | undefined;
+  type: ChartType;
 };
 
-const Channels = ({ chart }: ChannelUIProps) => {
-  const chartPos = useAppSelector(
-    (state) => state.reviewChartState.chartPositions
+const Channels = ({ type }: ChannelUIProps) => {
+  const chartPos = useAppSelector((state) =>
+    type === ChartType.RECORD
+      ? state.recordChartState.chartPositions
+      : state.reviewChartState.chartPositions
   );
   const currentProbe = useAppSelector(
     (state) => state.sensorState.currentProbe
@@ -19,7 +23,10 @@ const Channels = ({ chart }: ChannelUIProps) => {
   const maximizedChannel = useAppSelector(
     (state) => state.reviewChartState.maximizedChannel
   );
-  console.log(maximizedChannel);
+  const chart =
+    type === ChartType.RECORD
+      ? useChartContext().recordChart
+      : useChartContext().reviewChart;
 
   return (
     <div className="w-full h-full bg-dark2 relative">

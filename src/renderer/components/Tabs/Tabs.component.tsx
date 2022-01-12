@@ -2,18 +2,29 @@ import React, { useState } from 'react';
 
 import IconText from '@components/MicroComponents/IconText/IconText.component';
 
-const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
+type TabsProps = {
+  children: JSX.Element | JSX.Element[];
+  tabTopBorder?: boolean;
+  noBorder?: boolean;
+};
+
+const Tabs = ({
+  noBorder = false,
+  tabTopBorder = true,
+  children,
+}: TabsProps) => {
   const [activeTab, setActiveTab] = useState(0);
 
   if (!Array.isArray(children)) {
     const { label } = children.props;
 
     return (
-      <div className="h-full border-primary">
+      <div className={`h-full ${noBorder ? '' : 'border-primary '}`}>
         <div className="h-10 bg-grey1">
           <Tabs.Button
             label={label}
             isActive={true}
+            topBorder={tabTopBorder}
             onClick={() => {}}
             key={label}
           />
@@ -24,7 +35,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
   }
 
   return (
-    <div className="h-full border-primary rounded-md">
+    <div className={`h-full rounded-md ${noBorder ? '' : 'border-primary '}`}>
       <div className="flex rounded-md">
         {Array.isArray(children) &&
           children.map((child, i) => {
@@ -33,6 +44,7 @@ const Tabs = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
               <Tabs.Button
                 label={label}
                 isActive={activeTab === i}
+                topBorder={tabTopBorder}
                 onClick={() => setActiveTab(i)}
                 key={label + i}
               />
@@ -55,7 +67,10 @@ type TabProps = {
 
 Tabs.Tab = ({ label, children }: TabProps) => {
   return (
-    <div className="slideLeft px-3 " id={label}>
+    <div
+      className="slideLeft px-3 h-[calc(100%-0px)] overflow-y-auto w-full"
+      id={label}
+    >
       {children}
     </div>
   );
@@ -63,19 +78,27 @@ Tabs.Tab = ({ label, children }: TabProps) => {
 
 type ButtonProps = {
   label: string;
+  topBorder?: boolean;
   onClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
   isActive?: boolean;
 };
 
-Tabs.Button = ({ label, isActive = false, onClick }: ButtonProps) => {
+Tabs.Button = ({
+  label,
+  isActive = false,
+  topBorder = true,
+  onClick,
+}: ButtonProps) => {
   const tabColor = isActive
-    ? `bg-grey3 z-10 border-0`
+    ? `bg-grey3 z-10 border-0 ${
+        topBorder ? 'border-t-4 border-t-accent border-t-opacity-100' : ''
+      }`
     : `bg-grey1 hover:bg-grey2 z-0 `;
 
   return (
     <button
       type="button"
-      className={`w-1/3 px-3 h-10 flex items-center border-r-2 border-white border-opacity-20 ${tabColor} last:border-r-0`}
+      className={`w-1/3 px-3 h-10 flex items-center border-r-2 border-grey0 ${tabColor} last:border-r-0`}
       onClick={onClick}
       id={label}
     >

@@ -1,13 +1,11 @@
-import { useEffect } from 'react';
-import { useAppDispatch } from '@redux/hooks/hooks';
+import { dispatch } from '@redux/store';
 
 // Constants
 import { ProbeChannels } from '@utils/channels';
 import { setCurrentProbe } from '@redux/SensorStateSlice';
+import { useEffect } from 'react';
 
-const LoadStates = () => {
-  const dispatch = useAppDispatch();
-
+const useLoadStates = () => {
   useEffect(() => {
     (async () => {
       const currentProbe = await window.api.invokeIPC(
@@ -17,7 +15,5 @@ const LoadStates = () => {
       dispatch(setCurrentProbe(currentProbe));
     })();
   }, []);
-
-  return null;
 };
-export default LoadStates;
+export default useLoadStates;

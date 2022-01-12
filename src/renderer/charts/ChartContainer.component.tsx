@@ -1,11 +1,9 @@
 import { useAppSelector } from '@redux/hooks/hooks';
+import { ChartType } from '@utils/constants';
 import React from 'react';
 import ChannelUI from './ChartClass/ChannelUI/Channels.component';
-import RecordChart from './ChartClass/RecordChart';
-import ReviewChart from './ChartClass/ReviewChart';
 
 type ChartContainerProps = {
-  chart?: ReviewChart | RecordChart | undefined;
   children: any;
 };
 
@@ -17,8 +15,10 @@ const ChartLayout = ({ children }: ChartContainerProps) => {
   );
 };
 
-export const ChartContainer = ({ children, chart }: ChartContainerProps) => {
-  console.log(chart);
+export const ChartContainer = ({
+  children,
+  type,
+}: ChartContainerProps & { type: ChartType }) => {
   const currentProbe = useAppSelector(
     (state) => state.sensorState.currentProbe
   );
@@ -37,10 +37,10 @@ export const ChartContainer = ({ children, chart }: ChartContainerProps) => {
           </div>
         </div>
         <div className="w-[calc(100%-1.5rem)] h-[calc(100%-3rem)] absolute top-[1.5rem] left-[1.5rem] overflow-y-auto chart-scrollbar border-r-1 border-grey5">
-          <div className="absolute top-0 left-0 w-[100px] h-full">
-            <ChannelUI chart={chart} />
+          <div className="absolute top-0 left-0 w-[130px] h-full">
+            <ChannelUI type={type} />
           </div>
-          <div className="absolute top-0 right-0 h-full w-[calc(100%-100px)] ml-auto">
+          <div className="absolute top-0 right-0 h-full w-[calc(100%-130px)] ml-auto">
             {children}
           </div>
         </div>

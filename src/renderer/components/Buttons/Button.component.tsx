@@ -10,12 +10,12 @@ type ButtonProps = {
 const Button = ({ text, icon, className, onClick }: ButtonProps) => {
   return (
     <button
-      className={`group text-sm text-white flex gap-1 items-center border-primary bg-grey1 hover:bg-grey0 px-2 py-[0.35rem] rounded-md transition-colors duration-150 focus:ring-2 focus:ring-accent ${
-        className || ''
-      }`}
+      className={` text-sm text-white inline-flex gap-1 items-center border-primary bg-grey1 hover:bg-grey0 px-2 py-[0.35rem] rounded-md transition-colors duration-150 focus:ring-2 focus:ring-accent
+      ${className || ''}
+      `}
       onClick={onClick}
     >
-      {icon && <img src={icon} className="w-4" />}
+      {icon && <img src={icon} className="w-5" />}
       {text && text}
     </button>
   );

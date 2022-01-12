@@ -7,6 +7,7 @@ type AppStateSlice = {
   windowMaximized: boolean;
   recordChartLoaded: boolean;
   reviewChartLoaded: boolean;
+  sidebar: boolean;
   recordSidebar: boolean;
   reviewSidebar: boolean;
   probeCalibrationSidebar: boolean;
@@ -21,6 +22,7 @@ const initialState: AppStateSlice = {
   windowMaximized: true,
   recordChartLoaded: false,
   reviewChartLoaded: false,
+  sidebar: true,
   recordSidebar: true,
   reviewSidebar: true,
   probeCalibrationSidebar: true,
@@ -49,6 +51,9 @@ export const AppStateSlice = createSlice({
     setReviewChartLoaded: (state, { payload }: { payload: boolean }) => {
       state.reviewChartLoaded = payload;
     },
+    setSidebar: (state, { payload }: { payload: boolean }) => {
+      state.sidebar = payload;
+    },
     setRecordSidebar: (state, { payload }: { payload: boolean }) => {
       state.recordSidebar = payload;
     },
@@ -74,6 +79,7 @@ export const {
   changeAppState,
   setWindowResized,
   setWindowMaximized,
+  setSidebar,
   setRecordChartLoaded,
   setReviewChartLoaded,
   setRecordSidebar,

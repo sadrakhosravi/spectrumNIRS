@@ -88,6 +88,19 @@ export const ProbeChannels = {
   UpdateProbeIntensities: ProbeBase + 'update-intensities',
 };
 
+const ExportServerBase = 'export-server';
+export const ExportServerChannels = {
+  StartServer: ExportServerBase + 'start-server',
+  RestartServer: ExportServerBase + 'restart-server',
+  Restarted: ExportServerBase + 'restarted',
+  StopServer: ExportServerBase + 'stop-server',
+  ServerInfo: ExportServerBase + 'server-info',
+  ServerStatus: ExportServerBase + 'server-status',
+  ServerError: ExportServerBase + 'server-error',
+  ClientMessage: ExportServerBase + 'client-message',
+  RemoveClient: ExportServerBase + 'remove-client',
+};
+
 // User Settings
 const UserSettings = 'user-settings:';
 export const UserSettingsChannels = {

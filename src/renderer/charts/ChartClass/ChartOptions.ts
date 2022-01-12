@@ -9,9 +9,8 @@ import {
   UIPointableTextBox,
 } from '@arction/lcjs';
 import { setAllEvents } from '@redux/ChartSlice';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
 import { getState, dispatch } from '@redux/store';
+import msToTime from '@utils/msToTime';
 
 class ChartOptions {
   channels: string[];
@@ -184,7 +183,6 @@ class ChartOptions {
    * @param events Array of events
    */
   addEventsToCharts(data: any[]) {
-    dayjs.extend(duration);
     const DATA_LENGTH = data.length;
     const eventsArr = [];
     let hypoxia = false;
@@ -196,7 +194,7 @@ class ChartOptions {
         this.drawMarker(data[i].timeStamp, 'Hypoxia: Start', '#FFF');
         eventsArr.push({
           timeStamp: data[i].timeStamp,
-          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          time: msToTime(data[i].timeStamp),
           name: 'Hypoxia',
           color: '#FFF',
         });
@@ -211,7 +209,7 @@ class ChartOptions {
         event2 = true;
         eventsArr.push({
           timeStamp: data[i].timeStamp,
-          time: dayjs.duration(data[i].timeStamp).format('HH:mm:ss'),
+          time: msToTime(data[i].timeStamp),
           name: 'Event2',
           color: '#FFF',
         });

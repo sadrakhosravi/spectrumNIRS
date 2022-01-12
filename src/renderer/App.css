@@ -10,6 +10,18 @@
   .border-primary {
     @apply border-[1px] border-white border-opacity-[0.12];
   }
+  .border-t-primary {
+    @apply border-t-[1px] border-white border-opacity-[0.12];
+  }
+  .border--r-primary {
+    @apply border-r-[1px] border-white border-opacity-[0.12];
+  }
+  .border-b-primary {
+    @apply border-b-[1px] border-white border-opacity-[0.12];
+  }
+  .border-l-primary {
+    @apply border-l-[1px] border-white border-opacity-[0.12];
+  }
 }
 
 .font-larger {

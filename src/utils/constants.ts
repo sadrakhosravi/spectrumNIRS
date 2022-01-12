@@ -4,6 +4,7 @@ export enum AppState {
   RECORDING = '/main/recording',
   RECORD = '/main/recording/record',
   REVIEW = '/main/recording/review',
+  EXPORT_SERVER = '/main/export-server',
   RECORD_TAB = '/tabs/recording/record',
   REVIEW_TAB = '/tabs/recording/review',
   PROBE_CALIBRATION = '/main/probe-calibration',
@@ -36,6 +37,15 @@ export enum ChartType {
   RECORD = 'record',
   REVIEW = 'review',
   PROBE_CALIBRATION = 'probeCalibration',
+  NONE = 'none',
+}
+
+export enum SidebarType {
+  RECORD = 'record',
+  REVIEW = 'review',
+  PROBE_CALIBRATION = 'probeCalibration',
+  EXPORT_SERVER = 'exportServer',
+  NONE = 'none',
 }
 
 // Redux Thunk status

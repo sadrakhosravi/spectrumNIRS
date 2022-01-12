@@ -11,7 +11,6 @@ import ExperimentIcon from '@icons/experiment.svg';
 import RecordingIcon from '@icons/recording.svg';
 
 // Components
-import Separator from '@components/Separator/Separator.component';
 import TrayIconButtons from './TrayIconButton.component';
 
 // Constants
@@ -97,11 +96,7 @@ const TrayIcons = () => {
   let recordingButton = null;
 
   // Fix layout issue with margin bottom.
-  const SeparatorBar = (
-    <div className="mb-[5px]">
-      <Separator />
-    </div>
-  );
+  const SeparatorBar = <div className="mb-[5px]"></div>;
 
   // When experiment data is available
   if (experimentData.currentExperiment.name) {

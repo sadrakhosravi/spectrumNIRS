@@ -10,6 +10,11 @@ import {
   UIPanel,
   Axis,
   Point,
+  SolidLine,
+  SolidFill,
+  ColorHEX,
+  UIButtonPicture,
+  UICheckBox,
 } from '@arction/lcjs';
 
 // Methods
@@ -17,8 +22,8 @@ import dashboard from './methods/Dashboard';
 import createChartPerChannel from './methods/Charts';
 import createSeriesForEachChart from './methods/Series';
 import xAxisChart from './methods/XAxisChart';
-// import channelsUI from './methods/ChannelsUI';
 import customCursor from './methods/CustomCursor';
+import SeriesToggle from './methods/SeriesToggles';
 
 // Constants
 import { ChartType } from 'utils/constants';
@@ -29,7 +34,6 @@ class ChartClass {
   charts!: ChartXY<PointMarker, UIBackground>[];
   dashboard!: Dashboard;
   // ChartSyncXAxis: any;
-  seriesLength: any;
   type: string;
   channels: string[];
   series!: LineSeries[];
@@ -39,6 +43,11 @@ class ChartClass {
   ChartOptions: any;
   UIPanel: null | UIPanel;
   xAxisChart!: ChartXY<PointMarker, UIBackground>;
+  seriesToggles!: UICheckBox<
+    UIBackground,
+    UIButtonPicture,
+    UIButtonPicture
+  >[][];
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4', 'Ch5'],
@@ -61,11 +70,46 @@ class ChartClass {
     this.dashboard = dashboard(numOfRows, container);
     this.charts = createChartPerChannel.bind(this)();
     this.series = createSeriesForEachChart.bind(this)();
+    this.seriesToggles = SeriesToggle.bind(this)();
     this.xAxisChart = xAxisChart.bind(this)();
-    // channelsUI.bind(this)();
     customCursor.bind(this)();
-
     return this.dashboard;
+  }
+
+  /**
+   * Gets the all the dashboard's chart channel positions.
+   * @returns - Array of chart channel positions
+   */
+  getChartPositions() {
+    const chartPos = new Array(this.charts.length).fill({});
+    this.charts.forEach((chart, i) => {
+      // Get each chart position needed for aligning the ChannelUI elements
+      // Get the top left corner
+      const posEngine = translatePoint(
+        { x: 0, y: 0 },
+        chart.uiScale,
+        chart.engine.scale
+      );
+      const posDocument = chart.engine.engineLocation2Client(
+        posEngine.x,
+        posEngine.y
+      );
+
+      const posEngine2 = translatePoint(
+        { x: 100, y: 100 },
+        chart.uiScale,
+        chart.engine.scale
+      );
+      const posDocument2 = chart.engine.engineLocation2Client(
+        posEngine2.x,
+        posEngine2.y
+      );
+
+      const height = Math.abs(posDocument2.y - posDocument.y) + 3;
+      const width = Math.abs(posDocument2.x - posDocument.x);
+      chartPos[i] = { x: posDocument.x, y: posDocument2.y, height, width };
+    });
+    return chartPos;
   }
 
   translateXAxisPixelToAxisCoordinates(x: number, y: number) {
@@ -90,6 +134,15 @@ class ChartClass {
     synchronizeAxisIntervals(...syncedAxes);
   }
 
+  changeSeriesColor(series: LineSeries | undefined, color: string) {
+    series?.setStrokeStyle(
+      new SolidLine({
+        thickness: 1.25,
+        fillStyle: new SolidFill({ color: ColorHEX(color) }),
+      })
+    );
+  }
+
   clearCharts() {
     this.series.forEach((series) => {
       series.clear();
@@ -103,6 +156,10 @@ class ChartClass {
   }
 
   memoryCleanup() {
+    this.series.forEach((series) => {
+      series.clear();
+      series.dispose();
+    });
     this.dashboard.forEachChart((chart) => {
       chart.dispose();
     });

@@ -190,7 +190,7 @@ class ProbeCalibrationChart {
   }
 
   listenForData() {
-    window.api.onIPCData('signal-quality-monitor-data', (_event, data) => {
+    window.api.onIPCData('probe-calibration-data', (_event, data) => {
       data.forEach((dataPoint: any, i: number) => {
         this.LEDRectangles &&
           this.LEDRectangles[i]?.setDimensions({
@@ -220,6 +220,7 @@ class ProbeCalibrationChart {
   }
 
   cleanup() {
+    window.api.removeListeners('probe-calibration-data');
     this.chart?.dispose();
     this.rectangleSeries = undefined;
     this.chart = undefined;
