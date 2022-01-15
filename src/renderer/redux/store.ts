@@ -19,7 +19,7 @@ import ProbeStateReducer from './ProbeState';
 import RecordChartReducer from './RecordChartSlice';
 import ReviewChartReducer from './ReviewChartSlice';
 import RecordingSettingsReducer from './RecordingSettings';
-import ExportServerReducer from './ExportServerSlice';
+import GlobalStateReducer from './globalStateSlice';
 import { experimentsApi } from './api/experimentsApi';
 
 const reducers = combineReducers({
@@ -34,7 +34,7 @@ const reducers = combineReducers({
   recordChartState: RecordChartReducer,
   reviewChartState: ReviewChartReducer,
   recordingSettingsState: RecordingSettingsReducer,
-  exportServerState: ExportServerReducer,
+  global: GlobalStateReducer,
   [experimentsApi.reducerPath]: experimentsApi.reducer,
 });
 

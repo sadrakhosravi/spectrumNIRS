@@ -4,7 +4,9 @@ import { BrowserWindow, ipcMain } from 'electron';
 import startup from './startup';
 
 const startControllers = async () => {
+  await import('./store');
   await startup();
+  await import('./db');
   await import('./probes');
   await import('./chart');
   await import('./window');

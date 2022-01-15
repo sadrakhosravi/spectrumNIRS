@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
-import InitExportServer from './initServer/InitServer';
+import { setSidebar } from '@redux/AppStateSlice';
 import toast from 'react-hot-toast';
 
 // Components
@@ -12,13 +12,12 @@ import ClientStatus from './ClientStatus/ClientStatus.component';
 
 // Constants
 import { SidebarType } from '@utils/constants';
-import { setSidebar } from '@redux/AppStateSlice';
 
 const ExportServerPage = () => {
-  // Initialize the server
-  InitExportServer();
   const sidebarState = useAppSelector((state) => state.appState.sidebar);
-  const serverError = useAppSelector((state) => state.exportServerState.error);
+  const serverError = useAppSelector(
+    (state) => state.global.exportServer?.error
+  );
   const dispatch = useAppDispatch();
 
   useEffect(() => {

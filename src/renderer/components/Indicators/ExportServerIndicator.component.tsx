@@ -6,14 +6,17 @@ import Indicator from './Indicator.component';
 
 const ExportServerIndicator = () => {
   const isServerActive = useAppSelector(
-    (state) => state.exportServerState.serverInfo.ip
+    (state) => state.global.exportServer?.serverStatus?.status
+  );
+  const isStreaming = useAppSelector(
+    (state) => state.global.exportServer?.serverStatus?.isStreamingData
   );
 
   return (
     <>
       {isServerActive && (
         <Indicator
-          text="Export Server"
+          text={`Export: ${isStreaming === null ? 'Ready' : isStreaming}`}
           color="cyan"
           title="Export server is active and ready"
         />

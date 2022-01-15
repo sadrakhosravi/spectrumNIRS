@@ -14,7 +14,7 @@ const ServerInfo = () => {
   const [copyIconPort, setCopyIconPort] = useState(CopyIcon);
 
   const serverInfo = useAppSelector(
-    (state) => state.exportServerState.serverInfo
+    (state) => state.global.exportServer?.serverInfo
   );
 
   const handleCopyToClipboard = (text: string) => {
@@ -37,7 +37,8 @@ const ServerInfo = () => {
       <Tabs noBorder>
         <Tabs.Tab label="Server Information">
           <div className="py-2">
-            {serverInfo.ip &&
+            {serverInfo &&
+              serverInfo.ip &&
               serverInfo.ip.map(
                 (ip, i) =>
                   i === 0 && (

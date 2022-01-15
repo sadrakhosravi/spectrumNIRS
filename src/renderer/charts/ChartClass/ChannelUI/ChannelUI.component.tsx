@@ -93,7 +93,12 @@ const ChannelUI = ({
               width: '15px',
             }}
           >
-            <p className="-rotate-90 text-xs w-[10px]">Units</p>
+            <p
+              className="-rotate-90 text-xs w-[10px]"
+              hidden={chartPos.height <= 40}
+            >
+              Units
+            </p>
           </div>
         </>
       )}

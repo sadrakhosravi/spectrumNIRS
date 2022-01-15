@@ -39,15 +39,16 @@ const ButtonMenu = ({
           </Menu.Button>
           <Transition
             as={React.Fragment}
-            enter="transition ease-out duration-75"
-            enterFrom="transform opacity-0 scale-65"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+            enter="transition ease-out duration-300"
+            enterFrom="transform translate-y-2 opacity-0 scale-65"
+            enterTo="transform translate-y-0 opacity-100 scale-100"
+            leave="transition ease-in duration-100"
+            leaveFrom="transform translate-y-0 opacity-100 scale-100"
+            leaveTo="transform translate-y-2 opacity-0 scale-65"
           >
             <Menu.Items
-              className="absolute right-0 min-w-[10rem] mt-1 origin-top-right p-1.5 bg-grey3 border-primary text-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40"
+              className="absolute right-0 min-w-[10rem] mt-1 origin-top-right p-1.5 bg-grey3 border-primary text-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40
+              "
               style={{ width }}
             >
               {children}

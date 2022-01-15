@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
 
 // Components
 import Container from '@components/Containers/Container.component';
-
-// Icons
 import Tabs from '@components/Tabs/Tabs.component';
 import Button from '@components/Buttons/Button.component';
+
+// Icons
+import ExportServerIcon from '@icons/export-server.svg';
+import RestartIcon from '@icons/restart.svg';
+
+// Channels
 import { ExportServerChannels } from '@utils/channels';
 
 const ServerStatus = () => {
   const [restartBtnText, setRestartBtnText] = useState('Restart Server');
+  const [statusText, setStatusText] = useState('Start Server');
 
   const serverStatus = useAppSelector(
-    (state) => state.exportServerState.serverStatus
+    (state) => state.global.exportServer?.serverStatus
   );
 
   // Handles the restart server button click
@@ -25,25 +30,31 @@ const ServerStatus = () => {
       setRestartBtnText('Restart successful!');
       setTimeout(() => {
         setRestartBtnText('Restart Server');
-      }, 2000);
+      }, 1500);
     } else {
       setRestartBtnText('Restart failed!');
     }
   };
 
-  console.log(serverStatus);
+  // Handles the stop/start server button
+  const handleStopStartBtn = async () => {
+    await window.api.invokeIPC(
+      serverStatus
+        ? ExportServerChannels.StopServer
+        : ExportServerChannels.StartServer
+    );
+  };
+
+  // Check server status and set the status text state
+  useEffect(() => {
+    serverStatus ? setStatusText('Stop Server') : setStatusText('Start Server');
+  }, [serverStatus]);
 
   return (
     <Container noPadding>
       <Tabs noBorder>
         <Tabs.Tab label="Server Status">
           <>
-            {/* {!serverStatus && (
-              <div className="w-full h-full flex items-center justify-center bg-rose-600">
-                Error has occurred. Please restart the application and try
-                again.
-              </div>
-            )} */}
             <div className="py-2">
               <div className="flex flex-wrap mb-4">
                 <span className="w-2/4 bg-grey2 px-2 h-full py-2">Status:</span>
@@ -65,10 +76,17 @@ const ServerStatus = () => {
               </div>
             </div>
 
-            <div className="w-full flex justify-end">
+            <div className="w-full flex gap-2 justify-end">
               <Button
                 text={restartBtnText}
+                icon={RestartIcon}
                 onClick={handleRestartServerBtnClick}
+              />
+              <Button
+                text={statusText}
+                icon={ExportServerIcon}
+                onClick={handleStopStartBtn}
+                isActive={true}
               />
             </div>
           </>

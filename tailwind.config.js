@@ -2,7 +2,7 @@ module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx,ejs}'],
   theme: {
     fontFamily: {
-      sans: ['Inter', 'system-ui'],
+      sans: ['Inter', 'SegeoUI', '--apple-system', 'system-ui'],
       serif: ['ui-serif', 'Georgia'],
       mono: ['ui-monospace', 'SFMono-Regular'],
     },

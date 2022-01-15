@@ -1,4 +1,4 @@
-@import '../../assets//inter/inter.css';
+@import '../../assets/inter/inter.css';
 @import 'tippy.js/dist/tippy.css';
 
 /** Using tailwind css utilities */
@@ -24,27 +24,20 @@
   }
 }
 
-.font-larger {
-  font-size: 120%;
-}
-
-.font-larger .text-sm {
-  font-size: 16px !important;
-}
-
-.font-inherit {
-  font-size: inherit;
-  font-family: inherit;
-  font-weight: inherit;
-}
-
 :root {
   --title-bar-size: 30px;
   --main-navigation-size: 45px;
 }
 
+html {
+  @apply bg-dark h-screen w-full antialiased scroll-smooth;
+}
+
 body {
+  width: 100vw;
+  height: 100vh;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 /** Custom Styles */

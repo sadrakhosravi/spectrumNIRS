@@ -6,12 +6,12 @@ import withLoading from '@hoc/withLoading.hoc';
 
 // Components
 import ReviewChartClass from 'renderer/charts/ChartClass/ReviewChart';
-import ChartToolbar from './Toolbar/ReviewChartToolbar.component';
 
 // Constants
 import { ChartType } from 'utils/constants';
 import ChartLayout, { ChartContainer } from './ChartContainer.component';
 import { useChartContext } from 'renderer/context/ChartProvider';
+import ReviewChartToolbar from './Toolbar/ReviewChartToolbar.component';
 
 type ChartProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -111,7 +111,7 @@ const ReviewChart = ({
 
   return (
     <ChartLayout>
-      {chartLoaded && <ChartToolbar type={type} />}
+      {chartLoaded && <ReviewChartToolbar type={type} />}
 
       <ChartContainer type={ChartType.REVIEW}>
         <div className="h-full pointer-events-auto" id={containerId} />

@@ -9,6 +9,13 @@ class DummyData {
     this.amount = amount;
   }
 
+  public streamDummyData = async () => {
+    try {
+      const stream = await createQueryBuilder('readings_data').stream();
+      console.log(stream);
+    } catch (error: any) {}
+  };
+
   public getDummyDataFromDb = async () => {
     try {
       return await createQueryBuilder()

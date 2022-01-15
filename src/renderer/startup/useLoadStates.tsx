@@ -1,19 +1,34 @@
-import { dispatch } from '@redux/store';
-
-// Constants
-import { ProbeChannels } from '@utils/channels';
-import { setCurrentProbe } from '@redux/SensorStateSlice';
 import { useEffect } from 'react';
 
+import { useAppDispatch } from '@redux/hooks/hooks';
+import { setCurrentProbe } from '@redux/SensorStateSlice';
+import { setGlobalState } from '@redux/globalStateSlice';
+
+// Channels
+import { ProbeChannels } from '@utils/channels';
+
 const useLoadStates = () => {
+  const dispatch = useAppDispatch();
+  let unSubscribeGlobalStore: any;
   useEffect(() => {
     (async () => {
       const currentProbe = await window.api.invokeIPC(
         ProbeChannels.GetCurrentProbe
       );
-      console.log(currentProbe);
       dispatch(setCurrentProbe(currentProbe));
+
+      // Load the global store (Electron store used by the main process)
+      const GlobalStore = (await import('@lib/globalStore/GlobalStore'))
+        .default;
+      requestAnimationFrame(() =>
+        dispatch(setGlobalState(GlobalStore.store.store))
+      );
+      unSubscribeGlobalStore = GlobalStore.store.onDidAnyChange(() => {
+        dispatch(setGlobalState(GlobalStore.store.store));
+      });
     })();
+
+    return () => unSubscribeGlobalStore();
   }, []);
 };
 export default useLoadStates;

@@ -1,12 +1,11 @@
 'use strict';
 import Database from 'better-sqlite3';
+const db = new Database(data.dbPath, {
+  readonly: true,
+  fileMustExist: true,
+});
 
 self.onmessage = ({ data }) => {
-  const db = new Database(data.dbPath, {
-    readonly: true,
-    fileMustExist: true,
-  });
-
   const selectAll = db.prepare('SELECT PDRawData from recordings_data');
   const PDRawValues = selectAll.all();
 
@@ -22,3 +21,5 @@ self.onmessage = ({ data }) => {
   }
   self.postMessage(O2Hb);
 };
+
+self.onclose = () => db.close();

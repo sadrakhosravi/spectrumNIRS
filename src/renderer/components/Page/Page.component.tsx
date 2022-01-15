@@ -39,19 +39,21 @@ const Page = ({
           onClick={onSidebarClick}
         ></div>
       )}
-      {sidebarType && sidebarState && (
-        <div className={`h-full border-l-primary relative w-[350px]`}>
-          <>
-            <WidgetsContainer type={sidebarType} />
-            <div className="absolute bottom-3 right-2 opacity-40 hover:opacity-100">
-              <IconButtonWithTooltip
-                icon={HideRightPanelIcon}
-                onClick={onSidebarClick}
-              />
-            </div>
-          </>
-        </div>
-      )}
+
+      <div
+        className={`h-full border-l-primary relative w-[350px]`}
+        hidden={!(sidebarType && sidebarState)}
+      >
+        <>
+          <WidgetsContainer type={sidebarType} />
+          <div className="absolute bottom-3 right-2 opacity-40 hover:opacity-100">
+            <IconButtonWithTooltip
+              icon={HideRightPanelIcon}
+              onClick={onSidebarClick}
+            />
+          </div>
+        </>
+      </div>
     </div>
   );
 };

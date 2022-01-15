@@ -19,7 +19,7 @@ const Tabs = ({
     const { label } = children.props;
 
     return (
-      <div className={`h-full ${noBorder ? '' : 'border-primary '}`}>
+      <div className={`h-full ${noBorder ? '' : ''}`}>
         <div className="h-10 bg-grey1">
           <Tabs.Button
             label={label}
@@ -35,7 +35,7 @@ const Tabs = ({
   }
 
   return (
-    <div className={`h-full rounded-md ${noBorder ? '' : 'border-primary '}`}>
+    <div className={`h-full rounded-md ${noBorder ? '' : ''}`}>
       <div className="flex rounded-md">
         {Array.isArray(children) &&
           children.map((child, i) => {

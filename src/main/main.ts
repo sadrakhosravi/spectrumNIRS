@@ -110,8 +110,8 @@ const createMainWindow = async () => {
 
   // Create main window
   await app.whenReady();
-  await createMainWindow();
-  await startControllers();
+  createMainWindow();
+  startControllers();
 
   setTimeout(async () => {
     await updater();

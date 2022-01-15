@@ -4,9 +4,7 @@ import { ExportServerChannels } from '@utils/channels';
 
 let exportServer: ExportServer | undefined;
 
-/**
- * Starts the export server and send the initial data to the UI
- */
+// Starts the server and sends the initial data to the UI
 const startServer = async () => {
   exportServer = new ExportServer();
   await exportServer.start();
@@ -14,14 +12,12 @@ const startServer = async () => {
   // Send the info after 100ms
   setTimeout(() => {
     console.log('Send Server Info');
-    exportServer?.sendServerInfo();
-    exportServer?.sendServerStatus();
+    exportServer?.updateServerInfo();
+    exportServer?.updateStatus();
   }, 100);
 };
 
-/**
- * Stops the export server and clean the memory
- */
+// Stops the server and clears the memory
 const stopServer = () => {
   exportServer?.stop();
   exportServer = undefined;
@@ -34,16 +30,29 @@ ipcMain.handle(ExportServerChannels.StartServer, () => {
   }
 });
 
+// Stream data to all sockets
+ipcMain.handle(ExportServerChannels.StartStream, () =>
+  exportServer?.startStream()
+);
+
+// Stream data to all sockets
+ipcMain.handle(ExportServerChannels.StopStream, () =>
+  exportServer?.stopStream()
+);
+
+// Stream data to all sockets
+ipcMain.handle(ExportServerChannels.PauseStream, () =>
+  exportServer?.pauseStream()
+);
+
 // Stops the server
-ipcMain.on(ExportServerChannels.StopServer, () => {
-  stopServer();
-});
+ipcMain.handle(ExportServerChannels.StopServer, () => stopServer());
 
 // Restart server
 ipcMain.handle(ExportServerChannels.RestartServer, async () => {
   try {
     exportServer && stopServer();
-    setTimeout(async () => await startServer(), 1500);
+    setTimeout(async () => await startServer(), 1000);
     return true;
   } catch (err: any) {
     throw new Error(err.message);

@@ -4,6 +4,8 @@ import Button from '@components/Buttons/Button.component';
 import Tabs from '@components/Tabs/Tabs.component';
 import Widget from '@components/Widget/Widget.component';
 
+import TrashIcon from '@icons/trash.svg';
+
 import { ExportServerChannels } from '@utils/channels';
 
 const ClientLog = () => {
@@ -23,11 +25,18 @@ const ClientLog = () => {
   }, []);
 
   const handleClearBtn = () => {
-    if (textAreaRef.current) textAreaRef.current.value = '';
+    if (textAreaRef.current) {
+      textAreaRef.current.value = 'Console cleared!';
+
+      setTimeout(() => {
+        //@ts-ignore
+        textAreaRef.current.value = '';
+      }, 1000);
+    }
   };
 
   return (
-    <Widget span="3">
+    <Widget span="2">
       <Tabs>
         <Tabs.Tab label="Log">
           <textarea
@@ -36,8 +45,8 @@ const ClientLog = () => {
             disabled
           ></textarea>
           <Button
-            text="Clear"
-            className="absolute top-2 right-6"
+            icon={TrashIcon}
+            className="absolute bottom-3 right-5 border-0 bg-grey0"
             onClick={handleClearBtn}
           />
         </Tabs.Tab>

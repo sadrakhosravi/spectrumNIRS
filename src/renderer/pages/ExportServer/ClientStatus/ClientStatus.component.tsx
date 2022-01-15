@@ -10,7 +10,7 @@ import { DialogBoxChannels, ExportServerChannels } from '@utils/channels';
 
 const ClientStatus = () => {
   const clientStatus = useAppSelector(
-    (state) => state.exportServerState.clientStatus
+    (state) => state.global.exportServer?.clientStatus
   );
 
   // Formats the name string
@@ -43,8 +43,6 @@ const ClientStatus = () => {
     await window.api.invokeIPC(ExportServerChannels.RemoveClient, clientName);
   };
 
-  console.log(clientStatus);
-
   return (
     <Container noPadding>
       <Tabs noBorder>
@@ -52,6 +50,7 @@ const ClientStatus = () => {
           <div className="py-2">
             {clientStatus?.map((status) => (
               <ListButton
+                key={status.name + 'export-client-status'}
                 isActive={false}
                 onClick={undefined}
                 icon={WebSocketIcon}
@@ -64,7 +63,7 @@ const ClientStatus = () => {
             ))}
             {!clientStatus ||
               (clientStatus.length === 0 && (
-                <p className="text-white/40">No clients found.</p>
+                <p className="text-white/40">Waiting for connection ...</p>
               ))}
           </div>
         </Tabs.Tab>

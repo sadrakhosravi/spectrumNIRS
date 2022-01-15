@@ -2,14 +2,12 @@
 
 // A self adjusting accurate interval timer
 class AccurateTimer {
-  type: string;
   timer: any;
   callback: any;
   interval: number;
   _lastTimestamp: number;
   intervalTimer: any;
   constructor(callback: any, interval: number) {
-    this.type = 'setInterval';
     this.timer = null;
     this.callback = callback;
     this.interval = interval;

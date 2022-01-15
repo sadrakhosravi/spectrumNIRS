@@ -93,6 +93,22 @@ export const TopMenu = [
     ],
   },
   {
+    label: 'Database',
+    submenu: [
+      {
+        label: 'Optimize',
+        click: async () => {
+          toast.loading('Optimizing database ...');
+          await window.api.invokeIPC('database-vacuum');
+          setTimeout(() => {
+            toast.dismiss();
+            toast.success('Database optimization was successful');
+          }, 3000);
+        },
+      },
+    ],
+  },
+  {
     label: 'Help',
     submenu: [
       {

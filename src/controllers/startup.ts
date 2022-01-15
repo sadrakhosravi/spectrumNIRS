@@ -1,12 +1,9 @@
 import fs from 'fs';
-import { ipcMain } from 'electron';
-import Store from '@electron/models/Store';
 import createDBConnection from '../db/index';
 import firstRun from './firstRun';
 
 // Constants
 import { databaseFile, databasePath, settingsPath } from '../main/paths';
-import { UserSettingsChannels } from '../utils/channels';
 
 const startup = async () => {
   try {
@@ -25,16 +22,6 @@ const startup = async () => {
 
   // Create connection
   await createDBConnection();
-
-  ipcMain.handle(UserSettingsChannels.AddSetting, (_event, { key, value }) =>
-    Store.set(key, value)
-  );
-  ipcMain.handle(UserSettingsChannels.GetSetting, (_event, key) =>
-    Store.get(key)
-  );
-  ipcMain.handle(UserSettingsChannels.RemoveSetting, (_event, key) =>
-    Store.delete(key)
-  );
 };
 
 export default startup;
