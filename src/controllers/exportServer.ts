@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import ExportServer from '@electron/models/ExportServer';
+import ExportServer from '@electron/models/exportServer/ExportServer';
 import { ExportServerChannels } from '@utils/channels';
 
 let exportServer: ExportServer | undefined;

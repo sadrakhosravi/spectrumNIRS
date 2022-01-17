@@ -1,22 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  IServerStatus,
-  IClientStatus,
-  IServerInfo,
-} from '@electron/models/ExportServer';
+import { IGlobalStore } from '@lib/globalStore/GlobalStore';
 
-export type ExportServer = {
-  serverInfo: IServerInfo;
-  serverStatus: IServerStatus | null;
-  clientStatus: IClientStatus[] | null;
-  error: string;
-};
+interface IGlobalStateSlice {
+  exportServer: IGlobalStore['exportServer'] | null;
+}
 
-type GlobalStore = {
-  exportServer: ExportServer | null;
-};
-
-const initialState: GlobalStore = {
+const initialState: IGlobalStateSlice = {
   exportServer: null,
 };
 

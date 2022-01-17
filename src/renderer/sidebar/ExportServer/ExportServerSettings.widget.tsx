@@ -9,34 +9,41 @@ import ButtonMenu, {
 
 // Icons
 import CheckMarkIcon from '@icons/checkmark.svg';
-import Separator from '@components/Separator/Separator.component';
+// import Separator from '@components/Separator/Separator.component';
 
 import GlobalStore from '@lib/globalStore/GlobalStore';
 import { useAppSelector } from '@redux/hooks/hooks';
 
-const dataSize = [
-  { label: 'Batch (25samples)', value: 'batch' },
-  { label: 'Single Data Point', value: 'sdp' },
-];
-const dataTypes = [
-  { label: 'JSON', value: 'JSON' },
-  { label: 'String', value: 'string' },
-];
-const socketsToSend = [{ label: 'All Clients', value: 'all' }];
+import {
+  IDataSize,
+  IDataTypes,
+} from '@electron/models/exportServer/ExportServer';
 
 //Renders the filter widget on the sidebar
 const ExportServerSettings = () => {
-  const [outputDataSize, setOutputDataSize] = useState(dataSize[0]);
-  const [outputDataType, setOutputDataType] = useState(dataTypes[0]);
-  const [socketToSend, setSocketToSend] = useState(socketsToSend[0]);
-
+  const clientStatus = useAppSelector(
+    (state) => state.global.exportServer?.clientStatus
+  );
   const streamStarted = useAppSelector(
     (state) => state.global?.exportServer?.serverStatus?.isStreamingData
   );
+  const sendTo = useAppSelector((state) => state.global.exportServer?.sendTo);
+
+  const dataSize: IDataSize[] = [
+    { label: 'Batch (25samples)', value: 'batch' },
+    { label: 'Single Data Point', value: 'sdp' },
+  ];
+  const dataTypes: IDataTypes[] = [
+    { label: 'JSON', value: 'JSON' },
+    { label: 'String', value: 'string' },
+  ];
+
+  const [outputDataSize, setOutputDataSize] = useState(dataSize[0]);
+  const [outputDataType, setOutputDataType] = useState(dataTypes[0]);
 
   useEffect(() => {
     GlobalStore.setExportServer('outputDataSize', outputDataSize.value);
-    GlobalStore.setExportServer('streamTo', socketToSend.value);
+    GlobalStore.setExportServer('sendTo', 'All Clients');
     GlobalStore.setExportServer('outputDataType', outputDataType.value);
   }, []);
 
@@ -48,9 +55,9 @@ const ExportServerSettings = () => {
     GlobalStore.setExportServer('outputDataType', outputDataType.value);
   }, [outputDataType]);
 
-  useEffect(() => {
-    GlobalStore.setExportServer('streamTo', socketToSend.value);
-  }, [socketToSend]);
+  // Handles the send to option
+  const handleSendTo = (name: string) =>
+    GlobalStore.setExportServer('sendTo', name);
 
   return (
     <Widget span="3">
@@ -78,26 +85,33 @@ const ExportServerSettings = () => {
               ))}
             </ButtonMenu>
           </div>
-          <Separator orientation="horizontal" margin="lg" />
-          <div className="w-full">
+          <div className="w-full mt-4">
             <p className="mb-2">Send Data To: </p>
-            <ButtonMenu text={socketToSend.label} width="290px">
-              {socketsToSend.map((socket) => (
+            <ButtonMenu text={sendTo} width="290px">
+              <>
                 <ButtonMenuItem
-                  key={socket.label + 'export-server-sockets-data'}
-                  text={socket.label}
-                  icon={
-                    socketToSend.label === socket.label
-                      ? CheckMarkIcon
-                      : undefined
-                  }
-                  onClick={() => setSocketToSend(socket)}
+                  key={'All Clients' + 'export-server-sockets-data'}
+                  text={'All Clients'}
+                  icon={sendTo === 'All Clients' ? CheckMarkIcon : undefined}
+                  onClick={() => handleSendTo('All Clients')}
                 />
-              ))}
+                {clientStatus?.map(
+                  (socket) =>
+                    socket.status === 'Open' && (
+                      <ButtonMenuItem
+                        key={socket.appName + 'export-server-sockets-data'}
+                        text={socket.appName}
+                        icon={
+                          sendTo === socket.appName ? CheckMarkIcon : undefined
+                        }
+                        onClick={() => handleSendTo(socket.appName as string)}
+                      />
+                    )
+                )}
+              </>
             </ButtonMenu>
           </div>
-          <Separator orientation="horizontal" margin="lg" />
-          <div className="w-full">
+          <div className="w-full mt-4">
             <p className="mb-2">Output Data Type: </p>
             <ButtonMenu text={outputDataType.label} width="290px">
               {dataTypes.map((type) => (

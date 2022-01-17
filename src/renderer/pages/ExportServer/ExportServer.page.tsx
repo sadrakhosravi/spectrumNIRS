@@ -33,11 +33,11 @@ const ExportServerPage = () => {
       <ExportServerToolbar />
       <div className="flex gap-6 m-10 h-[calc(100%-130px)]">
         <div className="w-1/2 flex flex-col gap-6">
-          <div className="h-3/5">
-            <ServerInfo />
-          </div>
-          <div className="h-2/5">
+          <div className="h-1/2">
             <ServerStatus />
+          </div>
+          <div className="h-1/2">
+            <ServerInfo />
           </div>
         </div>
         <div className="w-1/2 ">

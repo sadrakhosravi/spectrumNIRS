@@ -11,13 +11,19 @@
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "rebuild": "electron-rebuild -f -v 15.3.0 -w usb-detection",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "license": "MIT",
   "dependencies": {
-    "better-sqlite3": "^7.4.5",
+    "better-sqlite3": "^7.4.6",
     "typeorm": "^0.2.41",
-    "usb-detection": "^4.13.0"
+    "usb-detection": "^4.13.0",
+    "ws": "^8.4.2"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.6",
+    "utf-8-validate": "^5.0.8"
   }
 }

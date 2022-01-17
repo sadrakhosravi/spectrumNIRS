@@ -1,9 +1,9 @@
 'use strict';
-import Database from 'better-sqlite3';
-const db = new Database(data.dbPath, {
-  readonly: true,
-  fileMustExist: true,
-});
+// import Database from 'better-sqlite3';
+// const db = new Database(data.dbPath, {
+//   readonly: true,
+//   fileMustExist: true,
+// });
 
 self.onmessage = ({ data }) => {
   const selectAll = db.prepare('SELECT PDRawData from recordings_data');

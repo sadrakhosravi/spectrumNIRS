@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import GlobalStore from '@lib/globalStore/GlobalStore';
 
 import { useAppDispatch } from '@redux/hooks/hooks';
 import { setCurrentProbe } from '@redux/SensorStateSlice';
@@ -18,8 +19,6 @@ const useLoadStates = () => {
       dispatch(setCurrentProbe(currentProbe));
 
       // Load the global store (Electron store used by the main process)
-      const GlobalStore = (await import('@lib/globalStore/GlobalStore'))
-        .default;
       requestAnimationFrame(() =>
         dispatch(setGlobalState(GlobalStore.store.store))
       );

@@ -1,5 +1,14 @@
 import Store from 'electron-store';
 
+// Types / Interfaces
+import {
+  IClientStatus,
+  IServerInfo,
+  IServerStatus,
+  IDataSize,
+  IDataTypes,
+} from '@electron/models/exportServer/ExportServer';
+
 let storePath = '';
 
 (async () => {
@@ -17,6 +26,18 @@ let storePath = '';
 // processes. It relies on the electron-store module.
 // Electron store uses a file based system and tracks its changes.
 // The file is saved in the settings path as config.json
+
+export interface IGlobalStore {
+  exportServer: {
+    serverInfo: IServerInfo;
+    serverStatus: IServerStatus | null;
+    clientStatus: IClientStatus[] | null;
+    error: string;
+    outputDataSize: IDataSize['value'];
+    outputDataType: IDataTypes['value'];
+    sendTo: string;
+  };
+}
 
 const initialState = {
   exportServer: {},
@@ -39,7 +60,7 @@ class GlobalStore {
   /**
    * Sets the export server state value
    */
-  setExportServer = (key: string, value: any) =>
+  setExportServer = (key: keyof IGlobalStore['exportServer'], value: any) =>
     this.store.set(`exportServer.${key}`, value);
 
   /**
@@ -50,7 +71,8 @@ class GlobalStore {
   /**
    * Gets a value from the export server state
    */
-  getExportServer = (key: string) => this.store.get(`exportServer.${key}`);
+  getExportServer = (key: keyof IGlobalStore['exportServer']) =>
+    this.store.get(`exportServer.${key}`);
 }
 
 export type GlobalStoreType = GlobalStore;

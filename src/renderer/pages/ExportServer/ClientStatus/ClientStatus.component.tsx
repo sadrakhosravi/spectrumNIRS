@@ -7,10 +7,18 @@ import ListButton from '@components/Buttons/ListButton';
 
 import WebSocketIcon from '@icons/websocket.svg';
 import { DialogBoxChannels, ExportServerChannels } from '@utils/channels';
+import GlobalStore from '@lib/globalStore/GlobalStore';
+import { IClientStatus } from '@electron/models/exportServer/ExportServer';
+import DisabledOverlay from '@components/Overlay/DisabledOverlay.component';
 
 const ClientStatus = () => {
   const clientStatus = useAppSelector(
     (state) => state.global.exportServer?.clientStatus
+  );
+
+  const sendTo = useAppSelector((state) => state.global.exportServer?.sendTo);
+  const isStreamingData = useAppSelector(
+    (state) => state.global.exportServer?.serverStatus?.isStreamingData
   );
 
   // Formats the name string
@@ -43,21 +51,43 @@ const ClientStatus = () => {
     await window.api.invokeIPC(ExportServerChannels.RemoveClient, clientName);
   };
 
+  const handleClientSocketClick = (status: IClientStatus) =>
+    status.status === 'Open' &&
+    GlobalStore.setExportServer('sendTo', status.appName);
+
   return (
     <Container noPadding>
       <Tabs noBorder>
         <Tabs.Tab label="Clients">
+          <> {isStreamingData && <DisabledOverlay />}</>
+
           <div className="py-2">
             {clientStatus?.map((status) => (
               <ListButton
                 key={status.name + 'export-client-status'}
                 isActive={false}
-                onClick={undefined}
+                onClick={() => handleClientSocketClick(status)}
                 icon={WebSocketIcon}
-                text={formatName(status?.name) || 'Client'}
-                description={`${
-                  status.state === 1 ? 'Open' : 'Not connected'
-                } - Client IP: ${status.ip?.split('f:')[1]}`}
+                className={
+                  sendTo === status.appName
+                    ? 'ring-2 ring-accent'
+                    : sendTo === 'All Clients'
+                    ? status.status === 'Open'
+                      ? 'ring-2 ring-accent'
+                      : 'opacity-70'
+                    : 'opacity-70' + ' focus:ring-0 active:ring-0'
+                }
+                text={formatName(status?.appName as string) || 'Client'}
+                description={
+                  <ul className="ml-4 text-sm list-disc">
+                    <li>
+                      Connection:{' '}
+                      {status.state === 1 ? 'Open' : 'Not connected'}{' '}
+                    </li>
+                    <li>Status: {status.status}</li>
+                    <li>IP: {status.ip?.split('f:')[1]}</li>
+                  </ul>
+                }
                 deleteOnClick={() => handleDeleteBtnClick(status.name)}
               />
             ))}

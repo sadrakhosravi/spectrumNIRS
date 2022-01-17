@@ -17,7 +17,7 @@ const TopMenuContainer = (): JSX.Element => {
 
   return (
     <nav className="inline-block h-[30px]">
-      <ul className="top-menu h-full my-auto ml-3 ">
+      <ul className="top-menu h-full my-auto ">
         {TopMenu.map((menuItem, i) => (
           <Menu as="li" className="h-full inline-block" key={i}>
             <TopMenuButton

@@ -2,7 +2,7 @@ import React from 'react';
 
 interface Props {
   title: string;
-  description: string;
+  description: string | JSX.Element | JSX.Element[];
 }
 
 const ButtonTitleDescription = (props: Props) => {
@@ -10,7 +10,8 @@ const ButtonTitleDescription = (props: Props) => {
   return (
     <>
       <h3 className="font-bold">{title}</h3>
-      <p className="text-base text-light">{description}</p>
+
+      <div className="text-base text-light">{description}</div>
     </>
   );
 };

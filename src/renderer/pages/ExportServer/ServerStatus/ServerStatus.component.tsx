@@ -45,6 +45,8 @@ const ServerStatus = () => {
     );
   };
 
+  console.log(serverStatus?.protocols);
+
   // Check server status and set the status text state
   useEffect(() => {
     serverStatus ? setStatusText('Stop Server') : setStatusText('Start Server');
@@ -67,11 +69,19 @@ const ServerStatus = () => {
                 <span className="w-2/4 py-2 px-2 bg-grey1 border-b-primary">
                   {serverStatus?.clients}
                 </span>
-                <span className="w-2/4 bg-grey2 px-2 h-full py-2">
+                <span className="w-2/4 bg-grey2 px-2 h-full py-2 border-b-primary">
                   Available Protocols:
                 </span>
+                <span className="w-2/4 py-2 px-2 bg-grey1 border-b-primary">
+                  {serverStatus?.protocols?.map((protocol, i) =>
+                    i === 0 ? protocol.name : ', ' + protocol.name
+                  )}
+                </span>
+                <span className="w-2/4 bg-grey2 px-2 h-full py-2">
+                  Selected Protocol:
+                </span>
                 <span className="w-2/4 py-2 px-2 bg-grey1">
-                  {serverStatus?.protocols && serverStatus.protocols.join(', ')}
+                  {serverStatus?.currentProtocol}
                 </span>
               </div>
             </div>

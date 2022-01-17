@@ -1,4 +1,4 @@
-import { WebSocketServer, Server, WebSocket } from 'ws';
+import { WebSocketServer, Server, WebSocket, RawData } from 'ws';
 import { BrowserWindow } from 'electron';
 import detectPort from 'detect-port';
 
@@ -7,11 +7,14 @@ import getLocalIP, { INetwork } from '@lib/network/getLocalIP';
 
 // Constants
 import { ExportServerChannels } from '@utils/channels';
-import DummyData from './DummyData';
 import AccurateTimer from '@electron/helpers/accurateTimer';
+import DummyData from '../DummyData';
 
 // Store
-import GlobalStore from '../../lib/globalStore/GlobalStore';
+import GlobalStore from '../../../lib/globalStore/GlobalStore';
+
+// Protocols
+import V1 from './protocols/v1';
 
 export interface IInterface {
   ip: string | undefined;
@@ -22,7 +25,8 @@ export interface IInterface {
 
 export interface IServerStatus {
   clients: number | undefined;
-  protocols: string[];
+  protocols: IProtocol[] | null;
+  currentProtocol: IProtocol | string;
   status: string;
   isStreamingData: 'streaming' | 'paused' | 'continued' | null;
 }
@@ -36,13 +40,49 @@ export interface IServerInfo {
 export interface IClientStatus extends IInterface {
   state: number;
   url: undefined | string;
+  appName: string | undefined;
+  status?: string | undefined;
 }
 
-interface IWebSocket extends WebSocket, IInterface {
+export interface IWebSocket extends WebSocket, IInterface {
   id: string;
+  appName: string | undefined;
+  status?: string | undefined;
 }
 
-type Commands = 'start' | 'pause' | 'stop' | 'get-protocol-version';
+export interface IProtocol {
+  name: string;
+  outputDataSize: string;
+  samplingRate: number;
+  parameters: string[];
+  protocolVersion: string;
+  payloadType: string;
+}
+
+export type Commands = 'start' | 'pause' | 'stop' | 'get-protocol-version';
+
+export type IDataSize = {
+  label: string;
+  value: 'batch' | 'sdp';
+};
+
+export type IDataTypes = {
+  label: string;
+  value: 'JSON' | 'string';
+};
+
+export const dataSize: IDataSize[] = [
+  { label: 'Batch (25samples)', value: 'batch' },
+  { label: 'Single Data Point', value: 'sdp' },
+];
+
+export const dataTypes: IDataTypes[] = [
+  { label: 'JSON', value: 'JSON' },
+  { label: 'String', value: 'string' },
+];
+
+export const sendTo = [{ label: 'All Clients', value: 'all' }];
+// Define protocols
 
 class ExportServer {
   #securityPhrase: 'beastspectrum-export-stream+'; // Private
@@ -51,9 +91,11 @@ class ExportServer {
   port: number | null;
   server: Server | null;
   sockets: IWebSocket[];
+  readySockets: IWebSocket[];
   isListening: boolean;
   isStreamingData: IServerStatus['isStreamingData'];
-  protocols: string[];
+  protocols: IProtocol[];
+  currentProtocol: IProtocol | null;
   nextId: number;
   curDataPointIndex: number;
   batchSize: number;
@@ -69,7 +111,9 @@ class ExportServer {
     this.port = null;
     this.server = null;
     this.sockets = [];
-    this.protocols = ['Protocol 1', 'Protocol 2'];
+    this.readySockets = [];
+    this.protocols = [V1];
+    this.currentProtocol = null;
     this.isListening = false;
     this.isStreamingData = null;
 
@@ -94,6 +138,7 @@ class ExportServer {
     return {
       clients: this.sockets.length,
       protocols: this.protocols,
+      currentProtocol: this.currentProtocol?.name || 'No protocol selected',
       status: this.isListening ? 'Active' : 'Error',
       isStreamingData: this.isStreamingData,
     };
@@ -116,10 +161,12 @@ class ExportServer {
       clients.push({
         url: socket.url,
         state: socket.readyState,
+        status: socket.status,
         ip: socket.ip,
         ipFamily: socket.ipFamily,
         port: socket.port,
         name: socket.id,
+        appName: socket.appName,
       });
     });
     return clients;
@@ -130,6 +177,14 @@ class ExportServer {
    * Starts streaming of data
    */
   public startStream = () => {
+    // Dont start another stream if one is active
+    if (this.isStreamingData === 'streaming') {
+      this.sendServerError(
+        'error:The server is already streaming data. Cannot start another stream'
+      );
+      return;
+    }
+
     const outputDataSize = GlobalStore.getExportServer(
       'outputDataSize'
     ) as string;
@@ -138,7 +193,11 @@ class ExportServer {
       | 'JSON'
       | 'string';
 
-    if (this.sockets.length > 0) {
+    const sendTo = GlobalStore.getExportServer('sendTo') as
+      | 'All Clients'
+      | string;
+
+    if (this.readySockets.length > 0) {
       this.sendCommand('start');
       this.isStreamingData = 'streaming';
 
@@ -147,6 +206,19 @@ class ExportServer {
         this.formatDataPointAsJSON;
       let formatDataFunc: (dataPointFormatter: (dataObj: any) => any) => any[] =
         this.formatBatchData;
+      let sendFunc: (data: any[]) => void;
+
+      if (sendTo === 'All Clients') {
+        sendFunc = (data) =>
+          this.readySockets.forEach((socket) =>
+            socket.send(JSON.stringify(data))
+          );
+      } else {
+        const selectedSocket = this.readySockets.find(
+          (socket) => socket.appName === sendTo
+        ) as IWebSocket;
+        sendFunc = (data: any) => selectedSocket.send(JSON.stringify(data));
+      }
 
       if (outputDataSize === 'batch') {
         this.batchSize = 25;
@@ -166,7 +238,7 @@ class ExportServer {
         dataPointFormatter = this.formatDataPointAsString;
       }
 
-      this.streamData(formatDataFunc, dataPointFormatter);
+      this.streamData(formatDataFunc, dataPointFormatter, sendFunc);
       this.updateStatus();
     }
   };
@@ -175,6 +247,10 @@ class ExportServer {
    * Stops streaming of data
    */
   public stopStream = () => {
+    if (this.isStreamingData === null) {
+      this.sendServerError('error:The are no active streams to stop.');
+      return;
+    }
     this.curDataPointIndex = 0;
     this.isStreamingData = null;
     this.sendCommand('stop');
@@ -185,6 +261,10 @@ class ExportServer {
    * Pauses streaming of data
    */
   public pauseStream = () => {
+    if (this.isStreamingData === null || this.isStreamingData === 'paused') {
+      this.sendServerError('error:The are no active streams to pause.');
+      return;
+    }
     this.isStreamingData = 'paused';
     this.sendCommand('pause');
     this.updateStatus();
@@ -203,14 +283,13 @@ class ExportServer {
    */
   private streamData = async (
     formatData: (dataPointFormatter: (obj: any) => any) => any[],
-    dataPointFormatter: (obj: any) => any
+    dataPointFormatter: (obj: any) => any,
+    sendFunc: (data: any) => void
   ) => {
     const timer = new AccurateTimer(() => {
-      console.time('loop1');
       // Check stream time to stop before any other code execution
       if (this.isStreamingData === null || this.isStreamingData === 'paused') {
         timer.stop();
-        console.log('Stopped!!');
         return;
       }
 
@@ -218,8 +297,7 @@ class ExportServer {
       // a check is done to make sure no extra data is sent to the sockets.
       // TODO: Fix this issue
       const batchData = formatData(dataPointFormatter);
-      this.sockets.forEach((socket) => socket.send(JSON.stringify(batchData)));
-      console.timeEnd('loop1');
+      sendFunc(batchData);
     }, 10 * this.batchSize);
     timer.start();
   };
@@ -282,7 +360,6 @@ class ExportServer {
    * Starts the export websocket server
    */
   public start = async () => {
-    console.log('started');
     this.server = await this.createServer();
     this.handleIncomingConnection();
     this.setLocalIP();
@@ -293,8 +370,10 @@ class ExportServer {
    * Stops the server and cleans up the memory
    */
   public stop = async () => {
-    console.log('stopped');
-    this.sockets.forEach((socket) => socket.close());
+    this.sockets.forEach((socket) => {
+      socket.send('server:Shutting down');
+      socket.close();
+    });
     this.server?.close();
 
     //@ts-ignore
@@ -326,6 +405,7 @@ class ExportServer {
    * Sends the server error message to the UI
    */
   public sendServerError = (message: string) => {
+    this.sockets.forEach((socket) => socket.send(message.toString()));
     this.mainWindow?.webContents.send(
       ExportServerChannels.ServerError,
       message
@@ -333,60 +413,19 @@ class ExportServer {
   };
 
   /* ------------ SOCKETS ------------ */
-  /**
-   * Adds listeners to the socket connection to monitor each client.
-   * @param socket - The socket connection to add listeners to
-   */
-  private addSocketListeners = (socket: IWebSocket) => {
-    socket.on('close', () => this.removeSocket(socket.id));
-    socket.on('error', (_error) => {});
-  };
 
   /**
-   * Removes and disconnects the socket from the list
-   * @param clientName - The id of the client/socket to be removed
-   */
-  public removeSocket = (socketId: string) => {
-    // Find the socket index from the list and remove it
-    const socketIndex = this.sockets.findIndex(
-      (currSocket) => currSocket.id === socketId
-    );
-
-    // Socket has already been closed and cleaned
-    if (socketIndex === -1) return;
-
-    // Close socket and remove it
-    this.sockets[socketIndex].close();
-    this.sockets.splice(socketIndex, 1);
-
-    // If no more active socket exists stop streaming.
-    if (this.sockets.length === 0) this.isStreamingData = null;
-    this.updateStatus();
-  };
-
-  /**
-   * Handles the messaging of each web socket
-   * @param socket - The web socket
-   */
-  private handleSocketMessage = (socket: IWebSocket) => {
-    socket.on('message', (data) => {
-      console.log(data.toString());
-      const message = socket.id + ' ' + data.toString();
-      this.mainWindow?.webContents.send(
-        ExportServerChannels.ClientMessage,
-        message
-      );
-    });
-  };
-
-  /**
-   * Handles the incoming connection
+   * Handles the incoming websocket connection
    */
   private handleIncomingConnection = async () => {
     const secKey = 'security-phrase';
 
     this.server?.on('connection', (socket: IWebSocket, request) => {
       const isTrustable = request.headers[secKey] === this.#securityPhrase;
+      const appName = request.headers['app-name'] as string | undefined;
+      const protocolVersion = request.headers['protocol-version'] as
+        | string
+        | undefined;
 
       // Check if the request contains the security headers. If not refuse connection.
       if (!isTrustable) {
@@ -411,17 +450,186 @@ class ExportServer {
 
       // Add custom values to the socket object to keep track of them
       socket.id = `client:${++this.nextId}`;
+      socket.appName = appName || socket.id;
       socket.ip = request.socket.remoteAddress;
       socket.ipFamily = request.socket.remoteFamily;
       socket.port = request.socket.remotePort;
 
+      // Check for protocol version in the header
+      switch (protocolVersion) {
+        case 'v1':
+          this.currentProtocol = V1;
+          this.sendHeadersToSocket(socket);
+          break;
+
+        case undefined:
+          this.handleNoHeaders(socket);
+          break;
+
+        default:
+          this.sendServerError('error:Header not supported.');
+          return;
+      }
+
       // Keep track of each socket.
       this.sockets.push(socket as IWebSocket);
-
-      // Add listeners to the socket
-      this.handleSocketMessage(socket);
       this.addSocketListeners(socket);
     });
+  };
+
+  /**
+   * Handles the connection of a socket that does not have the default headers
+   * in the initial request.
+   * @param socket - The socket connection
+   */
+  private handleNoHeaders = async (socket: IWebSocket) => {
+    // Listen for commands
+    socket.status = 'Waiting for protocol';
+    this.updateStatus();
+
+    // Listener function
+    const listenForHeaderCommands = (data: RawData) => {
+      switch (data.toString()) {
+        case 'v1':
+          this.currentProtocol = V1;
+          socket.off('message', listenForHeaderCommands);
+          this.sendHeadersToSocket(socket);
+          this.updateStatus();
+          return;
+
+        default:
+          this.sendServerError(
+            'error:Protocol not found! Available protocols: "v1".'
+          );
+          break;
+      }
+    };
+
+    // Ask for protocol version
+    socket.send('get-protocol-version');
+
+    // Remove the listener once the protocol has been selected
+    socket.on('message', listenForHeaderCommands);
+  };
+
+  /**
+   * Sends the selected protocol's header to the socket.
+   * @param socket - The socket to send the headers to
+   */
+  private sendHeadersToSocket = (socket: IWebSocket) => {
+    const dataType = GlobalStore.getExportServer('outputDataType');
+    const dataSize = GlobalStore.getExportServer('outputDataSize');
+
+    const headers = {
+      samplingRate: 100,
+      parameters: [
+        'Time Stamp',
+        'O2Hb',
+        'HHb',
+        'THb',
+        'TOI',
+        'Hbdiff',
+        'PI',
+        'SCORx',
+        'SCPRx',
+      ],
+      protocolVersion: this.currentProtocol?.name,
+      payloadType: dataType,
+      dataSize: dataSize,
+    };
+    socket.send(JSON.stringify(headers));
+
+    socket.status = 'Waiting for confirmation';
+    this.updateStatus();
+
+    const listenForConfirmation = (data: RawData) => {
+      switch (data.toString()) {
+        case 'headers-ok':
+          socket.off('message', listenForConfirmation);
+          socket.status = 'Open';
+          this.readySockets.push(socket);
+          this.handleSocketMessage(socket);
+          this.updateStatus();
+          return;
+
+        default:
+          this.sendServerError(
+            'error:Command not supported! Waiting for headers confirmation "headers-ok".'
+          );
+          break;
+      }
+    };
+
+    socket.on('message', listenForConfirmation);
+  };
+
+  /**
+   * Handles the messaging of each web socket
+   * @param socket - The web socket
+   */
+  private handleSocketMessage = (socket: IWebSocket) => {
+    socket.on('message', (data) => {
+      switch (data.toString()) {
+        case 'start':
+          this.startStream();
+          break;
+
+        case 'stop':
+          this.stopStream();
+          break;
+
+        case 'pause':
+          this.pauseStream();
+          break;
+
+        default:
+          this.sendServerError('error:Unsupported command!');
+          break;
+      }
+
+      const message = socket.appName + ': ' + data.toString();
+      this.mainWindow?.webContents.send(
+        ExportServerChannels.ClientMessage,
+        message
+      );
+    });
+  };
+
+  /**
+   * Adds listeners to the socket connection to monitor each client.
+   * @param socket - The socket connection to add listeners to
+   */
+  private addSocketListeners = (socket: IWebSocket) => {
+    socket.on('close', () => this.removeSocket(socket.id));
+    socket.on('error', (_error) => {});
+  };
+
+  /**
+   * Removes and disconnects the socket from the list
+   * @param clientName - The id of the client/socket to be removed
+   */
+  public removeSocket = (socketId: string) => {
+    // Find the socket index from the list and remove it
+    const socketIndex = this.sockets.findIndex(
+      (currSocket) => currSocket.id === socketId
+    );
+    const readySockIndex = this.readySockets.findIndex(
+      (readySocket) => readySocket.id === socketId
+    );
+
+    // Socket has already been closed and cleaned
+    if (socketIndex === -1) return;
+
+    // Close socket and remove it
+    this.sockets[socketIndex].close();
+    this.sockets.splice(socketIndex, 1);
+
+    // If no more active socket exists stop streaming.
+    if (this.sockets.length === 0) this.isStreamingData = null;
+    this.updateStatus();
+
+    if (readySockIndex === -1) return;
+    this.readySockets.splice(readySockIndex, 1);
   };
 
   /* ------------ SERVER ------------ */
@@ -458,10 +666,10 @@ class ExportServer {
    * Adds listeners to the server to monitor its status
    */
   private addServerListeners = () => {
-    this.server?.addListener('listening', () => (this.isListening = true));
+    this.server?.on('listening', () => (this.isListening = true));
 
     // Listen for server errors and send it to the UI
-    this.server?.addListener('error', (error) => {
+    this.server?.on('error', (error) => {
       this.isListening = false;
       this.mainWindow?.webContents.send(
         ExportServerChannels.ServerError,
@@ -469,11 +677,11 @@ class ExportServer {
       );
     });
     // Connection to server
-    this.server?.addListener('connection', (_client, _request) => {
+    this.server?.on('connection', (_client, _request) => {
       this.updateStatus();
     });
     // server close event
-    this.server?.addListener('close', () => {
+    this.server?.on('close', () => {
       GlobalStore.removeExportServer();
     });
   };

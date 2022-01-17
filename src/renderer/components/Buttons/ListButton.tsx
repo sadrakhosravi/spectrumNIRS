@@ -7,7 +7,7 @@ type ListButtonProps = {
   onClick: React.MouseEventHandler<HTMLDivElement> | undefined;
   icon: string;
   text: string;
-  description: string;
+  description: string | JSX.Element | JSX.Element;
   deleteOnClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
   time?: string;
   deleteTitle?: string;

@@ -1,5 +1,5 @@
-import RecordingsData from 'db/entity/RecordingsData';
 import { createQueryBuilder } from 'typeorm';
+import RecordingsData from 'db/entity/RecordingsData';
 import DatabaseError from './DatabaseError';
 
 class DummyData {
@@ -8,13 +8,6 @@ class DummyData {
   constructor(amount: '30min' | '1hr') {
     this.amount = amount;
   }
-
-  public streamDummyData = async () => {
-    try {
-      const stream = await createQueryBuilder('readings_data').stream();
-      console.log(stream);
-    } catch (error: any) {}
-  };
 
   public getDummyDataFromDb = async () => {
     try {

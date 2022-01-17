@@ -19,7 +19,7 @@ const ExportServerToolbar = () => {
     (state) => state.global.exportServer?.serverStatus?.isStreamingData
   );
   const status = useAppSelector(
-    (state) => state.global.exportServer?.serverStatus?.status
+    (state) => state.global.exportServer?.serverStatus
   );
 
   const clients = useAppSelector(
@@ -27,8 +27,10 @@ const ExportServerToolbar = () => {
   );
 
   const handleStartStreamBtnClick = async () => {
-    if (clients?.length === 0) {
-      toast.error('No clients connected! Cannot start the stream.');
+    if (clients?.length === 0 || status?.currentProtocol !== 'v1') {
+      toast.error(
+        'No clients has been initialized yet. Cannot start the stream'
+      );
       return;
     }
     await window.api.invokeIPC(

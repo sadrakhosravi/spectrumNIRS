@@ -1,11 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { combineReducers } from 'redux';
-// import {
-//   createStateSyncMiddleware,
-//   initStateWithPrevTab,
-//   withReduxStateSync,
-// } from 'redux-state-sync';
 
 // State slices
 import AppStateReducer from '@redux/AppStateSlice';

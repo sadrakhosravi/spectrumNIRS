@@ -65,10 +65,7 @@ const createMainWindow = async () => {
     darkTheme: true,
     frame: false,
     webPreferences: {
-      nativeWindowOpen: false,
-      nodeIntegrationInSubFrames: true,
       nodeIntegrationInWorker: true,
-      enableWebSQL: true,
       partition: 'persist:spectrum',
       contextIsolation: false,
       nodeIntegration: true,

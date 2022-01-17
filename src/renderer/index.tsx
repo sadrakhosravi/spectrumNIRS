@@ -13,6 +13,7 @@ export const loadUI = () => {
   const container = document.getElementById('root') as HTMLDivElement;
   container.innerHTML = '';
 
+  // Enable shared array buffer in the window object
   if (!('SharedArrayBuffer' in window)) {
     (window as any).SharedArrayBuffer = ArrayBuffer;
   }
