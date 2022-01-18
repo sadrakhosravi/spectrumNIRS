@@ -5,7 +5,7 @@ import Tooltip from '@components/Tooltip/Tooltip.component';
 
 const HomeIconButton = (props: any) => {
   const { isActive, onClick } = props;
-  let isDisabled = false;
+  let isDisabled = true;
 
   return (
     <Tooltip text="Home" placement="right">

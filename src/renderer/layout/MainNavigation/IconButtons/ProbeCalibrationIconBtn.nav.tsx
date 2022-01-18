@@ -15,6 +15,7 @@ const ProbeCalibrationButton = (props: any) => {
           isActive && 'icon-button-active bg-white bg-opacity-5'
         }`}
         onClick={onClick}
+        disabled={true}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

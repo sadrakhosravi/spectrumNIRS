@@ -17,7 +17,7 @@ type AppStateSlice = {
 };
 
 const initialState: AppStateSlice = {
-  value: AppState.HOME,
+  value: AppState.EXPORT_SERVER,
   windowResized: 0,
   windowMaximized: true,
   recordChartLoaded: false,

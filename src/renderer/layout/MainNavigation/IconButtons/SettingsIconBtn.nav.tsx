@@ -5,7 +5,7 @@ import Tooltip from '@components/Tooltip/Tooltip.component';
 
 const SettingsIconButton = (props: any) => {
   const { isActive } = props;
-  let isDisabled = false;
+  let isDisabled = true;
   // Check if the button is active and set the styling accordingly
   let activeClass;
   if (isActive) {

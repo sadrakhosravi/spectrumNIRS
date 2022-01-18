@@ -88,7 +88,7 @@ const ExportServerSettings = () => {
           </div>
           <div className="w-full mt-4">
             <p className="mb-2">Send Data To: </p>
-            <ButtonMenu text={sendTo} width="290px">
+            <ButtonMenu text={sendTo || 'All Clients'} width="290px">
               <>
                 <ButtonMenuItem
                   key={'All Clients' + 'export-server-sockets-data'}

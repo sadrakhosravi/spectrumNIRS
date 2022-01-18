@@ -10,9 +10,6 @@ import { Toaster } from 'react-hot-toast';
 // CSS
 import './App.css';
 
-// Constants
-import { AppState } from '@utils/constants';
-
 //Component import
 import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
 import useLoadState from 'renderer/startup/useLoadStates';
@@ -32,7 +29,7 @@ const ModalsContainer = React.lazy(
 
 // Pages
 const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
-const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
+// const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 const App = () => {
   useLoadState();
@@ -62,11 +59,11 @@ const App = () => {
           <Route path="/dasdasd" component={Clock} />
           <Route path="/main" component={ModalsContainer} />
           <Route path="/main" component={IndicatorContainer} />
-          <Route exact path={AppState.REVIEW_TAB}>
+          {/* <Route exact path={AppState.REVIEW_TAB}>
             <div className="h-full py-1">
               <ReviewPage />
             </div>
-          </Route>
+          </Route> */}
 
           <Route
             path={'/main'}

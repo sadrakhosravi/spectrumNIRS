@@ -2,10 +2,10 @@ import { IProtocol } from '../ExportServer';
 
 const V1: IProtocol = {
   name: 'v1',
-  outputDataSize: 'batch',
+  protocolVersion: 'v1',
   samplingRate: 100,
   parameters: [
-    'Time Stamp',
+    'timeStamp',
     'O2Hb',
     'HHb',
     'THb',
@@ -15,7 +15,7 @@ const V1: IProtocol = {
     'SCORx',
     'SCPRx',
   ],
-  protocolVersion: 'v1',
+  batchSize: 25,
   payloadType: 'string',
 };
 

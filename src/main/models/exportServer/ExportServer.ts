@@ -52,10 +52,10 @@ export interface IWebSocket extends WebSocket, IInterface {
 
 export interface IProtocol {
   name: string;
-  outputDataSize: string;
   samplingRate: number;
   parameters: string[];
   protocolVersion: string;
+  batchSize: number;
   payloadType: string;
 }
 
@@ -354,10 +354,10 @@ class ExportServer {
       HHb: dataObj.HHb,
       THb: dataObj.THb,
       TOI: dataObj.TOI,
-      HbDiff: 0,
-      PI: 0,
-      SCORx: 0,
-      SCPRx: 0,
+      Hbdiff: dataObj.O2Hb,
+      PI: dataObj.HHb,
+      SCORx: dataObj.THb,
+      SCPRx: dataObj.TOI,
     };
   };
 
@@ -531,23 +531,17 @@ class ExportServer {
     const dataType = GlobalStore.getExportServer('outputDataType');
     const dataSize = GlobalStore.getExportServer('outputDataSize');
 
-    const headers = {
-      samplingRate: 100,
-      parameters: [
-        'Time Stamp',
-        'O2Hb',
-        'HHb',
-        'THb',
-        'TOI',
-        'Hbdiff',
-        'PI',
-        'SCORx',
-        'SCPRx',
-      ],
-      protocolVersion: this.currentProtocol?.name,
-      payloadType: dataType,
-      dataSize: dataSize,
-    };
+    const headers = V1;
+
+    // TODO: Adjust the batch size dynamically based on the selection
+    if (dataSize === 'batch') {
+      headers['batchSize'] = 25;
+    } else {
+      headers['batchSize'] = 1;
+    }
+
+    headers['payloadType'] = dataType as string;
+
     socket.send(JSON.stringify(headers));
 
     socket.status = 'Waiting for confirmation';

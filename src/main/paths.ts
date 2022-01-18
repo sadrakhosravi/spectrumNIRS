@@ -5,10 +5,10 @@ import { app } from 'electron';
 const name = 'SpectrumNIRS';
 
 // Resources path
-export const initialFilesPath = path.join(
-  __dirname,
-  '../../resources/initialData'
-);
+export const initialFilesPath = app.isPackaged
+  ? path.join(process.resourcesPath, 'resources', 'initialData')
+  : path.join(__dirname, '../../resources/initialData');
+
 export const initialDbFilePath = path.join(initialFilesPath, 'spectrum.db');
 export const initialSettingsFilePath = path.join(
   initialFilesPath,
