@@ -37,7 +37,7 @@
   "build": {
     "productName": "Spectrum",
     "appId": "com.ibl.spectrumNIRS",
-    "asar": false,
+    "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
       "dist",

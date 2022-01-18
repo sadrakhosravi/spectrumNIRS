@@ -151,7 +151,7 @@ class ExportServer {
     return {
       ip: this.ip,
       port: this.port,
-      version: '0.1.0 - Alpha',
+      version: '0.1.4 - Alpha',
     };
   }
 
@@ -193,10 +193,6 @@ class ExportServer {
       | 'JSON'
       | 'string';
 
-    const sendTo = GlobalStore.getExportServer('sendTo') as
-      | 'All Clients'
-      | string;
-
     if (this.readySockets.length > 0) {
       this.sendCommand('start');
       this.isStreamingData = 'streaming';
@@ -206,19 +202,6 @@ class ExportServer {
         this.formatDataPointAsJSON;
       let formatDataFunc: (dataPointFormatter: (dataObj: any) => any) => any[] =
         this.formatBatchData;
-      let sendFunc: (data: any[]) => void;
-
-      if (sendTo === 'All Clients') {
-        sendFunc = (data) =>
-          this.readySockets.forEach((socket) =>
-            socket.send(JSON.stringify(data))
-          );
-      } else {
-        const selectedSocket = this.readySockets.find(
-          (socket) => socket.appName === sendTo
-        ) as IWebSocket;
-        sendFunc = (data: any) => selectedSocket.send(JSON.stringify(data));
-      }
 
       if (outputDataSize === 'batch') {
         this.batchSize = 25;
@@ -238,6 +221,7 @@ class ExportServer {
         dataPointFormatter = this.formatDataPointAsString;
       }
 
+      const sendFunc = this.getSendFunction();
       this.streamData(formatDataFunc, dataPointFormatter, sendFunc);
       this.updateStatus();
     }
@@ -275,7 +259,34 @@ class ExportServer {
    * @param command - The command/message string to be sent to the sockets
    */
   public sendCommand = (command: Commands) => {
-    this.sockets.forEach((socket) => socket.send(command));
+    const sendFunc = this.getSendFunction();
+    sendFunc(command);
+  };
+
+  /**
+   * A send function that sends a message only to the selected socket/sockets
+   * @returns A send function based on the selected send to socket option
+   */
+  private getSendFunction = () => {
+    const sendTo = GlobalStore.getExportServer('sendTo') as
+      | 'All Clients'
+      | string;
+
+    let sendFunc: (data: any) => void;
+
+    if (sendTo === 'All Clients') {
+      sendFunc = (data) =>
+        this.readySockets.forEach((socket) =>
+          socket.send(JSON.stringify(data))
+        );
+    } else {
+      const selectedSocket = this.readySockets.find(
+        (socket) => socket.appName === sendTo
+      ) as IWebSocket;
+      sendFunc = (data: any) => selectedSocket.send(JSON.stringify(data));
+    }
+
+    return sendFunc;
   };
 
   /**

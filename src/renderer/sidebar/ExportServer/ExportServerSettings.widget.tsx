@@ -55,6 +55,7 @@ const ExportServerSettings = () => {
     GlobalStore.setExportServer('outputDataType', outputDataType.value);
   }, [outputDataType]);
 
+  console.log(sendTo);
   // Handles the send to option
   const handleSendTo = (name: string) =>
     GlobalStore.setExportServer('sendTo', name);
