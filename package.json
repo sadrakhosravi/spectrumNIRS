@@ -1,5 +1,6 @@
 {
   "name": "spectrum-nirs",
+  "appName": "Beast Spectrum",
   "productName": "SpectrumNIRS",
   "version": "0.2.0-nightly.20211223-1",
   "description": "Spectrum NIRS data acquisition software",
@@ -264,6 +265,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.9",
     "tsconfig-paths": "^3.12.0",
+    "typedarray-to-buffer": "^4.0.0",
     "ws": "^8.4.2"
   },
   "devEngines": {

@@ -22,65 +22,60 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     (state) => state.experimentData.currentRecording.id
   );
   const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
-  const recordingState = useAppSelector((state) => state.recordState.value);
 
   const chartRef = useRef<RecordChartClass | undefined>(undefined);
   const containerId = 'recordChart';
 
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useEffect(() => {
-    setTimeout(() => {
-      // Create chart, series and any other static components.
-      const chart = new RecordChartClass(containerId, ChartType.RECORD);
+    // Create chart, series and any other static components.
+    const chart = new RecordChartClass(containerId, ChartType.RECORD);
 
-      chart.createRecordChart();
-      // Attach event listeners
-      chart.listenForData();
+    chart.createRecordChart();
+    // Attach event listeners
+    chart.listenForData();
 
-      // Keep a ref to the chart
-      chartRef.current = chart as RecordChartClass;
-      setRecordChart(chart);
-    }, 100);
+    // Keep a ref to the chart
+    chartRef.current = chart as RecordChartClass;
+    setRecordChart(chart);
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
       // Destroy chart.
-      window.api.removeListeners('data:reader-record');
-      setRecordChart(undefined);
-      chartRef.current?.cleanup();
       console.log('destroy chart');
+      window.api.removeListeners('data:reader-record');
       chartRef.current = undefined;
+      setRecordChart(undefined);
+      chart.cleanup();
     };
   }, []);
 
   useEffect(() => {
     setNewData(true);
     chartRef.current?.clearData();
+
+    return () => (chartRef.current = undefined);
   }, [recordingId]);
 
   useEffect(() => {
     if (newData) {
       setTimeout(() => {
         chartRef.current?.clearCharts();
-        chartRef.current?.loadLatestData();
+        // chartRef.current?.loadLatestData();
         setNewData(false);
       }, 100);
     }
-  }, [newData]);
 
-  const resetChartSize = () => {
-    requestAnimationFrame(() => {
-      chartRef.current?.dashboard.engine.layout();
-    });
-  };
+    return () => (chartRef.current = undefined);
+  }, [newData]);
 
   // Adjust chart width and height on sidebar resize
   useEffect(() => {
-    location.pathname === '/main/recording/record' && resetChartSize();
-    requestAnimationFrame(() => chartRef.current?.sendChartPositions());
-  }, [recordSidebar]);
+    chartRef.current?.sendChartPositions();
+    chartRef.current?.dashboard.engine.layout();
 
-  useEffect(() => {}, [recordingState]);
+    return () => (chartRef.current = undefined);
+  }, [recordSidebar]);
 
   useContextMenu(
     containerId,

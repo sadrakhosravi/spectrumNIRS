@@ -11,7 +11,6 @@
 import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import 'reflect-metadata';
-import updater from './updater';
 import { resolveHtmlPath } from './util';
 
 // Import controllers
@@ -60,10 +59,14 @@ const createMainWindow = async () => {
     backgroundColor: '#1E1E1E',
     x,
     y,
-    width: width,
-    height: height,
+    width,
+    height,
     darkTheme: true,
     frame: false,
+    titleBarStyle: 'hidden',
+    transparent: true,
+    titleBarOverlay: false,
+    paintWhenInitiallyHidden: true,
     webPreferences: {
       nodeIntegrationInWorker: true,
       partition: 'persist:spectrum',
@@ -75,8 +78,7 @@ const createMainWindow = async () => {
     icon: getAssetPath('icon.png'),
   });
 
-  mainWindow.maximize();
-  await mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Unmaximize event
   mainWindow.on('unmaximize', () => {
@@ -95,12 +97,6 @@ const createMainWindow = async () => {
   return mainWindow;
 };
 
-// app.on('activate', async () => {
-//   if (!mainWindow) {
-//     createMainWindow();
-//   }
-// });
-
 (async () => {
   // Set dark theme by default - Light theme will be added in the next versions
   nativeTheme.themeSource = 'dark';
@@ -109,10 +105,6 @@ const createMainWindow = async () => {
   await app.whenReady();
   createMainWindow();
   startControllers();
-
-  setTimeout(async () => {
-    await updater();
-  }, 2000);
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

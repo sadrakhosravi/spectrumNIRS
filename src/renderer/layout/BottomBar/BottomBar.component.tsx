@@ -3,7 +3,6 @@ import { useAppSelector } from '@redux/hooks/hooks';
 
 // Components
 import TrayIcons from './TrayIcons/TrayIcons.component';
-import ToastNotifications from '@components/Toast/ToastNotifications.component';
 
 // Icons
 import UpdateIcon from '@icons/update.svg';
@@ -36,7 +35,6 @@ const BottomBar = () => {
           <TrayIcons />
         </span>
       </footer>
-      <ToastNotifications />
     </>
   );
 };

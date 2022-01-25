@@ -13,16 +13,18 @@ const startControllers = async () => {
   await import('./experiment');
   await import('./recording');
   await import('./dialogBox');
-  await import('./settingsWindow');
   await import('./usbDetection');
-  await import('./others');
-  await import('./reviewTab');
   await import('./exportServer');
+  await import('./others');
+  // await import('./settingsWindow');
+  // await import('./reviewTab');
 
   // Let UI know that main has finished loading
   const mainWindow = BrowserWindow.getAllWindows()[0];
   mainWindow.webContents.send('main-loaded');
   ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
+
+  // await import('../main/devices/Reader');
 };
 
 export default startControllers;

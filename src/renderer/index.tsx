@@ -5,11 +5,11 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 
-export const loadUI = () => {
-  const App = React.lazy(() => import('./App'));
-  const ChartProvider = React.lazy(() => import('./context/ChartProvider'));
+// Components
+import App from './App';
+import ChartProvider from './context/ChartProvider';
 
-  console.log('UI');
+export const loadUI = () => {
   const container = document.getElementById('root') as HTMLDivElement;
   container.innerHTML = '';
 

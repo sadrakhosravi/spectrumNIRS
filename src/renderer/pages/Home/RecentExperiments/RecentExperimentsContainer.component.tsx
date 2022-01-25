@@ -43,7 +43,7 @@ const RecentExperimentsContainer = ({
     searchedExperiments: [],
   });
   const currentExperimentId = useAppSelector(
-    (state) => state.experimentData.currentExperiment.id
+    (state) => state.global.experiment?.currentExp?.id
   );
   const dispatch = useAppDispatch();
 

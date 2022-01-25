@@ -5,6 +5,7 @@ import ChartOptions from './ChartOptions';
 import { ChartChannels } from '@utils/channels';
 import { setPreviousData } from '@redux/ExperimentDataSlice';
 import { setRecordChartPositions } from '@redux/RecordChartSlice';
+// import WorkerManager from 'workers/WorkerManager';
 
 class RecordChart extends Chart {
   numberOfRows: number;
@@ -22,6 +23,8 @@ class RecordChart extends Chart {
     this.chartOptions = undefined;
 
     console.log(getState().sensorState.currentProbe?.samplingRate);
+
+    console.log('RECOORDDD CHARTTT');
   }
 
   // Creates the record chart
@@ -55,38 +58,17 @@ class RecordChart extends Chart {
     });
   }
 
-  listenForData() {
-    type Data = {
-      x: number;
-      y: number;
-    };
-    let count = 0;
-    let O2Hb: Data[] = [];
-    let HHb: Data[] = [];
-    let THb: Data[] = [];
-    let TOI: Data[] = [];
-
-    window.api.onIPCData('data:reader-record', (_event, data) => {
-      // Change TOI value every 15 samples (based on 100samples/s)
-      if (count === 5) {
-        this.TOILegend.setText(Math.round(data[data.length - 1][4]).toString());
-        count = 0;
-      }
-
-      for (let i = 0; i < data.length; i += 1) {
-        O2Hb.push({ x: data[i][0], y: data[i][1] });
-        HHb.push({ x: data[i][0], y: data[i][2] });
-        THb.push({ x: data[i][0], y: data[i][3] });
-        TOI.push({ x: data[i][0], y: data[i][4] });
-      }
-
-      requestAnimationFrame(() => {
-        this.series[0].add(O2Hb.splice(0, O2Hb.length - 1));
-        this.series[1].add(HHb.splice(0, HHb.length - 1));
-        this.series[2].add(THb.splice(0, THb.length - 1));
-        this.series[3].add(TOI.splice(0, TOI.length - 1));
-      });
+  handleIncomingData = (
+    _event: Electron.IpcRendererEvent,
+    data: number[][]
+  ) => {
+    data.forEach((data) => {
+      this.series.forEach((series) => series.addArrayY([data[2]], 10));
     });
+  };
+
+  listenForData() {
+    window.api.onIPCData('device:data', this.handleIncomingData);
   }
 
   drawData(data: any) {
@@ -155,7 +137,7 @@ class RecordChart extends Chart {
 
   cleanup() {
     console.log('Destroy Chart');
-    window.api.removeListeners('data:reader-record');
+    window.api.removeListeners('device:data');
     this.clearData();
     this.memoryCleanup();
     this.chartOptions?.memoryCleanup();

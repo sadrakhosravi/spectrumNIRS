@@ -1,24 +1,31 @@
-// import db from 'db/models/index';
 import { getConnection } from 'typeorm';
 import RecordingsData from 'db/entity/RecordingsData';
 import AccurateTimer from '@electron/helpers/accurateTimer';
 import { ChartChannels } from '@utils/channels';
 
-class RecordData {
+// Errors
+// import DataError from './Errors/DataError';
+
+class RecordingsDataModel {
   recordingId: number;
   transaction: any;
-
+  data: any[];
   constructor(recordingId: number) {
     this.recordingId = recordingId;
+    this.data = new Array(200).fill({});
   }
 
-  async addDataToTransaction(data: any[]) {
+  public addDataToTransaction = (dataPoint: unknown) => {
+    this.data.push(dataPoint);
+  };
+
+  public async insertTransactionData(_data: any[]) {
     try {
       await getConnection()
         .createQueryBuilder()
         .insert()
         .into(RecordingsData)
-        .values([...data])
+        .values(this.data)
         .useTransaction(true)
         .execute();
     } catch (error: any) {
@@ -26,7 +33,7 @@ class RecordData {
     }
   }
 
-  public static checkForRecordingData = async (recordingId: number) => {
+  public checkForRecordingData = async (recordingId: number) => {
     try {
       return await getConnection()
         .createQueryBuilder()
@@ -41,7 +48,7 @@ class RecordData {
     }
   };
 
-  public static getRecordingDataForInterval = async (
+  public getRecordingDataForInterval = async (
     recordingId: number,
     start: number,
     end: number
@@ -61,10 +68,7 @@ class RecordData {
     }
   };
 
-  public static streamRecordingData = async (
-    recordingId: number,
-    sender: any
-  ) => {
+  public streamRecordingData = async (recordingId: number, sender: any) => {
     try {
       const LIMIT = 100000;
       let offset = 0;
@@ -100,7 +104,7 @@ class RecordData {
     }
   };
 
-  public static getAllEvents = async (recordingId: number) => {
+  public getAllEvents = async (recordingId: number) => {
     try {
       return await getConnection()
         .createQueryBuilder()
@@ -116,4 +120,4 @@ class RecordData {
   };
 }
 
-export default RecordData;
+export default RecordingsDataModel;

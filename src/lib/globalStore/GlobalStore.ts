@@ -8,6 +8,8 @@ import {
   IDataSize,
   IDataTypes,
 } from '@electron/models/exportServer/ExportServer';
+import { IExperimentData } from '@electron/models/ExperimentModel';
+import { IPatientData } from '@electron/models/PatientModel';
 
 let storePath = '';
 
@@ -36,6 +38,15 @@ export interface IGlobalStore {
     outputDataSize: IDataSize['value'];
     outputDataType: IDataTypes['value'];
     sendTo: string;
+  };
+  experiment: {
+    currentExp: IExperimentData | null;
+  };
+  patient: {
+    currentPatient: IPatientData | null;
+  };
+  recording: {
+    currentRecording: any;
   };
 }
 
@@ -73,6 +84,57 @@ class GlobalStore {
    */
   getExportServer = (key: keyof IGlobalStore['exportServer']) =>
     this.store.get(`exportServer.${key}`);
+
+  /**
+   * Sets the experiment state value
+   */
+  setExperiment = (key: keyof IGlobalStore['experiment'], value: any) =>
+    this.store.set(`experiment.${key}`, value);
+
+  /**
+   * Removes the experiment key and all its values
+   */
+  removeExperiment = () => this.store.set('experiment', {});
+
+  /**
+   * Gets a value from the experiment state
+   */
+  getExperiment = (key: keyof IGlobalStore['experiment']) =>
+    this.store.get(`experiment.${key}`);
+
+  /**
+   * Sets the patient state value
+   */
+  setPatient = (key: keyof IGlobalStore['patient'], value: any) =>
+    this.store.set(`patient.${key}`, value);
+
+  /**
+   * Removes the patient key and all its values
+   */
+  removePatient = () => this.store.set('patient', {});
+
+  /**
+   * Gets a value from the patient state
+   */
+  getPatient = (key: keyof IGlobalStore['patient']) =>
+    this.store.get(`patient.${key}`);
+
+  /**
+   * Sets the recording state value
+   */
+  setRecording = (key: keyof IGlobalStore['recording'], value: any) =>
+    this.store.set(`recording.${key}`, value);
+
+  /**
+   * Removes the recording key and all its values
+   */
+  removeRecording = () => this.store.set('recording', {});
+
+  /**
+   * Gets a value from the recording state
+   */
+  getRecording = (key: keyof IGlobalStore['recording']) =>
+    this.store.get(`recording.${key}`);
 }
 
 export type GlobalStoreType = GlobalStore;

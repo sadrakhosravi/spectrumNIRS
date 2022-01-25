@@ -4,12 +4,14 @@ import toast from 'react-hot-toast';
 
 // Actions
 import { openModal } from '@redux/ModalStateSlice';
-import { resetExperimentData } from '@redux/ExperimentDataSlice';
-import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Constants
-import { ModalConstants, RecordState } from '@utils/constants';
-import { DialogBoxChannels, UpdaterChannels } from '@utils/channels';
+import { ModalConstants } from '@utils/constants';
+import {
+  DialogBoxChannels,
+  ExperimentChannels,
+  UpdaterChannels,
+} from '@utils/channels';
 
 export const TopMenu = [
   {
@@ -23,15 +25,14 @@ export const TopMenu = [
       },
       {
         label: 'Close',
-        click: () => {
-          dispatch(changeRecordState(RecordState.IDLE));
-
-          const noExperimentOpened =
-            getState().experimentData.currentExperiment.id === -1;
-          if (noExperimentOpened) return;
-
-          dispatch(resetExperimentData());
-          toast.success('Experiment closed.', { duration: 3000 });
+        click: async () => {
+          const isClosed = await window.api.invokeIPC(
+            ExperimentChannels.CloseExperiment
+          );
+          isClosed &&
+            setTimeout(() => {
+              toast.success('Experiment closed', { duration: 3000 });
+            }, 500);
         },
       },
       {

@@ -26,7 +26,7 @@ type PatientData = {
 const OpenPatientForm = () => {
   const [patients, setPatients] = useState<null | PatientData[]>(null);
   const experimentId = useAppSelector(
-    (state) => state.experimentData.currentExperiment.id
+    (state) => state.global.experiment?.currentExp?.id
   );
   const dispatch = useAppDispatch();
 
@@ -39,17 +39,17 @@ const OpenPatientForm = () => {
   };
 
   useEffect(() => {
-    const getAllPatients = async () => {
-      const allPatients = await window.api.invokeIPC(
-        ExperimentChannels.getAllPatients,
-        experimentId
-      );
-      allPatients && setPatients(allPatients);
-    };
-    setTimeout(() => {
+    if (experimentId) {
+      const getAllPatients = async () => {
+        const allPatients = await window.api.invokeIPC(
+          ExperimentChannels.getAllPatients,
+          experimentId
+        );
+        allPatients && setPatients(allPatients);
+      };
       getAllPatients();
-    }, 100);
-  }, []);
+    }
+  }, [experimentId]);
 
   const handleOpenNewPatientForm = () => {
     dispatch(openModal(ModalConstants.NEWPATIENT));

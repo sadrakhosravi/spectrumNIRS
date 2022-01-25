@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 
-import MainStore from '@electron/models/store/MainStore';
+import MainStore from '@electron/models/MainStore';
 
 // @ts-ignore
 import GlobalStore from '@lib/globalStore/GlobalStore';

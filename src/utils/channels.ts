@@ -2,14 +2,19 @@
 const ExpChannelBase = 'experiment:';
 export const ExperimentChannels = {
   NewExp: ExpChannelBase + 'new-exp',
+  GetAndUpdateExp: ExpChannelBase + 'get-and-update-exp',
   UpdateExp: ExpChannelBase + 'update-exp',
-  NewPatient: ExpChannelBase + 'newPatient',
-  NewRecording: ExpChannelBase + 'newRecording',
-  getRecentExperiments: ExpChannelBase + 'get-recent-experiments',
-  getAllPatients: ExpChannelBase + 'get-all-patients',
-  getAllRecordings: ExpChannelBase + 'get-all-recordings',
   deleteExperiment: ExpChannelBase + 'delete-experiment',
+  getRecentExperiments: ExpChannelBase + 'get-recent-experiments',
+  CloseExperiment: ExpChannelBase + 'close-experiment',
+  NewPatient: ExpChannelBase + 'newPatient',
+  GetAndUpdatePatient: ExpChannelBase + 'get-and-update-patient',
+  RemovePatient: ExpChannelBase + 'remove-patient',
+  getAllPatients: ExpChannelBase + 'get-all-patients',
   deletePatient: ExpChannelBase + 'delete-patient',
+  getAllRecordings: ExpChannelBase + 'get-all-recordings',
+  NewRecording: ExpChannelBase + 'newRecording',
+  GetAndUpdateRecording: ExpChannelBase + 'get-and-update-recording',
   deleteRecording: ExpChannelBase + 'delete-recording',
 };
 

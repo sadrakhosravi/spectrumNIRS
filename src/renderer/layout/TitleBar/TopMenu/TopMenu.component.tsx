@@ -1,5 +1,5 @@
 // Top Navigation of the app
-import React, { useState } from 'react';
+import React from 'react';
 
 import { TopMenu } from './Menu';
 
@@ -12,18 +12,12 @@ import SubMenuItem from '@components/Menu/SubMenuItem.component';
 import MenuSeparator from '@components/Separator/MenuSeparator.component';
 
 const TopMenuContainer = (): JSX.Element => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  console.log(isMenuOpen);
-
   return (
     <nav className="inline-block h-[30px]">
       <ul className="top-menu h-full my-auto ">
         {TopMenu.map((menuItem, i) => (
           <Menu as="li" className="h-full inline-block" key={i}>
-            <TopMenuButton
-              label={menuItem.label}
-              onClick={() => setIsMenuOpen(true)}
-            />
+            <TopMenuButton label={menuItem.label} onClick={undefined} />
             <Menu.Items className="absolute w-72 mt-0 origin-bottom-left z-50 bg-grey3 shadow-xl py-2">
               {menuItem.submenu.map((submenu, i) =>
                 submenu.label === 'separator' ? (

@@ -292,4 +292,4 @@ class ProbeManager {
   };
 }
 
-export default ProbeManager;
+export default new ProbeManager();

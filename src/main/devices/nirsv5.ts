@@ -1,7 +1,7 @@
 /**
  * Opens NIRSReader.exe and reads data from stdout - NIRSReader.exe is referenced by USBData variable
  */
-import RecordingsData from '@electron/models/RecordingsData';
+// import RecordingsData from '@electron/models/RecordingsData';
 import net from 'net';
 
 const path = require('path');
@@ -21,7 +21,7 @@ let lastTimeSequence = 0;
 let timeSequence = 0; // timeSequence in milliseconds
 const databaseArr: any[] = [];
 let databaseCount = 0;
-let Database: RecordingsData | undefined;
+// let Database: RecordingsData | undefined;
 
 let events = {
   hypoxia: false,
@@ -102,7 +102,7 @@ export const start = async (
   let sendCount = 0;
   let sendArr: any[] = [];
 
-  Database = new RecordingsData(recordingId);
+  // Database = RecordingsData();
   spawnNIRSV5();
 
   // Read each line from reader.exe stdout.
@@ -167,7 +167,7 @@ export const start = async (
       });
 
       if (databaseCount === 200) {
-        Database?.addDataToTransaction(databaseArr);
+        // Database?.insertTransactionData(databaseArr);
         databaseArr.length = 0;
         databaseCount = 0;
       }
@@ -245,10 +245,10 @@ export const stop = (): number => {
   rl.removeAllListeners();
 
   // Write the remaining data to the database
-  databaseArr.length > 0 && Database?.addDataToTransaction(databaseArr);
+  // databaseArr.length > 0 && Database?.insertTransactionData(databaseArr);
   databaseArr.length = 0;
   databaseCount = 0;
-  Database = undefined;
+  // Database = undefined;
 
   // Reset the timeSequence
   timeSequence = 0;

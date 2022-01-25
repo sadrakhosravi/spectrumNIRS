@@ -14,15 +14,7 @@ interface IInputField
 }
 
 const InputField = (props: IInputField): JSX.Element => {
-  const {
-    register,
-    type,
-    defaultValue,
-    className,
-    onBlur,
-    onKeyPress,
-    autoFocus,
-  } = props;
+  const { register, type, defaultValue, className, ...others } = props;
   return (
     <input
       type={type || 'text'}
@@ -32,9 +24,7 @@ const InputField = (props: IInputField): JSX.Element => {
         className || 'bg-light text-dark'
       }`}
       id={register ? register.name : undefined}
-      onBlur={onBlur}
-      onKeyPress={onKeyPress}
-      autoFocus={autoFocus}
+      {...others}
       onFocus={(e) => e.target.focus()}
     />
   );

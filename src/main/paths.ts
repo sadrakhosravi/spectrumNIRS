@@ -1,8 +1,8 @@
 import path from 'path';
 import { app } from 'electron';
+import { appName } from '~/package.json';
 
 // Constants
-const name = 'SpectrumNIRS';
 
 // Resources path
 export const initialFilesPath = path.join(
@@ -16,7 +16,7 @@ export const initialSettingsFilePath = path.join(
 );
 
 // Main application data path
-export const appDataPath = path.join(app.getPath('appData'), name);
+export const appDataPath = path.join(app.getPath('appData'), appName);
 
 // Database data path
 export const databasePath = path.join(appDataPath, 'database');
@@ -25,3 +25,7 @@ export const databaseFile = path.join(databasePath, 'spectrum.db');
 // Settings data path
 export const settingsPath = path.join(appDataPath, 'settings');
 export const settingsFilePath = path.join(settingsPath, 'user-settings.json');
+
+// Documents path
+export const documentsPath = app.getPath('documents');
+export const documentsSettingsPath = path.join(documentsPath, 'Spectrum NIRS');

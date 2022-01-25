@@ -94,3 +94,5 @@ declare namespace api {
 
 // global.d.ts
 declare module '*.css';
+
+declare module 'typedarray-to-buffer';

@@ -2,15 +2,13 @@ import { ipcMain } from 'electron';
 import { ProbeChannels } from '@utils/channels';
 import ProbeManager from '../main/models/ProbesManager';
 
-const probe = new ProbeManager();
-
 // Get the default probe
 (async () => {
-  await probe.getDefaultProbe();
+  await ProbeManager.getDefaultProbe();
 })();
 
 ipcMain.handle(ProbeChannels.GetCurrentProbe, async () =>
-  probe.getCurrentProbe()
+  ProbeManager.getCurrentProbe()
 );
 
 // Create a new probe
@@ -19,28 +17,28 @@ ipcMain.handle(ProbeChannels.NewProbe, async (_event) => {});
 // Gets all the devices
 ipcMain.handle(
   ProbeChannels.GetAllDevices,
-  async () => await probe.getAllDevices()
+  async () => await ProbeManager.getAllDevices()
 );
 
 // Gets all the devices
 ipcMain.handle(
   ProbeChannels.GetAllProbesOfDevice,
-  async (_event, deviceId) => await probe.getAllProbesOfDevice(deviceId)
+  async (_event, deviceId) => await ProbeManager.getAllProbesOfDevice(deviceId)
 );
 
 // Selects the current probe
 ipcMain.handle(ProbeChannels.SelectProbe, async (_event, probeId: number) =>
-  probe.setCurrentProbe(probeId)
+  ProbeManager.setCurrentProbe(probeId)
 );
 
 // Get the current probe intensities
 ipcMain.handle(
   ProbeChannels.GetProbeIntensities,
-  async () => await probe.getIntensities()
+  async () => await ProbeManager.getIntensities()
 );
 
 // Update probe intensities
 ipcMain.handle(
   ProbeChannels.UpdateProbeIntensities,
-  async (_event, intensities) => await probe.setIntensities(intensities)
+  async (_event, intensities) => await ProbeManager.setIntensities(intensities)
 );

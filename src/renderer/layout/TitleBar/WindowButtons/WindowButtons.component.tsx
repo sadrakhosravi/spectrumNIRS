@@ -23,14 +23,15 @@ const WindowButtons = () => {
     window.api.onIPCData('window:maximize', () => {
       dispatch(setWindowMaximized(true));
     });
-  }, []);
-
-  useEffect(() => {
     window.api.onIPCData('window:resize', () => {
       dispatch(setWindowResized(Math.random()));
     });
 
-    return () => window.api.removeListeners('window:resize');
+    return () => {
+      window.api.removeListeners('window:unmaximize');
+      window.api.removeListeners('window:maximize');
+      window.api.removeListeners('window:resize');
+    };
   }, []);
 
   return (
@@ -60,4 +61,4 @@ const WindowButtons = () => {
   );
 };
 
-export default React.memo(WindowButtons);
+export default WindowButtons;

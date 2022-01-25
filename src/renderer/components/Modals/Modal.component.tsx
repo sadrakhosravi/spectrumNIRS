@@ -18,7 +18,7 @@ const Modal: React.FC<IProps> = (props) => {
   const dispatch = useAppDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
-  const whichModal = useAppSelector((state) => state.modalState.value);
+  const openedModal = useAppSelector((state) => state.modalState.value);
 
   const largeStyles =
     size === 'large'
@@ -26,8 +26,8 @@ const Modal: React.FC<IProps> = (props) => {
       : 'w-1/2 max-h-3/4 overflow-y-auto';
 
   useEffect(() => {
-    whichModal === id ? setIsOpen(true) : setIsOpen(false);
-  }, [whichModal]);
+    openedModal === id ? setIsOpen(true) : setIsOpen(false);
+  }, [openedModal]);
 
   // Handle close of the modal
   const handleClose = () => {

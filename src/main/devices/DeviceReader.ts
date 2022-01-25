@@ -2,37 +2,6 @@
 import NIRSV5 from './nirsv5';
 import { CurrentRecording } from 'controllers/recording';
 
-export interface IDataReaders {
-  /**
-   * Starts reading data from the sensor.
-   */
-  startRecording(): void;
-  /**
-   * Stops reading data and kills the process.
-   */
-  stopRecording(): void;
-  /**
-   * Pauses reading data.
-   */
-  pauseRecording(): void;
-  /**
-   * Continues reading data.
-   */
-  continueRecording(): void;
-  /**
-   * Toggles the data to either display raw data or the calculated values.
-   */
-  toggleRawData(): void;
-  /**
-   * Toggles the passed event in the reader
-   */
-  toggleEvent(data: object): void;
-  /**
-   * Sends the new gain to the hardware
-   */
-  syncGainsWithHardware(data: string[]): Promise<any>;
-}
-
 type CurrentSensor = {
   start: (
     lastTimeSequence: number | undefined,
@@ -52,7 +21,7 @@ type CurrentSensor = {
 /**
  * Controls reading data from the specified sensor
  */
-export class DataReader implements IDataReaders {
+export class DataReader {
   sensor: number;
   patientId: number;
   isRawData: boolean;

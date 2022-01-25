@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch } from '@redux/hooks/hooks';
-import {
-  setPatientData,
-  setRecordingData,
-  resetPatientData,
-} from '@redux/ExperimentDataSlice';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
 import {
   deleteRecordingAndData,
@@ -55,14 +50,23 @@ const SelectPatient = ({
     setRecordings(recordings);
   };
 
-  const handleOpenRecordingButton = (recording: any) => {
-    dispatch(setPatientData(patient));
-    dispatch(setRecordingData(recording));
+  const handleOpenRecordingButton = async (recording: any) => {
+    await window.api.invokeIPC(
+      ExperimentChannels.GetAndUpdateRecording,
+      recording.id
+    );
     dispatch(closeModal());
   };
 
   useEffect(() => {
-    isOpen ? dispatch(setPatientData(patient)) : dispatch(resetPatientData());
+    (async () => {
+      isOpen
+        ? await window.api.invokeIPC(
+            ExperimentChannels.GetAndUpdatePatient,
+            patient.id
+          )
+        : await window.api.invokeIPC(ExperimentChannels.RemovePatient);
+    })();
   }, [isOpen]);
 
   return (

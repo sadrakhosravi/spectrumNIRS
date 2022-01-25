@@ -3,7 +3,12 @@ import createDBConnection from '../db/index';
 import firstRun from './firstRun';
 
 // Constants
-import { databaseFile, databasePath, settingsPath } from '../main/paths';
+import {
+  databaseFile,
+  databasePath,
+  documentsSettingsPath,
+  settingsPath,
+} from '../main/paths';
 
 const startup = async () => {
   try {
@@ -11,7 +16,8 @@ const startup = async () => {
     if (
       !fs.existsSync(databaseFile) ||
       !fs.existsSync(databasePath) ||
-      !fs.existsSync(settingsPath)
+      !fs.existsSync(settingsPath) ||
+      !fs.existsSync(documentsSettingsPath)
     ) {
       await firstRun();
     }

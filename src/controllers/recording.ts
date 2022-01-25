@@ -2,7 +2,6 @@ import { ipcMain } from 'electron';
 
 // Models
 import DataReader from '../main/devices/DeviceReader';
-import RecordingsData from '@electron/models/RecordingsData';
 
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
@@ -87,33 +86,6 @@ ipcMain.handle(RecordChannels.SyncGain, async (_event, data: string[]) => {
   console.log(reader);
   await reader?.syncGainsWithHardware(data);
 });
-
-// Checks if the current recording has data and sends the data back to the chart.
-ipcMain.handle(
-  ChartChannels.CheckForData,
-  async (_event, recordingId: number) =>
-    await RecordingsData.checkForRecordingData(recordingId)
-);
-
-// Get RecordingsData based on the given interval
-ipcMain.handle(
-  ChartChannels.GetDataForInterval,
-  async (_event, { recordingId, start, end }) =>
-    await RecordingsData.getRecordingDataForInterval(recordingId, start, end)
-);
-
-// Get all events
-ipcMain.handle(
-  ChartChannels.GetAllEvents,
-  async (_event, recordingId) => await RecordingsData.getAllEvents(recordingId)
-);
-
-// Get RecordingsData based on the given interval
-ipcMain.on(
-  ChartChannels.StreamData,
-  async (event, recordingId) =>
-    await RecordingsData.streamRecordingData(recordingId, event.sender)
-);
 
 // Hypoxia Event
 ipcMain.on(ChartChannels.Event, (_event, data: Object) => {

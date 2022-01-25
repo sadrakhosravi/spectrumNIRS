@@ -9,6 +9,7 @@ import {
   initialSettingsFilePath,
   databaseFile,
   settingsFilePath,
+  documentsSettingsPath,
 } from '../main/paths';
 
 const firstRun = async () => {
@@ -20,6 +21,9 @@ const firstRun = async () => {
 
   // Create the settings folder
   await fsPromises.mkdir(settingsPath, { recursive: true });
+
+  // Create the documents setting folder
+  await fsPromises.mkdir(documentsSettingsPath, { recursive: true });
 
   // Copy initial data to the related folders
   try {

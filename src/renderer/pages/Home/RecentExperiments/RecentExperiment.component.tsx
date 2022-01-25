@@ -1,10 +1,7 @@
 import React from 'react';
 import { useAppDispatch } from '@redux/hooks/hooks';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
-import {
-  resetExperimentData,
-  setCurrentExperiment,
-} from '@redux/ExperimentDataSlice';
+import { resetExperimentData } from '@redux/ExperimentDataSlice';
 import { changeRecordState } from '@redux/RecordStateSlice';
 import { deleteExperimentAndData } from '@adapters/experimentAdapter';
 
@@ -38,10 +35,15 @@ const RecentExperiment: React.FC<IProps> = ({
   const handleOpenExperimentButton = async () => {
     dispatch(resetExperimentData());
     dispatch(changeRecordState(RecordState.IDLE));
+
+    // Get the experiment from DB
+    await window.api.invokeIPC(
+      ExperimentChannels.GetAndUpdateExp,
+      experiment.id
+    );
+
     dispatch(closeModal());
-    dispatch(setCurrentExperiment(experiment));
     dispatch(openModal(ModalConstants.OPEN_PATIENT));
-    await window.api.invokeIPC(ExperimentChannels.UpdateExp, experiment.id);
   };
 
   return (

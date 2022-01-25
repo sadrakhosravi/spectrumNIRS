@@ -10,6 +10,12 @@ ipcMain.on('window:close', () => {
   BrowserWindow.getFocusedWindow()?.close();
 });
 
+// Close/quit window on minimize icon click
+ipcMain.handle('window:maximize', () => {
+  const window = BrowserWindow.getFocusedWindow();
+  window?.isMaximized ? window.restore() : window?.maximize();
+});
+
 // Restore window on minimize icon click
 ipcMain.on('window:restore', (event: IpcMainEvent) => {
   const mainWindow = BrowserWindow.fromWebContents(event.sender);

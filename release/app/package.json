@@ -1,6 +1,6 @@
 {
   "name": "spectrum-nirs",
-  "productName": "SpectrumNIRS",
+  "productName": "Beast Spectrum",
   "version": "0.2.0-nightly.20211223-1",
   "description": "Spectrum NIRS data acquisition software",
   "main": "./dist/main/main.js",

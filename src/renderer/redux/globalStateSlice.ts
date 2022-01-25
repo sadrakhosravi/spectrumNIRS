@@ -3,10 +3,16 @@ import { IGlobalStore } from '@lib/globalStore/GlobalStore';
 
 interface IGlobalStateSlice {
   exportServer: IGlobalStore['exportServer'] | null;
+  experiment: IGlobalStore['experiment'] | null;
+  patient: IGlobalStore['patient'] | null;
+  recording: IGlobalStore['recording'] | null;
 }
 
 const initialState: IGlobalStateSlice = {
   exportServer: null,
+  experiment: null,
+  patient: null,
+  recording: null,
 };
 
 export const GlobalStateSlice = createSlice({
