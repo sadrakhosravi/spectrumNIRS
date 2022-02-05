@@ -5,12 +5,6 @@ class DuplexStream extends Duplex {
     super(options);
   }
 
-  _pushWithBackpressure(chunk: Buffer | String | Uint8Array) {
-    if (!this.push(chunk)) {
-      this.once('drain', () => this._pushWithBackpressure(chunk));
-    }
-  }
-
   _write(
     _chunk: any,
     _encoding: BufferEncoding,

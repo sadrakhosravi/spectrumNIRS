@@ -10,6 +10,8 @@ import {
 } from '@electron/models/exportServer/ExportServer';
 import { IExperimentData } from '@electron/models/ExperimentModel';
 import { IPatientData } from '@electron/models/PatientModel';
+import { IRecordingData } from '@electron/models/RecordingModel';
+import { CurrentProbe } from '@electron/models/ProbesManager';
 
 let storePath = '';
 
@@ -46,7 +48,10 @@ export interface IGlobalStore {
     currentPatient: IPatientData | null;
   };
   recording: {
-    currentRecording: any;
+    currentRecording: IRecordingData | null;
+  };
+  probe: {
+    currentProbe: CurrentProbe | null;
   };
 }
 
@@ -135,6 +140,23 @@ class GlobalStore {
    */
   getRecording = (key: keyof IGlobalStore['recording']) =>
     this.store.get(`recording.${key}`);
+
+  /**
+   * Sets the probe state value
+   */
+  setProbe = (key: keyof IGlobalStore['probe'], value: any) =>
+    this.store.set(`probe.${key}`, value);
+
+  /**
+   * Removes the probe key and all its values
+   */
+  removeProbe = () => this.store.set('probe', {});
+
+  /**
+   * Gets a value from the probe state
+   */
+  getProbe = (key: keyof IGlobalStore['probe']) =>
+    this.store.get(`probe.${key}`);
 }
 
 export type GlobalStoreType = GlobalStore;

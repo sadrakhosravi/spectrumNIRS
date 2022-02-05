@@ -101,7 +101,7 @@ export const ReviewToolbar = [
           detail:
             'No recording found. Either open a recording or create a new one.',
         });
-        return;
+        // return;
       }
 
       dispatch(openModal(ModalConstants.EXPORT_FORM));

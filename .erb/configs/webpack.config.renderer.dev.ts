@@ -59,6 +59,7 @@ export default merge(baseConfig, {
     path: webpackPaths.distRendererPath,
     publicPath: '/',
     filename: '[name].dev.js',
+    chunkFilename: '[name].chunk.js',
   },
 
   module: {

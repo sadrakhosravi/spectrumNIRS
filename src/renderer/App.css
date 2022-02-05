@@ -22,6 +22,9 @@
   .border-l-primary {
     @apply border-l-[1px] border-white border-opacity-[0.12];
   }
+  .title-description p {
+    @apply text-white/50;
+  }
 }
 
 :root {

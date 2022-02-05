@@ -26,6 +26,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Force high performance gpu
 app.commandLine.appendSwitch('--force_high_performance_gpu', 'true');
+app.commandLine.appendSwitch('enable-unsafe-es3-apis');
 
 // const isDevelopment =
 //   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';

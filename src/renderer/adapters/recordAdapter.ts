@@ -4,6 +4,7 @@ import { changeRecordState } from '@redux/RecordStateSlice';
 // Constants
 import { DialogBoxChannels, RecordChannels } from '@utils/channels';
 import { RecordState } from '@utils/constants';
+import DataManager from 'renderer/DataManager/DataManager';
 
 const dispatch = store.dispatch;
 
@@ -76,6 +77,21 @@ export const handleRecord = async () => {
 
     dispatch(changeRecordState(RecordState.RECORD));
   }
+};
+
+export const handleRecord2 = () => {
+  const { recordState } = store.getState();
+
+  if (recordState.value === RecordState.IDLE) {
+    DataManager.initDataManager();
+    dispatch(changeRecordState(RecordState.RECORD));
+    return;
+  }
+
+  DataManager.stopDataManager();
+  dispatch(changeRecordState(RecordState.IDLE));
+
+  return;
 };
 
 // Pause and continue recording logic

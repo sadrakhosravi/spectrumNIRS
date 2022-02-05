@@ -33,7 +33,7 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
 
     chart.createRecordChart();
     // Attach event listeners
-    chart.listenForData();
+    // chart.listenForData();
 
     // Keep a ref to the chart
     chartRef.current = chart as RecordChartClass;

@@ -191,6 +191,7 @@ class ProbeCalibrationChart {
 
   listenForData() {
     window.api.onIPCData('probe-calibration-data', (_event, data) => {
+      console.log(data);
       data.forEach((dataPoint: any, i: number) => {
         this.LEDRectangles &&
           this.LEDRectangles[i]?.setDimensions({

@@ -16,7 +16,8 @@ import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 import IndicatorContainer from '@components/Indicators/IndicatorContainer.component';
 import { AppState } from '@utils/constants';
 
-// const Clock = React.lazy(() => import('@components/Clock/Clock.component'));
+// Workers and data Managers
+import DataManager from './DataManager/DataManager';
 
 const ModalsContainer = React.lazy(
   () => import('@layout/ModalsContainer/ModalsContainer.component')
@@ -28,15 +29,11 @@ const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
 
 const App = () => {
   useLoadState();
-
   // Load the web workers
   useEffect(() => {
-    let WorkerManager: any;
-    (async () => {
-      WorkerManager = (await import('../workers/WorkerManager')).default;
-    })();
-
-    return () => WorkerManager.terminateAllWorkers();
+    return () => {
+      DataManager.stopDataManager();
+    };
   }, []);
 
   return (

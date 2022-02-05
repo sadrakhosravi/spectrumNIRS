@@ -10,6 +10,9 @@ const dashboard = (numberOfRows: number, container: string): Dashboard => {
     theme: spectrumTheme, // Custom theme for the software
     devicePixelRatio: true,
     lineAntiAlias: true,
+    webgl: {
+      version: 'webgl2',
+    },
   });
 
   // First column channel info

@@ -14,7 +14,7 @@ import TimeDivisionIcon from '@icons/time-division.svg';
 import { RecordState } from '@utils/constants';
 
 // Adapters
-import { handlePause, handleRecord } from '@adapters/recordAdapter';
+import { handleRecord2 } from '@adapters/recordAdapter';
 import ChartOptions from '../ChartClass/ChartOptions';
 
 // State
@@ -127,15 +127,6 @@ export const RecordButtons = [
     },
 
     isActive: (state: RecordState) => state !== RecordState.IDLE,
-    click: (state: RecordState) => {
-      switch (state) {
-        case RecordState.IDLE:
-          return handleRecord;
-        case RecordState.PAUSED:
-        case RecordState.RECORD:
-        case RecordState.CONTINUE:
-          return handlePause;
-      }
-    },
+    click: (_state: RecordState) => handleRecord2,
   },
 ];

@@ -41,6 +41,10 @@ export class ExperimentModel {
    * @param experiment - the experiment to be set as the current experiment
    */
   public setCurrentExperiment = (experiment: Experiments | undefined) => {
+    GlobalStore.removeExperiment();
+    GlobalStore.removePatient();
+    GlobalStore.removeRecording();
+
     this.currentExperiment = experiment;
 
     if (!this.currentExperiment) {

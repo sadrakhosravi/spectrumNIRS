@@ -3,9 +3,11 @@
  */
 // import RecordingsData from '@electron/models/RecordingsData';
 import net from 'net';
+import RecordingModel from '@electron/models/RecordingModel';
 
 const path = require('path');
 import readline from 'readline';
+import { BrowserWindow } from 'electron';
 const { spawn } = require('child_process'); // Spawns a child process (NIRSReader.exe)
 
 // Socket for connecting to the driver
@@ -89,12 +91,11 @@ const spawnedProcesses: any[] = [];
 export const start = async (
   prevTime = 0,
   isRawData: boolean,
-  sender: any,
-  recordingId: number
+  _sender: any,
+  _recordingId: number
 ) => {
   // Check if RawData was requested
   isRawData ? (rawData = true) : (rawData = false);
-  console.log('RecordingId:' + recordingId);
   lastTimeSequence = 0;
 
   // Count variable to keep track of the readline loop
@@ -102,7 +103,10 @@ export const start = async (
   let sendCount = 0;
   let sendArr: any[] = [];
 
-  // Database = RecordingsData();
+  const database = RecordingModel.recordingsDataModel;
+  const sender = BrowserWindow.getAllWindows()[0].webContents;
+  const recordingId = RecordingModel.currentRecording?.id;
+
   spawnNIRSV5();
 
   // Read each line from reader.exe stdout.
@@ -167,7 +171,7 @@ export const start = async (
       });
 
       if (databaseCount === 200) {
-        // Database?.insertTransactionData(databaseArr);
+        database?.insertTransactionData(databaseArr);
         databaseArr.length = 0;
         databaseCount = 0;
       }
@@ -199,7 +203,9 @@ export const start = async (
  * Starts the V5 sensor for quality check, no data will be saved
  */
 
-export const startQualityMonitor = async (sender: any) => {
+export const startQualityMonitor = async (_sender: any) => {
+  const sender = BrowserWindow.getAllWindows()[0].webContents;
+
   spawnNIRSV5();
   let count = 0;
   let LEDPDs = [0, 0, 0, 0, 0, 0];
@@ -212,12 +218,12 @@ export const startQualityMonitor = async (sender: any) => {
     .on('line', async function (line: string) {
       const data = line.split(',');
       const outputArr = [
-        parseInt(data[6]),
-        parseInt(data[7]),
-        parseInt(data[8]),
-        parseInt(data[9]),
-        parseInt(data[10]),
-        parseInt(data[11]),
+        parseInt(data[0]),
+        parseInt(data[1]),
+        parseInt(data[2]),
+        parseInt(data[3]),
+        parseInt(data[4]),
+        parseInt(data[5]),
       ];
 
       outputArr.forEach((data, i) => (LEDPDs[i] += data));

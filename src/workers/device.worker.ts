@@ -4,26 +4,51 @@ import { IGetDevice } from '@lib/Device/device-api';
 import V5 from '@electron/devices/device/V5';
 import { Readable } from 'stream';
 import AddTimeStamp from '@lib/Stream/AddTimeStamp';
-// import ConsumeStream from '@lib/Stream/ConsumeStream';
-import SendDataToParent from '@lib/Stream/SendDataToUI';
-// import AddTimeStamp from '../Stream/AddTimeStamp';
+import SendDataToUI from '@lib/Stream/SendDataToUI';
+// import split2 from 'split2';
 
-class DeviceReader {
+export interface IDeviceInfo {
+  samplingRate: number;
+  dataByteSize: number;
+  batchSize: number;
+  numOfElementsPerDataPoint: number;
+}
+
+class DeviceWorker {
   devices: IGetDevice[];
   selectedDevice: IGetDevice;
+  port: MessagePort;
 
-  constructor() {
+  constructor(port: MessagePort) {
     this.devices = [V5];
     this.selectedDevice = this.devices[0];
+    this.port = port;
   }
 
+  /**
+   * Start
+   */
   start = () => {
     const device = this.getSelectedDevice();
-    const Parser = new device.Parser({ highWaterMark: 10024 });
-    new AddTimeStamp({ highWaterMark: 10024 });
-    const SendData = new SendDataToParent({ highWaterMark: 10024 });
 
+    const highWaterMark = device.Stream.getSampleBufferSize() * 25;
+
+    // Start the parser and transformer streams
+    const Parser = new device.Parser({
+      highWaterMark: highWaterMark,
+      readableHighWaterMark: highWaterMark,
+      writableHighWaterMark: highWaterMark,
+    });
+    new AddTimeStamp({ highWaterMark: 1 });
+    const SendData = new SendDataToUI(
+      { highWaterMark: highWaterMark },
+      this.port
+    );
+
+    // Start the device
     device.Device.startDevice();
+
+    // Wait for the cold start
     setTimeout(() => {
       const deviceStream = device.Stream.getDeviceStream();
       if (deviceStream instanceof Readable) {
@@ -32,14 +57,13 @@ class DeviceReader {
     }, this.selectedDevice.Device.getStartupDelay());
   };
 
+  /**
+   * Stops the device an its stream
+   */
   stop = () => {
     this.selectedDevice.Stream.stopDeviceStream();
     this.selectedDevice.Device.stopDevice();
   };
-
-  /**
-   * Create the shared data arrays to be sent to the parent process
-   */
 
   /**
    * @returns an array of all the devices that are integrated in the app
@@ -52,11 +76,17 @@ class DeviceReader {
   public getSelectedDevice = () => this.selectedDevice;
 }
 
-export default DeviceReader;
+let deviceWorker: DeviceWorker | undefined;
 
-const reader = new DeviceReader();
+self.onmessage = (event) => {
+  console.log(event);
+  if (event.data === 'start') {
+    deviceWorker = new DeviceWorker(event.ports[0]);
+    deviceWorker.start();
+  }
 
-self.onmessage = ({ data }) => {
-  data === 'start' && reader.start();
-  data === 'stop' && reader.stop();
+  if (event.data === 'stop') {
+    deviceWorker?.stop();
+    deviceWorker = undefined;
+  }
 };

@@ -6,10 +6,12 @@ import { ChartChannels } from '@utils/channels';
 import { setPreviousData } from '@redux/ExperimentDataSlice';
 import { setRecordChartPositions } from '@redux/RecordChartSlice';
 // import WorkerManager from 'workers/WorkerManager';
+import AccurateTimer from '@electron/helpers/accurateTimer';
 
 class RecordChart extends Chart {
   numberOfRows: number;
   chartOptions: undefined | ChartOptions;
+  drawingTimer: AccurateTimer | null;
   constructor(
     containerId: string,
     type: ChartType.RECORD | ChartType.REVIEW,
@@ -21,7 +23,7 @@ class RecordChart extends Chart {
     super(channels, type, samplingRate, containerId);
     this.numberOfRows = this.channels.length;
     this.chartOptions = undefined;
-
+    this.drawingTimer = null;
     console.log(getState().sensorState.currentProbe?.samplingRate);
 
     console.log('RECOORDDD CHARTTT');
@@ -58,17 +60,60 @@ class RecordChart extends Chart {
     });
   }
 
-  handleIncomingData = (
-    _event: Electron.IpcRendererEvent,
-    data: number[][]
-  ) => {
-    data.forEach((data) => {
-      this.series.forEach((series) => series.addArrayY([data[2]], 10));
-    });
+  handleIncomingData = () => {
+    const O2Hb = new Array(0).fill(0);
+    const HHb = new Array(0).fill(0);
+    const THb = new Array(0).fill(0);
+    const TOI = new Array(0).fill(0);
+
+    // Animate x axis scrolling manually.
+    let xStepPerFrame =
+      // New points count per 1 second
+      (this.samplingRate * 10) /
+      // 60 frames per second (axis is stepped every frame for smoothness)
+      60;
+
+    // const calcWorker = WorkerManager.getCalculationWorker() as Worker;
+    // calcWorker.addEventListener('message', ({ data }) => {
+    //   data.forEach((dataPoint: any) => {
+    //     O2Hb.push(dataPoint[4]);
+    //     HHb.push(dataPoint[5]);
+    //     THb.push(dataPoint[6]);
+    //     TOI.push(dataPoint[7]);
+    //   });
+    // });
+
+    const addData = () => {
+      this.series[0].addArrayY(O2Hb.splice(0, O2Hb.length), 10);
+      this.series[1].addArrayY(HHb.splice(0, HHb.length), 10);
+      this.series[2].addArrayY(THb.splice(0, THb.length), 10);
+      this.series[3].addArrayY(TOI.splice(0, TOI.length), 10);
+    };
+
+    this.drawingTimer = new AccurateTimer(() => {
+      addData();
+    }, 200);
+
+    const axisX = this.xAxisChart.getDefaultAxisX();
+
+    const stepAxisX = () => {
+      const xCur = axisX.getInterval().end;
+      const xMax = this.series[0].getXMax();
+      const xNext = Math.min(xCur + xStepPerFrame, xMax);
+      if (xNext !== xCur) {
+        axisX.setInterval(xNext - 30 * 1000, xNext);
+      }
+      requestAnimationFrame(stepAxisX);
+    };
+    stepAxisX();
+
+    this.drawingTimer.start();
   };
 
+  processIncomingData = () => {};
+
   listenForData() {
-    window.api.onIPCData('device:data', this.handleIncomingData);
+    this.handleIncomingData();
   }
 
   drawData(data: any) {
@@ -129,6 +174,7 @@ class RecordChart extends Chart {
   };
 
   customizeRecordCharts() {
+    this.dashboard.setAnimationsEnabled(false);
     this.charts &&
       this.charts.forEach((_chart, i) => {
         this.series && this.series[i].setDataCleaning({ minDataPointCount: 1 });
@@ -138,6 +184,7 @@ class RecordChart extends Chart {
   cleanup() {
     console.log('Destroy Chart');
     window.api.removeListeners('device:data');
+    setImmediate(() => this.drawingTimer?.stop());
     this.clearData();
     this.memoryCleanup();
     this.chartOptions?.memoryCleanup();

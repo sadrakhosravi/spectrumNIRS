@@ -44,7 +44,7 @@ export class DataReader {
     this.isRawData = isRawData;
     this.currentRecording = currentRecording;
     this.senderWindow = senderWindow;
-    this.currentSensor = this.dataReader[this.sensor - 1]; // Selects the sensor
+    this.currentSensor = this.dataReader[this.sensor]; // Selects the sensor
     this.lastTimeStamp = lastTimeStamp;
   }
 

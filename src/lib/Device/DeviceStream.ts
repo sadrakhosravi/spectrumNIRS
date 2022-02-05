@@ -15,6 +15,21 @@ export interface IDeviceStream {
   getSampleBufferSize: () => number;
 
   /**
+   * @returns the output buffer size of the data batch sent to the UI via IPC
+   */
+  getOutputBufferSizeToUIInBytes: () => number;
+
+  /**
+   * @returns the number of data point in a data batch
+   */
+  getDataBatchSize: () => number;
+
+  /**
+   *
+   */
+  getNumOfElementsPerDataPoint: () => number;
+
+  /**
    * Gets the stream data from the device
    */
   getDeviceStream: () => Readable | ReadLine | null;

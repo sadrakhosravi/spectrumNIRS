@@ -1,11 +1,18 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import {
+  ChildProcess,
+  ChildProcessWithoutNullStreams,
+  spawn,
+  SpawnOptionsWithoutStdio,
+} from 'child_process';
 import path from 'path';
 
 export interface IPhysicalDevice {
   /**
    * Starts the physical device by spawning a device reader as a child process
    */
-  startDevice: () => ChildProcessWithoutNullStreams;
+  startDevice: (
+    options?: SpawnOptionsWithoutStdio
+  ) => ChildProcessWithoutNullStreams | ChildProcess;
 
   /**
    * Stops the device and removes its process from the memory

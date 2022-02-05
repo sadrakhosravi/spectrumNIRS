@@ -5,6 +5,7 @@ import withTooltip from '@hoc/withTooltip.hoc';
 import TrayIconButtons from './TrayIconButton.component';
 
 import RecordingIcon from '@icons/recording.svg';
+import { CurrentProbe } from '@electron/models/ProbesManager';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
@@ -12,20 +13,30 @@ const RecordingTrayIcon = () => {
   const recordingData = useAppSelector(
     (state) => state.global.recording?.currentRecording
   );
-  console.log(recordingData);
+
+  const settings: CurrentProbe =
+    recordingData && JSON.parse(recordingData.settings);
 
   let patientTooltipText = null;
 
   if (recordingData) {
     patientTooltipText = (
       <div className="px-2 py-2 text-left">
-        <h2 className="text-xl text-accent mb-1">Patient</h2>
+        <h2 className="text-xl text-accent mb-1">Recording Info</h2>
 
         <div className="ml-4">
-          <p>Name: {recordingData?.name}</p>
-          <p>DOB: {recordingData.dob}</p>
+          <p>Name: {recordingData.name}</p>
+          <p>DOB: {recordingData.date}</p>
           {recordingData?.description && (
             <p>Description: {recordingData?.description}</p>
+          )}
+          {recordingData?.settings && (
+            <>
+              <p>Probe: {settings.name}</p>
+              <p>Sampling Rate: {settings.samplingRate}</p>
+              <p>Device: {settings.device.name}</p>
+              <p>Channels: {settings.device.defaultChannels.join(', ')}</p>
+            </>
           )}
         </div>
       </div>

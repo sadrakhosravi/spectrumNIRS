@@ -23,8 +23,6 @@ const startControllers = async () => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
   mainWindow.webContents.send('main-loaded');
   ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
-
-  // await import('../main/devices/Reader');
 };
 
 export default startControllers;

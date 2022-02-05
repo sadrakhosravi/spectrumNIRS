@@ -1,19 +1,25 @@
 import path from 'path';
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import {
+  ChildProcessWithoutNullStreams,
+  spawn,
+  SpawnOptionsWithoutStdio,
+} from 'child_process';
+// import readline from 'readline';
 import {
   IDeviceInput,
   IDeviceStream,
   IGetDevice,
   INIRSDevice,
-  DuplexStream,
-  Transformer,
-  TransformerCallback,
   TransformerOptions,
 } from '@lib/Device/device-api';
 import { Socket } from 'net';
-import readline, { ReadLine } from 'readline';
+import { ReadLine } from 'readline';
+import { Readable, Transform, TransformCallback } from 'stream';
 import toBuffer from 'typedarray-to-buffer';
 
+// Constants
+const NUM_OF_DATAPOINTS_PER_CHUNK = 25;
+const NUM_OF_ELEMENTS_PER_DATAPOINT = 12;
 /**
  * V5 NIRS Device class
  */
@@ -41,13 +47,20 @@ class V5Device implements INIRSDevice {
     this.spawnedDevices = [];
   }
 
-  public startDevice = () => {
+  public startDevice = (options?: SpawnOptionsWithoutStdio) => {
     // Kill any prior process before spawning another
     this.spawnedDevices.forEach((device) => device.kill());
 
     const spawnedDevice = spawn(
-      path.join(__dirname, '../../../../resources/drivers/nirs-v5/Test1.exe'),
-      ['test', path.join('../../resources/drivers/nirs-v5/Test1.exe')]
+      path.join(
+        process.env.INIT_CWD as string,
+        'resources',
+        'drivers',
+        'nirs-v5',
+        'Test1.exe'
+      ),
+      [],
+      options
     );
 
     this.spawnedDevices.push(spawnedDevice);
@@ -126,20 +139,26 @@ class V5Input implements IDeviceInput {
  */
 class V5Stream implements IDeviceStream {
   physicalDevice: INIRSDevice;
+  NIRSV5Reader: ReadLine | undefined;
   streamType: 'stdout';
   sampleBufferSizeInBytes: number;
-  deviceStream: ReadLine | null;
-  streamReader: null;
+  outputBufferSizeToUIInBytes: number;
+  dataBatchSize: number;
+  numOfElementsPerDataPoint: number;
+  deviceStream: ReadLine | Readable | undefined;
   chunks: Float32Array | null;
   count: number;
   arrayPos: number;
 
   constructor(physicalDevice: INIRSDevice) {
     this.physicalDevice = physicalDevice;
+    this.NIRSV5Reader = undefined;
     this.streamType = 'stdout';
-    this.sampleBufferSizeInBytes = 147;
-    this.deviceStream = null;
-    this.streamReader = null;
+    this.sampleBufferSizeInBytes = 270;
+    this.outputBufferSizeToUIInBytes = 220;
+    this.dataBatchSize = NUM_OF_DATAPOINTS_PER_CHUNK;
+    this.numOfElementsPerDataPoint = NUM_OF_ELEMENTS_PER_DATAPOINT;
+    this.deviceStream = undefined;
     this.chunks = null;
     this.count = 0;
     this.arrayPos = 0;
@@ -149,28 +168,29 @@ class V5Stream implements IDeviceStream {
 
   public getSampleBufferSize = () => this.sampleBufferSizeInBytes;
 
+  public getOutputBufferSizeToUIInBytes = () =>
+    this.outputBufferSizeToUIInBytes;
+
+  public getDataBatchSize = () => this.dataBatchSize;
+
+  public getNumOfElementsPerDataPoint = () => this.numOfElementsPerDataPoint;
+
   // Return a stream of individual samples for now
   public getDeviceStream = () => {
     const device = this.physicalDevice.getDevice();
 
-    const duplexStream = new DuplexStream({ highWaterMark: 1024 });
+    this.deviceStream = device.stdout;
 
-    this.deviceStream = readline
-      .createInterface({
-        input: device.stdout,
-        terminal: false,
-      })
-      .on('line', (line) => {
-        duplexStream._pushWithBackpressure(line);
-      });
-
-    return duplexStream;
+    return this.deviceStream;
   };
 
   stopDeviceStream = () => {
     if (this.deviceStream) {
-      this.deviceStream.close();
+      this.NIRSV5Reader?.close();
       this.deviceStream.removeAllListeners('line');
+
+      this.NIRSV5Reader = undefined;
+      this.deviceStream = undefined;
       return true;
     }
     return false;
@@ -180,27 +200,48 @@ class V5Stream implements IDeviceStream {
 /**
  * Device parser
  */
-class V5Parser extends Transformer {
+class V5Parser extends Transform {
+  dataArray: Uint16Array;
   constructor(options?: TransformerOptions) {
     super(options);
+    this.dataArray = new Uint16Array(
+      NUM_OF_DATAPOINTS_PER_CHUNK * NUM_OF_ELEMENTS_PER_DATAPOINT
+    );
   }
 
   _transform(
     chunk: Buffer,
     _encoding: BufferEncoding,
-    callback: TransformerCallback
+    callback: TransformCallback
   ): void {
-    const data = chunk.toString().split(',');
-    const DATA_LENGTH = data.length;
+    console.log(chunk.toString());
 
-    const transformedData = new Float32Array(DATA_LENGTH);
+    // Split lines based on \r\n
+    const lines = chunk.toString().split(/\r?\n/);
 
-    for (let i = 0; i < DATA_LENGTH; i += 1) {
-      transformedData[i] = parseFloat(data[i]);
+    const dataArray = new Uint16Array(
+      NUM_OF_DATAPOINTS_PER_CHUNK * NUM_OF_ELEMENTS_PER_DATAPOINT
+    );
+
+    let arrayIndex = 0;
+    // Use a for loop for the best performance
+    for (let i = 0; i < NUM_OF_DATAPOINTS_PER_CHUNK; i += 1) {
+      const data = lines[i].split(',');
+
+      // Parse numbers
+      for (let j = 0; j < NUM_OF_ELEMENTS_PER_DATAPOINT; j += 1) {
+        dataArray[arrayIndex] = ~~data[j];
+        arrayIndex += 1;
+      }
     }
+    //@ts-ignore
+    chunk = null;
+    callback(null, toBuffer(dataArray));
+  }
 
-    this._pushWithBackpressure(toBuffer(transformedData));
-    callback();
+  // Indicates that the stream is over
+  _final(_callback: (error?: Error | null) => void): void {
+    this.push(null);
   }
 }
 

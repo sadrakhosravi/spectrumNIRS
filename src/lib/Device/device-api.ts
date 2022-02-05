@@ -3,12 +3,12 @@ import NIRSDevice, { INIRSDevice } from './NIRSDevice';
 import DeviceStream, { IDeviceStream } from './DeviceStream';
 import DeviceInput, { IDeviceInput } from './DeviceInput';
 import DeviceParser, { IDeviceParser } from './DeviceParser';
-import { Transform } from 'stream';
 import DuplexStream, { DuplexStreamOptions } from '@lib/Stream/DuplexStream';
 import Transformer, {
   TransformerOptions,
   TransformerCallback,
 } from '@lib/Stream/Transformer';
+import { Transform } from 'stream';
 
 // Export all device classes
 export {

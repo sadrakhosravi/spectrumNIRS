@@ -9,7 +9,13 @@ import store from './redux/store';
 import App from './App';
 import ChartProvider from './context/ChartProvider';
 
-export const loadUI = () => {
+// Workers
+import '../workers/WorkerManager';
+
+// Data Manager
+import './DataManager/DataManager';
+
+export const loadUI = async () => {
   const container = document.getElementById('root') as HTMLDivElement;
   container.innerHTML = '';
 

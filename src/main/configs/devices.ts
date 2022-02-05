@@ -1,7 +1,7 @@
 // Devices
 export const devices = [
   {
-    id: 1,
+    id: 0,
     name: 'NIRS V5',
     defaultSamplingRate: 100,
     maxSamplingRate: 100,
@@ -16,7 +16,7 @@ export const devices = [
     driverName: 'STM32',
   },
   {
-    id: 2,
+    id: 1,
     name: 'NIRS Beast',
     defaultSamplingRate: 100,
     maxSamplingRate: 1000,

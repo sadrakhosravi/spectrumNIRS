@@ -34,10 +34,14 @@ export class PatientModel {
    * @param patient - the patient to be set as the current patient
    */
   public setCurrentPatient = (patient: Patients | undefined) => {
+    GlobalStore.removePatient();
+    GlobalStore.removeRecording();
+
     this.currentPatient = patient;
 
     if (!this.currentPatient) {
       GlobalStore.removePatient();
+      GlobalStore.removeRecording();
       return;
     }
 

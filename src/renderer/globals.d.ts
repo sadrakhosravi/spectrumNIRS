@@ -96,3 +96,4 @@ declare namespace api {
 declare module '*.css';
 
 declare module 'typedarray-to-buffer';
+declare module 'thread-stream';

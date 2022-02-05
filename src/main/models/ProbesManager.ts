@@ -10,7 +10,7 @@ export interface IProbe extends Probe {
 
 export type Probe = Probes;
 
-type CurrentProbe = {
+export type CurrentProbe = {
   createdAt: string;
   gain: number;
   id: number;

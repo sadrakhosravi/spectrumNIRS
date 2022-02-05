@@ -4,9 +4,14 @@ import { IGetDevice } from '@lib/Device/device-api';
 import V5 from '@electron/devices/device/V5';
 import { Readable } from 'stream';
 import AddTimeStamp from '@lib/Stream/AddTimeStamp';
-// import ConsumeStream from '@lib/Stream/ConsumeStream';
-import SendDataToUI from '@lib/Stream/SendDataToUI';
-// import AddTimeStamp from '../Stream/AddTimeStamp';
+// import SendDataToUI from '@lib/Stream/SendDataToUI';
+
+export interface IDeviceInfo {
+  samplingRate: number;
+  dataByteSize: number;
+  batchSize: number;
+  numOfElementsPerDataPoint: number;
+}
 
 class Reader {
   devices: IGetDevice[];
@@ -15,24 +20,34 @@ class Reader {
   constructor() {
     this.devices = [V5];
     this.selectedDevice = this.devices[0];
-    this.start();
+    this.start(null);
   }
 
-  start = () => {
+  start = (_port: MessagePort | any) => {
     const device = this.getSelectedDevice();
-    const Parser = new device.Parser({ highWaterMark: 10024 });
-    new AddTimeStamp({ highWaterMark: 10024 });
-    const SendData = new SendDataToUI({ highWaterMark: 10024 });
 
+    // Start the parser and transformer streams
+    // const Parser = new device.Parser({ highWaterMark: 2 * 1024 });
+    new AddTimeStamp({ highWaterMark: 1 });
+    // const SendData = new SendDataToUI({ highWaterMark: 1024 * 2 }, port);
+
+    // Start the device
     device.Device.startDevice();
+
+    // Wait for the cold start
     setTimeout(() => {
       const deviceStream = device.Stream.getDeviceStream();
       if (deviceStream instanceof Readable) {
-        deviceStream.pipe(Parser).pipe(SendData);
+        deviceStream.on('data', (data) => {
+          console.log(data.toString());
+        });
       }
     }, this.selectedDevice.Device.getStartupDelay());
   };
 
+  /**
+   * Stops the device an its stream
+   */
   stop = () => {
     this.selectedDevice.Stream.stopDeviceStream();
     this.selectedDevice.Device.stopDevice();
@@ -54,3 +69,4 @@ class Reader {
 }
 
 export default new Reader();
+export interface IReader extends Reader {}

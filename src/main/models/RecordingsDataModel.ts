@@ -19,13 +19,13 @@ class RecordingsDataModel {
     this.data.push(dataPoint);
   };
 
-  public async insertTransactionData(_data: any[]) {
+  public async insertTransactionData(data: any[]) {
     try {
       await getConnection()
         .createQueryBuilder()
         .insert()
         .into(RecordingsData)
-        .values(this.data)
+        .values([...data])
         .useTransaction(true)
         .execute();
     } catch (error: any) {

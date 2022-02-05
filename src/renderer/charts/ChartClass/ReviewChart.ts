@@ -16,7 +16,7 @@ import {
 import zoomBandChart from './methods/ZoomBandChart';
 
 import ChartOptions from './ChartOptions';
-import WorkerManager from 'workers/WorkerManager';
+// import WorkerManager from 'workers/WorkerManager';
 import { getState, dispatch } from '@redux/store';
 import { setIsLoadingData } from '@redux/AppStateSlice';
 import { ChartChannels } from '@utils/channels';
@@ -93,18 +93,18 @@ class ReviewChart extends Chart {
    * @returns - If no data found.
    */
   loadData = async () => {
-    const databasePath = await window.api.invokeIPC('get-database-path');
-    const databaseWorker = WorkerManager.startDatabaseWorker();
-    const buffMemLength = new SharedArrayBuffer(1024 * 480);
+    // const databasePath = await window.api.invokeIPC('get-database-path');
+    // // const databaseWorker = WorkerManager.startDatabaseWorker();
+    // const buffMemLength = new SharedArrayBuffer(1024 * 480);
 
-    databaseWorker.postMessage({ dbPath: databasePath, arr: buffMemLength });
+    // databaseWorker.postMessage({ dbPath: databasePath, arr: buffMemLength });
 
-    databaseWorker.onmessage = ({ data }) => {
-      console.timeEnd('threadStart');
-      this.drawAnimationFrameId = requestAnimationFrame(() => {
-        this.series.forEach((series) => series.addArrayY(data, 10, 0));
-      });
-    };
+    // databaseWorker.onmessage = ({ data }) => {
+    //   console.timeEnd('threadStart');
+    //   this.drawAnimationFrameId = requestAnimationFrame(() => {
+    //     this.series.forEach((series) => series.addArrayY(data, 10, 0));
+    //   });
+    // };
 
     dispatch(setIsLoadingData(true));
     console.log('LOAD DATA');
@@ -251,15 +251,15 @@ class ReviewChart extends Chart {
     // If any events found, send them to the worker to
     // return a sorted list with the start and end of each event
     if (events.length > 0) {
-      const eventsWorker = WorkerManager.startEventsWorker();
-      eventsWorker.postMessage(events);
-      // eventsWorker.onmessage = ({ data }) => {
-      //   dispatch(setAllEvents(data));
-      //   console.log(data);
-      //   eventsWorker.terminate();
-      //   return;
-      // };
-      eventsWorker.terminate();
+      // const eventsWorker = WorkerManager.startEventsWorker();
+      // eventsWorker.postMessage(events);
+      // // eventsWorker.onmessage = ({ data }) => {
+      // //   dispatch(setAllEvents(data));
+      // //   console.log(data);
+      // //   eventsWorker.terminate();
+      // //   return;
+      // // };
+      // eventsWorker.terminate();
     }
 
     dispatch(setAllEvents([]));
