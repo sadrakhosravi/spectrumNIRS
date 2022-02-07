@@ -63,7 +63,7 @@ export type Commands = 'start' | 'pause' | 'stop' | 'get-protocol-version';
 
 export type IDataSize = {
   label: string;
-  value: 'batch' | 'sdp';
+  value: 'batch' | 'batch50' | 'batch100' | 'sdp';
 };
 
 export type IDataTypes = {
@@ -205,6 +205,16 @@ class ExportServer {
 
       if (outputDataSize === 'batch') {
         this.batchSize = 25;
+        formatDataFunc = this.formatBatchData;
+      }
+
+      if (outputDataSize === 'batch50') {
+        this.batchSize = 50;
+        formatDataFunc = this.formatBatchData;
+      }
+
+      if (outputDataSize === 'batch100') {
+        this.batchSize = 100;
         formatDataFunc = this.formatBatchData;
       }
 
@@ -362,9 +372,7 @@ class ExportServer {
   };
 
   private formatDataPointAsString = (dataObj: any) => {
-    return `[${dataObj.timeStamp},${dataObj.O2Hb},${dataObj.HHb},${
-      dataObj.THb
-    },${dataObj.TOI},${0},${0},${0},${0}]`;
+    return `[${dataObj.timeStamp},${dataObj.O2Hb},${dataObj.HHb},${dataObj.THb},${dataObj.TOI},${dataObj.O2Hb},${dataObj.HHb},${dataObj.THb},${dataObj.THb}]`;
   };
 
   /**
@@ -438,9 +446,31 @@ class ExportServer {
         | string
         | undefined;
 
+      let string = '';
+
+      for (const key in request.headers) {
+        string += `${key}: ${request.headers[key]} \n`;
+      }
+
+      // Send the client headers to UI
+      this.mainWindow?.webContents.send(
+        ExportServerChannels.ClientMessage,
+        `Connection headers from client:
+        ${string}`
+      );
+
       // Check if the request contains the security headers. If not refuse connection.
       if (!isTrustable) {
         socket.send('error:Security phrase was incorrect! Please try again.');
+
+        // Log the error to UI log console
+        this.mainWindow?.webContents.send(
+          ExportServerChannels.ClientMessage,
+          `Security phrase failed by the client!
+          Client sent: ${request.headers[secKey]}
+         `
+        );
+
         request.destroy();
         socket?.terminate();
         return;
@@ -481,6 +511,33 @@ class ExportServer {
           this.sendServerError('error:Header not supported.');
           return;
       }
+
+      socket.on('message', (data) => {
+        this.mainWindow?.webContents.send(
+          ExportServerChannels.ClientMessage,
+          `${socket.appName}: ${data.toString()}`
+        );
+      });
+
+      socket.on('error', (err) => {
+        this.mainWindow?.webContents.send(
+          ExportServerChannels.ClientMessage,
+          `${socket} error: ${err}`
+        );
+        console.log('SOCKET ERROR');
+        console.log(err);
+      });
+
+      socket.on('unexpected-response', (_request, response) => {
+        this.mainWindow?.webContents.send(
+          ExportServerChannels.ClientMessage,
+          `${socket} unexpected response: ${response}`
+        );
+        console.log('UNEXPECTED RESPONSE');
+        console.log(response);
+      });
+
+      socket.on;
 
       // Keep track of each socket.
       this.sockets.push(socket as IWebSocket);
@@ -536,6 +593,10 @@ class ExportServer {
     // TODO: Adjust the batch size dynamically based on the selection
     if (dataSize === 'batch') {
       headers['batchSize'] = 25;
+    } else if (dataSize === 'batch50') {
+      headers['batchSize'] = 50;
+    } else if (dataSize === 'batch100') {
+      headers['batchSize'] = 100;
     } else {
       headers['batchSize'] = 1;
     }
@@ -591,12 +652,6 @@ class ExportServer {
           this.sendServerError('error:Unsupported command!');
           break;
       }
-
-      const message = socket.appName + ': ' + data.toString();
-      this.mainWindow?.webContents.send(
-        ExportServerChannels.ClientMessage,
-        message
-      );
     });
   };
 
@@ -605,8 +660,25 @@ class ExportServer {
    * @param socket - The socket connection to add listeners to
    */
   private addSocketListeners = (socket: IWebSocket) => {
-    socket.on('close', () => this.removeSocket(socket.id));
-    socket.on('error', (_error) => {});
+    socket.on('close', () => {
+      this.removeSocket(socket.id);
+      this.mainWindow?.webContents.send(
+        ExportServerChannels.ClientMessage,
+        `Socket ${socket.appName} closed`
+      );
+    });
+    socket.on('error', (error) => {
+      this.mainWindow?.webContents.send(
+        ExportServerChannels.ClientMessage,
+        `${socket.appName} Error: ${error}`
+      );
+    });
+    socket.on('unexpected-response', (_, response) => {
+      this.mainWindow?.webContents.send(
+        ExportServerChannels.ClientMessage,
+        `${socket.appName} Unexpected Response: ${response}`
+      );
+    });
   };
 
   /**
@@ -678,7 +750,7 @@ class ExportServer {
       this.isListening = false;
       this.mainWindow?.webContents.send(
         ExportServerChannels.ServerError,
-        error
+        `Server Error: ${error}`
       );
     });
     // Connection to server

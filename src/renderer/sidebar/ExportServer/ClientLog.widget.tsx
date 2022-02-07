@@ -9,14 +9,16 @@ import TrashIcon from '@icons/trash.svg';
 import { ExportServerChannels } from '@utils/channels';
 
 const ClientLog = () => {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const textAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.api.onIPCData(ExportServerChannels.ClientMessage, (_, msg) => {
       if (textAreaRef.current) {
-        textAreaRef.current.value += msg + '\n';
+        const span = document.createElement('span');
+        span.className = 'my-2 px-2 break-words w-full';
+        span.innerText = msg;
+        textAreaRef.current.appendChild(span);
       }
-      console.log(msg);
     });
 
     return () => {
@@ -26,11 +28,11 @@ const ClientLog = () => {
 
   const handleClearBtn = () => {
     if (textAreaRef.current) {
-      textAreaRef.current.value = 'Console cleared!';
+      textAreaRef.current.innerHTML = 'Console cleared!';
 
       setTimeout(() => {
         //@ts-ignore
-        textAreaRef.current.value = '';
+        textAreaRef.current.innerHTML = '';
       }, 1000);
     }
   };
@@ -39,11 +41,11 @@ const ClientLog = () => {
     <Widget span="2">
       <Tabs>
         <Tabs.Tab label="Log">
-          <textarea
+          <div
             ref={textAreaRef}
-            className="w-full mt-1 h-[calc(100%-0.75rem)] bg-grey2 px-4 py-2 border-primary rounded-md resize-none "
-            disabled
-          ></textarea>
+            className="w-full mt-1 h-[calc(100%-0.75rem)] bg-grey2 px-4 py-2 border-primary rounded-md resize-none overflow-y-auto overflow-x-hidden flex flex-row flex-wrap break-words"
+          ></div>
+
           <Button
             icon={TrashIcon}
             className="absolute bottom-3 right-5 border-0 bg-grey0"

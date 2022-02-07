@@ -31,6 +31,8 @@ const ExportServerSettings = () => {
 
   const dataSize: IDataSize[] = [
     { label: 'Batch (25samples)', value: 'batch' },
+    { label: 'Batch (50samples)', value: 'batch50' },
+    { label: 'Batch (100samples)', value: 'batch100' },
     { label: 'Single Data Point', value: 'sdp' },
   ];
   const dataTypes: IDataTypes[] = [
