@@ -31,6 +31,11 @@ export default merge(baseConfig, {
   entry: {
     main: path.join(webpackPaths.srcMainPath, 'main.ts'),
     preload: path.join(webpackPaths.srcMainPath, 'preload.js'),
+    'calculation.worker': path.join(
+      webpackPaths.srcPath,
+      'workers',
+      'calculation.worker.js'
+    ),
   },
 
   output: {

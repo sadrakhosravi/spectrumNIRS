@@ -2,19 +2,17 @@ import { dispatch, getState } from '@redux/store';
 import toast from 'react-hot-toast';
 
 import {
-  setExperimentData,
-  setPatientData,
   setRecordingData,
   resetRecordingData,
   resetExperimentData,
 } from '@redux/ExperimentDataSlice';
 import { setCurrentProbe } from '@redux/SensorStateSlice';
-import { closeModal, openModal } from '@redux/ModalStateSlice';
+import { closeModal } from '@redux/ModalStateSlice';
 import { setInitialState } from '@redux/ChartSlice';
 import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Constants
-import { AppState, ModalConstants, RecordState } from 'utils/constants';
+import { AppState, RecordState } from 'utils/constants';
 import {
   DialogBoxChannels,
   ExperimentChannels,
@@ -23,47 +21,7 @@ import {
 import { changeAppState } from '@redux/AppStateSlice';
 
 // Interfaces
-import { INewPatientData, INewRecordingData } from 'interfaces/interfaces';
-
-/**
- * Send the experiment data to the backend via ipc
- * @param newExpData Experiment data (currentExperiment and currentPatient)
- */
-export const newExperiment = async (newExpData: object) => {
-  // Set isLoading to true
-
-  // Create a new experiment and await the result
-  const newExperiment = await window.api.invokeIPC(
-    ExperimentChannels.NewExp,
-    newExpData
-  );
-
-  if (newExperiment) {
-    dispatch(setExperimentData(newExperiment));
-    dispatch(resetRecordingData());
-    dispatch(closeModal());
-    dispatch(openModal(ModalConstants.NEWRECORDING));
-  }
-};
-
-/**
- * Sets the patient data in the state and sends it to the controller.
- * @param data - Patient data from the patient form
- */
-export const newPatient = async (data: INewPatientData) => {
-  // Add the current experiment Id to the data
-  const experimentId: number = getState().experimentData.currentExperiment.id;
-  data.experiment = experimentId;
-
-  // Send the prepared data to the controller
-  const newPatient = await window.api.invokeIPC(
-    ExperimentChannels.NewPatient,
-    data
-  );
-  dispatch(setPatientData(newPatient));
-  dispatch(closeModal());
-  dispatch(openModal(ModalConstants.NEWRECORDING));
-};
+import { INewRecordingData } from 'interfaces/interfaces';
 
 /**
  * Sets the recording status in the experimentDataState

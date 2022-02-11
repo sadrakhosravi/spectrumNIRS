@@ -4,6 +4,7 @@ import Patients from 'db/entity/Patients';
 // Interfaces
 import { INewPatientData } from 'interfaces/interfaces';
 import GlobalStore from '@lib/globalStore/GlobalStore';
+import ExperimentModel from './ExperimentModel';
 
 export interface IPatientData {
   createdAt: string;
@@ -68,8 +69,14 @@ export class PatientModel {
    */
   public async createNewPatient(data: INewPatientData): Promise<any> {
     try {
+      const experiment = ExperimentModel.getCurrentExperiment();
+
+      if (!experiment) return;
+
       const _newPatient = new Patients();
       Object.assign(_newPatient, data);
+      _newPatient.experiment = experiment;
+
       const newPatient = await _newPatient.save();
 
       // Set the current experiment after successful creation

@@ -1,128 +1,71 @@
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@redux/hooks/hooks';
-import { useForm } from 'react-hook-form';
-import { RadioGroup } from '@headlessui/react';
-
-// Interfaces
-import { INewRecordingData } from 'interfaces/interfaces';
-
-// Config file
-import { devices } from '@electron/configs/devices';
+import toast from 'react-hot-toast';
+import { useAppDispatch } from '@redux/hooks/hooks';
+import { closeModal } from '@redux/ModalStateSlice';
+import { changeAppState } from '@redux/AppStateSlice';
 
 // Components
-import InputField from '@components/Form/InputField.component';
-import SubmitButton from '@components/Form/SubmitButton.component';
-import DateField from '@components/Form/DateField.component';
-import TextAreaField from '@components/Form/TextAreaField.component';
+import NewRecordingInfo from './NewRecordingInfo.form';
+import Button from '@components/Buttons/Button.component';
+import SelectProbeForm from '@forms/Probes/SelectProbes.form';
 
-// Adapters
-import { newRecording } from '@adapters/experimentAdapter';
+import { ExperimentChannels } from '@utils/channels';
+import { AppState } from '@utils/constants';
 
-// Icon
-import SensorIcon from '@icons/sensor.svg';
-import { ProbeChannels } from '@utils/channels';
+export enum Steps {
+  RecordingInfo = 1,
+  DeviceSelection = 2,
+  ProbeInfo = 3,
+}
 
 const NewRecordingForm = () => {
-  const [_probes, setProbes] = useState(null);
-  const [sensor, setSensor] = useState(1);
-  const { register, handleSubmit } = useForm();
-
-  const detectedSensor = useAppSelector(
-    (state) => state.sensorState.detectedSensor
-  );
+  const [step, setStep] = useState(1);
+  const [recordingInfo, setRecordingInfo] = useState();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    (async () => {
-      const allProbes = await window.api.invokeIPC(ProbeChannels.GetAllDevices);
-      console.log(allProbes);
-      setProbes(allProbes);
-    })();
-  }, []);
+    if (recordingInfo) setStep(Steps.DeviceSelection);
+  }, [recordingInfo]);
 
-  // Sets the current sensor state to the global experimentData current sensor state
+  const handleSubmit = async () => {
+    if (!recordingInfo) {
+      toast.error('Please enter recording information');
+      return;
+    }
 
-  type FormData = {
-    sensor: {
-      channels: string;
-      samplingRate: string;
-    };
-    recording: INewRecordingData;
-  };
+    // Send the recording info to the controller
+    const result = await window.api.invokeIPC(
+      ExperimentChannels.NewRecording,
+      recordingInfo
+    );
 
-  // Handle form submit
-  const onSubmit = (formData: FormData) => {
-    newRecording(formData.recording);
+    if (result) {
+      requestAnimationFrame(() => dispatch(closeModal()));
+      requestAnimationFrame(() => dispatch(changeAppState(AppState.RECORD)));
+    }
   };
 
   return (
-    <div className="w-full px-4 pt-2 ">
-      <div className="w-full">
-        <form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-          <h3 className="py-2 text-xl">Recording Information:</h3>
+    <div>
+      <div className="slideLeft w-full" hidden={step !== Steps.RecordingInfo}>
+        <NewRecordingInfo setData={setRecordingInfo} />
+      </div>
+      <div className="slideLeft" hidden={step !== Steps.DeviceSelection}>
+        <SelectProbeForm />
 
-          <label className="text-sm inline-block w-1/2 mt-2 pr-2">
-            <span className="block pb-1">Name:</span>
-            <InputField
-              type="text"
-              register={register('recording.name', { required: true })}
-            />
-          </label>
-          <label className="text-sm inline-block w-1/2 mt-2 pl-2">
-            <span className="block pb-1">Date:</span>
-            <DateField
-              type="text"
-              register={register('recording.date', { required: true })}
-            />
-          </label>
-          <label className="text-sm inline-block w-full mt-2">
-            <span className="block pb-1">Description:</span>
-            <TextAreaField
-              type="text"
-              register={register('recording.description')}
-            />
-          </label>
-
-          <h3 className="mt-4 py-2 text-xl">Select a device:</h3>
-          <RadioGroup value={sensor} onChange={setSensor}>
-            <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-            <div className="grid grid-cols-2 gap-6">
-              {devices.map((device: any) => (
-                <RadioGroup.Option
-                  value={device.id}
-                  disabled={device.name.includes('Beast')}
-                  key={device.id}
-                >
-                  {({ checked, disabled }) => (
-                    <>
-                      <div
-                        className={`${
-                          checked && 'ring-2 ring-accent'
-                        } w-full h-20 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
-                          disabled &&
-                          'bg-light bg-opacity-40 cursor-not-allowed'
-                        }`}
-                      >
-                        <img
-                          src={SensorIcon}
-                          width="28px"
-                          height="28px"
-                          alt="Sensor"
-                        />
-                        <p className="mt-2">{device.name}</p>
-                        <p className="absolute right-2 top-1">
-                          Status:{' '}
-                          {detectedSensor?.name === device.name ? '✅' : '❌'}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-
-          <SubmitButton text="Create Recording" />
-        </form>
+        <span className="w-full flex items-center justify-between">
+          <Button
+            text="Previous"
+            className="my-2"
+            onClick={() => setStep(Steps.RecordingInfo)}
+          />
+          <Button
+            text="Submit"
+            className="my-2"
+            isActive={true}
+            onClick={handleSubmit}
+          />
+        </span>
       </div>
     </div>
   );

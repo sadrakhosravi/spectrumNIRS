@@ -9,7 +9,11 @@ import { ModalConstants } from 'utils/constants';
 
 const NewRecording: React.FC = () => {
   return (
-    <Modal id={ModalConstants.NEWRECORDING} title="Create a New Recording">
+    <Modal
+      id={ModalConstants.NEWRECORDING}
+      title="Create a New Recording"
+      fixedSize={true}
+    >
       <div>
         <RecordingForm />
       </div>

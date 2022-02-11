@@ -61,6 +61,7 @@ function createChartPerChannel(this: ChartClass) {
       .setThickness(0)
       .setStrokeStyle(emptyLine)
       .setScrollStrategy(AxisScrollStrategies.progressive)
+      .disableAnimations()
       .setTickStrategy(AxisTickStrategies.Empty)
       .setStrokeStyle(emptyLine);
 
@@ -74,6 +75,7 @@ function createChartPerChannel(this: ChartClass) {
     axisY
       .setScrollStrategy(AxisScrollStrategies.fitting)
       .setNibMousePickingAreaSize(0)
+      .disableAnimations()
       .setNibStyle(emptyLine)
       .setThickness(65)
       .setInterval(-50, 50);

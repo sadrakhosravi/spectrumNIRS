@@ -8,8 +8,8 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
 import { app, BrowserWindow, nativeTheme, screen } from 'electron';
+import path from 'path';
 import 'reflect-metadata';
 import { resolveHtmlPath } from './util';
 
@@ -26,15 +26,9 @@ if (process.env.NODE_ENV === 'production') {
 
 // Force high performance gpu
 app.commandLine.appendSwitch('--force_high_performance_gpu', 'true');
-app.commandLine.appendSwitch('enable-unsafe-es3-apis');
 
 // const isDevelopment =
 //   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
-// // Load debugger if app is in development
-// if (isDevelopment) {
-//   require('electron-debug')();
-// }
 
 // Create the main window
 const createMainWindow = async () => {
@@ -69,7 +63,6 @@ const createMainWindow = async () => {
     titleBarOverlay: false,
     paintWhenInitiallyHidden: true,
     webPreferences: {
-      nodeIntegrationInWorker: true,
       partition: 'persist:spectrum',
       contextIsolation: false,
       nodeIntegration: true,

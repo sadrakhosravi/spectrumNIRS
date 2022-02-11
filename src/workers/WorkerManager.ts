@@ -1,27 +1,19 @@
 class WorkerManager {
-  deviceWorker: Worker | null;
   calculationWorker: Worker | null;
   eventsWorker: Worker | null;
   databaseWorker: Worker | null;
+
   constructor() {
-    this.deviceWorker = null;
     this.calculationWorker = null;
     this.eventsWorker = null;
     this.databaseWorker = null;
-    this.startDeviceWorker();
-    this.startCalculationWorker();
     console.log('WORKER MANAGER');
   }
-  /**
-   * @returns the device web worker
-   */
-  public getDeviceWorker = () => this.deviceWorker || this.startDeviceWorker();
 
   /**
    * @returns the calculation web worker
    */
-  public getCalculationWorker = () =>
-    this.calculationWorker || this.startCalculationWorker();
+  public getCalculationWorker = () => this.calculationWorker;
 
   /**
    * @returns the events web worker
@@ -38,28 +30,13 @@ class WorkerManager {
    * @returns calculation worker
    */
   public startCalculationWorker() {
-    if (!this.calculationWorker) {
-      this.calculationWorker = new Worker(
-        //@ts-ignore
-        new URL('./calculation.worker.ts', import.meta.url)
-      );
-    }
+    // if (!this.calculationWorker) {
+    //   this.calculationWorker = new Worker(
+    //     //@ts-ignore
+    //     new URL('./calculation.worker.ts', import.meta.url)
+    //   );
+    // }
     return this.calculationWorker;
-  }
-
-  /**
-   * Starts the device web worker if not active and returns it
-   * @returns device worker
-   */
-  public startDeviceWorker() {
-    if (!this.deviceWorker) {
-      this.deviceWorker = new Worker(
-        //@ts-ignore
-        new URL('./device.worker.ts', import.meta.url)
-      );
-    }
-
-    return this.deviceWorker;
   }
 
   /**
@@ -81,12 +58,12 @@ class WorkerManager {
    * @returns database worker
    */
   public startDatabaseWorker = () => {
-    if (!this.databaseWorker) {
-      this.databaseWorker = new Worker(
-        //@ts-ignore
-        new URL('./database.worker.js', import.meta.url)
-      );
-    }
+    // if (!this.databaseWorker) {
+    //   this.databaseWorker = new Worker(
+    //     //@ts-ignore
+    //     new URL('./database.worker.js', import.meta.url)
+    //   );
+    // }
     return this.databaseWorker;
   };
 

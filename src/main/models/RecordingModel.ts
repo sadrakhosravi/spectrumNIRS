@@ -2,7 +2,9 @@ import { getConnection } from 'typeorm';
 import { Recordings } from 'db/entity/Recordings';
 import RecordingsDataModel from './RecordingsDataModel';
 import GlobalStore from '@lib/globalStore/GlobalStore';
+
 import ProbesManager from './ProbesManager';
+import PatientModel from './PatientModel';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
@@ -37,6 +39,7 @@ class RecordingModel {
    * @param recording - the recording to be set as the current recording
    */
   public setCurrentRecording = (recording: Recordings | undefined) => {
+    this.recordingsDataModel = undefined;
     GlobalStore.removeRecording();
 
     this.currentRecording = recording;
@@ -73,8 +76,13 @@ class RecordingModel {
    */
   public createNewRecording = async (data: INewRecordingData): Promise<any> => {
     try {
+      const patient = PatientModel.getCurrentPatient();
+
+      if (!patient) return;
+
       const _newRecording = new Recordings();
       Object.assign(_newRecording, data);
+      _newRecording.patient = patient;
 
       // Add probe info to the recording settings
       const probeInfo = ProbesManager.getCurrentProbe();
@@ -85,13 +93,9 @@ class RecordingModel {
       // Set the current experiment after successful creation
       this.setCurrentRecording(newRecording);
 
-      return {
-        ...newRecording,
-        createdAt: newRecording.createdAt.toString(),
-        updatedAt: newRecording.updatedAt.toString(),
-      };
+      return true;
     } catch (error: any) {
-      console.log('Error RECORDING:' + error.message);
+      throw new Error(error.message);
     }
   };
 

@@ -11,10 +11,11 @@ interface IProps {
   title: string;
   id: string;
   size?: 'large' | undefined;
+  fixedSize?: boolean;
 }
 
 const Modal: React.FC<IProps> = (props) => {
-  const { title, size, id } = props;
+  const { title, size, id, fixedSize = false } = props;
   const dispatch = useAppDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +66,9 @@ const Modal: React.FC<IProps> = (props) => {
               </span>
 
               <div
-                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 border-primary shadow-xl rounded-md ${largeStyles}`}
+                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 border-primary shadow-xl rounded-md ${largeStyles} ${
+                  fixedSize && 'min-h-[50vh] min-w-[50vw]'
+                }`}
               >
                 <Dialog.Title as="h1" className="text-3xl font-bold">
                   {title}

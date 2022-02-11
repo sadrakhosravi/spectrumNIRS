@@ -1,11 +1,10 @@
 import { ipcMain } from 'electron';
 
 // Models
-import DataReader from '../main/devices/DeviceReader';
+import DataReader from '../devices/DeviceReader';
 
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
-import RecordingsDataModel from '@electron/models/RecordingsDataModel';
 
 export type CurrentRecording = {
   id: number;
@@ -91,10 +90,4 @@ ipcMain.handle(RecordChannels.SyncGain, async (_event, data: string[]) => {
 // Hypoxia Event
 ipcMain.on(ChartChannels.Event, (_event, data: Object) => {
   reader && reader.toggleEvent(data);
-});
-
-const recordingDataM = new RecordingsDataModel(20);
-
-ipcMain.on('db:data', async (_event, data) => {
-  await recordingDataM.insertTransactionData(data);
 });

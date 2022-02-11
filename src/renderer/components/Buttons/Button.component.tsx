@@ -8,6 +8,7 @@ type ButtonProps = {
   isActive?: boolean;
   disabled?: boolean;
   title?: string;
+  type?: 'button' | 'submit' | 'reset' | undefined;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 };
 
@@ -19,6 +20,7 @@ const Button = ({
   isActive,
   disabled,
   title,
+  type,
   onClick,
 }: ButtonProps) => {
   return (
@@ -28,6 +30,7 @@ const Button = ({
       } ${className || ''}  ${disabled ? 'cursor-not-allowed !bg-grey3' : ''}
       `}
       style={style}
+      type={type}
       onClick={onClick}
       disabled={disabled}
       title={title}

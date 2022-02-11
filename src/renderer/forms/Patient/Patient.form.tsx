@@ -1,6 +1,8 @@
 import React from 'react';
+import { useAppDispatch } from '@redux/hooks/hooks';
 import { useForm } from 'react-hook-form';
-import { newPatient } from '@adapters/experimentAdapter';
+import { setPatientData } from '@redux/ExperimentDataSlice';
+import { closeModal, openModal } from '@redux/ModalStateSlice';
 
 // Components
 import InputField from '@components/Form/InputField.component';
@@ -10,13 +12,26 @@ import SubmitButton from '@components/Form/SubmitButton.component';
 
 // Interfaces
 import { INewPatientData } from 'interfaces/interfaces';
+import { ExperimentChannels } from '@utils/channels';
+import { ModalConstants } from '@utils/constants';
 
 const PatientForm = () => {
+  const dispatch = useAppDispatch();
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data: any) => {
     const patient: INewPatientData = data.patient;
-    newPatient(patient);
+    // Send the prepared data to the controller
+    const newPatient = await window.api.invokeIPC(
+      ExperimentChannels.NewPatient,
+      patient
+    );
+
+    if (newPatient) {
+      dispatch(setPatientData(newPatient));
+      dispatch(closeModal());
+      dispatch(openModal(ModalConstants.NEWRECORDING));
+    }
   };
 
   return (

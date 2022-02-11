@@ -10,15 +10,13 @@ import {
   IDeviceStream,
   IGetDevice,
   INIRSDevice,
-  TransformerOptions,
 } from '@lib/Device/device-api';
 import { Socket } from 'net';
-import { ReadLine } from 'readline';
-import { Readable, Transform, TransformCallback } from 'stream';
-import toBuffer from 'typedarray-to-buffer';
+import { Readable } from 'stream';
+import { app, BrowserWindow, dialog } from 'electron';
 
 // Constants
-const NUM_OF_DATAPOINTS_PER_CHUNK = 25;
+const NUM_OF_DATAPOINTS_PER_CHUNK = 10;
 const NUM_OF_ELEMENTS_PER_DATAPOINT = 12;
 /**
  * V5 NIRS Device class
@@ -47,21 +45,38 @@ class V5Device implements INIRSDevice {
     this.spawnedDevices = [];
   }
 
-  public startDevice = (options?: SpawnOptionsWithoutStdio) => {
+  public startDevice = (_options?: SpawnOptionsWithoutStdio) => {
     // Kill any prior process before spawning another
     this.spawnedDevices.forEach((device) => device.kill());
 
-    const spawnedDevice = spawn(
-      path.join(
-        process.env.INIT_CWD as string,
-        'resources',
-        'drivers',
-        'nirs-v5',
-        'Test1.exe'
-      ),
-      [],
-      options
-    );
+    const readerPath = app.isPackaged
+      ? path.join(
+          process.resourcesPath,
+          'resources',
+          'drivers',
+          'nirs-v5',
+          'Test1.exe'
+        )
+      : path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe');
+
+    dialog.showMessageBox(BrowserWindow.getAllWindows()[0], {
+      title: 'Test',
+      message: readerPath,
+    });
+
+    const spawnedDevice = spawn(readerPath, [], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    spawnedDevice.stderr.on('data', (data) => {
+      console.log(data.toString());
+    });
+
+    spawnedDevice.channel?.close();
+
+    spawnedDevice.stdin;
+
+    spawnedDevice.stdout.setEncoding('binary');
 
     this.spawnedDevices.push(spawnedDevice);
     return spawnedDevice;
@@ -139,13 +154,13 @@ class V5Input implements IDeviceInput {
  */
 class V5Stream implements IDeviceStream {
   physicalDevice: INIRSDevice;
-  NIRSV5Reader: ReadLine | undefined;
+  NIRSV5Reader: Readable | undefined | null;
   streamType: 'stdout';
   sampleBufferSizeInBytes: number;
   outputBufferSizeToUIInBytes: number;
   dataBatchSize: number;
   numOfElementsPerDataPoint: number;
-  deviceStream: ReadLine | Readable | undefined;
+  deviceStream: Readable | undefined | null;
   chunks: Float32Array | null;
   count: number;
   arrayPos: number;
@@ -154,7 +169,7 @@ class V5Stream implements IDeviceStream {
     this.physicalDevice = physicalDevice;
     this.NIRSV5Reader = undefined;
     this.streamType = 'stdout';
-    this.sampleBufferSizeInBytes = 270;
+    this.sampleBufferSizeInBytes = 1350;
     this.outputBufferSizeToUIInBytes = 220;
     this.dataBatchSize = NUM_OF_DATAPOINTS_PER_CHUNK;
     this.numOfElementsPerDataPoint = NUM_OF_ELEMENTS_PER_DATAPOINT;
@@ -186,9 +201,6 @@ class V5Stream implements IDeviceStream {
 
   stopDeviceStream = () => {
     if (this.deviceStream) {
-      this.NIRSV5Reader?.close();
-      this.deviceStream.removeAllListeners('line');
-
       this.NIRSV5Reader = undefined;
       this.deviceStream = undefined;
       return true;
@@ -200,50 +212,27 @@ class V5Stream implements IDeviceStream {
 /**
  * Device parser
  */
-class V5Parser extends Transform {
-  dataArray: Uint16Array;
-  constructor(options?: TransformerOptions) {
-    super(options);
-    this.dataArray = new Uint16Array(
-      NUM_OF_DATAPOINTS_PER_CHUNK * NUM_OF_ELEMENTS_PER_DATAPOINT
-    );
-  }
+const V5Parser = (chunk: Buffer): Uint16Array => {
+  const lines = chunk.toString().split(/\r?\n/);
 
-  _transform(
-    chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: TransformCallback
-  ): void {
-    console.log(chunk.toString());
+  const dataArray = new Uint16Array(
+    NUM_OF_DATAPOINTS_PER_CHUNK * NUM_OF_ELEMENTS_PER_DATAPOINT
+  ).fill(0);
 
-    // Split lines based on \r\n
-    const lines = chunk.toString().split(/\r?\n/);
+  let arrayIndex = 0;
+  // Use a for loop for the best performance
+  for (let i = 0; i < NUM_OF_DATAPOINTS_PER_CHUNK; i += 1) {
+    const data = lines[i].split(',');
 
-    const dataArray = new Uint16Array(
-      NUM_OF_DATAPOINTS_PER_CHUNK * NUM_OF_ELEMENTS_PER_DATAPOINT
-    );
-
-    let arrayIndex = 0;
-    // Use a for loop for the best performance
-    for (let i = 0; i < NUM_OF_DATAPOINTS_PER_CHUNK; i += 1) {
-      const data = lines[i].split(',');
-
+    for (let j = 0; j < NUM_OF_ELEMENTS_PER_DATAPOINT; j += 1) {
       // Parse numbers
-      for (let j = 0; j < NUM_OF_ELEMENTS_PER_DATAPOINT; j += 1) {
-        dataArray[arrayIndex] = ~~data[j];
-        arrayIndex += 1;
-      }
+      dataArray[arrayIndex] = ~~data[j];
+      arrayIndex += 1;
     }
-    //@ts-ignore
-    chunk = null;
-    callback(null, toBuffer(dataArray));
   }
 
-  // Indicates that the stream is over
-  _final(_callback: (error?: Error | null) => void): void {
-    this.push(null);
-  }
-}
+  return dataArray;
+};
 
 const Device = new V5Device();
 const Input = new V5Input();

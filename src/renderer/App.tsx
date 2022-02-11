@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
@@ -16,25 +16,16 @@ import MainNavigation from './layout/MainNavigation/MainNavigation.component';
 import IndicatorContainer from '@components/Indicators/IndicatorContainer.component';
 import { AppState } from '@utils/constants';
 
-// Workers and data Managers
-import DataManager from './DataManager/DataManager';
-
 const ModalsContainer = React.lazy(
   () => import('@layout/ModalsContainer/ModalsContainer.component')
 );
 
 // Pages
 const RouteHandler = React.lazy(() => import('@pages/RouteHandler'));
-// const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
+const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 const App = () => {
   useLoadState();
-  // Load the web workers
-  useEffect(() => {
-    return () => {
-      DataManager.stopDataManager();
-    };
-  }, []);
 
   return (
     <div className="relative h-full w-full">
@@ -50,11 +41,11 @@ const App = () => {
           {/* <Route path="/dasdasd" component={Clock} /> */}
           <Route path="/main" component={ModalsContainer} />
           <Route path="/main" component={IndicatorContainer} />
-          {/* <Route exact path={AppState.REVIEW_TAB}>
+          <Route exact path={AppState.REVIEW_TAB}>
             <div className="h-full py-1">
               <ReviewPage />
             </div>
-          </Route> */}
+          </Route>
 
           <Route
             exact

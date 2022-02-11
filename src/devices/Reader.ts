@@ -1,8 +1,8 @@
 import { IGetDevice } from '@lib/Device/device-api';
 
 // Devices
-import V5 from '@electron/devices/device/V5';
-import { Readable } from 'stream';
+import V5 from 'devices/V5/V5';
+// import { Readable } from 'stream';
 import AddTimeStamp from '@lib/Stream/AddTimeStamp';
 // import SendDataToUI from '@lib/Stream/SendDataToUI';
 
@@ -11,6 +11,7 @@ export interface IDeviceInfo {
   dataByteSize: number;
   batchSize: number;
   numOfElementsPerDataPoint: number;
+  channels: string[];
 }
 
 class Reader {
@@ -24,7 +25,7 @@ class Reader {
   }
 
   start = (_port: MessagePort | any) => {
-    const device = this.getSelectedDevice();
+    this.getSelectedDevice();
 
     // Start the parser and transformer streams
     // const Parser = new device.Parser({ highWaterMark: 2 * 1024 });
@@ -32,16 +33,16 @@ class Reader {
     // const SendData = new SendDataToUI({ highWaterMark: 1024 * 2 }, port);
 
     // Start the device
-    device.Device.startDevice();
+    // device.Device.startDevice();
 
     // Wait for the cold start
     setTimeout(() => {
-      const deviceStream = device.Stream.getDeviceStream();
-      if (deviceStream instanceof Readable) {
-        deviceStream.on('data', (data) => {
-          console.log(data.toString());
-        });
-      }
+      // const deviceStream = device.Stream.getDeviceStream();
+      // if (deviceStream instanceof Readable) {
+      //   deviceStream.on('data', (data) => {
+      //     console.log(data.toString());
+      //   });
+      // }
     }, this.selectedDevice.Device.getStartupDelay());
   };
 

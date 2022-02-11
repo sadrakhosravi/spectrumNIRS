@@ -36,7 +36,7 @@ function xAxisChart(this: ChartClass) {
   axisY.setTickStrategy(AxisTickStrategies.Empty);
   axisY
     .setStrokeStyle(emptyLine)
-    .setScrollStrategy(AxisScrollStrategies.progressive)
+    .setScrollStrategy(undefined)
     .setTickStrategy(AxisTickStrategies.Empty)
     .setStrokeStyle(emptyLine);
 
@@ -54,6 +54,7 @@ function xAxisChart(this: ChartClass) {
 
   // X Axis
   axisX.setThickness(35);
+  axisX.setScrollStrategy(AxisScrollStrategies.progressive);
   axisX.setStrokeStyle(emptyLine);
   axisX.setTickStrategy(AxisTickStrategies.Time, (visibleTick: any) =>
     visibleTick

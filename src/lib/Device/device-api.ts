@@ -8,7 +8,6 @@ import Transformer, {
   TransformerOptions,
   TransformerCallback,
 } from '@lib/Stream/Transformer';
-import { Transform } from 'stream';
 
 // Export all device classes
 export {
@@ -31,7 +30,8 @@ export {
 
 export interface IGetDevice {
   Device: IPhysicalDevice | INIRSDevice;
-  Parser: typeof Transform;
+  Parser: (chunk: any) => Uint16Array;
   Input: IDeviceInput;
   Stream: IDeviceStream;
+  DBParser?: (data: Uint16Array) => any;
 }

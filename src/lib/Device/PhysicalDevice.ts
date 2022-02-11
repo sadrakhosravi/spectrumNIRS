@@ -1,10 +1,11 @@
 import {
   ChildProcess,
-  ChildProcessWithoutNullStreams,
+  ChildProcessByStdio,
   spawn,
   SpawnOptionsWithoutStdio,
 } from 'child_process';
 import path from 'path';
+import { Readable } from 'stream';
 
 export interface IPhysicalDevice {
   /**
@@ -12,7 +13,7 @@ export interface IPhysicalDevice {
    */
   startDevice: (
     options?: SpawnOptionsWithoutStdio
-  ) => ChildProcessWithoutNullStreams | ChildProcess;
+  ) => ChildProcessByStdio<null, Readable, Readable> | ChildProcess;
 
   /**
    * Stops the device and removes its process from the memory
@@ -22,7 +23,7 @@ export interface IPhysicalDevice {
   /**
    * @returns the current spawned process of the device
    */
-  getDevice: () => ChildProcessWithoutNullStreams;
+  getDevice: () => ChildProcess;
 
   /**
    * @returns the name of the device
@@ -93,7 +94,7 @@ class PhysicalDevice {
    */
   public startDevice = (readerPath: string) => {
     return spawn(readerPath, [
-      'test',
+      'run',
       path.join('../../resources/drivers/nirs-v5/Test1.exe'),
     ]);
   };

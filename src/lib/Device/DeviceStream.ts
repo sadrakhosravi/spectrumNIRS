@@ -32,7 +32,7 @@ export interface IDeviceStream {
   /**
    * Gets the stream data from the device
    */
-  getDeviceStream: () => Readable | ReadLine | null;
+  getDeviceStream: () => Readable | ReadLine | null | undefined;
 
   /**
    * Stops the device stream

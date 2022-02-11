@@ -12,7 +12,6 @@ import { ProbeChannels } from '@utils/channels';
 import SensorIcon from '@icons/sensor.svg';
 import ProbeIcon from '@icons/probe.svg';
 import toast from 'react-hot-toast';
-import { closeModal } from '@redux/ModalStateSlice';
 import { CurrentProbe, setCurrentProbe } from '@redux/SensorStateSlice';
 
 const SelectProbeForm = () => {
@@ -66,7 +65,6 @@ const SelectProbeForm = () => {
     }
     dispatch(setCurrentProbe(probe));
     toast.success(`Probe ${selectedProbe?.name} was selected successfully`);
-    setTimeout(() => dispatch(closeModal()), 500);
   };
 
   return (

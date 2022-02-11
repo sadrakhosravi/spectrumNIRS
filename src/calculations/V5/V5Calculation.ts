@@ -38,6 +38,7 @@ class V5Calculation {
     this.waveIndex = this.calcWaveIndex();
     this.HBCoef = this.calcHBCoef();
     this.A = this.calcPseudoInverse();
+    console.log('V5CALC');
   }
 
   /**
@@ -45,8 +46,9 @@ class V5Calculation {
    * @param data
    * @returns
    */
-  public processRawData = (data: Buffer, batchSize: number) => {
-    const dataBatch = new Uint16Array(data.buffer);
+  public processRawData = (data: Buffer, batchSize: number): number[][] => {
+    const dataBatch = new Uint16Array(data);
+
     let arrayIndex = 0;
     const NUM_OF_RAW_PD_VALUES = 6; // Number of elements per each sample data point
 
@@ -67,9 +69,9 @@ class V5Calculation {
       arrayIndex += this.NUM_OF_LEDs + 1;
 
       // Calculate values
-      const hemodynamics = this.calcHemodynamics(rawPDValues);
-      const TOI = this.calcTOI(rawPDValues, LEDIntValues);
-      const dataArray = [...hemodynamics, TOI, ...rawPDValues, ...LEDIntValues];
+      const dataArray = this.calcHemodynamics(rawPDValues);
+      dataArray.push(this.calcTOI(rawPDValues, LEDIntValues));
+
       calculatedData[i] = dataArray;
     }
 

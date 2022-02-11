@@ -63,14 +63,14 @@ export const TopMenu = [
       {
         label: 'Patient',
         click: () =>
-          getState().experimentData.currentExperiment.name
+          getState().global.experiment?.currentExp?.name
             ? dispatch(openModal(ModalConstants.NEWPATIENT))
             : dispatch(openModal(ModalConstants.NEWEXPERIMENT)),
       },
       {
         label: 'Recording',
         click: () =>
-          getState().experimentData.currentPatient.name
+          getState().global.patient?.currentPatient?.name
             ? dispatch(openModal(ModalConstants.NEWRECORDING))
             : dispatch(openModal(ModalConstants.NEWEXPERIMENT)),
       },
