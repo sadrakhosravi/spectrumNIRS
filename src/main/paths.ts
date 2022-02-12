@@ -20,6 +20,7 @@ export const appDataPath = path.join(app.getPath('appData'), appName);
 
 // Database data path
 export const databasePath = path.join(appDataPath, 'database');
+export const databaseRecordingsPath = path.join(databasePath, 'recordings');
 export const databaseFile = path.join(databasePath, 'spectrum.db');
 
 // Settings data path

@@ -3,6 +3,8 @@ import V5 from 'devices/V5/V5';
 import { BrowserWindow, powerSaveBlocker } from 'electron';
 import { Readable } from 'stream';
 import WorkerManager from '@electron/models/WorkerManager';
+import { databaseRecordingsPath } from '../paths';
+import fs from 'fs';
 
 export interface IDeviceInfo {
   samplingRate: number;
@@ -11,7 +13,14 @@ export interface IDeviceInfo {
   numOfElementsPerDataPoint: number;
 }
 
+const getNewSqliteDbFileAndPath = () => {
+  fs.access(databaseRecordingsPath, (err) => {
+    console.log(err);
+  });
+};
+
 const start = (_port?: MessagePort) => {
+  getNewSqliteDbFileAndPath();
   const device = V5;
 
   // Prevent the application from being suspended.
@@ -33,12 +42,15 @@ const start = (_port?: MessagePort) => {
     count++;
   });
 
+  const dbWorker = WorkerManager.getDatabaseWorker();
+
   // Wait for the cold start
   setTimeout(() => {
     const deviceStream = device.Stream.getDeviceStream();
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', (chunk) => {
         const data = device.Parser(chunk);
+        dbWorker.postMessage(data);
         worker.postMessage(data, [data.buffer]);
       });
     }

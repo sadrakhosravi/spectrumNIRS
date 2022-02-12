@@ -25,7 +25,7 @@ const startControllers = async () => {
   ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
 
   await import('../main/models/WorkerManager');
-  // await import('../main/models/DeviceReader');
+  await import('../main/models/DeviceReader');
 };
 
 export default startControllers;

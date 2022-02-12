@@ -15,28 +15,16 @@ export class RecordingsData extends BaseEntity {
   @PrimaryGeneratedColumn({ select: false })
   id: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'int' })
   timeStamp: number;
 
-  @Column({ type: 'float' })
-  O2Hb: number;
-
-  @Column({ type: 'float' })
-  HHb: number;
-
-  @Column({ type: 'float' })
-  THb: number;
-
-  @Column({ type: 'float' })
-  TOI: number;
-
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   PDRawData: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar' })
   LEDIntensities: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar' })
   gainValues: string;
 
   @Column({ type: 'tinyint', nullable: true })
