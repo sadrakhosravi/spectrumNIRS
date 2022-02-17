@@ -84,6 +84,7 @@ class ProbeCalibrationChart {
       .setTitle('LEDs + Ambient')
       .setMouseInteractions(false)
       .setScrollStrategy(AxisScrollStrategies.fitting)
+
       // Disable default ticks.
       .setTickStrategy(AxisTickStrategies.Empty);
   }
@@ -116,11 +117,23 @@ class ProbeCalibrationChart {
           majorTick
             .setLabelFont(uiMajorTickFont)
             .setLabelFillStyle(textFillStyle)
+            .setGridStrokeStyle(
+              new SolidLine({
+                thickness: 0.5,
+                fillStyle: new SolidFill({ color: ColorHEX('#222') }),
+              })
+            )
         )
         .setMinorTickStyle((minorTick: VisibleTicks) =>
           minorTick
             .setLabelFont(uiMinorTickFont)
             .setLabelFillStyle(textFillStyle)
+            .setGridStrokeStyle(
+              new SolidLine({
+                thickness: 0.5,
+                fillStyle: new SolidFill({ color: ColorHEX('#222') }),
+              })
+            )
         )
     );
   }
@@ -172,7 +185,7 @@ class ProbeCalibrationChart {
     const axisX = this.chart?.getDefaultAxisX() as lcjs.Axis;
     const width = 0.6;
     let count = 0;
-    const LEDRectangles = this.LEDs.map((LED) => {
+    const LEDRectangles = this.LEDs.map((LED, i) => {
       const rectangle = this.rectangleSeries
         ?.add({
           x: count,
@@ -184,9 +197,15 @@ class ProbeCalibrationChart {
 
       axisX
         .addCustomTick(UIElementBuilders.AxisTick)
+
         .setValue(count + width / 2)
-        .setTextFormatter(() => LED)
-        .setGridStrokeLength(0);
+        .setTextFormatter(() => `${LED} ${i + 1}`)
+        .setGridStrokeStyle(
+          new SolidLine({
+            thickness: 0.5,
+            fillStyle: new SolidFill({ color: ColorHEX('#222') }),
+          })
+        );
 
       count += 1;
       return rectangle;
@@ -203,7 +222,12 @@ class ProbeCalibrationChart {
       .addCustomTick(UIElementBuilders.AxisTick)
       .setValue(count + width / 2)
       .setTextFormatter(() => 'Ambient')
-      .setGridStrokeLength(0);
+      .setGridStrokeStyle(
+        new SolidLine({
+          thickness: 0.5,
+          fillStyle: new SolidFill({ color: ColorHEX('#222') }),
+        })
+      );
 
     LEDRectangles.push(ambient);
 
