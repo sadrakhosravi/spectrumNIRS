@@ -10,14 +10,16 @@ import {
   IDeviceStream,
   IGetDevice,
   INIRSDevice,
+  IPhysicalDevice,
 } from '@lib/Device/device-api';
-import { Socket } from 'net';
+import net from 'net';
 import { Readable } from 'stream';
-import { app, BrowserWindow, dialog } from 'electron';
+import { app } from 'electron';
 
 // Constants
 const NUM_OF_DATAPOINTS_PER_CHUNK = 10;
 const NUM_OF_ELEMENTS_PER_DATAPOINT = 12;
+
 /**
  * V5 NIRS Device class
  */
@@ -40,7 +42,7 @@ class V5Device implements INIRSDevice {
     this.defaultSamplingRate = 100;
     this.PDs = [{ name: 'main', location: 'main' }];
     this.LEDs = [680, 740, 810, 840, 950];
-    this.startupDelay = 1000;
+    this.startupDelay = 500;
 
     this.spawnedDevices = [];
   }
@@ -59,24 +61,8 @@ class V5Device implements INIRSDevice {
         )
       : path.join(__dirname, '../../../resources/drivers/nirs-v5/Test1.exe');
 
-    dialog.showMessageBox(BrowserWindow.getAllWindows()[0], {
-      title: 'Test',
-      message: readerPath,
-    });
-
-    const spawnedDevice = spawn(readerPath, [], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-
-    spawnedDevice.stderr.on('data', (data) => {
-      console.log(data.toString());
-    });
-
-    spawnedDevice.channel?.close();
-
-    spawnedDevice.stdin;
-
-    spawnedDevice.stdout.setEncoding('binary');
+    const spawnedDevice = spawn(readerPath);
+    spawnedDevice.stdout.setEncoding('utf-8');
 
     this.spawnedDevices.push(spawnedDevice);
     return spawnedDevice;
@@ -109,41 +95,45 @@ class V5Device implements INIRSDevice {
  * Device input communication
  */
 class V5Input implements IDeviceInput {
-  connection: Socket | null;
+  connection: net.Socket | undefined;
 
   constructor() {
-    this.connection = null;
+    this.connection = undefined;
   }
 
-  public createConnectionInterface = () => new Socket();
+  public createConnectionInterface = () => new net.Socket();
 
-  public connect = () => {
+  public connect = async () => {
+    console.log('CONNECT TO SOCKET');
     const IP = '127.0.0.1';
     const PORT = 1337;
 
-    const connectionInterface = this.createConnectionInterface();
-    const connection = connectionInterface.connect(PORT, IP);
+    this.connection = this.createConnectionInterface();
+    this.connection = this.connection.connect(PORT, IP);
 
-    // Set the connection if successfully connected
-    const onConnectionSuccess = () => {
-      this.connection = connected;
-    };
-
-    const onConnectionError = () => {
-      throw Error('Failed to connect to the hardware');
-    };
-
-    const connected = connection.on('ready', onConnectionSuccess);
-    connection.on('error', onConnectionError);
+    this.connection.prependOnceListener('error', (_err) => {
+      console.log('Failed to connect to the hardware. Please try again.');
+    });
   };
 
   public isConnected = () => (this.connection ? true : false);
 
   public sendToDevice = (message: string) => {
-    if (!this.connection) return false;
+    if (!this.connection) {
+      this.connect();
+    }
+    const result = this.connection?.write(message) as boolean;
 
-    const isSuccessful = this.connection.write(message);
-    if (isSuccessful) return true;
+    if (this.connection) this.closeConnection();
+    return result;
+  };
+
+  public closeConnection = () => {
+    if (this.connection) {
+      this.connection.destroy();
+      this.connection = undefined;
+      return true;
+    }
 
     return false;
   };
@@ -161,19 +151,20 @@ class V5Stream implements IDeviceStream {
   dataBatchSize: number;
   numOfElementsPerDataPoint: number;
   deviceStream: Readable | undefined | null;
+  deviceLogStream: Readable | undefined | null;
   chunks: Float32Array | null;
   count: number;
   arrayPos: number;
 
-  constructor(physicalDevice: INIRSDevice) {
-    this.physicalDevice = physicalDevice;
-    this.NIRSV5Reader = undefined;
+  constructor(physicalDevice: INIRSDevice | IPhysicalDevice) {
+    this.physicalDevice = physicalDevice as INIRSDevice;
     this.streamType = 'stdout';
     this.sampleBufferSizeInBytes = 1350;
     this.outputBufferSizeToUIInBytes = 220;
     this.dataBatchSize = NUM_OF_DATAPOINTS_PER_CHUNK;
     this.numOfElementsPerDataPoint = NUM_OF_ELEMENTS_PER_DATAPOINT;
     this.deviceStream = undefined;
+    this.deviceLogStream = undefined;
     this.chunks = null;
     this.count = 0;
     this.arrayPos = 0;
@@ -193,16 +184,24 @@ class V5Stream implements IDeviceStream {
   // Return a stream of individual samples for now
   public getDeviceStream = () => {
     const device = this.physicalDevice.getDevice();
-
     this.deviceStream = device.stdout;
-
     return this.deviceStream;
+  };
+
+  // Return the stderr as the device logs info to stderr
+  public getDeviceLogStream = () => {
+    const device = this.physicalDevice.getDevice();
+    this.deviceLogStream = device.stderr;
+    return this.deviceLogStream;
   };
 
   stopDeviceStream = () => {
     if (this.deviceStream) {
-      this.NIRSV5Reader = undefined;
+      this.deviceStream.destroy();
       this.deviceStream = undefined;
+
+      this.deviceLogStream?.destroy();
+      this.deviceLogStream = undefined;
       return true;
     }
     return false;
@@ -212,12 +211,13 @@ class V5Stream implements IDeviceStream {
 /**
  * Device parser
  */
-const V5Parser = (chunk: Buffer): Uint16Array => {
-  const lines = chunk.toString().split(/\r?\n/);
+const V5Parser = (
+  chunk: String,
+  sharedBuffer?: SharedArrayBuffer | Int32Array
+): Int32Array => {
+  const lines = chunk.split('\r\n');
 
-  const dataArray = new Uint16Array(
-    NUM_OF_DATAPOINTS_PER_CHUNK * NUM_OF_ELEMENTS_PER_DATAPOINT
-  ).fill(0);
+  const dataArray = new Int32Array(sharedBuffer as SharedArrayBuffer);
 
   let arrayIndex = 0;
   // Use a for loop for the best performance
@@ -234,10 +234,10 @@ const V5Parser = (chunk: Buffer): Uint16Array => {
   return dataArray;
 };
 
-const Device = new V5Device();
-const Input = new V5Input();
+const Device = V5Device;
+const Input = V5Input;
 const Parser = V5Parser;
-const Stream = new V5Stream(Device);
+const Stream = V5Stream;
 
 const V5: IGetDevice = {
   Device,

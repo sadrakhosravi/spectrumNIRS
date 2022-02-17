@@ -21,6 +21,11 @@ export interface IDeviceInput {
    * Whether the connection with the device input in open
    */
   isConnected: () => boolean;
+
+  /**
+   * Closes the connection with device's input stream/interface
+   */
+  closeConnection: () => boolean;
 }
 
 type InputType = 'websocket' | 'stdin';

@@ -12,6 +12,8 @@ import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import path from 'path';
 import 'reflect-metadata';
 import { resolveHtmlPath } from './util';
+require('v8').setFlagsFromString('--expose_gc');
+global.gc = require('vm').runInNewContext('gc');
 
 // Import controllers
 import startControllers from 'controllers';
@@ -26,6 +28,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Force high performance gpu
 app.commandLine.appendSwitch('--force_high_performance_gpu', 'true');
+app.commandLine.appendSwitch('js-flags', '--expose_gc');
 
 // const isDevelopment =
 //   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
@@ -66,6 +69,7 @@ const createMainWindow = async () => {
       partition: 'persist:spectrum',
       contextIsolation: false,
       nodeIntegration: true,
+      nodeIntegrationInWorker: true,
       preload: path.join(__dirname, 'preload.js'),
       backgroundThrottling: false,
     },

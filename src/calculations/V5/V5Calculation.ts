@@ -46,9 +46,10 @@ class V5Calculation {
    * @param data
    * @returns
    */
-  public processRawData = (data: Buffer, batchSize: number): number[][] => {
-    const dataBatch = new Uint16Array(data);
-
+  public processRawData = (
+    dataBatch: Int32Array,
+    batchSize: number
+  ): number[][] => {
     let arrayIndex = 0;
     const NUM_OF_RAW_PD_VALUES = 6; // Number of elements per each sample data point
 
@@ -127,7 +128,7 @@ class V5Calculation {
    * Calculates the O2Hb, HHb, and THb values from the raw intensities read from the sensor
    * uses the Raw PD readings (ADC) values.
    */
-  public calcHemodynamics = (rawPDValues: Uint16Array) => {
+  public calcHemodynamics = (rawPDValues: Int32Array) => {
     const data = new Float32Array(rawPDValues.slice(0, rawPDValues.length - 1));
     const baseline = rawPDValues[rawPDValues.length - 1];
 
@@ -178,7 +179,7 @@ class V5Calculation {
    * Calculates the Tissue Oxygenation Index from the intensities and raw PD (ADC) values
    * @returns the TOI calculated from the intensities and raw PD (ADC) values from the sensor
    */
-  private calcTOI = (rawPDValues: Uint16Array, LEDIntValues: Uint16Array) => {
+  private calcTOI = (rawPDValues: Int32Array, LEDIntValues: Int32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
       (LEDIntValues[0] / 255) * 4095,

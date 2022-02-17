@@ -6,11 +6,11 @@ import RecordChartClass from './ChartClass/RecordChart';
 
 // Constants
 import { ChartType } from 'utils/constants';
-// import ChartLayout, { ChartContainer } from './ChartContainer.component';
+import ChartLayout, { ChartContainer } from './ChartContainer.component';
 // import useContextMenu from '@hooks/useContextMenu';
 // import ContextMenu from '@components/Menu/ContextMenu.component';
 import { useChartContext } from 'renderer/context/ChartProvider';
-// import RecordChartToolbar from './Toolbar/RecordChartToolbar.component';
+import RecordChartToolbar from './Toolbar/RecordChartToolbar.component';
 
 type ChartProps = {};
 
@@ -33,7 +33,7 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
 
     chart.createRecordChart();
     // Attach event listeners
-    chart.listenForData();
+    // chart.listenForData();
 
     // Keep a ref to the chart
     chartRef.current = chart as RecordChartClass;
@@ -95,13 +95,15 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
   // );
 
   return (
-    <div className="pointer-events-auto h-full w-full" id={containerId}></div>
-    // <ChartLayout>
-    //   <RecordChartToolbar type={ChartType.RECORD} />
-    //   <ChartContainer type={ChartType.RECORD}>
-
-    //   </ChartContainer>
-    // </ChartLayout>
+    <ChartLayout>
+      <RecordChartToolbar type={ChartType.RECORD} />
+      <ChartContainer type={ChartType.RECORD}>
+        <div
+          className="pointer-events-auto h-full w-full"
+          id={containerId}
+        ></div>
+      </ChartContainer>
+    </ChartLayout>
   );
 };
 

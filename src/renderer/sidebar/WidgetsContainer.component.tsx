@@ -5,7 +5,7 @@ import Filter from './ProbeCalibrationWidgets/Filter.component';
 import Intensities from './ProbeCalibrationWidgets/Intensities.component';
 import EventsWidget from './ReviewWidgets/Events.widget';
 import ExportServerSettings from './ExportServer/ExportServerSettings.widget';
-import ClientLog from './ExportServer/ClientLog.widget';
+import ClientLog from './Shared/ClientLog.widget';
 
 // Constants
 import { SidebarType } from '@utils/constants';
@@ -20,7 +20,7 @@ const WidgetsContainer = ({
     <div className="h-[calc(100%+0px)] px-4 py-4 ">
       <>
         {' '}
-        <div className="h-[calc(100%-2rem)] relative pb-3 grid grid-flow-row grid-rows-5 gap-5">
+        <div className="relative grid h-[calc(100%-2rem)] grid-flow-row grid-rows-5 gap-5 pb-3">
           {type === SidebarType.RECORD && (
             <>
               <Filter />
@@ -34,6 +34,7 @@ const WidgetsContainer = ({
           {type === SidebarType.PROBE_CALIBRATION && (
             <>
               <Intensities />
+              <ClientLog />
             </>
           )}
           {type === SidebarType.EXPORT_SERVER && (

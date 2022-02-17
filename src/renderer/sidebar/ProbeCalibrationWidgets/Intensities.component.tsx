@@ -8,6 +8,7 @@ import Widget from '../../components/Widget/Widget.component';
 
 // Icons
 import BorderButton from '@components/Buttons/BorderButton.component';
+import DisabledOverlay from '@components/Overlay/DisabledOverlay.component';
 
 //Renders the filter widget on the sidebar
 const Intensities = () => {
@@ -18,6 +19,11 @@ const Intensities = () => {
     (state) => state.sensorState.currentProbe
   );
 
+  const isCalibrating = useAppSelector(
+    (state) => state.global.recordState?.isCalibrating
+  );
+
+  // Loads the current probe intensities from the DB
   const loadIntensities = async () => {
     const probeConfigs = await window.api.invokeIPC(
       ProbeChannels.GetProbeIntensities
@@ -29,17 +35,19 @@ const Intensities = () => {
     setDefaultIntensities(probeConfigs.defaultIntensities);
   };
 
+  // Load probe intensities whenever a new probe is selected
   useEffect(() => {
     loadIntensities();
   }, [currentProbe]);
 
-  console.log(intensities);
-
+  // Handles the range slider change of value
   const handleRangeSliderChange = (event: any) => {
     const id = event.target.id;
     const element = document.getElementById(`${id}-value`) as HTMLInputElement;
     element.value = event.target.value;
   };
+
+  // Handles the input change of value
 
   const handleInputChange = (event: any) => {
     const id = event.target.id.split('-')[0];
@@ -49,6 +57,7 @@ const Intensities = () => {
     sendDataToController();
   };
 
+  // Send the data to controller
   const sendDataToController = async () => {
     const newIntensities: any[] = [];
     intensities &&
@@ -60,9 +69,8 @@ const Intensities = () => {
       });
     newIntensities.push('HIGH');
     newIntensities.push('100');
-    console.log(newIntensities);
     const result = await window.api.invokeIPC(
-      RecordChannels.SyncGain,
+      RecordChannels.SyncIntensitiesAndGain,
       newIntensities
     );
     if (result) {
@@ -72,6 +80,7 @@ const Intensities = () => {
     }
   };
 
+  // Asks the controller to save the intensities in the DB
   const saveIntensities = async () => {
     const newIntensities: string[] = [];
     intensities &&
@@ -97,6 +106,11 @@ const Intensities = () => {
         <Widget span="3">
           <Tabs>
             <Tabs.Tab label="Intensities">
+              <>
+                {!isCalibrating && (
+                  <DisabledOverlay message='Press the "Start" button to enable this section' />
+                )}
+              </>
               <div>
                 <div className="mb-4 text-white text-opacity-70">
                   Current Probe: {currentProbe?.name}
@@ -104,7 +118,7 @@ const Intensities = () => {
                 {intensities &&
                   intensities.map((intensity: number, i: number) => (
                     <div
-                      className="mb-4 flex items-center group"
+                      className="group mb-4 flex items-center"
                       key={`LED${i}`}
                     >
                       <label
@@ -125,7 +139,7 @@ const Intensities = () => {
                       />
                       <input
                         id={`LED${i}-value`}
-                        className="absolute right-0 -bottom-4 text-base w-12 bg-transparent"
+                        className="absolute right-0 -bottom-4 w-12 bg-transparent text-base"
                         type="number"
                         onChange={handleInputChange}
                         defaultValue={intensity}
@@ -137,7 +151,9 @@ const Intensities = () => {
                 </div>
               </div>
 
-              <span className="text-base">Status: {status}</span>
+              <span className="absolute bottom-5 left-3 text-base">
+                Status: {status}
+              </span>
             </Tabs.Tab>
           </Tabs>
         </Widget>

@@ -3,7 +3,7 @@ import { Recordings } from 'db/entity/Recordings';
 import RecordingsDataModel from './RecordingsDataModel';
 import GlobalStore from '@lib/globalStore/GlobalStore';
 
-import ProbesManager from './ProbesManager';
+import ProbesManager, { CurrentProbe } from './ProbesManager';
 import PatientModel from './PatientModel';
 
 // Interfaces
@@ -16,7 +16,7 @@ export interface IRecordingData {
   id: number;
   name: string;
   patient: number;
-  settings: string;
+  settings: CurrentProbe;
   updatedAt: string;
 }
 
@@ -42,7 +42,14 @@ class RecordingModel {
     this.recordingsDataModel = undefined;
     GlobalStore.removeRecording();
 
+    // Parse the setting
+    if (recording instanceof Recordings) {
+      recording.settings = JSON.parse(recording.settings as string);
+    }
+
     this.currentRecording = recording;
+
+    console.log(this.currentRecording);
 
     if (!this.currentRecording) {
       GlobalStore.removeRecording();

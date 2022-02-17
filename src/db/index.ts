@@ -14,6 +14,7 @@ const createDBConnection = async () => {
     database: databaseFile,
     synchronize: true,
     logging: false,
+    statementCacheSize: 100 * 10,
     entities: [Experiments, Patients, Recordings, RecordingsData, Probes],
     migrations: ['src/db/migration/**/*.ts'],
     subscribers: ['src/db/subscriber/**/*.ts'],

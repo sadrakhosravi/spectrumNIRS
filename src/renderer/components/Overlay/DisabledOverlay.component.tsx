@@ -2,14 +2,21 @@ import React from 'react';
 
 type DisabledOverlayProps = {
   title?: string;
+  message?: string;
 };
 
-const DisabledOverlay = ({ title }: DisabledOverlayProps) => {
+const DisabledOverlay = ({ title, message }: DisabledOverlayProps) => {
   return (
     <div
-      className="absolute top-0 left-0 w-full h-full bg-dark2/80 cursor-not-allowed z-50 rounded-md"
+      className="absolute top-0 left-0 z-50 flex h-full w-full cursor-not-allowed items-center justify-center rounded-md bg-dark2/90 transition-all duration-150"
       title={title || 'This section is disabled'}
-    />
+    >
+      {message && (
+        <p className="px-4 text-center transition-all duration-300">
+          {message}
+        </p>
+      )}
+    </div>
   );
 };
 export default DisabledOverlay;

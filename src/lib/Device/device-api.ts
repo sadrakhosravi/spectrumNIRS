@@ -28,10 +28,21 @@ export {
   TransformerOptions,
 };
 
+type Device<I> = new () => I;
+type Input<I> = new () => I;
+type Stream<I> = new (physicalDevice: INIRSDevice | IPhysicalDevice) => I;
+
 export interface IGetDevice {
+  Device: Device<IPhysicalDevice | INIRSDevice>;
+  Parser: (chunk: any, dataBuf: Int32Array | SharedArrayBuffer) => Int32Array;
+  Input: Input<IDeviceInput>;
+  Stream: Stream<IDeviceStream>;
+  DBParser?: (data: Uint16Array) => any;
+}
+
+export interface DeviceAPI {
   Device: IPhysicalDevice | INIRSDevice;
-  Parser: (chunk: any) => Uint16Array;
+  Parser: (chunk: any, dataBuf: Int32Array | SharedArrayBuffer) => Int32Array;
   Input: IDeviceInput;
   Stream: IDeviceStream;
-  DBParser?: (data: Uint16Array) => any;
 }

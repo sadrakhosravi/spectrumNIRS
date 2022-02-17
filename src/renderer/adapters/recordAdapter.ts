@@ -4,7 +4,6 @@ import { changeRecordState } from '@redux/RecordStateSlice';
 // Constants
 import { DialogBoxChannels, RecordChannels } from '@utils/channels';
 import { RecordState } from '@utils/constants';
-import DataManager from 'renderer/DataManager/DataManager';
 
 const dispatch = store.dispatch;
 
@@ -79,21 +78,6 @@ export const handleRecord = async () => {
   }
 };
 
-export const handleRecord2 = () => {
-  const { recordState } = store.getState();
-
-  if (recordState.value === RecordState.IDLE) {
-    DataManager.initDataManager();
-    dispatch(changeRecordState(RecordState.RECORD));
-    return;
-  }
-
-  DataManager.stopDataManager();
-  dispatch(changeRecordState(RecordState.IDLE));
-
-  return;
-};
-
 // Pause and continue recording logic
 export const handlePause = () => {
   const { recordState } = store.getState();
@@ -106,26 +90,4 @@ export const handlePause = () => {
 
   console.log(store.getState().recordState.value);
   window.api.sendIPC(RecordChannels.Base + store.getState().recordState.value);
-};
-
-/**
- * Send a signal to the main process to start the signal quality monitor
- */
-export const signalQualityMonitor = async (active: boolean) => {
-  const sensorId = store.getState().sensorState.detectedSensor?.id;
-  console.log(sensorId);
-  if (sensorId === undefined) {
-    await window.api.invokeIPC(DialogBoxChannels.MessageBox, {
-      title: 'No Sensor Found',
-      type: 'error',
-      message: 'No Sensor was detected on the system',
-      detail: 'Please attach a sensor and try again',
-    });
-
-    return false;
-  }
-  await window.api.invokeIPC(RecordChannels.Init, { sensorId });
-  window.api.sendIPC(RecordChannels.QualityMonitor, active);
-
-  return true;
 };

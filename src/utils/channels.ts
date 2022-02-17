@@ -1,3 +1,13 @@
+//
+// Constants used for IPC channels
+//
+
+// General Purpose Channels
+const GeneralBase = 'general';
+export const GeneralChannels = {
+  LogMessage: GeneralBase + 'log-message',
+};
+
 // Experiment Channel
 const ExpChannelBase = 'experiment:';
 export const ExperimentChannels = {
@@ -38,12 +48,12 @@ export const RecordChannels = {
   Base: RecordBase,
   Init: RecordBase + 'init',
   Recording: RecordBase + 'recording',
-  QualityMonitor: RecordBase + 'quality-monitor',
+  ProbeCalibration: RecordBase + 'probe-calibration',
   Stop: RecordBase + 'stop',
   Pause: RecordBase + 'pause',
   Continue: RecordBase + 'continue',
   RawData: RecordBase + 'raw-data',
-  SyncGain: RecordBase + 'gain-base',
+  SyncIntensitiesAndGain: RecordBase + 'sync-intensities-gain',
 };
 
 // Review Tab
@@ -93,6 +103,7 @@ export const ProbeChannels = {
   UpdateProbeIntensities: ProbeBase + 'update-intensities',
 };
 
+// Web Socket Export Server
 const ExportServerBase = 'export-server:';
 export const ExportServerChannels = {
   StartServer: ExportServerBase + 'start-server',

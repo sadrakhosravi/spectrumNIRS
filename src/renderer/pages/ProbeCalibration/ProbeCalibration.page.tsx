@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { signalQualityMonitor } from '@adapters/recordAdapter';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
 
 // Chart
@@ -8,7 +7,7 @@ import ProbeCalibrationChart from 'renderer/charts/ChartClass/ProbeCalibrationCh
 
 // Constants
 import { SidebarType } from '@utils/constants';
-import IconTextButton from '@components/Buttons/IconTextButton.component';
+import ActionButton from '@components/Buttons/ActionButton.component';
 
 // Icons
 import StartIcon from '@icons/start.svg';
@@ -19,27 +18,49 @@ import { setProbeCalibrationSidebar } from '@redux/AppStateSlice';
 import ToolbarContainer from '@components/Toolbar/ToolbarContainer.component';
 
 const ProbeCalibrationPage = () => {
-  const [isQualityChecking, setIsQualityChecking] = useState(false);
   const containerId = 'probeCalibrationChart';
+  const dispatch = useAppDispatch();
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  const chartRef = useRef<ProbeCalibrationChart | undefined>(undefined);
+
   const sidebarState = useAppSelector(
     (state) => state.appState.probeCalibrationSidebar
   );
-  const dispatch = useAppDispatch();
-  let chart: ProbeCalibrationChart | undefined;
+  const isCalibrating = useAppSelector(
+    (state) => state.global.recordState?.isCalibrating
+  );
+
   useEffect(() => {
-    chart = new ProbeCalibrationChart(containerId);
-    chart.createSignalMonitorChart();
+    const chart = new ProbeCalibrationChart(containerId);
+    chart.createProbeCalibrationChart();
+
+    chartRef.current = chart;
 
     return () => {
-      window.api.sendIPC(RecordChannels.Stop);
+      window.api.invokeIPC(RecordChannels.ProbeCalibration, true);
+      chartRef.current = undefined;
       chart?.cleanup();
     };
   }, []);
 
-  const handleStartMonitoring = async () => {
-    const isStarted = await signalQualityMonitor(!isQualityChecking);
-    isStarted && chart?.resetData();
-    isStarted && setIsQualityChecking(!isQualityChecking);
+  useEffect(() => {
+    if (isCalibrating) {
+      chartRef.current?.listenForData();
+    } else {
+      chartRef.current?.stopListening();
+      setTimeout(() => chartRef.current?.resetData(), 1000);
+    }
+  }, [isCalibrating]);
+
+  const handleDeviceCalibration = async () => {
+    !isDisabled &&
+      (await window.api.invokeIPC(
+        RecordChannels.ProbeCalibration,
+        isCalibrating
+      ));
+    setIsDisabled(true);
+    setTimeout(() => setIsDisabled(false), 800);
   };
 
   return (
@@ -49,24 +70,25 @@ const ProbeCalibrationPage = () => {
       onSidebarClick={() => dispatch(setProbeCalibrationSidebar(!sidebarState))}
     >
       <ToolbarContainer>
-        <div className="col-start-5 col-span-2 items-center text-center">
-          {isQualityChecking && (
-            <p className="w-full text-sm">Refresh Rate: 0.5s</p>
+        <div className="flex w-full items-center justify-end">
+          {isCalibrating && (
+            <p className="ml-auto mr-4 inline-block text-sm">
+              Refresh Rate: 0.1s
+            </p>
           )}
-          <div className="w-28 ml-auto">
-            <IconTextButton
-              icon={isQualityChecking ? PauseIcon : StartIcon}
-              text={isQualityChecking ? 'Stop' : 'Start'}
-              onClick={() => {
-                handleStartMonitoring();
-              }}
-              isActive={isQualityChecking}
+          <div className="mr-4 inline-block">
+            <ActionButton
+              icon={isCalibrating ? PauseIcon : StartIcon}
+              text={isCalibrating ? 'Stop' : 'Start'}
+              onClick={() => handleDeviceCalibration()}
+              isActive={isCalibrating}
+              disabled={isDisabled}
             />
           </div>
         </div>
       </ToolbarContainer>
 
-      <div className="w-full h-[calc(100%-50px)]" id={containerId}></div>
+      <div className="h-[calc(100%-50px)] w-full" id={containerId}></div>
     </Page>
   );
 };

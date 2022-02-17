@@ -4,7 +4,7 @@ import { RecordButtons, RecordToolbar } from './RecordToolbar';
 // Components
 import Separator from '@components/Separator/Separator.component';
 import IconButton from '@components/Buttons/IconButton.component';
-import IconTextButton from '@components/Buttons/IconTextButton.component';
+import ActionButton from '@components/Buttons/ActionButton.component';
 import withTooltip from '@hoc/withTooltip.hoc';
 import TimeDivision from './TimeDivision.component';
 import TimeDiv from './TimeDiv.component';
@@ -18,7 +18,7 @@ import ToolbarContainer from '@components/Toolbar/ToolbarContainer.component';
 
 // Buttons with tooltip
 const IconButtonWithTooltip = withTooltip(IconButton);
-const IconTextButtonWithTooltip = withTooltip(IconTextButton);
+const ActionButtonWithTooltip = withTooltip(ActionButton);
 
 type RecordChartToolbarProps = {
   type: ChartType.RECORD | ChartType.REVIEW;
@@ -33,10 +33,10 @@ const RecordChartToolbar = ({
   return (
     <>
       <ToolbarContainer>
-        <div className="flex w-full items-center justify-between h-full px-4">
+        <div className="flex h-full w-full items-center justify-between px-4">
           {recordChart && (
             <>
-              <div className="grid grid-flow-col col-span-4 auto-cols-max items-center gap-1">
+              <div className="col-span-4 grid auto-cols-max grid-flow-col items-center gap-1">
                 {RecordToolbar.map((option, index) => {
                   if (option.label === 'separator')
                     return <Separator orientation="vertical" key={index} />;
@@ -69,11 +69,11 @@ const RecordChartToolbar = ({
               </div>
 
               {/* Stop Start Button */}
-              <div className="grid grid-flow-col col-span-2 auto-cols-max items-center gap-3 justify-end">
-                <div className="grid grid-flow-col auto-cols-max gap-3">
+              <div className="col-span-2 grid auto-cols-max grid-flow-col items-center justify-end gap-3">
+                <div className="grid auto-cols-max grid-flow-col gap-3">
                   {type === ChartType.RECORD
                     ? RecordButtons.map((button, index) => (
-                        <IconTextButtonWithTooltip
+                        <ActionButtonWithTooltip
                           text={button.dynamicLabel(recordState)}
                           icon={button.dynamicIcon(recordState)}
                           darker
@@ -83,7 +83,7 @@ const RecordChartToolbar = ({
                         />
                       ))
                     : RecordButtons.map((button, index) => (
-                        <IconTextButtonWithTooltip
+                        <ActionButtonWithTooltip
                           text={`Status: ${button.dynamicLabel(recordState)}`}
                           icon={button.dynamicIcon(recordState)}
                           darker

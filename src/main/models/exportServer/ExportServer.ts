@@ -6,7 +6,7 @@ import detectPort from 'detect-port';
 import getLocalIP, { INetwork } from '@lib/network/getLocalIP';
 
 // Constants
-import { ExportServerChannels } from '@utils/channels';
+import { ExportServerChannels, GeneralChannels } from '@utils/channels';
 import AccurateTimer from '@electron/helpers/accurateTimer';
 import DummyData from '../DummyData';
 
@@ -599,10 +599,9 @@ class ExportServer {
       }
 
       const message = socket.appName + ': ' + data.toString();
-      this.mainWindow?.webContents.send(
-        ExportServerChannels.ClientMessage,
-        message
-      );
+      this.mainWindow?.webContents.send(GeneralChannels.LogMessage, {
+        message,
+      });
     });
   };
 

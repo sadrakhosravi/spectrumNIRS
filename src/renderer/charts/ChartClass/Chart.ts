@@ -22,8 +22,8 @@ import dashboard from './methods/Dashboard';
 import createChartPerChannel from './methods/Charts';
 import createSeriesForEachChart from './methods/Series';
 import xAxisChart from './methods/XAxisChart';
-// import customCursor from './methods/CustomCursor';
-// import SeriesToggle from './methods/SeriesToggles';
+import customCursor from './methods/CustomCursor';
+import SeriesToggle from './methods/SeriesToggles';
 
 // Constants
 import { ChartType } from 'utils/constants';
@@ -70,9 +70,9 @@ class ChartClass {
     this.dashboard = dashboard(numOfRows, container);
     this.charts = createChartPerChannel.bind(this)();
     this.series = createSeriesForEachChart.bind(this)();
-    // this.seriesToggles = SeriesToggle.bind(this)();
+    this.seriesToggles = SeriesToggle.bind(this)();
     this.xAxisChart = xAxisChart.bind(this)();
-    // customCursor.bind(this)();
+    customCursor.bind(this)();
     return this.dashboard;
   }
 

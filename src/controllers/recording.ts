@@ -1,10 +1,9 @@
 import { ipcMain } from 'electron';
 
-// Models
-import DataReader from '../devices/DeviceReader';
-
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
+
+import DeviceReader from '@electron/models/DeviceReader';
 
 export type CurrentRecording = {
   id: number;
@@ -13,81 +12,59 @@ export type CurrentRecording = {
   date: string;
 };
 
-type RecordInit = {
-  sensorId: number;
-  patientId: number;
-  currentRecording: CurrentRecording;
-  isRawData: boolean;
-  lastTimeStamp: number;
-};
+let deviceReader: DeviceReader | undefined;
 
-// Store
-export let reader: DataReader | undefined;
-
-// Select the sensor
-ipcMain.handle(
-  RecordChannels.Init,
-  (
-    event,
-    {
-      sensorId,
-      patientId,
-      currentRecording,
-      isRawData,
-      lastTimeStamp,
-    }: RecordInit
-  ) => {
-    reader = new DataReader(
-      patientId,
-      sensorId,
-      currentRecording,
-      isRawData,
-      lastTimeStamp,
-      event.sender
-    );
+// Initialize device reader
+ipcMain.handle(RecordChannels.Init, (_event, _args) => {
+  if (!deviceReader) {
+    deviceReader = new DeviceReader();
+    return;
   }
-);
 
-// Start recording
-ipcMain.on(RecordChannels.Recording, () => {
-  reader && reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
+  // If a reader already exists
+  deviceReader = undefined;
+  setTimeout(() => {
+    deviceReader = new DeviceReader();
+  });
 });
 
+// Start recording
+ipcMain.on(RecordChannels.Recording, () => {});
+
 // Start quality monitor
-ipcMain.on(RecordChannels.QualityMonitor, (_event, active: boolean) => {
-  if (!reader) return;
-  active && reader.startQualityMonitor();
-  !active && reader && reader.stopRecording();
+ipcMain.handle(RecordChannels.ProbeCalibration, (_event, isActive) => {
+  if (!deviceReader && !isActive) {
+    deviceReader = new DeviceReader();
+    deviceReader.readDeviceDataOnly();
+    console.log('RECREATED');
+  }
+
+  if (deviceReader && isActive) {
+    deviceReader.stopDevice();
+    deviceReader = undefined;
+  }
 });
 
 // Stop recording
-ipcMain.on(RecordChannels.Stop, () => {
-  reader && reader.stopRecording();
-});
+ipcMain.on(RecordChannels.Stop, () => {});
 
 // Pause recording
-ipcMain.on(RecordChannels.Pause, () => {
-  reader && reader.pauseRecording();
-});
+ipcMain.on(RecordChannels.Pause, () => {});
 
 // Continue recording
-ipcMain.on(RecordChannels.Continue, () => {
-  reader && reader.continueRecording();
-});
+ipcMain.on(RecordChannels.Continue, () => {});
 
 // Display Raw Data
-ipcMain.on(RecordChannels.RawData, () => {
-  reader && reader.toggleRawData();
-});
+ipcMain.on(RecordChannels.RawData, () => {});
 
 // Gain Sync
-ipcMain.handle(RecordChannels.SyncGain, async (_event, data: string[]) => {
-  console.log('CONTROLLER' + data);
-  console.log(reader);
-  await reader?.syncGainsWithHardware(data);
-});
+ipcMain.handle(
+  RecordChannels.SyncIntensitiesAndGain,
+  async (_event, data: string[]) => {
+    console.log('CONTROLLER' + data);
+    return deviceReader?.sendCommandToDevice(data.join(','));
+  }
+);
 
 // Hypoxia Event
-ipcMain.on(ChartChannels.Event, (_event, data: Object) => {
-  reader && reader.toggleEvent(data);
-});
+ipcMain.on(ChartChannels.Event, (_event, _data: Object) => {});

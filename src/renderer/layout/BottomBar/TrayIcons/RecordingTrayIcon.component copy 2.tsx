@@ -14,15 +14,14 @@ const RecordingTrayIcon = () => {
     (state) => state.global.recording?.currentRecording
   );
 
-  const settings: CurrentProbe =
-    recordingData && JSON.parse(recordingData.settings);
+  const settings: CurrentProbe | undefined = recordingData?.settings;
 
   let patientTooltipText = null;
 
   if (recordingData) {
     patientTooltipText = (
       <div className="px-2 py-2 text-left">
-        <h2 className="text-xl text-accent mb-1">Recording Info</h2>
+        <h2 className="mb-1 text-xl text-accent">Recording Info</h2>
 
         <div className="ml-4">
           <p>Name: {recordingData.name}</p>
@@ -32,10 +31,10 @@ const RecordingTrayIcon = () => {
           )}
           {recordingData?.settings && (
             <>
-              <p>Probe: {settings.name}</p>
-              <p>Sampling Rate: {settings.samplingRate}</p>
-              <p>Device: {settings.device.name}</p>
-              <p>Channels: {settings.device.defaultChannels.join(', ')}</p>
+              <p>Probe: {settings?.name}</p>
+              <p>Sampling Rate: {settings?.samplingRate}</p>
+              <p>Device: {settings?.device.name}</p>
+              <p>Channels: {settings?.device.defaultChannels.join(', ')}</p>
             </>
           )}
         </div>

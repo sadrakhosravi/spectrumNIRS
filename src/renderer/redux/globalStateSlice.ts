@@ -6,6 +6,7 @@ interface IGlobalStateSlice {
   experiment: IGlobalStore['experiment'] | null;
   patient: IGlobalStore['patient'] | null;
   recording: IGlobalStore['recording'] | null;
+  recordState: IGlobalStore['recordState'] | null;
 }
 
 const initialState: IGlobalStateSlice = {
@@ -13,6 +14,7 @@ const initialState: IGlobalStateSlice = {
   experiment: null,
   patient: null,
   recording: null,
+  recordState: null,
 };
 
 export const GlobalStateSlice = createSlice({

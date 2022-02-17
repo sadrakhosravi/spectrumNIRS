@@ -1,10 +1,10 @@
-import { getState } from '@redux/store';
+import { getState, dispatch } from '@redux/store';
 import { ChartType } from '@utils/constants';
 import Chart from './Chart';
-// import ChartOptions from './ChartOptions';
+import ChartOptions from './ChartOptions';
 // import { ChartChannels } from '@utils/channels';
 // import { setPreviousData } from '@redux/ExperimentDataSlice';
-// import { setRecordChartPositions } from '@redux/RecordChartSlice';
+import { setRecordChartPositions } from '@redux/RecordChartSlice';
 import AccurateTimer from '@electron/helpers/accurateTimer';
 import { AxisScrollStrategies } from '@arction/lcjs';
 
@@ -37,31 +37,30 @@ class RecordChart extends Chart {
     this.createDashboard(this.numberOfRows, this.containerId);
     this.synchronizeXAxis(this.charts);
     this.customizeRecordCharts();
-    // this.chartOptions = new ChartOptions(
-    //   this.channels,
-    //   this.dashboard,
-    //   this.charts,
-    //   this.series
-    // );
-    // this.sendChartPositions();
+    this.chartOptions = new ChartOptions(
+      this.channels,
+      this.dashboard,
+      this.charts,
+      this.series
+    );
+    this.sendChartPositions();
   }
 
-  // sendChartPositions() {
-  //   // Send the initial chart position on creation
-  //   requestAnimationFrame(() => {
-  //     console.log(this.getChartPositions());
-  //     dispatch(setRecordChartPositions(this.getChartPositions()));
-  //   });
+  sendChartPositions() {
+    // Send the initial chart position on creation
+    requestAnimationFrame(() => {
+      dispatch(setRecordChartPositions(this.getChartPositions()));
+    });
 
-  //   // Listen for chart resize and send to the state
-  //   // Using only one chart for reference event because it trigger
-  //   // all the other charts in the dashboard
-  //   this.charts[0].onResize(() => {
-  //     requestAnimationFrame(() => {
-  //       dispatch(setRecordChartPositions(this.getChartPositions()));
-  //     });
-  //   });
-  // }
+    // Listen for chart resize and send to the state
+    // Using only one chart for reference event because it trigger
+    // all the other charts in the dashboard
+    this.charts[0].onResize(() => {
+      requestAnimationFrame(() => {
+        dispatch(setRecordChartPositions(this.getChartPositions()));
+      });
+    });
+  }
 
   listenForData() {
     const { ipcRenderer } = require('electron');

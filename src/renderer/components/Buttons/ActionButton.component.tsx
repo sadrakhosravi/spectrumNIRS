@@ -3,16 +3,16 @@ import React from 'react';
 // Component
 import IconText from '@components/MicroComponents/IconText/IconText.component';
 
-interface IProps {
+type ActionButtonProps = {
   icon?: string;
   text?: string;
   darker?: boolean;
   isActive?: boolean;
   disabled?: boolean;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-}
+};
 
-const IconTextButton: React.FC<IProps> = (props) => {
+const ActionButton = (props: ActionButtonProps) => {
   const {
     icon,
     text,
@@ -28,16 +28,16 @@ const IconTextButton: React.FC<IProps> = (props) => {
   const activeStyle =
     isActive && 'bg-accent hover:bg-accent-hover active:bg-accent';
   const disabledStyle =
-    disabled && 'bg-grey2 hover:bg-grey2 cursor-not-allowed';
+    disabled && 'bg-grey3 hover:bg-grey3 cursor-not-allowed';
 
   return (
     <button
       type="button"
-      className={`${disabledStyle} ${disabled || buttonBackground} ${
-        disabled || activeStyle
-      } ${
-        text ? 'px-4' : 'px-3 bg-grey1 active:bg-accent'
-      } w-full py-2 grid grid-flow-col auto-cols-max items-center relative rounded-md`}
+      className={`inline-block ${disabledStyle} ${
+        disabled || buttonBackground
+      } ${disabled || activeStyle} ${
+        text ? 'px-4' : 'bg-grey1 px-3 active:bg-accent'
+      } relative grid w-full auto-cols-max grid-flow-col items-center rounded-md py-2`}
       onClick={onClick}
     >
       <IconText text={text || undefined} icon={icon} />
@@ -45,4 +45,4 @@ const IconTextButton: React.FC<IProps> = (props) => {
   );
 };
 
-export default IconTextButton;
+export default ActionButton;

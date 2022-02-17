@@ -51,7 +51,10 @@ class ProbeCalibrationChart {
     this.PD_THRESHOLD_VALUE = 2000;
   }
 
-  createSignalMonitorChart() {
+  /**
+   * Creates the chart used to test probe intensities
+   */
+  createProbeCalibrationChart() {
     this.chart = lightningChart()
       .ChartXY({
         container: this.containerId,
@@ -68,10 +71,12 @@ class ProbeCalibrationChart {
     this.customizeXAxis();
     this.customizeYAxis();
     this.LEDRectangles = this.addLEDRectangles();
-    this.listenForData();
     this.addUIElements();
   }
 
+  /**
+   * Customizes the x axis of the chart
+   */
   customizeXAxis() {
     const axisX = this.chart?.getDefaultAxisX() as lcjs.Axis;
 
@@ -83,6 +88,9 @@ class ProbeCalibrationChart {
       .setTickStrategy(AxisTickStrategies.Empty);
   }
 
+  /**
+   * Customizes the Y axis of the chart
+   */
   customizeYAxis() {
     const axisY = this.chart?.getDefaultAxisY() as lcjs.Axis;
     axisY
@@ -117,18 +125,25 @@ class ProbeCalibrationChart {
     );
   }
 
+  /**
+   * Resets the data on the graph
+   */
   resetData() {
-    console.log(this.LEDRectangles);
     this.LEDRectangles &&
-      this.LEDRectangles.forEach((rectangle) => {
-        rectangle?.setDimensions({
-          ...(rectangle.getDimensionsPositionAndSize() as lcjs.RectanglePositionAndSize),
-          height: 0,
-        });
+      this.LEDRectangles.forEach((_, i) => {
+        this.LEDRectangles &&
+          this.LEDRectangles[i]?.setDimensions({
+            ...(this.LEDRectangles[
+              i
+            ]?.getDimensionsPositionAndSize() as lcjs.RectanglePositionAndSize),
+            height: 0,
+          });
       });
-    console.log('Cleaned');
   }
 
+  /**
+   * Adds UI element to the chart
+   */
   addUIElements() {
     this.UIElement = this.chart
       ?.addUIElement(UIElementBuilders.TextBox, {
@@ -143,10 +158,16 @@ class ProbeCalibrationChart {
       .setText('Threshold Value');
   }
 
+  /**
+   * Creates rectangle series for the chart
+   */
   createRectangleSeries() {
     if (this.chart) this.rectangleSeries = this.chart.addRectangleSeries();
   }
 
+  /**
+   * Adds bar charts for each LED
+   */
   addLEDRectangles() {
     const axisX = this.chart?.getDefaultAxisX() as lcjs.Axis;
     const width = 0.6;
@@ -189,10 +210,13 @@ class ProbeCalibrationChart {
     return LEDRectangles;
   }
 
+  /**
+   * Listens for incoming device data
+   */
   listenForData() {
-    window.api.onIPCData('probe-calibration-data', (_event, data) => {
-      console.log(data);
-      data.forEach((dataPoint: any, i: number) => {
+    console.log('LISTENING');
+    window.api.onIPCData('device:calibration', (_event, data: number[]) => {
+      data.forEach((dataPoint, i) => {
         this.LEDRectangles &&
           this.LEDRectangles[i]?.setDimensions({
             ...(this.LEDRectangles[
@@ -220,6 +244,16 @@ class ProbeCalibrationChart {
     });
   }
 
+  /**
+   * Stops listening for data
+   */
+  stopListening() {
+    window.api.removeListeners('probe-calibration-data');
+  }
+
+  /**
+   * Cleanups the memory and disposes the chart
+   */
   cleanup() {
     window.api.removeListeners('probe-calibration-data');
     this.chart?.dispose();

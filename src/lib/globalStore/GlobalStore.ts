@@ -12,6 +12,7 @@ import { IExperimentData } from '@electron/models/ExperimentModel';
 import { IPatientData } from '@electron/models/PatientModel';
 import { IRecordingData } from '@electron/models/RecordingModel';
 import { CurrentProbe } from '@electron/models/ProbesManager';
+import { RecordState } from '@electron/models/DeviceReader';
 
 let storePath = '';
 
@@ -53,6 +54,7 @@ export interface IGlobalStore {
   probe: {
     currentProbe: CurrentProbe | null;
   };
+  recordState: RecordState;
 }
 
 const initialState = {
@@ -157,6 +159,23 @@ class GlobalStore {
    */
   getProbe = (key: keyof IGlobalStore['probe']) =>
     this.store.get(`probe.${key}`);
+
+  /**
+   * Sets the record state value
+   */
+  setRecordState = (key: keyof IGlobalStore['recordState'], value: any) =>
+    this.store.set(`recordState.${key}`, value);
+
+  /**
+   * Removes the record key and all its values
+   */
+  removeRecordState = () => this.store.set('recordState', {});
+
+  /**
+   * Gets a value from the record state
+   */
+  getRecordState = (key: keyof IGlobalStore['recordState']) =>
+    this.store.get(`recordState.${key}`);
 }
 
 export type GlobalStoreType = GlobalStore;

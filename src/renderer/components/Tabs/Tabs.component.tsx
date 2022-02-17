@@ -29,7 +29,7 @@ const Tabs = ({
             key={label}
           />
         </div>
-        <div className="bg-grey3 h-[calc(100%-2.5rem)] py-2">{children}</div>
+        <div className="h-[calc(100%-2.5rem)] bg-grey3 py-2">{children}</div>
       </div>
     );
   }
@@ -51,7 +51,7 @@ const Tabs = ({
             );
           })}
       </div>
-      <div className="bg-grey3 h-[calc(100%-2.5rem)] py-2">
+      <div className="h-[calc(100%-2.5rem)] bg-grey3 py-2">
         {Array.isArray(children) &&
           children.map((child, i) => activeTab === i && child)}
       </div>
@@ -68,7 +68,7 @@ type TabProps = {
 Tabs.Tab = ({ label, children }: TabProps) => {
   return (
     <div
-      className="slideLeft px-3 h-[calc(100%-0px)] overflow-y-auto w-full"
+      className="slideLeft h-[calc(100%-0px)] w-full overflow-y-auto px-3"
       id={label}
     >
       {children}
@@ -98,7 +98,7 @@ Tabs.Button = ({
   return (
     <button
       type="button"
-      className={`w-1/3 px-3 h-10 flex items-center border-r-2 border-grey0 ${tabColor} last:border-r-0`}
+      className={`flex h-10 w-1/3 items-center border-r-2 border-grey0 px-3 ${tabColor} last:border-r-0`}
       onClick={onClick}
       id={label}
     >

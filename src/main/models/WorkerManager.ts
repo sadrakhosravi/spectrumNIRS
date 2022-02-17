@@ -18,10 +18,13 @@ class WorkerManager {
   /**
    * @returns the calculation worker thread
    */
-  getCalculationWorker() {
+  getCalculationWorker(workerData?: any) {
     if (!this.calculationWorker) {
       this.calculationWorker = new Worker(
-        path.join(this.workersPath, 'calculation.worker.js')
+        path.join(this.workersPath, 'calculation.worker.js'),
+        {
+          workerData,
+        }
       );
     }
     return this.calculationWorker as Worker;
@@ -30,14 +33,23 @@ class WorkerManager {
   /**
    * @returns the database worker thread
    */
-  getDatabaseWorker(dbFilePath?: string) {
+  getDatabaseWorker(workerData?: any) {
+    if (workerData) {
+      Object.assign(workerData, { dbFilePath: databaseFile });
+    }
+
     if (!this.databaseWorker) {
       this.databaseWorker = new Worker(
         path.join(this.workersPath, 'database.worker.js'),
-        { workerData: dbFilePath || databaseFile }
+        { workerData: workerData || { dbFilePath: databaseFile } }
       );
     }
     return this.databaseWorker as Worker;
+  }
+
+  terminateAllWorkers() {
+    this.calculationWorker?.terminate();
+    this.databaseWorker?.terminate();
   }
 }
 

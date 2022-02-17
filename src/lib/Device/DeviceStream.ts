@@ -1,7 +1,6 @@
 import { IPhysicalDevice } from './PhysicalDevice';
 import { INIRSDevice } from './NIRSDevice';
 import { Readable } from 'stream';
-import { ReadLine } from 'readline';
 
 export interface IDeviceStream {
   /**
@@ -32,12 +31,24 @@ export interface IDeviceStream {
   /**
    * Gets the stream data from the device
    */
-  getDeviceStream: () => Readable | ReadLine | null | undefined;
+  getDeviceStream: () => Readable | null | undefined;
 
   /**
    * Stops the device stream
    */
   stopDeviceStream: () => boolean;
+
+  /**
+   * If the device error operates on a different channel,
+   * the error messages stream can be obtained using this function
+   */
+  getDeviceErrorStream?: () => Readable | null | undefined;
+
+  /**
+   * If the device has a log channel (which logs the errors, updates, and other communications),
+   * can be used for displaying it in the UI
+   */
+  getDeviceLogStream?: () => Readable | null | undefined;
 
   physicalDevice: INIRSDevice | IPhysicalDevice;
 }

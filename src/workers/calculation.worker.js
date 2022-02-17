@@ -1,16 +1,18 @@
 'use strict';
 
 const { parentPort, workerData, isMainThread } = require('worker_threads');
+const path = require('path');
 const v5Calc = require('../calculations/V5/index').default;
 
-console.log('CALC WORKER!!');
-console.log(isMainThread);
-
+// workerData: {
+//   deviceName: deviceName - string,
+//   supportedSamplingRates: number[],
+//   probeSamplingRate: number,
+//   dataBatchSize: number,
+//   numOfElementsPerDataPoint: number,
+//   dbFilePath: string,
+// }
 const calc = new v5Calc();
-
-console.log(workerData);
-
-const path = require('path');
 
 parentPort.on('message', (_data) => {
   const data = calc.processRawData(_data, 10);

@@ -1,31 +1,50 @@
 const { isMainThread, workerData, parentPort } = require('worker_threads');
-const db = require('better-sqlite3')(workerData);
+const SQLITE3 = require('better-sqlite3');
+const path = require('path');
+const db = SQLITE3(path.join(__dirname, 'mydb.db'));
 
-const data = new Array(10).fill({
-  timeStamp: 0.0,
-  PDRawData:
-    '123431,12313,4324543,765756,87897,23123,123123,42325345,365456,456456,45674',
-  LEDIntensities:
-    '1233,123143,324535,34535,34535,3453,2324,234,433345,35353,3523',
-  gainValues: '100,HIGH',
-  events: 'sadhasde,rwerwr.er,ewqequwe32424284274234',
-});
+// The data file
+const dataArr = [];
 
-// setInterval(() => {
-//   db.pragma('wal_checkpoint(RESTART)');
-// }, 5 * 1000);
+const pragma1 = db.pragma('cache_size=1');
 
-// Insert statement
-const insert = db.prepare(
-  'INSERT INTO recordings_data (timeStamp, PDRawData, LEDIntensities, gainValues, events) VALUES (@timeStamp, @PDRawData, @LEDIntensities, @gainValues, @events)'
+console.log(pragma1);
+const stmt = db.prepare(
+  'INSERT INTO recordings_data(timeStamp,PDRawData, LEDIntensities) VALUES (?, ?, ?)'
 );
 
-const insertMany = db.transaction((data) => {
-  const DATA_LENGTH = data.length;
-  for (let i = 0; i < DATA_LENGTH; i += 1) insert.run(data[i]);
+const insertMany = db.transaction((dbData) => {
+  for (let i = 0; i < 100; i++) stmt.run(10, 'sample', '1234');
+  return;
 });
 
-parentPort.on('message', (d) => {
-  //   console.log(d);
-  insertMany(data);
+const dbTransaction = () => {
+  console.log(db.inTransaction);
+  const dataArrLength = dataArr.length;
+
+  try {
+    db.exec(`BEGIN TRANSACTION`);
+    for (let i = 0; i < dataArrLength; i++) {
+      db.exec(
+        `INSERT INTO recordings_data(timeStamp,PDRawData, LEDIntensities) VALUES (${dataArr[i].timeStamp}, ${dataArr[i].PDRawData}, ${dataArr[i].LEDIntensities})`
+      );
+    }
+    db.exec(`COMMIT`);
+  } catch (err) {
+    console.log('Error');
+    console.log(err.message);
+  }
+};
+
+parentPort.on('message', (dataBatch) => {
+  console.time('dbLoop');
+  dataArr.push(...dataBatch);
+
+  if (dataArr.length === 200) {
+    console.log(dataArr);
+
+    dbTransaction();
+    dataArr.length = 0;
+  }
+  console.timeEnd('dbLoop');
 });
