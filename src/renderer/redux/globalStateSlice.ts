@@ -2,19 +2,21 @@ import { createSlice } from '@reduxjs/toolkit';
 import { IGlobalStore } from '@lib/globalStore/GlobalStore';
 
 interface IGlobalStateSlice {
-  exportServer: IGlobalStore['exportServer'] | null;
   experiment: IGlobalStore['experiment'] | null;
   patient: IGlobalStore['patient'] | null;
   recording: IGlobalStore['recording'] | null;
   recordState: IGlobalStore['recordState'] | null;
+  probe: IGlobalStore['probe'] | null;
+  exportServer: IGlobalStore['exportServer'] | null;
 }
 
 const initialState: IGlobalStateSlice = {
-  exportServer: null,
   experiment: null,
   patient: null,
   recording: null,
+  probe: null,
   recordState: null,
+  exportServer: null,
 };
 
 export const GlobalStateSlice = createSlice({

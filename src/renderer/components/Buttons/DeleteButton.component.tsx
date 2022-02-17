@@ -9,7 +9,8 @@ type DeleteButtonProps = {
 const DeleteButton = ({ onClick, title, className }: DeleteButtonProps) => {
   return (
     <button
-      className={`px-2 py-1.5 hover:bg-grey0 active:ring-2 active:ring-accent rounded-md z-30 duration-150 cursor-pointer ${
+      type="button"
+      className={`z-30 cursor-pointer rounded-md px-2 py-1.5 duration-150 hover:bg-grey0 active:ring-2 active:ring-accent ${
         className || ''
       }`}
       title={title}

@@ -3,6 +3,7 @@ import { BrowserWindow, dialog } from 'electron';
 import DatabaseError from './DatabaseError';
 import Probes from 'db/entity/Probes';
 import { devices } from '@electron/configs/devices';
+import GlobalStore from '@lib/globalStore/GlobalStore';
 
 export interface IProbe extends Probe {
   device: typeof devices[0];
@@ -30,7 +31,7 @@ class ProbeManager {
 
   constructor() {
     this.currentProbe = undefined;
-    this.defaultProbeId = 0;
+    this.defaultProbeId = 1;
   }
 
   /**
@@ -41,9 +42,9 @@ class ProbeManager {
       const currentProbe = (await this.getProbe()) as any;
 
       this.currentProbe = this.formatProbeData(currentProbe);
-
-      console.log(this.currentProbe);
       this.defaultProbeId = this.currentProbe?.id;
+
+      GlobalStore.setProbe('currentProbe', this.currentProbe);
     } catch (error) {
       new DatabaseError(error);
     }
@@ -56,14 +57,6 @@ class ProbeManager {
   public getCurrentProbe = () => this.currentProbe;
 
   /**
-   * Gets all device.
-   * @return an array containing all the available devices
-   */
-  public getAllDevices = async () => {
-    return devices;
-  };
-
-  /**
    * Gets all probes of the given deviceId.
    * @return an array containing all the probes of the given deviceId
    */
@@ -73,6 +66,7 @@ class ProbeManager {
         .select()
         .from(Probes, '')
         .where('deviceId = :deviceId', { deviceId })
+        .orderBy({ updatedAt: 'DESC' })
         .getRawMany();
     } catch (error: any) {
       new DatabaseError(error);
@@ -127,7 +121,7 @@ class ProbeManager {
       await getConnection()
         .createQueryBuilder()
         .update(Probes)
-        .where('id = :id', { id: this.currentProbe?.id })
+        .where('id = :id', { id: this.defaultProbeId })
         .set({ isDefault: 0 })
         .execute();
 
@@ -140,6 +134,7 @@ class ProbeManager {
         .execute();
 
       await this.setDefaultProbeId();
+      return true;
     } catch (error) {
       new DatabaseError(error);
       return;
@@ -165,14 +160,26 @@ class ProbeManager {
    * Sets the current sensor of the application
    * @param probeId - The id of the probe to be set
    */
-  public setCurrentProbe = async (probeId: number) => {
+  public setCurrentProbe = async (probeId: number, update?: boolean) => {
     try {
       const newProbe = await this.getProbe(probeId);
-
       this.currentProbe = this.formatProbeData(newProbe);
+      GlobalStore.setProbe('currentProbe', this.currentProbe);
+
+      if (update) {
+        await getConnection()
+          .createQueryBuilder()
+          .update(Probes)
+          .set({
+            updatedAt: new Date(),
+          })
+          .where('id = :id', { id: probeId })
+          .execute();
+      }
 
       return this.currentProbe;
     } catch (error) {
+      GlobalStore.removeProbe();
       new DatabaseError(error);
       return false;
     }
@@ -183,18 +190,29 @@ class ProbeManager {
    * @param data - New probe's data
    * @param sensorId - Probes sensor
    */
-  public newProbe = async (data: any, sensorId: number) => {
+  public newProbe = async (data: any) => {
+    // Format data before insertion.
+    if (typeof data.intensities !== 'string') {
+      data.intensities = JSON.stringify(data.intensities);
+    }
+
+    if (data.isDefault === undefined) {
+      data.isDefault = 0;
+    }
+
     try {
       const newProbe = await getConnection()
         .createQueryBuilder()
         .insert()
         .into(Probes)
-        .values([data, sensorId])
+        .values([data])
         .execute();
 
-      this.setCurrentProbe(newProbe.raw);
+      await this.setCurrentProbe(newProbe.raw);
+      return true;
     } catch (error) {
       new DatabaseError(error);
+      return false;
     }
   };
 
@@ -203,53 +221,50 @@ class ProbeManager {
    * @param probeId - The id of the probe to be deleted
    */
   public deleteProbe = async (probeId: number) => {
-    // Show confirmation
-    const confirmation = dialog.showMessageBoxSync(
-      BrowserWindow.getFocusedWindow() as BrowserWindow,
-      {
+    const mainWindow = BrowserWindow.getFocusedWindow() as BrowserWindow;
+    if (probeId === this.defaultProbeId) {
+      // Show confirmation
+      dialog.showMessageBoxSync(mainWindow, {
         title: 'Deleting probe failed',
+        type: 'error',
         message: 'Cannot delete the default probe.',
         detail: 'Please change the default probe before deleting this probe.',
-        buttons: ['Confirm', 'Cancel'],
-        defaultId: 1,
-        noLink: true,
-      }
-    );
+      });
 
-    // If the user confirms
-    if (confirmation === 1) {
-      // Check to see if the user is deleting the default probe
-      if (probeId === this.defaultProbeId) {
-        dialog.showMessageBoxSync(
-          BrowserWindow.getFocusedWindow() as BrowserWindow,
-          {
-            title: 'Deleting probe failed',
-            message: 'Cannot delete the default probe.',
-            detail:
-              'Please change the default probe before deleting this probe.',
-          }
-        );
-        return;
-      }
-      try {
-        await getConnection()
-          .createQueryBuilder()
-          .delete()
-          .from(Probes)
-          .where('id = :id', { id: probeId })
-          .execute();
-
-        // If the deleted probe was the current probe,
-        // set the default probe as the main probe
-        if (probeId === this.currentProbe?.id) {
-          this.getDefaultProbe();
-        }
-      } catch (error) {
-        new DatabaseError(error);
-      }
+      return;
     }
+    // Check to see if the user is deleting the default probe
+    const confirmation = dialog.showMessageBoxSync(mainWindow, {
+      title: 'Confirmation',
+      message: `Deleting ${this.currentProbe?.name} probe!`,
+      detail: 'This is a permanent action. Are you sure you want to continue?',
+      type: 'warning',
+      buttons: ['Cancel', 'Confirm'],
+      defaultId: 0,
+      noLink: true,
+    });
 
-    return;
+    if (confirmation !== 1) {
+      return;
+    }
+    try {
+      await getConnection()
+        .createQueryBuilder()
+        .delete()
+        .from(Probes)
+        .where('id = :id', { id: probeId })
+        .execute();
+
+      // If the deleted probe was the current probe,
+      // set the default probe as the main probe
+      if (probeId === this.currentProbe?.id) {
+        await this.getDefaultProbe();
+      }
+      return true;
+    } catch (error) {
+      new DatabaseError(error);
+      return false;
+    }
   };
 
   /**

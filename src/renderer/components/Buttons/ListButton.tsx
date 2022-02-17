@@ -31,13 +31,13 @@ const ListButton = ({
         type="button"
         className={`${
           isActive ? 'bg-accent' : 'bg-grey2 hover:bg-grey3 '
-        } flex gap-2 items-center w-full mb-3 rounded-md hover:cursor-pointer border-primary active:ring-2 active:ring-accent focus:ring-2 focus:ring-accent ${
+        } border-primary mb-3 flex w-full items-center gap-2 rounded-md hover:cursor-pointer focus:ring-2 focus:ring-accent active:ring-2 active:ring-accent ${
           className || ''
         }`}
       >
-        <div className="w-full flex px-3 py-2" onClick={onClick}>
+        <div className="flex w-full px-3 py-2" onClick={onClick}>
           <div className="flex w-2/3 items-center">
-            <span className="inline-block mr-5">
+            <span className="mr-5 inline-block">
               <img className="opacity-80" src={icon} width="42px" alt="File" />
             </span>
             <span className="inline-block text-left">
@@ -51,12 +51,12 @@ const ListButton = ({
           >
             <span className="text-right">
               {time && (
-                <p className="text-light text-sm">
+                <p className="text-sm text-light">
                   Last Saved: {time.toString().split(', ')[0]}
                 </p>
               )}
               {time && (
-                <p className="text-light text-sm">
+                <p className="text-sm text-light">
                   Time: {time.toString().split(', ')[1]}
                 </p>
               )}
@@ -65,11 +65,13 @@ const ListButton = ({
         </div>
       </button>
 
-      <DeleteButton
-        className="absolute right-4 top-1/2 -translate-y-1/2"
-        onClick={deleteOnClick}
-        title={deleteTitle || 'Delete'}
-      />
+      {deleteOnClick !== undefined && (
+        <DeleteButton
+          className="absolute right-4 top-1/2 z-40 -translate-y-1/2"
+          onClick={deleteOnClick}
+          title={deleteTitle || 'Delete'}
+        />
+      )}
     </div>
   );
 };

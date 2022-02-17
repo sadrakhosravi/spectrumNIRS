@@ -51,9 +51,9 @@ const NewRecordingForm = () => {
         <NewRecordingInfo setData={setRecordingInfo} />
       </div>
       <div className="slideLeft" hidden={step !== Steps.DeviceSelection}>
-        <SelectProbeForm />
+        <SelectProbeForm isSelectionOnly={true} />
 
-        <span className="w-full flex items-center justify-between">
+        <span className="flex w-full items-center justify-between">
           <Button
             text="Previous"
             className="my-2"

@@ -97,10 +97,11 @@ export const ProbeChannels = {
   SelectProbe: ProbeBase + 'select-probe',
   GetCurrentProbe: ProbeBase + 'get-current-probe',
   GetAllProbesOfDevice: ProbeBase + 'get-all-probes-of-device',
-  GetAllDevices: ProbeBase + 'get-all-devices',
   GetProbeSettings: ProbeBase + 'get-probe-settings',
   GetProbeIntensities: ProbeBase + 'get-probe-intensities',
   UpdateProbeIntensities: ProbeBase + 'update-intensities',
+  DeleteProbe: ProbeBase + 'delete-probe',
+  SetProbeAsDefault: ProbeBase + 'set-probe-default',
 };
 
 // Web Socket Export Server

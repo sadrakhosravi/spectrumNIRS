@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
+import { useAppSelector } from '@redux/hooks/hooks';
 import { RadioGroup } from '@headlessui/react';
 
 // Components
@@ -12,59 +12,81 @@ import { ProbeChannels } from '@utils/channels';
 import SensorIcon from '@icons/sensor.svg';
 import ProbeIcon from '@icons/probe.svg';
 import toast from 'react-hot-toast';
-import { CurrentProbe, setCurrentProbe } from '@redux/SensorStateSlice';
+import { CurrentProbe } from '@redux/SensorStateSlice';
 
-const SelectProbeForm = () => {
-  const [devices, setDevices] = useState<any[] | null>(null);
+import { devices } from '@electron/configs/devices';
+import Button from '@components/Buttons/Button.component';
+
+const SelectProbeForm = ({
+  isSelectionOnly = false,
+}: {
+  isSelectionOnly?: boolean;
+}) => {
   const [sensor, setSensor] = useState(0);
+  const [refresh, setRefresh] = useState(false);
   const [probes, setProbes] = useState<any[] | null>(null);
   const [selectedProbe, setSelectedProbe] = useState<CurrentProbe | null>(null);
   const currentProbe = useAppSelector(
-    (state) => state.sensorState.currentProbe as CurrentProbe
+    (state) => state.global.probe?.currentProbe
   );
-  const dispatch = useAppDispatch();
-
   const detectedSensor = useAppSelector(
     (state) => state.sensorState.detectedSensor
   );
 
   useEffect(() => {
     (async () => {
-      const allDevices = await window.api.invokeIPC(
-        ProbeChannels.GetAllDevices
-      );
-      setDevices(allDevices);
-    })();
-
-    return () => window.api.removeListeners(ProbeChannels.GetAllDevices);
-  }, []);
-
-  useEffect(() => {
-    console.log(sensor);
-    (async () => {
       const probesOfDevice = await window.api.invokeIPC(
         ProbeChannels.GetAllProbesOfDevice,
         sensor
       );
-      console.log(probesOfDevice);
       setProbes(probesOfDevice);
     })();
-  }, [sensor]);
+  }, [sensor, currentProbe, refresh]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const probe = selectedProbe;
+
     // Handle form submit
-    const probe = await window.api.invokeIPC(
+    const result = await window.api.invokeIPC(
       ProbeChannels.SelectProbe,
       selectedProbe?.id
     );
-    if (!probe) {
-      toast.error(
-        'Failed to change the probe. Please contact the system administrator'
-      );
+
+    if (!result) {
+      toast.error('Failed to change the current probe.');
+      return;
     }
-    dispatch(setCurrentProbe(probe));
-    toast.success(`Probe ${selectedProbe?.name} was selected successfully`);
+    toast.success(`Probe ${probe?.name} was selected successfully`);
+  };
+
+  const handleDeleteProbeBtn = async (probeId: number) => {
+    const result = await window.api.invokeIPC(
+      ProbeChannels.DeleteProbe,
+      probeId
+    );
+
+    if (!result) {
+      toast.error('Failed to delete the probe.');
+      return;
+    }
+    setRefresh(!refresh);
+
+    toast.success(`Probe was deleted successfully`);
+  };
+
+  const handleSetAsDefaultBtn = async (probeId: number) => {
+    const result = await window.api.invokeIPC(
+      ProbeChannels.SetProbeAsDefault,
+      probeId
+    );
+    if (!result) {
+      toast.error('Failed to set the probe as default.');
+      return;
+    }
+
+    setRefresh(!refresh);
+    toast.success(`Probe was set as default successfully`);
   };
 
   return (
@@ -87,9 +109,9 @@ const SelectProbeForm = () => {
                         <div
                           className={`${
                             checked && 'ring-2 ring-accent'
-                          } w-full h-20 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
+                          } flex h-20 w-full cursor-pointer flex-col items-center justify-center rounded-md bg-grey2 ${
                             disabled &&
-                            'bg-light bg-opacity-40 cursor-not-allowed'
+                            'cursor-not-allowed bg-light bg-opacity-40'
                           }`}
                         >
                           <img
@@ -114,20 +136,35 @@ const SelectProbeForm = () => {
             <>
               <h3 className="mt-4 py-2 text-xl">Select a Probe:</h3>
               {probes.map((probe: any) => (
-                <ListButton
-                  text={
-                    probe.name + `${probe.isDefault === 1 ? ' (Default)' : ''}`
-                  }
-                  description={`Sampling Rate: ${probe.samplingRate}`}
-                  icon={ProbeIcon}
-                  isActive={probe.id === currentProbe.id}
-                  onClick={() => {
-                    setSelectedProbe(probe);
-                  }}
-                  time={probe.lastUpdate || undefined}
-                  deleteOnClick={undefined}
-                  key={probe.name + probe.id + 'select-probe'}
-                />
+                <div className="relative w-full">
+                  <ListButton
+                    text={
+                      probe.name +
+                      `${probe.isDefault === 1 ? ' (Default)' : ''}`
+                    }
+                    description={`Sampling Rate: ${probe.samplingRate}`}
+                    icon={ProbeIcon}
+                    isActive={probe.id === currentProbe?.id}
+                    onClick={() => {
+                      setSelectedProbe(probe);
+                    }}
+                    time={probe.lastUpdate || undefined}
+                    deleteOnClick={
+                      isSelectionOnly
+                        ? undefined
+                        : () => handleDeleteProbeBtn(probe.id)
+                    }
+                    key={probe.name + probe.id + 'select-probe'}
+                  />
+                  {!isSelectionOnly && probe.isDefault !== 1 && (
+                    <Button
+                      type="button"
+                      className="absolute right-20 top-1/2 z-40 -translate-y-1/2"
+                      text="Set as Default"
+                      onClick={() => handleSetAsDefaultBtn(probe.id)}
+                    />
+                  )}
+                </div>
               ))}
             </>
           )}

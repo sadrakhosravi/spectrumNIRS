@@ -17,9 +17,9 @@ const SubmitButton: React.FC<IProps> = ({
         onClick={onClick}
         disabled={disabled}
         type="submit"
-        className={`inline-block justify-center mt-4 px-4 py-2 text-sm border-primary border-opacity-50 rounded-md text-white ${
+        className={`border-primary mt-4 inline-block justify-center rounded-md border-opacity-50 px-4 py-2 text-sm text-white ${
           disabled
-            ? 'text-opacity-40 cursor-not-allowed'
+            ? 'cursor-not-allowed text-opacity-40'
             : 'hover:bg-grey0 active:ring-2 active:ring-accent'
         }`}
       >

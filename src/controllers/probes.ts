@@ -12,12 +12,8 @@ ipcMain.handle(ProbeChannels.GetCurrentProbe, async () =>
 );
 
 // Create a new probe
-ipcMain.handle(ProbeChannels.NewProbe, async (_event) => {});
-
-// Gets all the devices
-ipcMain.handle(
-  ProbeChannels.GetAllDevices,
-  async () => await ProbeManager.getAllDevices()
+ipcMain.handle(ProbeChannels.NewProbe, async (_event, data) =>
+  ProbeManager.newProbe(data)
 );
 
 // Gets all the devices
@@ -27,8 +23,10 @@ ipcMain.handle(
 );
 
 // Selects the current probe
-ipcMain.handle(ProbeChannels.SelectProbe, async (_event, probeId: number) =>
-  ProbeManager.setCurrentProbe(probeId)
+ipcMain.handle(
+  ProbeChannels.SelectProbe,
+  async (_event, probeId: number) =>
+    await ProbeManager.setCurrentProbe(probeId, true)
 );
 
 // Get the current probe intensities
@@ -41,4 +39,16 @@ ipcMain.handle(
 ipcMain.handle(
   ProbeChannels.UpdateProbeIntensities,
   async (_event, intensities) => await ProbeManager.setIntensities(intensities)
+);
+
+// Deletes a new probe from the DB
+ipcMain.handle(
+  ProbeChannels.DeleteProbe,
+  async (_event, probeId: number) => await ProbeManager.deleteProbe(probeId)
+);
+
+// Sets the selected probe as default
+ipcMain.handle(
+  ProbeChannels.SetProbeAsDefault,
+  async (_event, probeId: number) => await ProbeManager.setDefaultProbe(probeId)
 );

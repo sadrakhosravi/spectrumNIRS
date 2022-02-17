@@ -18,7 +18,9 @@ const NewRecordingDevice = () => {
 
   useEffect(() => {
     (async () => {
-      const allProbes = await window.api.invokeIPC(ProbeChannels.GetAllDevices);
+      const allProbes = await window.api.invokeIPC(
+        ProbeChannels.GetAllProbesOfDevice
+      );
       console.log(allProbes);
       setProbes(allProbes);
     })();
@@ -41,8 +43,8 @@ const NewRecordingDevice = () => {
                   <div
                     className={`${
                       checked && 'ring-2 ring-accent'
-                    } w-full h-20 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
-                      disabled && 'bg-light bg-opacity-40 cursor-not-allowed'
+                    } flex h-20 w-full cursor-pointer flex-col items-center justify-center rounded-md bg-grey2 ${
+                      disabled && 'cursor-not-allowed bg-light bg-opacity-40'
                     }`}
                   >
                     <img
