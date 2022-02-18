@@ -16,7 +16,8 @@ const ClientLog = () => {
       console.log(data);
       if (textAreaRef.current) {
         const span = document.createElement('span');
-        span.className = 'my-2 px-2 break-words w-full' + data.color || '';
+        span.className = 'my-1 px-2 break-words w-full';
+        span.style.color = data.color || 'white';
         span.innerText = data.message;
         textAreaRef.current.appendChild(span);
       }
@@ -24,6 +25,8 @@ const ClientLog = () => {
 
     return () => {
       window.api.removeListeners(GeneralChannels.LogMessage);
+      //@ts-ignore
+      textAreaRef.current = undefined;
     };
   }, []);
 
@@ -44,7 +47,7 @@ const ClientLog = () => {
         <Tabs.Tab label="Log">
           <div
             ref={textAreaRef}
-            className="border-primary mt-1 flex h-[calc(100%-0.75rem)] w-full resize-none flex-row flex-wrap overflow-y-auto overflow-x-hidden break-words rounded-md bg-grey2 px-4 py-2"
+            className="border-primary mt-1 flex h-[calc(100%-0.75rem)] w-full flex-auto flex-grow-0 resize-none flex-row flex-wrap overflow-y-auto overflow-x-hidden break-words rounded-md bg-grey2 px-4 py-2"
           ></div>
 
           <Button

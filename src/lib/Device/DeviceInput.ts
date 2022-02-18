@@ -4,7 +4,7 @@ export interface IDeviceInput {
   /**
    * Creates the connection interface with the physical device
    */
-  createConnectionInterface: () => net.Socket;
+  createConnectionInterface: () => typeof net.Socket;
 
   /**
    * Connects to the controller of the device

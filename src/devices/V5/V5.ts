@@ -12,9 +12,10 @@ import {
   INIRSDevice,
   IPhysicalDevice,
 } from '@lib/Device/device-api';
-import net from 'net';
+
 import { Readable } from 'stream';
 import { app } from 'electron';
+import net from 'node:net';
 
 // Constants
 const NUM_OF_DATAPOINTS_PER_CHUNK = 10;
@@ -101,31 +102,51 @@ class V5Input implements IDeviceInput {
     this.connection = undefined;
   }
 
-  public createConnectionInterface = () => new net.Socket();
+  public createConnectionInterface = () => net.Socket;
 
   public connect = async () => {
     console.log('CONNECT TO SOCKET');
     const IP = '127.0.0.1';
     const PORT = 1337;
 
-    this.connection = this.createConnectionInterface();
-    this.connection = this.connection.connect(PORT, IP);
+    const connectionInterface = this.createConnectionInterface();
+    this.connection = new connectionInterface();
+
+    this.connection.connect(PORT, IP, () => {
+      console.log('Connection Established');
+    });
 
     this.connection.prependOnceListener('error', (_err) => {
       console.log('Failed to connect to the hardware. Please try again.');
+    });
+
+    this.connection.prependOnceListener('close', () => {
+      console.log('Connection Closed');
     });
   };
 
   public isConnected = () => (this.connection ? true : false);
 
   public sendToDevice = (message: string) => {
-    if (!this.connection) {
-      this.connect();
-    }
-    const result = this.connection?.write(message) as boolean;
+    const DRIVER_SOCKET_IP = '127.0.0.1';
+    const DRIVER_SOCKET_PORT = 1337;
 
-    if (this.connection) this.closeConnection();
-    return result;
+    const mySocket = new net.Socket();
+    mySocket.connect(DRIVER_SOCKET_PORT, DRIVER_SOCKET_IP, function () {
+      console.log('Connection Established');
+    });
+
+    let response = mySocket.write(message);
+
+    mySocket.prependOnceListener('error', (data) => {
+      if (data) response = false;
+      console.log(data);
+    });
+
+    mySocket.prependOnceListener('close', () =>
+      console.log('Socket Destroyed')
+    );
+    return response;
   };
 
   public closeConnection = () => {

@@ -90,10 +90,10 @@ class DeviceReader {
     // Start the device
     this.device.Device.startDevice();
     // Connect to device input listener
-    setTimeout(() => {
-      this.device.Input.connect();
-      this.syncIntensitiesAndGainWithController();
-    }, this.device.Device.getStartupDelay());
+    // setTimeout(() => {
+    //   this.device.Input.connect();
+    //   this.syncIntensitiesAndGainWithController();
+    // }, this.device.Device.getStartupDelay());
 
     GlobalStore.setRecordState('isDeviceStarted', true);
   }
@@ -176,6 +176,8 @@ class DeviceReader {
     isDownSampled
       ? this.readDeviceDataWithDownSampling(this.deviceStream as Readable)
       : this.readDeviceData(this.deviceStream as Readable);
+
+    GlobalStore.setRecordState('isDeviceStarted', true);
   }
 
   /**
@@ -196,7 +198,6 @@ class DeviceReader {
     const dbWorker = WorkerManager.getDatabaseWorker(workerData);
     const calcWorker = WorkerManager.getCalculationWorker(workerData);
     this.attachWorkerListeners(calcWorker);
-
     return { calcWorker, dbWorker };
   }
 
@@ -206,6 +207,7 @@ class DeviceReader {
    */
   attachWorkerListeners(calcWorker: Worker, _dbWorker?: Worker) {
     calcWorker.on('message', (calculatedData) => {
+      console.log(calculatedData);
       this.mainWindow.send('device:data', calculatedData);
     });
   }
@@ -235,8 +237,8 @@ class DeviceReader {
       deviceStream.on('data', async (chunk: string) => {
         // Parse the data and store it in the Shared Array
         const data = this.device.Parser(chunk, sharedDataBuffer);
-        const dbData = dbParser(data, BATCH_SIZE, NUM_OF_DP);
-        dbWorker.postMessage(dbData);
+        dbParser(data, BATCH_SIZE, NUM_OF_DP);
+        // dbWorker.postMessage(dbData);
         calcWorker.postMessage(data);
       });
     }
@@ -300,6 +302,8 @@ class DeviceReader {
     // Start the device first and register its input
     this.startDevice();
 
+    const deviceName = this.device.Device.getDeviceName();
+
     this.deviceStream = this.device.Stream.getDeviceStream();
     const deviceParser = this.device.Parser;
 
@@ -341,7 +345,10 @@ class DeviceReader {
       const deviceLogStream = this.device.Stream.getDeviceLogStream();
 
       deviceLogStream?.on('data', (chunk: string) => {
-        this.mainWindow.send(GeneralChannels.LogMessage, { message: chunk });
+        this.mainWindow.send(GeneralChannels.LogMessage, {
+          message: `${deviceName}: ${chunk.toString()}`,
+          color: '#CCC',
+        });
       });
     }
   }
