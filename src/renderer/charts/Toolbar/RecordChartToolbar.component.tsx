@@ -10,7 +10,7 @@ import Button from '@components/Buttons/Button.component';
 // Icons
 import StartIcon from '@icons/start.svg';
 import PauseIcon from '@icons/pause.svg';
-import StopIcon from '@icons/stop.svg';
+// import StopIcon from '@icons/stop.svg';
 import ResetHeightIcon from '@icons/reset-height.svg';
 
 // Constants
@@ -51,10 +51,6 @@ const RecordChartToolbar = ({}: RecordChartToolbarProps) => {
     }
   };
 
-  const handleStop = async () => {};
-
-  console.log(recordState);
-
   return (
     <>
       <ToolbarContainer>
@@ -90,13 +86,13 @@ const RecordChartToolbar = ({}: RecordChartToolbarProps) => {
                   false
                 }
               />
-              <ActionButton
+              {/* <ActionButton
                 text={'Stop'}
                 icon={StopIcon}
-                onClick={handleStop}
+                onDoubleClick={handleStop}
                 darker={recordState !== 'idle' && recordState !== 'pause'}
                 disabled={recordState !== 'idle' && recordState !== 'pause'}
-              />
+              /> */}
             </div>
           </div>
         </div>

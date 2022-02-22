@@ -17,6 +17,7 @@ import { DeviceAPI } from '@lib/Device/device-api';
 import { databaseFile } from '@electron/paths';
 import dbParser from '@lib/Stream/DatabaseParser';
 import TimeStampGenerator from '@lib/Device/TimeStampGenerator';
+import V5Calculation from 'calculations/V5/V5Calculation';
 
 export interface IDeviceInfo {
   samplingRate: number;
@@ -114,8 +115,8 @@ class DeviceReader {
    * Stops the physical device and cleans all the listeners
    */
   stopDevice() {
+    console.log('DEVICE STOPPED');
     this.terminateDevice();
-    GlobalStore.removeRecordState();
 
     powerSaveBlocker.stop(this.powerSaveBlocker);
   }
@@ -256,12 +257,21 @@ class DeviceReader {
     const sharedDataBuffer = new Int32Array(SAB);
 
     // Start workers
+    //@ts-ignore
     const { calcWorker, dbProcess } = this.startWorkers();
 
     const recordingId = RecordingModel.getCurrentRecording()?.id || 99;
 
+    const V5Calc = new V5Calculation();
+
+    let count = 0;
+
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', async (chunk: string) => {
+        if (count === 100) {
+          console.log(process.hrtime.bigint());
+          count = 0;
+        }
         // Parse the data and store it in the Shared Array
         const data = this.device.Parser(chunk, sharedDataBuffer);
         const parsedData = dbParser(
@@ -272,12 +282,23 @@ class DeviceReader {
           recordingId
         );
         dbProcess.webContents.send('db:data', parsedData);
-        calcWorker.postMessage({
-          data,
-          timeStamp: this.timeStamp.getTimeStamp(),
-          timeDelta: this.timeStamp.getTimeDelta(),
+        // calcWorker.postMessage({
+        //   data,
+        //   timeStamp: this.timeStamp.getTimeStamp(),
+        //   timeDelta: this.timeStamp.getTimeDelta(),
+        // });
+        const calculatedData = V5Calc.processRawData(data, BATCH_SIZE);
+        let delta = this.timeStamp.getTimeDelta();
+
+        calculatedData.forEach((dataPoint) => {
+          dataPoint.unshift(this.timeStamp.getTimeStamp() + delta);
+          delta += 10;
         });
+
+        this.mainWindow.send('device:data', calculatedData);
         this.timeStamp.generateNextTimeStamp();
+
+        count++;
       });
     }
   }
@@ -370,7 +391,7 @@ class DeviceReader {
               'Something went wrong. Down sampling engine did not produce the right value'
             );
 
-          this.mainWindow.send('device:calibration', outputData[0]);
+          this.mainWindow.send('device:calibration', outputData[0].slice(0, 6));
         }
 
         const data = deviceParser(chunk, typedArray);

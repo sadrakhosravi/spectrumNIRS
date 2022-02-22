@@ -82,10 +82,7 @@ class RecordChart extends Chart {
 
     const addData = () => {
       this.series.forEach((series, i) => {
-        series.addArrayY(
-          this.seriesData[i].splice(0, this.seriesData[i].length - 1),
-          10
-        );
+        series.add(this.seriesData[i].splice(0, this.seriesData[i].length - 1));
       });
     };
 
@@ -110,19 +107,30 @@ class RecordChart extends Chart {
       addData();
       this.stepXAxisFrame = requestAnimationFrame(stepAxisX);
     };
-    stepAxisX();
+
+    setTimeout(() => {
+      addData();
+      axisX.setInterval(
+        this.series[0].getXMax() -
+          (this.chartOptions?.getTimeDivision() as number),
+        this.series[0].getXMax()
+      );
+
+      // stepAxisX();
+      requestAnimationFrame(stepAxisX);
+    }, 150);
   }
 
   handleDeviceData = (_event: any, _data: number[][]) => {
     this.series.forEach((_series, i) => {
-      const channelData = _data.map((dataPoint) => dataPoint[i + 1]);
+      const channelData = _data.map((dataPoint) => {
+        return { x: dataPoint[0], y: dataPoint[i + 1] };
+      });
       this.seriesData[i].push(...channelData);
 
       if (i === this.series.length - 1) {
-        let TOI = channelData.reduce(
-          (prevValue, currentVal) => prevValue + currentVal,
-          0
-        );
+        let TOI = 0;
+        channelData.forEach((dataPoint) => (TOI += dataPoint.y));
         TOI = Math.round(TOI / channelData.length);
         dispatch(setTOIValue(TOI));
       }

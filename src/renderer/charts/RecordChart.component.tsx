@@ -23,14 +23,18 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
   const recordState = useAppSelector(
     (state) => state.global.recordState?.recordState
   );
+  const recordingId = useAppSelector(
+    (state) => state.global.recording?.currentRecording?.id
+  );
 
   const chartRef = useRef<RecordChartClass | undefined>(undefined);
   const containerId = 'recordChart';
 
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useEffect(() => {
+    let chart: RecordChartClass;
     // Create chart, series and any other static components.
-    const chart = new RecordChartClass(containerId, ChartType.RECORD);
+    chart = new RecordChartClass(containerId, ChartType.RECORD);
 
     chart.createRecordChart();
     // Attach event listeners
@@ -42,13 +46,12 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     // Return function that will destroy the chart when component is unmounted.
     return () => {
       // Destroy chart.
-      console.log('destroy chart');
-      window.api.removeListeners('data:reader-record');
+      chart.stopListeningForData();
       chartRef.current = undefined;
       setRecordChart(undefined);
       chart.cleanup();
     };
-  }, []);
+  }, [recordingId]);
 
   useEffect(() => {
     recordState === 'recording'

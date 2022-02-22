@@ -55,6 +55,7 @@ ipcMain.handle(RecordChannels.Start, () => {
 
 // Stop recording
 ipcMain.handle(RecordChannels.Stop, () => {
+  GlobalStore.removeRecordState();
   deviceReader?.stopDevice();
   deviceReader = undefined;
   lastTimeStamp = 0;

@@ -27,11 +27,11 @@ export const TopMenu = [
       {
         label: 'Close',
         click: async () => {
+          await window.api.invokeIPC(RecordChannels.Stop);
+
           const isClosed = await window.api.invokeIPC(
             ExperimentChannels.CloseExperiment
           );
-
-          await window.api.invokeIPC(RecordChannels.Stop);
 
           isClosed &&
             setTimeout(() => {

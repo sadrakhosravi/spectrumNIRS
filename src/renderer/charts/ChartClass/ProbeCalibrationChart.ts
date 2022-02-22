@@ -265,6 +265,7 @@ class ProbeCalibrationChart {
           ? this.UIElement?.dispose()
           : this.UIElement?.restore();
       });
+      console.log(data);
     });
   }
 

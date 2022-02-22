@@ -11,11 +11,14 @@ const v5Calc = require('../calculations/V5/index').default;
 //   dataBatchSize: number,
 //   numOfElementsPerDataPoint: number,
 //   dbFilePath: string,
+//   calcOnly: boolean,
 // }
 
 const calc = new v5Calc();
 
-parentPort.on('message', (data) => {
+const handleMessage = (data) => {
+  console.log('HANDLE MESSAGE');
+
   let delta = 0;
   const timeStamp = data.timeStamp;
   const calcData = calc.processRawData(data.data, workerData.dataBatchSize);
@@ -25,4 +28,10 @@ parentPort.on('message', (data) => {
   });
 
   parentPort.postMessage(calcData);
-});
+};
+
+const handleCalcOnly = (data) => {
+  console.log('CALC ONLY');
+};
+
+parentPort.on('message', workerData.calcOnly ? handleCalcOnly : handleMessage);

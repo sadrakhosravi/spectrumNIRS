@@ -102,20 +102,21 @@ var V5Calculation = /** @class */ (function () {
       O2Hb = Math.abs(O2Hb);
       HHb = Math.abs(HHb);
       // Check for values to make sense
-      if (O2Hb < 0.1 && O2Hb > 0.01) {
-        O2Hb = O2Hb * 100;
-      }
-      if (O2Hb < 0.01) {
-        O2Hb = O2Hb * 1000;
-      }
-      if (HHb < 0.1 && HHb > 0.01) {
-        HHb = HHb * 100;
-      }
-      if (HHb < 0.01) {
-        HHb = HHb * 1000;
-      }
+      // if (O2Hb < 0.1 && O2Hb > 0.01) {
+      //   O2Hb = O2Hb * 100;
+      // }
+      // if (O2Hb < 0.01) {
+      //   O2Hb = O2Hb * 1000;
+      // }
+      // if (HHb < 0.1 && HHb > 0.01) {
+      //   HHb = HHb * 100;
+      // }
+      // if (HHb < 0.01) {
+      //   HHb = HHb * 1000;
+      // }
       var THb = O2Hb + HHb;
       var calculatedData = [O2Hb, HHb, THb]; // The last value (0) will be filled by TOI
+      console.log(calculatedData);
       return calculatedData;
     };
     /**

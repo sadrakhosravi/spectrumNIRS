@@ -75,7 +75,6 @@ class V5Calculation {
 
       calculatedData[i] = dataArray;
     }
-
     return calculatedData;
   };
 
@@ -132,18 +131,19 @@ class V5Calculation {
     const data = new Float32Array(rawPDValues.slice(0, rawPDValues.length - 1));
     const baseline = rawPDValues[rawPDValues.length - 1];
 
-    // Use for loop for the best performance possible
+    // Subtract the baseline from each raw value and divide by 4096
     for (let i = 0; i < this.NUM_OF_LEDs; i += 1) {
       data[i] = (data[i] - baseline) / 4096;
 
-      // If the value is less than 0.01, replace it with 0.01
-      if (data[i] < 0.01) data[i] = 0.01;
+      // If the value is less than 0.001, replace it with 0.001
+      if (data[i] < 0.001) data[i] = 0.001;
 
       data[i] = Math.log(data[i]);
     }
 
     let O2Hb = 0;
     let HHb = 0;
+
     // Use matrix dot product to calculate O2HB and HHb
     for (let i = 0; i < this.NUM_OF_LEDs; i++) {
       O2Hb += data[i] * this.A[0][i];
@@ -154,24 +154,25 @@ class V5Calculation {
     HHb = Math.abs(HHb);
 
     // Check for values to make sense
-    if (O2Hb < 0.1 && O2Hb > 0.01) {
-      O2Hb = O2Hb * 100;
-    }
+    // if (O2Hb < 0.1 && O2Hb > 0.01) {
+    //   O2Hb = O2Hb * 100;
+    // }
 
-    if (O2Hb < 0.01) {
-      O2Hb = O2Hb * 1000;
-    }
+    // if (O2Hb < 0.01) {
+    //   O2Hb = O2Hb * 1000;
+    // }
 
-    if (HHb < 0.1 && HHb > 0.01) {
-      HHb = HHb * 100;
-    }
+    // if (HHb < 0.1 && HHb > 0.01) {
+    //   HHb = HHb * 100;
+    // }
 
-    if (HHb < 0.01) {
-      HHb = HHb * 1000;
-    }
+    // if (HHb < 0.01) {
+    //   HHb = HHb * 1000;
+    // }
 
     const THb = O2Hb + HHb;
     const calculatedData = [O2Hb, HHb, THb]; // The last value (0) will be filled by TOI
+
     return calculatedData;
   };
 
@@ -214,6 +215,7 @@ class V5Calculation {
     // Take the absolute value and multiply by 100 to get a positive percentage
     TOI = Math.abs(TOI) * 100;
     if (!TOI || TOI === Infinity) TOI = 0;
+
     return TOI;
   };
 }

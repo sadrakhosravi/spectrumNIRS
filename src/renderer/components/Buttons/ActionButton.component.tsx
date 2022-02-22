@@ -10,6 +10,7 @@ type ActionButtonProps = {
   isActive?: boolean;
   disabled?: boolean;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onDoubleClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 };
 
 const ActionButton = (props: ActionButtonProps) => {
@@ -20,6 +21,7 @@ const ActionButton = (props: ActionButtonProps) => {
     isActive = false,
     disabled = false,
     onClick,
+    onDoubleClick,
   } = props;
 
   const buttonBackground = darker
@@ -39,6 +41,7 @@ const ActionButton = (props: ActionButtonProps) => {
         text ? 'px-4' : 'bg-grey1 px-3 active:bg-accent'
       } relative grid w-full auto-cols-max grid-flow-col items-center rounded-md py-1.5`}
       onClick={disabled ? undefined : onClick}
+      onDoubleClick={disabled ? undefined : onDoubleClick}
     >
       <IconText text={text || undefined} icon={icon} />
     </button>
