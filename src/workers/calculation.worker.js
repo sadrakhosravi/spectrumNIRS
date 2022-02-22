@@ -12,9 +12,17 @@ const v5Calc = require('../calculations/V5/index').default;
 //   numOfElementsPerDataPoint: number,
 //   dbFilePath: string,
 // }
+
 const calc = new v5Calc();
 
-parentPort.on('message', (_data) => {
-  const data = calc.processRawData(_data, 10);
-  parentPort.postMessage(data);
+parentPort.on('message', (data) => {
+  let delta = 0;
+  const timeStamp = data.timeStamp;
+  const calcData = calc.processRawData(data.data, workerData.dataBatchSize);
+  calcData.forEach((dataPoint) => {
+    dataPoint.unshift(timeStamp + delta);
+    delta += data.timeDelta;
+  });
+
+  parentPort.postMessage(calcData);
 });

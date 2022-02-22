@@ -29,20 +29,19 @@ if (process.env.NODE_ENV === 'production') {
 // Force high performance gpu
 app.commandLine.appendSwitch('--force_high_performance_gpu', 'true');
 app.commandLine.appendSwitch('js-flags', '--expose_gc');
+app.commandLine.appendSwitch('trace-warnings');
+process.on('warning', (e) => console.warn(e.stack));
 
-// const isDevelopment =
-//   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+const RESOURCES_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'assets')
+  : path.join(__dirname, '../../assets');
+
+const getAssetPath = (...paths: string[]): string => {
+  return path.join(RESOURCES_PATH, ...paths);
+};
 
 // Create the main window
 const createMainWindow = async () => {
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
   // Create a window that fills the screen's available work area.
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
@@ -76,6 +75,9 @@ const createMainWindow = async () => {
     icon: getAssetPath('icon.png'),
   });
 
+  //@ts-ignore
+  mainWindow.windowId = 'mainWindow'; // Used to filter windows
+
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // Unmaximize event
@@ -95,12 +97,34 @@ const createMainWindow = async () => {
   return mainWindow;
 };
 
+const createDbProcess = async () => {
+  const dbWindow = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      partition: 'persist:spectrum',
+      contextIsolation: false,
+      nodeIntegration: true,
+      backgroundThrottling: false,
+    },
+    icon: getAssetPath('icon.png'),
+  });
+
+  //@ts-ignore
+  dbWindow.windowId = 'dbWindow'; // Used to filter windows
+
+  dbWindow.loadURL(resolveHtmlPath('db.html'));
+  setTimeout(() => {
+    // dbWindow.webContents.openDevTools();
+  }, 1000);
+};
+
 (async () => {
   // Set dark theme by default - Light theme will be added in the next versions
   nativeTheme.themeSource = 'dark';
 
   // Create main window
   await app.whenReady();
+  createDbProcess();
   createMainWindow();
   startControllers();
 

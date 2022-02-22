@@ -48,9 +48,12 @@ export default merge(baseConfig, {
     main: [
       `webpack-dev-server/client?http://localhost:${port}/dist`,
       'webpack/hot/only-dev-server',
-      'core-js',
-      'regenerator-runtime/runtime',
       path.join(webpackPaths.srcRendererPath, 'index.tsx'),
+    ],
+    db: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRendererPath, 'db.ts'),
     ],
     settings: path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
   },
@@ -153,6 +156,20 @@ export default merge(baseConfig, {
       filename: path.join('index.html'),
       template: path.join(webpackPaths.srcRendererPath, 'html', 'index.ejs'),
       chunks: ['main'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('db.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'db.ejs'),
+      chunks: ['db'],
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,

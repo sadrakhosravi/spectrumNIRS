@@ -20,7 +20,7 @@ const RouteHandler = () => {
   useNavigation();
 
   return (
-    <main className="main-container flex">
+    <main className="main-container z-40 flex">
       <Router>
         <React.Suspense fallback={'Loading ...'}>
           <Switch>

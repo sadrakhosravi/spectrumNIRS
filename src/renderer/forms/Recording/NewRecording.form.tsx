@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import React, { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+
 import { useAppDispatch } from '@redux/hooks/hooks';
 import { closeModal } from '@redux/ModalStateSlice';
 import { changeAppState } from '@redux/AppStateSlice';
@@ -11,33 +12,37 @@ import SelectProbeForm from '@forms/Probes/SelectProbes.form';
 
 import { ExperimentChannels } from '@utils/channels';
 import { AppState } from '@utils/constants';
+import NewRecordingSettings from './NewRecordingSettings.form';
 
 export enum Steps {
   RecordingInfo = 1,
-  DeviceSelection = 2,
-  ProbeInfo = 3,
+  ProbeSelection = 2,
+  RecordingSetting = 3,
 }
 
 const NewRecordingForm = () => {
   const [step, setStep] = useState(1);
-  const [recordingInfo, setRecordingInfo] = useState();
   const dispatch = useAppDispatch();
+  const methods = useForm();
 
-  useEffect(() => {
-    if (recordingInfo) setStep(Steps.DeviceSelection);
-  }, [recordingInfo]);
-
-  const handleSubmit = async () => {
-    if (!recordingInfo) {
-      toast.error('Please enter recording information');
-      return;
+  const handleFormSubmit = async (data: any) => {
+    // Check TOI settings
+    if (data.TOI?.threshold) {
+      if (!data.TOI?.minimum || !data.TOI?.maximum) return;
     }
 
+    const settingsObj = {
+      TOIThreshold: false,
+    };
+
+    // Add the TOI Threshold settings
+    settingsObj.TOIThreshold = data.TOI;
+
     // Send the recording info to the controller
-    const result = await window.api.invokeIPC(
-      ExperimentChannels.NewRecording,
-      recordingInfo
-    );
+    const result = await window.api.invokeIPC(ExperimentChannels.NewRecording, {
+      data: data.recording,
+      settings: settingsObj,
+    });
 
     if (result) {
       requestAnimationFrame(() => dispatch(closeModal()));
@@ -47,26 +52,65 @@ const NewRecordingForm = () => {
 
   return (
     <div>
-      <div className="slideLeft w-full" hidden={step !== Steps.RecordingInfo}>
-        <NewRecordingInfo setData={setRecordingInfo} />
-      </div>
-      <div className="slideLeft" hidden={step !== Steps.DeviceSelection}>
-        <SelectProbeForm isSelectionOnly={true} />
+      <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(handleFormSubmit)}>
+          {/* Recording Info */}
+          <div
+            className="slideLeft w-full"
+            hidden={step !== Steps.RecordingInfo}
+          >
+            <NewRecordingInfo />
+            <div className="w-full text-center">
+              <Button
+                text="Next"
+                className="my-2"
+                isActive={true}
+                onClick={() => setStep(step + 1)}
+              />
+            </div>
+          </div>
 
-        <span className="flex w-full items-center justify-between">
-          <Button
-            text="Previous"
-            className="my-2"
-            onClick={() => setStep(Steps.RecordingInfo)}
-          />
-          <Button
-            text="Submit"
-            className="my-2"
-            isActive={true}
-            onClick={handleSubmit}
-          />
-        </span>
-      </div>
+          {/* Recording Settings */}
+          <div className="slideLeft" hidden={step !== Steps.RecordingSetting}>
+            <NewRecordingSettings />
+
+            <span className="mt-4 flex w-full items-center justify-between">
+              <Button
+                text="Previous"
+                className="my-2"
+                onClick={() => setStep(step - 1)}
+              />
+              <Button
+                type="submit"
+                text="Create Recording"
+                className="my-2"
+                isActive={true}
+              />
+            </span>
+          </div>
+        </form>
+
+        {/* This form should be last because it contains another <form> tag and
+            is not related to the wizard steps
+        */}
+        <div className="slideLeft" hidden={step !== Steps.ProbeSelection}>
+          <SelectProbeForm isSelectionOnly={true} />
+
+          <span className="flex w-full items-center justify-between">
+            <Button
+              text="Previous"
+              className="my-2"
+              onClick={() => setStep(step - 1)}
+            />
+            <Button
+              text="Next"
+              className="my-2"
+              isActive={true}
+              onClick={() => setStep(step + 1)}
+            />
+          </span>
+        </div>
+      </FormProvider>
     </div>
   );
 };

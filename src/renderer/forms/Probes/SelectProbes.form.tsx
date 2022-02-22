@@ -47,6 +47,8 @@ const SelectProbeForm = ({
     event.preventDefault();
     const probe = selectedProbe;
 
+    console.log(probe);
+
     // Handle form submit
     const result = await window.api.invokeIPC(
       ProbeChannels.SelectProbe,
@@ -136,7 +138,7 @@ const SelectProbeForm = ({
             <>
               <h3 className="mt-4 py-2 text-xl">Select a Probe:</h3>
               {probes.map((probe: any) => (
-                <div className="relative w-full">
+                <div className="relative w-full" key={probe.name + probe.id}>
                   <ListButton
                     text={
                       probe.name +

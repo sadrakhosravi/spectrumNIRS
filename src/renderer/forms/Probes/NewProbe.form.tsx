@@ -17,6 +17,7 @@ import SelectField, {
 
 import { devices } from '@electron/configs/devices';
 import { ProbeChannels } from '@utils/channels';
+import FormGrid from '@components/Form/FormGrid.component';
 
 type FormDataProps = {
   name: string;
@@ -107,15 +108,15 @@ const NewProbeForm = () => {
 
         <h3 className="mt-4 py-4 text-xl">Create a Probe:</h3>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="grid auto-rows-auto grid-cols-[150px_1fr] items-center gap-x-2 gap-y-4 pb-4">
-            <div>Name</div>
+          <FormGrid>
+            <label htmlFor="name">Name</label>
             <div>
               <InputField
                 placeholder="Please enter a name for the probe"
                 register={register('name', { required: true })}
               />
             </div>
-            <div>Sampling Rate</div>
+            <label htmlFor="samplingRate">Sampling Rate</label>
             <div>
               <SelectField
                 register={register('samplingRate', {
@@ -154,7 +155,7 @@ const NewProbeForm = () => {
                 />
               ))}
             </div>
-          </div>
+          </FormGrid>
           <SubmitButton text="Create Probe" />
         </form>
       </div>

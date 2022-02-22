@@ -5,7 +5,7 @@ const DateField = (props: any) => {
     <input
       type="date"
       {...props.register}
-      className="px-3 py-2 h-40px w-full bg-light text-dark focus:ring-2 ring-accent rounded-sm"
+      className="h-[34px] w-full rounded-sm bg-light px-3 py-2 text-dark ring-accent focus:ring-2"
     />
   );
 };

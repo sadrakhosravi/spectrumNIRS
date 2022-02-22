@@ -12,7 +12,7 @@ import { SidebarType } from '@utils/constants';
 const RecordPage = () => {
   const sidebarStatus = useAppSelector((state) => state.appState.recordSidebar);
   const dispatch = useAppDispatch();
-
+  console.log('RECORD PAGE');
   return (
     <Page
       sidebarType={SidebarType.RECORD}

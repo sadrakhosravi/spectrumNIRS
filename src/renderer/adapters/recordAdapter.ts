@@ -72,7 +72,7 @@ export const handleRecord = async () => {
     });
 
     // Start recording
-    window.api.sendIPC(RecordChannels.Recording);
+    window.api.sendIPC(RecordChannels.Init);
 
     dispatch(changeRecordState(RecordState.RECORD));
   }

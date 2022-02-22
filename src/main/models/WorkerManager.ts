@@ -1,15 +1,13 @@
 import { app } from 'electron';
 import path from 'path';
-import { Worker } from 'worker_threads';
-import { databaseFile } from '../paths';
+import { Worker as WorkerThread } from 'worker_threads';
+const { Worker } = require('worker_threads');
 
 class WorkerManager {
-  calculationWorker: Worker | null;
-  databaseWorker: Worker | null;
+  calculationWorker: WorkerThread | null;
   workersPath: string;
   constructor() {
     this.calculationWorker = null;
-    this.databaseWorker = null;
     this.workersPath = app.isPackaged
       ? __dirname
       : path.join(__dirname, '../../workers');
@@ -26,30 +24,22 @@ class WorkerManager {
           workerData,
         }
       );
-    }
-    return this.calculationWorker as Worker;
-  }
 
-  /**
-   * @returns the database worker thread
-   */
-  getDatabaseWorker(workerData?: any) {
-    if (workerData) {
-      Object.assign(workerData, { dbFilePath: databaseFile });
+      this.calculationWorker?.on('exit', () => {
+        console.log('CALCULATION WORKER EXITED');
+      });
+
+      this.calculationWorker?.setMaxListeners(2);
     }
 
-    if (!this.databaseWorker) {
-      this.databaseWorker = new Worker(
-        path.join(this.workersPath, 'database.worker.js'),
-        { workerData: workerData || { dbFilePath: databaseFile } }
-      );
-    }
-    return this.databaseWorker as Worker;
+    return this.calculationWorker as WorkerThread;
   }
 
   terminateAllWorkers() {
     this.calculationWorker?.terminate();
-    this.databaseWorker?.terminate();
+
+    //@ts-ignore
+    this.calculationWorker = undefined;
   }
 }
 

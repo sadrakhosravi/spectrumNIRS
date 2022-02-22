@@ -21,6 +21,7 @@ type ChannelUIProps = {
   color: string;
   index: number;
   isMaximized?: boolean;
+  reading?: number | undefined;
 };
 
 const ChannelUI = ({
@@ -30,6 +31,7 @@ const ChannelUI = ({
   color,
   index,
   isMaximized = false,
+  reading,
 }: ChannelUIProps) => {
   const dispatch = useAppDispatch();
   const handleMaximizeChannel = () => {
@@ -51,7 +53,7 @@ const ChannelUI = ({
       {chartPos?.height && chartPos.height > 10 && (
         <>
           <div
-            className="fixed bg-dark2 border-b-[3px] border-r-[3px] border-[#222] p-2 flex"
+            className="fixed flex border-b-[3px] border-r-[3px] border-[#222] bg-dark2 p-2"
             style={{
               top: chartPos.y + 'px',
               left: chartPos.x - 130 + 'px',
@@ -59,46 +61,56 @@ const ChannelUI = ({
               width: '130px',
             }}
           >
-            <SignalLabelAndSettings
-              chart={chart}
-              name={name}
-              color={color}
-              chartPos={chartPos}
-            />
+            <div className="relative h-full w-full">
+              <SignalLabelAndSettings
+                chart={chart}
+                name={name}
+                color={color}
+                chartPos={chartPos}
+              />
 
-            {chartPos.height > 80 && (
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 max-h-8">
-                <button
-                  className={`w-8 h-8 p-1 flex items-center rounded-md ${
-                    isMaximized ? 'opacity-100 bg-accent' : 'opacity-40 bg-dark'
-                  }`}
-                  onClick={() => handleMaximizeChannel()}
-                  title="Make this channel fullscreen"
-                >
-                  <img
-                    className={`w-full h-full`}
-                    src={EnlargeIcon}
-                    alt="Expand"
-                  />
-                </button>
-              </div>
-            )}
-          </div>
-          <div
-            className="fixed flex items-center justify-center z-10"
-            style={{
-              top: chartPos.y + 'px',
-              left: chartPos.x + 'px',
-              height: chartPos.height + 'px',
-              width: '15px',
-            }}
-          >
-            <p
-              className="-rotate-90 text-xs w-[10px]"
-              hidden={chartPos.height <= 40}
+              {chartPos.height > 100 && (
+                <div className="absolute top-[40%] left-1/2 my-4 -translate-x-1/2 -translate-y-1/2 text-4xl font-medium">
+                  {reading}
+                </div>
+              )}
+
+              {chartPos.height > 80 && (
+                <div className="absolute bottom-2 left-1/2 flex max-h-8 -translate-x-1/2 items-center gap-1.5">
+                  <button
+                    className={`flex h-8 w-8 items-center rounded-md p-1 ${
+                      isMaximized
+                        ? 'bg-accent opacity-100'
+                        : 'bg-dark opacity-40'
+                    }`}
+                    onClick={() => handleMaximizeChannel()}
+                    title="Make this channel fullscreen"
+                  >
+                    <img
+                      className={`h-full w-full`}
+                      src={EnlargeIcon}
+                      alt="Expand"
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div
+              className="fixed z-10 flex items-center justify-center"
+              style={{
+                top: chartPos.y + 'px',
+                left: chartPos.x + 'px',
+                height: chartPos.height + 'px',
+                width: '15px',
+              }}
             >
-              Units
-            </p>
+              <p
+                className="w-[10px] -rotate-90 text-xs"
+                hidden={chartPos.height <= 40}
+              >
+                Units
+              </p>
+            </div>
           </div>
         </>
       )}

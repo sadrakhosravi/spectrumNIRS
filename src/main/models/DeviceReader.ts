@@ -5,7 +5,7 @@ import { Readable } from 'stream';
 import WorkerManager from '@electron/models/WorkerManager';
 import RecordingModel from '@electron/models/RecordingModel';
 import ProbesManager from './ProbesManager';
-import dbParser from '@lib/Stream/DatabaseParser';
+// import dbParser from '@lib/Stream/DatabaseParser';
 
 import { Worker } from 'worker_threads';
 import DownSampler from 'calculations/DownSampler';
@@ -13,6 +13,10 @@ import DownSampler from 'calculations/DownSampler';
 import GlobalStore from '@lib/globalStore/GlobalStore';
 import { GeneralChannels } from '@utils/channels';
 import { DeviceAPI } from '@lib/Device/device-api';
+// import dbParser from '@lib/Stream/DatabaseParser';
+import { databaseFile } from '@electron/paths';
+import dbParser from '@lib/Stream/DatabaseParser';
+import TimeStampGenerator from '@lib/Device/TimeStampGenerator';
 
 export interface IDeviceInfo {
   samplingRate: number;
@@ -24,7 +28,7 @@ export interface IDeviceInfo {
 export interface RecordState {
   isDeviceStarted: boolean;
   isCalibrating: boolean;
-  recordState: 'idle' | 'pause' | 'continue' | 'stop';
+  recordState: 'idle' | 'recording' | 'pause' | 'continue';
 }
 
 class DeviceReader {
@@ -47,8 +51,11 @@ class DeviceReader {
    */
   probeCalibrationSamples: number;
   powerSaveBlocker: number;
+  timeStamp: TimeStampGenerator;
+  calcWorker: Worker | undefined;
+  recordingId: number | undefined;
 
-  constructor() {
+  constructor(lastTimeStamp?: number) {
     this.recordingSettings = RecordingModel.getCurrentRecording()?.settings as
       | JSON
       | undefined;
@@ -77,10 +84,15 @@ class DeviceReader {
 
     // Main Window
     this.mainWindow = BrowserWindow.getAllWindows()[0].webContents;
-
     this.probeCalibrationSamples = 10;
-
     this.powerSaveBlocker = 0;
+
+    this.timeStamp = new TimeStampGenerator(
+      this.device.Stream.getDataBatchSize(),
+      lastTimeStamp
+    );
+
+    this.calcWorker = undefined;
   }
 
   /**
@@ -90,10 +102,10 @@ class DeviceReader {
     // Start the device
     this.device.Device.startDevice();
     // Connect to device input listener
-    // setTimeout(() => {
-    //   this.device.Input.connect();
-    //   this.syncIntensitiesAndGainWithController();
-    // }, this.device.Device.getStartupDelay());
+    setTimeout(() => {
+      this.device.Input.connect();
+      this.syncIntensitiesAndGainWithController();
+    }, this.device.Device.getStartupDelay());
 
     GlobalStore.setRecordState('isDeviceStarted', true);
   }
@@ -102,6 +114,13 @@ class DeviceReader {
    * Stops the physical device and cleans all the listeners
    */
   stopDevice() {
+    this.terminateDevice();
+    GlobalStore.removeRecordState();
+
+    powerSaveBlocker.stop(this.powerSaveBlocker);
+  }
+
+  terminateDevice() {
     this.deviceStream?.removeAllListeners();
     this.deviceLogStream?.removeAllListeners();
     this.deviceStream = undefined;
@@ -111,9 +130,16 @@ class DeviceReader {
     this.device.Stream.stopDeviceStream();
     this.device.Device.stopDevice();
 
-    GlobalStore.removeRecordState();
-    WorkerManager.terminateAllWorkers();
+    this.calcWorker?.removeListener('message', this.listenForCalcWorkerData);
+    this.calcWorker = undefined;
 
+    WorkerManager.terminateAllWorkers();
+  }
+
+  pauseDevice() {
+    this.terminateDevice();
+    GlobalStore.setRecordState('recordState', 'pause');
+    GlobalStore.setRecordState('isDeviceStarted', false);
     powerSaveBlocker.stop(this.powerSaveBlocker);
   }
 
@@ -184,6 +210,8 @@ class DeviceReader {
    * @returns the database and calculation worker
    */
   startWorkers() {
+    const dbProcess = BrowserWindow.getAllWindows()[1];
+
     // Prepare workers' data
     const workerData = {
       deviceName: this.device.Device.getDeviceName(),
@@ -193,23 +221,20 @@ class DeviceReader {
       dataBatchSize: this.device.Stream.getDataBatchSize(),
       numOfElementsPerDataPoint:
         this.device.Stream.getNumOfElementsPerDataPoint(),
+      dbFilePath: databaseFile,
     };
 
-    const dbWorker = WorkerManager.getDatabaseWorker(workerData);
-    const calcWorker = WorkerManager.getCalculationWorker(workerData);
-    this.attachWorkerListeners(calcWorker);
-    return { calcWorker, dbWorker };
+    // DB initialization
+    dbProcess.webContents.send('db:init', workerData);
+    this.calcWorker = WorkerManager.getCalculationWorker(workerData);
+
+    this.calcWorker.on('message', this.listenForCalcWorkerData.bind(this));
+
+    return { calcWorker: this.calcWorker, dbProcess };
   }
 
-  /**
-   * Listens for messages from worker threads
-   * Used to send calculated results to the UI
-   */
-  attachWorkerListeners(calcWorker: Worker, _dbWorker?: Worker) {
-    calcWorker.on('message', (calculatedData) => {
-      console.log(calculatedData);
-      this.mainWindow.send('device:data', calculatedData);
-    });
+  listenForCalcWorkerData(calculatedData: any) {
+    this.mainWindow.send('device:data', calculatedData);
   }
 
   /**
@@ -217,6 +242,7 @@ class DeviceReader {
    * @param deviceStream the stream instance of the device
    */
   readDeviceData(deviceStream: Readable | null | undefined) {
+    GlobalStore.setRecordState('recordState', 'recording');
     const device = this.device;
 
     // Device number of elements and number of data points send to NodeJS
@@ -230,16 +256,28 @@ class DeviceReader {
     const sharedDataBuffer = new Int32Array(SAB);
 
     // Start workers
-    //@ts-ignore
-    const { calcWorker, dbWorker } = this.startWorkers();
+    const { calcWorker, dbProcess } = this.startWorkers();
+
+    const recordingId = RecordingModel.getCurrentRecording()?.id || 99;
 
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', async (chunk: string) => {
         // Parse the data and store it in the Shared Array
         const data = this.device.Parser(chunk, sharedDataBuffer);
-        dbParser(data, BATCH_SIZE, NUM_OF_DP);
-        // dbWorker.postMessage(dbData);
-        calcWorker.postMessage(data);
+        const parsedData = dbParser(
+          data,
+          BATCH_SIZE,
+          NUM_OF_DP,
+          this.timeStamp.addTimeDelta,
+          recordingId
+        );
+        dbProcess.webContents.send('db:data', parsedData);
+        calcWorker.postMessage({
+          data,
+          timeStamp: this.timeStamp.getTimeStamp(),
+          timeDelta: this.timeStamp.getTimeDelta(),
+        });
+        this.timeStamp.generateNextTimeStamp();
       });
     }
   }

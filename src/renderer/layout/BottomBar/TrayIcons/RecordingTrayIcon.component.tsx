@@ -5,7 +5,6 @@ import withTooltip from '@hoc/withTooltip.hoc';
 import TrayIconButtons from './TrayIconButton.component';
 
 import RecordingIcon from '@icons/recording.svg';
-import { CurrentProbe } from '@electron/models/ProbesManager';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
@@ -14,7 +13,7 @@ const RecordingTrayIcon = () => {
     (state) => state.global.recording?.currentRecording
   );
 
-  const settings: CurrentProbe | undefined = recordingData?.settings;
+  const settings = recordingData?.settings;
 
   let patientTooltipText = null;
 
@@ -29,12 +28,14 @@ const RecordingTrayIcon = () => {
           {recordingData?.description && (
             <p>Description: {recordingData?.description}</p>
           )}
-          {recordingData?.settings && (
+          {settings && settings?.probe && (
             <>
-              <p>Probe: {settings?.name}</p>
-              <p>Sampling Rate: {settings?.samplingRate}</p>
-              <p>Device: {settings?.device.name}</p>
-              <p>Channels: {settings?.device.defaultChannels.join(', ')}</p>
+              <p>Probe: {settings.probe.name}</p>
+              <p>Sampling Rate: {settings.probe.samplingRate}</p>
+              <p>Device: {settings.probe.device.name}</p>
+              <p>
+                Channels: {settings.probe.device.defaultChannels.join(', ')}
+              </p>
             </>
           )}
         </div>

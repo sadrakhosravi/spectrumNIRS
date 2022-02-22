@@ -10,6 +10,7 @@ import { ModalConstants } from '@utils/constants';
 import {
   DialogBoxChannels,
   ExperimentChannels,
+  RecordChannels,
   UpdaterChannels,
 } from '@utils/channels';
 
@@ -29,6 +30,9 @@ export const TopMenu = [
           const isClosed = await window.api.invokeIPC(
             ExperimentChannels.CloseExperiment
           );
+
+          await window.api.invokeIPC(RecordChannels.Stop);
+
           isClosed &&
             setTimeout(() => {
               toast.success('Experiment closed', { duration: 3000 });

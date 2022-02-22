@@ -28,8 +28,10 @@ const Channels = ({ type }: ChannelUIProps) => {
       ? useChartContext().recordChart
       : useChartContext().reviewChart;
 
+  const TOI = useAppSelector((state) => state.recordChartState.TOI);
+
   return (
-    <div className="w-full h-full bg-dark2 relative">
+    <div className="relative h-full w-full bg-dark2">
       {chartPos &&
         currentProbe?.device.defaultChannels.map((channel, i) => (
           <ChannelUI
@@ -40,6 +42,10 @@ const Channels = ({ type }: ChannelUIProps) => {
             isMaximized={maximizedChannel === channel}
             index={i}
             key={channel + 'channelUI'}
+            reading={
+              (type === ChartType.RECORD && channel === 'TOI' && TOI) ||
+              undefined
+            }
           />
         ))}
     </div>

@@ -10,11 +10,13 @@ export type ChartPositions = {
 type InitialState = {
   chartPositions: ChartPositions[] | null;
   maximizedChannel: null | string;
+  TOI: number | undefined;
 };
 
 const initialState: InitialState = {
   chartPositions: null,
   maximizedChannel: null,
+  TOI: 0,
 };
 
 /**
@@ -39,6 +41,9 @@ export const RecordChartSlice = createSlice({
     resetMaximizedChannel: (state) => {
       state.maximizedChannel = null;
     },
+    setTOIValue: (state, { payload }: { payload: number | undefined }) => {
+      state.TOI = payload;
+    },
   },
 });
 
@@ -46,6 +51,7 @@ export const {
   setRecordChartPositions,
   setRecordChartMaximizedChannel,
   resetMaximizedChannel,
+  setTOIValue,
 } = RecordChartSlice.actions;
 
 export default RecordChartSlice.reducer;

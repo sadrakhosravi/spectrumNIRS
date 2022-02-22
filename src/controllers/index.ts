@@ -24,7 +24,7 @@ const startControllers = async () => {
   mainWindow.webContents.send('main-loaded');
   ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
 
-  await import('../main/models/WorkerManager');
+  // const WorkerManager = (await import('../main/models/WorkerManager')).default;
 };
 
 export default startControllers;

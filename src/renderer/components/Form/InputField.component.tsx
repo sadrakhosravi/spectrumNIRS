@@ -29,9 +29,9 @@ const InputField = (props: IInputField): JSX.Element => {
       type={type || 'text'}
       defaultValue={defaultValue || undefined}
       {...register}
-      className={`h-40px w-full rounded-sm px-3 py-2 ring-accent focus:ring-2 ${
-        className || 'bg-light text-dark'
-      } ${disabled && 'cursor-not-allowed bg-light2'}`}
+      className={`h-[34px] w-full rounded-sm px-3 py-2 ring-accent focus:ring-2 ${
+        className || 'bg-light text-dark '
+      } ${disabled && '.placeholder-disabled cursor-not-allowed bg-light2'}`}
       placeholder={placeholder}
       id={register ? register.name : undefined}
       disabled={disabled}

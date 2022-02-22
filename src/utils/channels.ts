@@ -26,6 +26,7 @@ export const ExperimentChannels = {
   NewRecording: ExpChannelBase + 'newRecording',
   GetAndUpdateRecording: ExpChannelBase + 'get-and-update-recording',
   deleteRecording: ExpChannelBase + 'delete-recording',
+  GetCurrentRecordingData: ExpChannelBase + 'get-current-recording-data',
 };
 
 // App State Channel
@@ -47,7 +48,7 @@ const RecordBase = 'record:';
 export const RecordChannels = {
   Base: RecordBase,
   Init: RecordBase + 'init',
-  Recording: RecordBase + 'recording',
+  Start: RecordBase + 'start',
   ProbeCalibration: RecordBase + 'probe-calibration',
   Stop: RecordBase + 'stop',
   Pause: RecordBase + 'pause',

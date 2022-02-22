@@ -9,7 +9,7 @@ type ChartContainerProps = {
 
 const ChartLayout = ({ children }: ChartContainerProps) => {
   return (
-    <div className="bg-grey3 h-full w-full">
+    <div className="h-full w-full bg-grey3">
       <div className=" h-full w-full">{children}</div>
     </div>
   );
@@ -25,26 +25,26 @@ export const ChartContainer = ({
 
   return (
     <div className="h-[calc(100%-50px)] bg-dark2">
-      <div className="h-full flex">
-        <div className="absolute top-0 left-0 w-full h-6 border-b-1 border-x-1 border-grey5 text-sm text-center">
+      <div className="flex h-full">
+        <div className="absolute top-0 left-0 h-6 w-full border-x-1 border-b-1 border-grey5 text-center text-sm">
           <p className="h-full">Probe Data</p>
         </div>
-        <div className="basis-6 h-full border-l-1 border-r-1 border-grey5 ">
-          <div className="w-6 absolute top-1/2 left-0 transform-origin: center text-sm -rotate-90 whitespace-nowrap text-white">
+        <div className="h-full basis-6 border-l-1 border-r-1 border-grey5 ">
+          <div className="transform-origin: center absolute top-1/2 left-0 w-6 -rotate-90 whitespace-nowrap text-sm text-white">
             <p>
               {currentProbe?.name} - {currentProbe?.device?.name}
             </p>
           </div>
         </div>
-        <div className="w-[calc(100%-1.5rem)] h-[calc(100%-3rem)] absolute top-[1.5rem] left-[1.5rem] overflow-y-auto chart-scrollbar border-r-1 border-grey5">
-          <div className="absolute top-0 left-0 w-[130px] h-full">
+        <div className="chart-scrollbar absolute top-[1.5rem] left-[1.5rem] h-[calc(100%-3rem)] w-[calc(100%-1.5rem)] overflow-y-auto border-r-1 border-grey5">
+          <div className="absolute top-0 left-0 h-full w-[130px]">
             <ChannelUI type={type} />
           </div>
-          <div className="absolute top-0 right-0 h-full w-[calc(100%-130px)] ml-auto">
+          <div className="absolute top-0 right-0 ml-auto h-full w-[calc(100%-130px)]">
             {children}
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 w-full h-6 pl-6 border-1 border-l-0 border-grey5 text-sm flex justify-end"></div>
+        <div className="absolute bottom-0 left-0 flex h-6 w-full justify-end border-1 border-l-0 border-grey5 pl-6 text-sm"></div>
       </div>
     </div>
   );

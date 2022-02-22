@@ -33,12 +33,12 @@ const ActionButton = (props: ActionButtonProps) => {
   return (
     <button
       type="button"
-      className={`inline-block ${disabledStyle} ${
-        disabled || buttonBackground
-      } ${disabled || activeStyle} ${
+      className={`${
+        isActive ? activeStyle : buttonBackground
+      } border-primary inline-block duration-150 focus:ring-2 focus:ring-accent ${disabledStyle} ${
         text ? 'px-4' : 'bg-grey1 px-3 active:bg-accent'
-      } relative grid w-full auto-cols-max grid-flow-col items-center rounded-md py-2`}
-      onClick={onClick}
+      } relative grid w-full auto-cols-max grid-flow-col items-center rounded-md py-1.5`}
+      onClick={disabled ? undefined : onClick}
     >
       <IconText text={text || undefined} icon={icon} />
     </button>

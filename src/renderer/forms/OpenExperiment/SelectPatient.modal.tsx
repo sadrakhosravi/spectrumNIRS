@@ -71,13 +71,13 @@ const SelectPatient = ({
 
   return (
     <>
-      <button
-        className="w-full bg-grey2 hover:bg-grey3 cursor-pointer focus:bg-grey3 duration-150 rounded-md"
+      <div
+        className="w-full cursor-pointer rounded-md bg-grey2 duration-150 hover:bg-grey3 focus:bg-grey3"
         key={patient.id}
       >
-        <div className="flex items-center w-full gap-2 pr-4">
+        <div className="flex w-full items-center gap-2 pr-4">
           <div
-            className="w-full h-full flex items-center gap-5 p-6 pr-2"
+            className="flex h-full w-full items-center gap-5 p-6 pr-2"
             onClick={() => {
               getAllRecordings(patient.id);
               setIsOpen(!isOpen);
@@ -86,11 +86,11 @@ const SelectPatient = ({
             <span className="w-[40px]">
               <img src={PatientIcon} width="40px" />
             </span>
-            <span className="text-lg w-2/3 text-left">{patient.name}</span>
+            <span className="w-2/3 text-left text-lg">{patient.name}</span>
             <span className="w-1/3 text-right">
               Last Update: {patient.updatedAt.split(' ')[0]}
             </span>
-            <span className="w-[25px] mb-1">
+            <span className="mb-1 w-[25px]">
               <img
                 className={`duration-300 ${
                   isOpen ? 'rotate-0' : 'rotate-180'
@@ -108,23 +108,23 @@ const SelectPatient = ({
             title="Delete Patient and its Data"
           />
         </div>
-      </button>
+      </div>
       <div
-        className="w-full -mt-1 px-6 pt-6 pb-20 bg-grey3  border-t-2 border-grey1 text-left"
+        className="-mt-1 w-full border-t-2 border-grey1 bg-grey3 px-6  pt-6 pb-20 text-left"
         hidden={!isOpen}
       >
         {recordings &&
           recordings.map((recording: any, index: number) => (
             <div
-              className="inline-block w-full rounded-sm border-light2 border-b-2 last:border-b-0"
+              className="inline-block w-full rounded-sm border-b-2 border-light2 last:border-b-0"
               key={recording + index}
             >
               <button
-                className="bg-grey1 hover:bg-accent  w-full text-left flex items-center gap-4 rounded-sm"
+                className="flex w-full  items-center gap-4 rounded-sm bg-grey1 text-left hover:bg-accent"
                 key={recording.id}
               >
                 <div
-                  className="w-full flex items-center px-4 py-2"
+                  className="flex w-full items-center px-4 py-2"
                   onClick={() => handleOpenRecordingButton(recording)}
                 >
                   <span className="w-[40px]">
@@ -153,7 +153,7 @@ const SelectPatient = ({
         {recordings?.length === 0 && (
           <p>
             No recordings found for the patient:{' '}
-            <span className="text-accent font-medium text-lg text-opacity-75">
+            <span className="text-lg font-medium text-accent text-opacity-75">
               {patient.name}
             </span>
           </p>

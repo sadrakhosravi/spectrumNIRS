@@ -43,6 +43,9 @@ ipcMain.handle(
 // Removes the current experiment and patient from the global state
 ipcMain.handle(ExperimentChannels.CloseExperiment, async () => {
   ExperimentModel.setCurrentExperiment(undefined);
+  PatientModel.setCurrentPatient(undefined);
+  RecordingModel.setCurrentRecording(undefined);
+  RecordingModel.recordingsDataModel = undefined;
   return true;
 });
 
@@ -101,10 +104,11 @@ ipcMain.handle(
 // Creates a new recording in the database
 ipcMain.handle(
   ExperimentChannels.NewRecording,
-  async (_event, data: any) => await RecordingModel.createNewRecording(data)
+  async (_event, { data, settings }) =>
+    await RecordingModel.createNewRecording(data, settings)
 );
 
-// Creates a new recording in the database
+// Gets a recording record from the database and updates its last update column
 ipcMain.handle(
   ExperimentChannels.GetAndUpdateRecording,
   async (_event, recordingId: number) => {
@@ -118,6 +122,11 @@ ipcMain.handle(
   ExperimentChannels.deleteRecording,
   async (_event, recordingId: number) =>
     await ExperimentModel.deleteData(recordingId, 'recordings')
+);
+
+ipcMain.handle(
+  ExperimentChannels.GetCurrentRecordingData,
+  async (_event) => await RecordingModel.getCurrentRecordingData()
 );
 
 //==============================================================================

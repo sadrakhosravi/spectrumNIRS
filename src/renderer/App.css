@@ -33,7 +33,7 @@
 }
 
 html {
-  @apply bg-dark h-screen w-full antialiased scroll-smooth;
+  @apply h-screen w-full scroll-smooth bg-dark antialiased;
 }
 
 body {
@@ -270,6 +270,9 @@ input[type]:focus-visible {
   background-color: #707070;
 }
 
+.placeholder-disabled::placeholder {
+  @apply text-dark;
+}
 /** Custom media queries */
 @media only screen and (max-width: 1600px) {
   html {

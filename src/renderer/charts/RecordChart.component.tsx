@@ -11,6 +11,7 @@ import ChartLayout, { ChartContainer } from './ChartContainer.component';
 // import ContextMenu from '@components/Menu/ContextMenu.component';
 import { useChartContext } from 'renderer/context/ChartProvider';
 import RecordChartToolbar from './Toolbar/RecordChartToolbar.component';
+import { useAppSelector } from '@redux/hooks/hooks';
 
 type ChartProps = {};
 
@@ -18,10 +19,10 @@ type ChartProps = {};
 const RecordChart = ({}: ChartProps): JSX.Element => {
   const [_newData, _setNewData] = useState(false);
   const { setRecordChart } = useChartContext();
-  // const recordingId = useAppSelector(
-  //   (state) => state.experimentData.currentRecording.id
-  // );
-  // const recordSidebar = useAppSelector((state) => state.appState.recordSidebar);
+
+  const recordState = useAppSelector(
+    (state) => state.global.recordState?.recordState
+  );
 
   const chartRef = useRef<RecordChartClass | undefined>(undefined);
   const containerId = 'recordChart';
@@ -33,7 +34,6 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
 
     chart.createRecordChart();
     // Attach event listeners
-    // chart.listenForData();
 
     // Keep a ref to the chart
     chartRef.current = chart as RecordChartClass;
@@ -50,49 +50,11 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   setNewData(true);
-  //   chartRef.current?.clearData();
-
-  //   return () => (chartRef.current = undefined);
-  // }, [recordingId]);
-
-  // useEffect(() => {
-  //   if (newData) {
-  //     setTimeout(() => {
-  //       chartRef.current?.clearCharts();
-  //       // chartRef.current?.loadLatestData();
-  //       setNewData(false);
-  //     }, 100);
-  //   }
-
-  //   return () => (chartRef.current = undefined);
-  // }, [newData]);
-
-  // // Adjust chart width and height on sidebar resize
-  // useEffect(() => {
-  //   chartRef.current?.sendChartPositions();
-  //   chartRef.current?.dashboard.engine.layout();
-
-  //   return () => (chartRef.current = undefined);
-  // }, [recordSidebar]);
-
-  // useContextMenu(
-  //   containerId,
-  //   <ContextMenu
-  //     items={[
-  //       { label: 'Auto Scale', value: 'test' },
-  //       { label: 'separator', value: '' },
-  //       { label: 'Channel Settings', value: '' },
-  //       { label: 'separator', value: '' },
-  //       {
-  //         label: 'Maximize Channel',
-  //         value: '',
-  //       },
-  //       { label: 'Reset Channel Heights', value: '' },
-  //     ]}
-  //   />
-  // );
+  useEffect(() => {
+    recordState === 'recording'
+      ? chartRef.current?.listenForData()
+      : chartRef.current?.stopListeningForData();
+  }, [recordState]);
 
   return (
     <ChartLayout>

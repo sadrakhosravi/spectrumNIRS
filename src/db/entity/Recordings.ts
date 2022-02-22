@@ -30,7 +30,7 @@ export class Recordings extends BaseEntity {
   date: Date;
 
   @Column({ type: 'blob', nullable: true })
-  settings: JSON | string;
+  settings: JSON | string | any;
 
   @ManyToOne(() => Patients, { onDelete: 'CASCADE' })
   patient: Patients | number;

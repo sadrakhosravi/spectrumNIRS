@@ -1,50 +1,46 @@
-const { isMainThread, workerData, parentPort } = require('worker_threads');
-const SQLITE3 = require('better-sqlite3');
+'use strict';
+
+const { parentPort, workerData, isMainThread } = require('worker_threads');
 const path = require('path');
-const db = SQLITE3(path.join(__dirname, 'mydb.db'));
+const fs = require('fs');
+const v8 = require('v8');
 
-// The data file
-const dataArr = [];
+const SQLITE = require('better-sqlite3');
+const dbPath = path.join(__dirname, 'mydb2.db');
 
-const pragma1 = db.pragma('cache_size=1');
+const db = new SQLITE(dbPath, {
+  timeout: 1000,
+});
 
-console.log(pragma1);
-const stmt = db.prepare(
-  'INSERT INTO recordings_data(timeStamp,PDRawData, LEDIntensities) VALUES (?, ?, ?)'
+db.exec(
+  'CREATE TABLE IF NOT EXISTS sensor_data (id INTEGER PRIMARY KEY AUTOINCREMENT, timeStamp INTEGER, PDRawData BLOB, LEDIntensities BLOB, gainValues BLOB, events BLOB, recordingId INTEGER);'
 );
 
-const insertMany = db.transaction((dbData) => {
-  for (let i = 0; i < 100; i++) stmt.run(10, 'sample', '1234');
-  return;
-});
+const insert = db.prepare(
+  'INSERT INTO sensor_data (timeStamp, PDRawData, LEDIntensities, gainValues, events, recordingId ) VALUES (@timeStamp, @PDRawData, @LEDIntensities, @gainValues, @events, @recordingId)'
+);
 
-const dbTransaction = () => {
-  console.log(db.inTransaction);
-  const dataArrLength = dataArr.length;
-
-  try {
-    db.exec(`BEGIN TRANSACTION`);
-    for (let i = 0; i < dataArrLength; i++) {
-      db.exec(
-        `INSERT INTO recordings_data(timeStamp,PDRawData, LEDIntensities) VALUES (${dataArr[i].timeStamp}, ${dataArr[i].PDRawData}, ${dataArr[i].LEDIntensities})`
-      );
-    }
-    db.exec(`COMMIT`);
-  } catch (err) {
-    console.log('Error');
-    console.log(err.message);
+const insertMany = db.transaction((myData) => {
+  for (const dataPoint of myData) {
+    insert.run(dataPoint);
   }
+});
+const sampleData = {
+  timeStamp: 0,
+  PDRawData: '12313,123123,12313,1243535,3456464,213132,42342',
+  LEDIntensities: '123,435,123,4345,123,3435,132,345',
+  gainValues: null,
+  events: null,
+  recordingId: null,
 };
 
-parentPort.on('message', (dataBatch) => {
-  console.time('dbLoop');
-  dataArr.push(...dataBatch);
+const myData = Array(20).fill(sampleData);
 
-  if (dataArr.length === 200) {
-    console.log(dataArr);
-
-    dbTransaction();
-    dataArr.length = 0;
-  }
-  console.timeEnd('dbLoop');
+parentPort.on('message', (data) => {
+  const data1 = data;
+  insertMany(myData);
 });
+
+setTimeout(() => {
+  db.close();
+}, 1000);

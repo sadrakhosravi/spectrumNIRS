@@ -22,6 +22,7 @@ import { toggleRawData } from '@redux/ChartSlice';
 
 // Events
 import { events } from '@electron/configs/events';
+// import { RecordChannels } from '@utils/channels';
 
 export const RecordToolbar = [
   {
@@ -126,6 +127,11 @@ export const RecordButtons = [
     },
 
     isActive: (state: RecordState) => state !== RecordState.IDLE,
-    click: (_state: RecordState) => {},
+    click: async (_state: RecordState) => {
+      console.log('START');
+      // await window.api.invokeIPC(RecordChannels.Init);
+      // await window.api.invokeIPC(RecordChannels.Start);
+      // console.log('Clicked');
+    },
   },
 ];

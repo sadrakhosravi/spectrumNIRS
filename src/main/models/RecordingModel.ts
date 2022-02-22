@@ -8,6 +8,20 @@ import PatientModel from './PatientModel';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
+import RecordingsData from 'db/entity/RecordingsData';
+
+export interface ITOIThreshold {
+  min: number;
+  max: number;
+}
+
+export interface IRecordingSetting {
+  TOIThreshold: ITOIThreshold | undefined;
+}
+
+export interface IRecordingSettingDefault {
+  probe: CurrentProbe | undefined;
+}
 
 export interface IRecordingData {
   createdAt: string;
@@ -16,12 +30,18 @@ export interface IRecordingData {
   id: number;
   name: string;
   patient: number;
-  settings: CurrentProbe;
+  settings: IRecordingSetting & IRecordingSettingDefault;
   updatedAt: string;
 }
 
+// The default settings
+const settings: IRecordingSetting & IRecordingSettingDefault = {
+  probe: undefined,
+  TOIThreshold: undefined,
+};
+
 class RecordingModel {
-  currentRecording: Recordings | undefined;
+  currentRecording: IRecordingData | undefined;
   recordingsDataModel: RecordingsDataModel | undefined;
 
   constructor() {
@@ -47,9 +67,7 @@ class RecordingModel {
       recording.settings = JSON.parse(recording.settings as string);
     }
 
-    this.currentRecording = recording;
-
-    console.log(this.currentRecording);
+    this.currentRecording = recording as any;
 
     if (!this.currentRecording) {
       GlobalStore.removeRecording();
@@ -61,6 +79,8 @@ class RecordingModel {
       this.currentRecording.id
     );
     GlobalStore.setRecording('currentRecording', this.currentRecording);
+    console.log('NEW RECORDING CREATED');
+    console.log(this.currentRecording.settings);
   };
 
   /**
@@ -81,19 +101,32 @@ class RecordingModel {
   /**
    * Creates a new recording record in the database.
    */
-  public createNewRecording = async (data: INewRecordingData): Promise<any> => {
+  public createNewRecording = async (
+    data: INewRecordingData,
+    settingsData?: IRecordingSetting
+  ): Promise<any> => {
     try {
       const patient = PatientModel.getCurrentPatient();
 
       if (!patient) return;
 
       const _newRecording = new Recordings();
+
       Object.assign(_newRecording, data);
       _newRecording.patient = patient;
 
+      // Add other settings if exists
+      if (settingsData) {
+        Object.assign(settings, settingsData);
+      }
+
       // Add probe info to the recording settings
+      // Should be added last for it not to be overwritten
       const probeInfo = ProbesManager.getCurrentProbe();
-      _newRecording.settings = JSON.stringify(probeInfo) || '';
+      settings.probe = probeInfo;
+
+      // Stringify the settings before inserting it to the DB
+      _newRecording.settings = JSON.stringify(settings);
 
       const newRecording = await _newRecording.save();
 
@@ -124,6 +157,22 @@ class RecordingModel {
     } catch (error: any) {
       throw new Error(error.message);
     }
+  };
+
+  public getCurrentRecordingData = async () => {
+    if (this.currentRecording?.id) {
+      const dataChunk = await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(RecordingsData, '')
+        .where(`recordingId = ${this.currentRecording?.id}`)
+        .limit(10000)
+        .getRawMany();
+
+      return dataChunk;
+    }
+
+    return undefined;
   };
 }
 

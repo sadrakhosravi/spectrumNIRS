@@ -69,7 +69,13 @@ class V5Device implements INIRSDevice {
     return spawnedDevice;
   };
 
-  public stopDevice = () => this.spawnedDevices.map((device) => device.kill());
+  public stopDevice = () => {
+    this.spawnedDevices.forEach((device) => {
+      device.removeAllListeners();
+    });
+
+    return this.spawnedDevices.map((device) => device.kill());
+  };
 
   public getDeviceName = () => this.name;
 
@@ -104,26 +110,7 @@ class V5Input implements IDeviceInput {
 
   public createConnectionInterface = () => net.Socket;
 
-  public connect = async () => {
-    console.log('CONNECT TO SOCKET');
-    const IP = '127.0.0.1';
-    const PORT = 1337;
-
-    const connectionInterface = this.createConnectionInterface();
-    this.connection = new connectionInterface();
-
-    this.connection.connect(PORT, IP, () => {
-      console.log('Connection Established');
-    });
-
-    this.connection.prependOnceListener('error', (_err) => {
-      console.log('Failed to connect to the hardware. Please try again.');
-    });
-
-    this.connection.prependOnceListener('close', () => {
-      console.log('Connection Closed');
-    });
-  };
+  public connect = async () => {};
 
   public isConnected = () => (this.connection ? true : false);
 
@@ -218,9 +205,11 @@ class V5Stream implements IDeviceStream {
 
   stopDeviceStream = () => {
     if (this.deviceStream) {
+      this.deviceStream.removeAllListeners();
       this.deviceStream.destroy();
       this.deviceStream = undefined;
 
+      this.deviceLogStream?.removeAllListeners();
       this.deviceLogStream?.destroy();
       this.deviceLogStream = undefined;
       return true;

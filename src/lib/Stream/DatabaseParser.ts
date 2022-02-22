@@ -1,23 +1,32 @@
 const dbParser = (
   data: Int32Array,
   batchSize: number,
-  numOfElementsPerDataPoint: number
+  numOfElementsPerDataPoint: number,
+  addTimeDelta: () => number,
+  recordingId: number
 ) => {
-  const parsedData = new Array(batchSize);
-
   let index = 0;
+  const parsedData = new Array(batchSize);
   for (let i = 0; i < batchSize; i += 1) {
+    const dataPoint = [];
+
+    for (let j = 0; j < numOfElementsPerDataPoint; j++) {
+      dataPoint.push(data[index]);
+      index++;
+    }
+
     parsedData[i] = {
-      timeStamp: 0,
-      PDRawData: data.slice(index, index + 5).join(','),
-      LEDIntensities: data.slice(index + 6, index + 11).join(','),
+      timeStamp: addTimeDelta(),
+      PDRawData: dataPoint.slice(0, 6).join(','),
+      LEDIntensities: dataPoint.slice(6, 11).join(','),
       gainValues: null,
       events: null,
-      recordingId: 1,
+      event: 0,
+      sensor2RawData: null,
+      sensor3RawData: null,
+      recordingId,
     };
-    index += numOfElementsPerDataPoint;
   }
-
   return parsedData;
 };
 

@@ -23,7 +23,7 @@ const MainNavigation = (): JSX.Element => {
   const dispatch = useDispatch();
 
   return (
-    <div className="absolute top-30px left-0 w-[45px] h-[calc(100%-60px)] bg-grey2 text-center">
+    <div className="top-30px absolute left-0 z-0 h-[calc(100%-60px)] w-[45px] bg-grey2 text-center">
       <div className="relative h-full">
         <HomeIconButton
           onClick={() => dispatch(changeAppState(AppState.HOME))}

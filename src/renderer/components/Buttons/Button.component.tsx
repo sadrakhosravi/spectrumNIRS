@@ -25,12 +25,12 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={` text-sm text-white inline-flex gap-1 items-center border-primary px-2 py-[0.4rem] rounded-md transition-colors duration-150 focus:ring-2 focus:ring-accent ${
+      className={` border-primary inline-flex items-center gap-1 rounded-md px-2 py-[0.4rem] text-sm text-white transition-colors duration-150 focus:ring-2 focus:ring-accent ${
         isActive ? 'bg-accent hover:bg-accent/80' : 'bg-grey1 hover:bg-grey0'
       } ${className || ''}  ${disabled ? 'cursor-not-allowed !bg-grey3' : ''}
       `}
       style={style}
-      type={type}
+      type={type || 'button'}
       onClick={onClick}
       disabled={disabled}
       title={title}

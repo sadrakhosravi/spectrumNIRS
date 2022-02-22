@@ -19,7 +19,7 @@ exports.default = async function notarizeMacos(context) {
     return;
   }
 
-  const appName = 'Spectrum';
+  const appName = 'Beast Spectrum';
 
   await notarize({
     appBundleId: build.appId,

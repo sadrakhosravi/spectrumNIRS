@@ -11,7 +11,7 @@ import SensorIcon from '@icons/sensor.svg';
 import TrayIconButtons from './TrayIconButton.component';
 import ExperimentTrayIcon from './ExperimentTrayIcon.component';
 import PatientTrayIcon from './PatientTrayIcon.component copy';
-import RecordingTrayIcon from './RecordingTrayIcon.component copy 2';
+import RecordingTrayIcon from './RecordingTrayIcon.component';
 
 // Constants
 import { USBDetectionChannels } from '@utils/channels';
@@ -45,7 +45,7 @@ const TrayIcons = () => {
   // Tooltip for sensor icon.
   const sensorTooltip = (
     <div className="px-2 py-2 text-left">
-      <h2 className="text-xl text-accent mb-1">Sensor Information</h2>
+      <h2 className="mb-1 text-xl text-accent">Sensor Information</h2>
 
       <div className="ml-4">
         {!sensorState.detectedSensor && <p>No sensor found!</p>}
@@ -64,7 +64,7 @@ const TrayIcons = () => {
   const SeparatorBar = <div className="mb-[5px]"></div>;
 
   return (
-    <div className="text-right col-span-9 h-30px">
+    <div className="col-span-9 h-30px text-right">
       <div className="grid grid-flow-col items-center justify-end pb-2">
         <ExperimentTrayIcon />
         <PatientTrayIcon />
