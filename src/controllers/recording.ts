@@ -112,6 +112,8 @@ ipcMain.handle(RecordChannels.ProbeCalibration, (_event, isActive) => {
   }
 
   if (deviceReader && isActive) {
+    GlobalStore.removeRecordState();
+
     deviceReader.stopDevice();
     deviceReader = undefined;
   }

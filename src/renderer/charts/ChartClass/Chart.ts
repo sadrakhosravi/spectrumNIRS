@@ -80,9 +80,9 @@ class ChartClass {
    * Gets the all the dashboard's chart channel positions.
    * @returns - Array of chart channel positions
    */
-  getChartPositions() {
-    const chartPos = new Array(this.charts.length).fill({});
-    this.charts.forEach((chart, i) => {
+  getChartPositions = (charts: ChartXY<PointMarker, UIBackground>[]) => {
+    const chartPos = new Array(charts.length).fill({});
+    charts.forEach((chart, i) => {
       // Get each chart position needed for aligning the ChannelUI elements
       // Get the top left corner
       const posEngine = translatePoint(
@@ -110,7 +110,7 @@ class ChartClass {
       chartPos[i] = { x: posDocument.x, y: posDocument2.y, height, width };
     });
     return chartPos;
-  }
+  };
 
   translateXAxisPixelToAxisCoordinates(x: number, y: number) {
     const xAxisChart = this.xAxisChart as ChartXY<PointMarker, UIBackground>;

@@ -65,7 +65,7 @@ const ReviewChart = ({
 
       setReviewChart(chart);
       chart.createReviewChart();
-      requestAnimationFrame(() => chart?.loadData());
+      requestAnimationFrame(() => chart?.loadInitialData());
 
       // Keep a ref to the chart
       chartRef.current = chart as any;
@@ -114,7 +114,7 @@ const ReviewChart = ({
       {chartLoaded && <ReviewChartToolbar type={type} />}
 
       <ChartContainer type={ChartType.REVIEW}>
-        <div className="h-full pointer-events-auto" id={containerId} />
+        <div className="pointer-events-auto h-full" id={containerId} />
         {children}
       </ChartContainer>
     </ChartLayout>

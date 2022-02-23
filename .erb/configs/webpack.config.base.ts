@@ -29,6 +29,11 @@ export default {
         test: /\.node$/,
         loader: 'node-loader',
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader',
+      },
     ],
   },
 

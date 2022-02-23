@@ -22,6 +22,7 @@ import { setIsLoadingData } from '@redux/AppStateSlice';
 import { ChartChannels } from '@utils/channels';
 import { setAllEvents } from '@redux/ChartSlice';
 import { setReviewChartPositions } from '@redux/ReviewChartSlice';
+import UIWorkerManager from 'renderer/UIWorkerManager';
 
 class ReviewChart extends Chart {
   numberOfRows: number;
@@ -75,7 +76,7 @@ class ReviewChart extends Chart {
   sendChartPositions() {
     // Send the initial chart position on creation
     requestAnimationFrame(() => {
-      dispatch(setReviewChartPositions(this.getChartPositions()));
+      dispatch(setReviewChartPositions(this.getChartPositions(this.charts)));
     });
 
     // Listen for chart resize and send to the state
@@ -83,48 +84,53 @@ class ReviewChart extends Chart {
     // all the other charts in the dashboard
     this.charts[0].onResize(() => {
       requestAnimationFrame(() => {
-        dispatch(setReviewChartPositions(this.getChartPositions()));
+        dispatch(setReviewChartPositions(this.getChartPositions(this.charts)));
       });
     });
   }
 
-  /**
-   * Gets the current recording data from the controller.
-   * @returns - If no data found.
-   */
-  loadData = async () => {
-    // const databasePath = await window.api.invokeIPC('get-database-path');
-    // // const databaseWorker = WorkerManager.startDatabaseWorker();
-    // const buffMemLength = new SharedArrayBuffer(1024 * 480);
+  loadInitialData = async () => {
+    console.log('LOAD INITIAL DATA');
+    const recordingId = getState().global.recording?.currentRecording?.id;
+    if (!recordingId) return;
 
-    // databaseWorker.postMessage({ dbPath: databasePath, arr: buffMemLength });
+    const dbWorker = UIWorkerManager.getDatabaseWorker();
+    const calcWorker = UIWorkerManager.getCalcWorker();
+    const dbFilePath = await window.api.invokeIPC('get-database-path');
 
-    // databaseWorker.onmessage = ({ data }) => {
-    //   console.timeEnd('threadStart');
-    //   this.drawAnimationFrameId = requestAnimationFrame(() => {
-    //     this.series.forEach((series) => series.addArrayY(data, 10, 0));
-    //   });
-    // };
+    dbWorker.postMessage({
+      dbFilePath,
+      recordingId,
+      limit: undefined, // 30seconds
+    });
 
-    dispatch(setIsLoadingData(true));
-    console.log('LOAD DATA');
-    const recordingId = getState().experimentData?.currentRecording?.id;
+    dbWorker.onmessage = (event) => {
+      console.log(event.data);
+      calcWorker.postMessage(event.data);
+      UIWorkerManager.terminateDatabaseWorker();
+    };
 
-    if (recordingId === -1 || !recordingId) {
-      dispatch(dispatch(setIsLoadingData(false)));
-      return;
-    }
-    // window.api.sendIPC(ChartChannels.StreamData, recordingId);
-    // window.api.onIPCData(ChartChannels.StreamData, (_event, data: number[]) => {
-    //   console.log(data);
-    //   if (data.length === 0) {
-    //     dispatch(dispatch(setIsLoadingData(false)));
-    //     console.log(this.allData);
-    //   }
-    //   this.allData.push(data);
-    //   this.drawDataOnCharts(data);
-    // });
+    calcWorker.onmessage = ({ data }) => {
+      console.log(data);
+      this.drawData(data);
+      UIWorkerManager.terminateCalcWorker();
+    };
   };
+
+  drawData(data: number[][]) {
+    const dataLength = data.length;
+    const processedData: any[] = [[], [], [], [], []];
+    for (let i = 0; i < dataLength; i += 1) {
+      this.series.forEach((_series, j) => {
+        processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
+      });
+    }
+    console.log(processedData);
+    this.series.forEach((series, iSeries) => {
+      series.add(processedData[iSeries]);
+      this.zoomBandChartSeries[iSeries].add(processedData[iSeries]);
+    });
+  }
 
   /**
    * Sorts the data array and sends it to the `LCJS` for the chart

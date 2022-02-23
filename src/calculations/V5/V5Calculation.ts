@@ -31,7 +31,7 @@ class V5Calculation {
 
   constructor() {
     this.NUM_OF_LEDs = 5;
-    this.wavelengths = new Uint16Array([670, 730, 810, 850, 950]);
+    this.wavelengths = new Uint16Array([950, 730, 810, 850, 650]);
     this.c_beta = new Float32Array([
       -1.2132, -0.0728, 1.8103, 1.1433, -11.5816,
     ]);
@@ -72,9 +72,28 @@ class V5Calculation {
       // Calculate values
       const dataArray = this.calcHemodynamics(rawPDValues);
       dataArray.push(this.calcTOI(rawPDValues, LEDIntValues));
-
       calculatedData[i] = dataArray;
     }
+    return calculatedData;
+  };
+
+  public processDbData = (dataBatch: any[]) => {
+    const batchSize = dataBatch.length;
+    const calculatedData: any[] = new Array(batchSize);
+
+    for (let i = 0; i < batchSize; i += 1) {
+      // Prepare arrays for calculation
+      const rawPDValues = dataBatch[i].PDRawData;
+
+      const LEDIntValues = dataBatch[i].LEDIntensities;
+
+      // Calculate values
+      const dataArray = this.calcHemodynamics(rawPDValues);
+      dataArray.push(this.calcTOI(rawPDValues, LEDIntValues));
+      dataArray.unshift(dataBatch[i].timeStamp);
+      calculatedData[i] = dataArray;
+    }
+
     return calculatedData;
   };
 
@@ -151,7 +170,7 @@ class V5Calculation {
     }
 
     O2Hb = Math.abs(O2Hb);
-    HHb = Math.abs(HHb);
+    HHb = Math.abs(HHb) * -5;
 
     // Check for values to make sense
     // if (O2Hb < 0.1 && O2Hb > 0.01) {
@@ -170,7 +189,7 @@ class V5Calculation {
     //   HHb = HHb * 1000;
     // }
 
-    const THb = O2Hb + HHb;
+    const THb = O2Hb + Math.abs(HHb);
     const calculatedData = [O2Hb, HHb, THb]; // The last value (0) will be filled by TOI
 
     return calculatedData;
@@ -215,6 +234,9 @@ class V5Calculation {
     // Take the absolute value and multiply by 100 to get a positive percentage
     TOI = Math.abs(TOI) * 100;
     if (!TOI || TOI === Infinity) TOI = 0;
+
+    // FIXME: Fix TOI Coefficients
+    TOI = TOI / 2.6;
 
     return TOI;
   };

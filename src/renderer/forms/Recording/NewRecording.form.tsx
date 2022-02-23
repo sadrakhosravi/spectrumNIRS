@@ -46,7 +46,7 @@ const NewRecordingForm = () => {
 
     if (result) {
       requestAnimationFrame(() => dispatch(closeModal()));
-      requestAnimationFrame(() => dispatch(changeAppState(AppState.RECORD)));
+      setTimeout(() => dispatch(changeAppState(AppState.RECORD)), 300);
     }
   };
 

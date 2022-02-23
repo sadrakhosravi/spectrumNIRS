@@ -5,8 +5,11 @@ import ChartOptions from './ChartOptions';
 // import { ChartChannels } from '@utils/channels';
 // import { setPreviousData } from '@redux/ExperimentDataSlice';
 import { setRecordChartPositions, setTOIValue } from '@redux/RecordChartSlice';
-import { ExperimentChannels } from '@utils/channels';
+import UIWorkerManager from 'renderer/UIWorkerManager';
 const { ipcRenderer } = require('electron');
+
+import TOINotification from '../../../sound/TOI_Notification.mp3';
+import { ColorRGBA, SolidFill } from '@arction/lcjs';
 
 class RecordChart extends Chart {
   numberOfRows: number;
@@ -15,6 +18,7 @@ class RecordChart extends Chart {
   seriesData: any[];
   TOI: number;
   count: number;
+  TOINotification: HTMLAudioElement;
   constructor(
     containerId: string,
     type: ChartType.RECORD | ChartType.REVIEW,
@@ -36,14 +40,8 @@ class RecordChart extends Chart {
     this.TOI = 0;
     this.count = 0;
 
-    requestAnimationFrame(this.getCurrentRecordingData);
+    this.TOINotification = new Audio(TOINotification);
   }
-
-  getCurrentRecordingData = async () => {
-    console.log(
-      await window.api.invokeIPC(ExperimentChannels.GetCurrentRecordingData)
-    );
-  };
 
   // Creates the record chart
   createRecordChart() {
@@ -56,24 +54,65 @@ class RecordChart extends Chart {
       this.charts,
       this.series
     );
-    this.sendChartPositions();
+    requestAnimationFrame(() => this.sendChartPositions());
   }
 
-  sendChartPositions() {
-    // Send the initial chart position on creation
-    requestAnimationFrame(() => {
-      dispatch(setRecordChartPositions(this.getChartPositions()));
+  loadInitialData = async () => {
+    console.log('LOAD INITIAL DATA');
+    const recordingId = getState().global.recording?.currentRecording?.id;
+    if (!recordingId) return;
+
+    const dbWorker = UIWorkerManager.getDatabaseWorker();
+    const calcWorker = UIWorkerManager.getCalcWorker();
+    const dbFilePath = await window.api.invokeIPC('get-database-path');
+
+    dbWorker.postMessage({
+      dbFilePath,
+      recordingId,
+      limit: 30 * this.samplingRate, // 30seconds
     });
+
+    dbWorker.onmessage = (event) => {
+      console.log(event.data);
+      calcWorker.postMessage(event.data);
+      UIWorkerManager.terminateDatabaseWorker();
+    };
+
+    calcWorker.onmessage = ({ data }) => {
+      console.log(data);
+      this.drawData(data);
+      UIWorkerManager.terminateCalcWorker();
+    };
+  };
+
+  drawData(data: number[][]) {
+    const dataLength = data.length;
+    const processedData: any[] = [[], [], [], [], []];
+    for (let i = 0; i < dataLength; i += 1) {
+      this.series.forEach((_series, j) => {
+        processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
+      });
+    }
+    console.log(processedData);
+    this.series.forEach((series, iSeries) =>
+      series.add(processedData[iSeries])
+    );
+  }
+
+  sendChartPositions = () => {
+    // Send the initial chart position on creation
+    const chartPos = this.getChartPositions(this.charts);
+    dispatch(setRecordChartPositions(chartPos));
 
     // Listen for chart resize and send to the state
     // Using only one chart for reference event because it trigger
     // all the other charts in the dashboard
     this.charts[0].onResize(() => {
       requestAnimationFrame(() => {
-        dispatch(setRecordChartPositions(this.getChartPositions()));
+        dispatch(setRecordChartPositions(this.getChartPositions(this.charts)));
       });
     });
-  }
+  };
 
   listenForData() {
     ipcRenderer.on('device:data', this.handleDeviceData);
@@ -121,8 +160,8 @@ class RecordChart extends Chart {
     }, 150);
   }
 
-  handleDeviceData = (_event: any, _data: number[][]) => {
-    this.series.forEach((_series, i) => {
+  handleDeviceData = async (_event: any, _data: number[][]) => {
+    this.series.forEach(async (_series, i) => {
       const channelData = _data.map((dataPoint) => {
         return { x: dataPoint[0], y: dataPoint[i + 1] };
       });
@@ -130,14 +169,25 @@ class RecordChart extends Chart {
 
       if (i === this.series.length - 1) {
         let TOI = 0;
-        channelData.forEach((dataPoint) => (TOI += dataPoint.y));
+        channelData.forEach(async (dataPoint) => (TOI += dataPoint.y));
         TOI = Math.round(TOI / channelData.length);
+        if (TOI > 60) {
+          this.TOINotification.play();
+          this.charts[3].setSeriesBackgroundFillStyle(
+            new SolidFill({ color: ColorRGBA(60, 0, 0) })
+          );
+        } else {
+          this.charts[3].setSeriesBackgroundFillStyle(
+            new SolidFill({ color: ColorRGBA(0, 0, 0) })
+          );
+        }
         dispatch(setTOIValue(TOI));
       }
     });
   };
 
   stopListeningForData() {
+    this.TOINotification.pause();
     const { ipcRenderer } = require('electron');
     ipcRenderer.removeAllListeners('device:data');
     cancelAnimationFrame(this.stepXAxisFrame);
@@ -166,12 +216,14 @@ class RecordChart extends Chart {
   cleanup() {
     console.log('Destroy Chart');
     window.api.removeListeners('device:data');
-    setImmediate(() => cancelAnimationFrame(this.stepXAxisFrame));
+    cancelAnimationFrame(this.stepXAxisFrame);
     this.clearData();
     this.memoryCleanup();
     this.chartOptions?.memoryCleanup();
     //@ts-ignore
     this.chartOptions = undefined;
+    UIWorkerManager.terminateDatabaseWorker();
+    console.log('End Cleaning');
   }
 
   // Clears the series and custom ticks

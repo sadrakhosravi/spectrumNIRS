@@ -32,7 +32,9 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
 
   // Create a new chart on component mount synchronously (needed for chart options to not throw an error)
   useEffect(() => {
-    let chart: RecordChartClass;
+    let chart: RecordChartClass | undefined;
+    if (chart) return;
+
     // Create chart, series and any other static components.
     chart = new RecordChartClass(containerId, ChartType.RECORD);
 
@@ -43,13 +45,15 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     chartRef.current = chart as RecordChartClass;
     setRecordChart(chart);
 
+    chart.loadInitialData();
+
     // Return function that will destroy the chart when component is unmounted.
     return () => {
       // Destroy chart.
-      chart.stopListeningForData();
+      chart?.stopListeningForData();
+      chart?.cleanup();
       chartRef.current = undefined;
       setRecordChart(undefined);
-      chart.cleanup();
     };
   }, [recordingId]);
 

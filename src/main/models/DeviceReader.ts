@@ -288,6 +288,7 @@ class DeviceReader {
         //   timeDelta: this.timeStamp.getTimeDelta(),
         // });
         const calculatedData = V5Calc.processRawData(data, BATCH_SIZE);
+        console.log(calculatedData);
         let delta = this.timeStamp.getTimeDelta();
 
         calculatedData.forEach((dataPoint) => {

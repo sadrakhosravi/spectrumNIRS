@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
 
 import withTooltip from '@hoc/withTooltip.hoc';
 import TrayIconButtons from './TrayIconButton.component';
 
 import RecordingIcon from '@icons/recording.svg';
+import { RecordChannels } from '@utils/channels';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
@@ -12,6 +13,10 @@ const RecordingTrayIcon = () => {
   const recordingData = useAppSelector(
     (state) => state.global.recording?.currentRecording
   );
+
+  useEffect(() => {
+    window.api.invokeIPC(RecordChannels.Stop);
+  }, [recordingData?.id]);
 
   const settings = recordingData?.settings;
 
