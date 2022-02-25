@@ -7,13 +7,11 @@ import AppStateReducer from '@redux/AppStateSlice';
 import RecordStateReducer from '@redux/RecordStateSlice';
 import SensorStateReducer from '@redux/SensorStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
-import IsLoadingReducer from '@redux/IsLoadingSlice';
 import ExperimentDataReducer from '@redux/ExperimentDataSlice';
 import ChartSliceReducer from './ChartSlice';
 import ProbeStateReducer from './ProbeState';
 import RecordChartReducer from './RecordChartSlice';
 import ReviewChartReducer from './ReviewChartSlice';
-import RecordingSettingsReducer from './RecordingSettings';
 import GlobalStateReducer from './globalStateSlice';
 import { experimentsApi } from './api/experimentsApi';
 
@@ -22,13 +20,11 @@ const reducers = combineReducers({
   recordState: RecordStateReducer,
   sensorState: SensorStateReducer,
   modalState: ModalStateReducer,
-  isLoadingState: IsLoadingReducer,
   experimentData: ExperimentDataReducer,
   chartState: ChartSliceReducer,
   probeState: ProbeStateReducer,
   recordChartState: RecordChartReducer,
   reviewChartState: ReviewChartReducer,
-  recordingSettingsState: RecordingSettingsReducer,
   global: GlobalStateReducer,
   [experimentsApi.reducerPath]: experimentsApi.reducer,
 });

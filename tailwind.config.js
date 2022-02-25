@@ -82,6 +82,9 @@ module.exports = {
       gridAutoColumns: {
         3070: 'minmax(max-content, 1fr)',
       },
+      animation: {
+        'pulse-fast': 'pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;',
+      },
     },
   },
   variants: {

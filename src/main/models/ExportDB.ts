@@ -24,6 +24,7 @@ class ExportDB {
 
       // If the path was undefined, the export was canceled.
       if (!savePath) return 'canceled';
+      if (!recordingId) return 'canceled';
 
       // Create a write stream to write to a text file
       let writeStream = fs.createWriteStream(savePath + '.' + type);
@@ -123,7 +124,10 @@ class ExportDB {
    * @param recordingId - The id of the recording to get the data from
    * @returns the start and end of the recording data or undefined
    */
-  public static findRangeOfExportData = async (recordingId: number) => {
+  public static findRangeOfExportData = async () => {
+    const recordingId = RecordingModel.getCurrentRecording()?.id;
+    if (!recordingId) return;
+
     try {
       const start = await getConnection()
         .createQueryBuilder()

@@ -8,6 +8,7 @@ ipcMain.on('window:minimize', (event: IpcMainEvent) => {
 // Close/quit window on minimize icon click
 ipcMain.on('window:close', () => {
   BrowserWindow.getFocusedWindow()?.close();
+  app.quit();
 });
 
 // Close/quit window on minimize icon click

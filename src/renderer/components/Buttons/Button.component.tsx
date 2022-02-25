@@ -25,7 +25,7 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={` border-primary inline-flex items-center gap-1 rounded-md px-2 py-[0.4rem] text-sm text-white transition-colors duration-150 focus:ring-2 focus:ring-accent ${
+      className={` border-primary inline-flex items-center gap-1 rounded-md px-2 py-[0.4rem] text-sm text-white transition-all duration-150 focus:ring-2 focus:ring-accent  ${
         isActive ? 'bg-accent hover:bg-accent/80' : 'bg-grey1 hover:bg-grey0'
       } ${className || ''}  ${disabled ? 'cursor-not-allowed !bg-grey3' : ''}
       `}
@@ -35,7 +35,7 @@ const Button = ({
       disabled={disabled}
       title={title}
     >
-      {icon && <img src={icon} className="w-5" />}
+      {icon && <img src={icon} className="w-[1.45rem]" />}
       {text && text}
     </button>
   );

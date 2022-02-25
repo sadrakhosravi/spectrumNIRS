@@ -10,7 +10,7 @@ import RecentFileIcon from '@icons/recent-file.svg';
 
 // Constants
 import { ModalConstants, RecordState } from '@utils/constants';
-import { ExperimentChannels } from '@utils/channels';
+import { ExperimentChannels, RecordChannels } from '@utils/channels';
 import ListButton from '@components/Buttons/ListButton';
 
 interface IProps {
@@ -55,7 +55,10 @@ const RecentExperiment: React.FC<IProps> = ({
       description={description}
       time={saved}
       deleteOnClick={async () => {
+        await window.api.invokeIPC(RecordChannels.Stop);
         await deleteExperimentAndData(experiment.id, experiment.name);
+        await window.api.invokeIPC(ExperimentChannels.CloseExperiment);
+
         refetch();
       }}
       className="py-2"

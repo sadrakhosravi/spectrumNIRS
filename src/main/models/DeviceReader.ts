@@ -3,7 +3,9 @@ import V5 from 'devices/V5/V5';
 import { BrowserWindow, powerSaveBlocker } from 'electron';
 import { Readable } from 'stream';
 import WorkerManager from '@electron/models/WorkerManager';
-import RecordingModel from '@electron/models/RecordingModel';
+import RecordingModel, {
+  IRecordingData,
+} from '@electron/models/RecordingModel';
 import ProbesManager from './ProbesManager';
 // import dbParser from '@lib/Stream/DatabaseParser';
 
@@ -55,9 +57,12 @@ class DeviceReader {
   timeStamp: TimeStampGenerator;
   calcWorker: Worker | undefined;
   recordingId: number | undefined;
+  currentRecording: IRecordingData | undefined;
+  events: { hypoxia: boolean; event2: boolean };
 
   constructor(lastTimeStamp?: number) {
-    this.recordingSettings = RecordingModel.getCurrentRecording()?.settings as
+    this.currentRecording = RecordingModel.getCurrentRecording();
+    this.recordingSettings = this.currentRecording?.settings as
       | JSON
       | undefined;
 
@@ -90,10 +95,14 @@ class DeviceReader {
 
     this.timeStamp = new TimeStampGenerator(
       this.device.Stream.getDataBatchSize(),
-      lastTimeStamp
+      lastTimeStamp || RecordingModel.getLastTimeStamp() || 0
     );
 
     this.calcWorker = undefined;
+    this.events = {
+      hypoxia: false,
+      event2: false,
+    };
   }
 
   /**
@@ -196,7 +205,7 @@ class DeviceReader {
     this.powerSaveBlocker = powerSaveBlocker.start('prevent-app-suspension');
 
     // Start the device,
-    device.Device.startDevice();
+    this.startDevice();
 
     this.deviceStream = device.Stream.getDeviceStream() as Readable;
 
@@ -227,10 +236,10 @@ class DeviceReader {
 
     // DB initialization
     dbProcess.webContents.send('db:init', workerData);
-    this.calcWorker = WorkerManager.getCalculationWorker(workerData);
+    // this.calcWorker = WorkerManager.getCalculationWorker(workerData);
 
-    this.calcWorker.on('message', this.listenForCalcWorkerData.bind(this));
-
+    // this.calcWorker.on('message', this.listenForCalcWorkerData.bind(this));
+    this.calcWorker = undefined;
     return { calcWorker: this.calcWorker, dbProcess };
   }
 
@@ -250,6 +259,12 @@ class DeviceReader {
     const NUM_OF_DP = device.Stream.getNumOfElementsPerDataPoint();
     const BATCH_SIZE = device.Stream.getDataBatchSize();
 
+    // TOI Value
+    const TOIAverageFactor =
+      (ProbesManager.getCurrentProbe()?.samplingRate || 100) / 5;
+    let TOI = 0; // TOI initializer used to average
+    let TOICount = 0;
+
     // The size of the Shared Array buffer used to speed of communication between
     // multiple threads.
     const SAB_SIZE = NUM_OF_DP * BATCH_SIZE;
@@ -257,21 +272,15 @@ class DeviceReader {
     const sharedDataBuffer = new Int32Array(SAB);
 
     // Start workers
-    //@ts-ignore
-    const { calcWorker, dbProcess } = this.startWorkers();
+    const { dbProcess } = this.startWorkers();
 
-    const recordingId = RecordingModel.getCurrentRecording()?.id || 99;
+    const recordingId = RecordingModel.getCurrentRecording()?.id;
+    if (!recordingId) return;
 
     const V5Calc = new V5Calculation();
 
-    let count = 0;
-
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', async (chunk: string) => {
-        if (count === 100) {
-          console.log(process.hrtime.bigint());
-          count = 0;
-        }
         // Parse the data and store it in the Shared Array
         const data = this.device.Parser(chunk, sharedDataBuffer);
         const parsedData = dbParser(
@@ -288,18 +297,24 @@ class DeviceReader {
         //   timeDelta: this.timeStamp.getTimeDelta(),
         // });
         const calculatedData = V5Calc.processRawData(data, BATCH_SIZE);
-        console.log(calculatedData);
         let delta = this.timeStamp.getTimeDelta();
 
         calculatedData.forEach((dataPoint) => {
           dataPoint.unshift(this.timeStamp.getTimeStamp() + delta);
           delta += 10;
+          TOI += dataPoint[dataPoint.length - 1];
+          TOICount++;
         });
 
         this.mainWindow.send('device:data', calculatedData);
         this.timeStamp.generateNextTimeStamp();
 
-        count++;
+        // Send average TOI
+        if (TOICount === TOIAverageFactor) {
+          this.mainWindow.send('device:TOI', TOI / TOIAverageFactor);
+          TOI = 0;
+          TOICount = 0;
+        }
       });
     }
   }
@@ -349,6 +364,12 @@ class DeviceReader {
         downSampler.downSampleData(data);
       });
     }
+  }
+
+  toggleEvent(event: object | any) {
+    const eventName = Object.keys(event)[0] as keyof typeof this.events;
+    const eventState = event[eventName] as boolean;
+    this.events[eventName] = eventState;
   }
 
   /**

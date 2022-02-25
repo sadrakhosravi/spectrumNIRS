@@ -55,7 +55,11 @@ export default merge(baseConfig, {
       'webpack/hot/only-dev-server',
       path.join(webpackPaths.srcRendererPath, 'db.ts'),
     ],
-    settings: path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
+    settings: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
+    ],
   },
 
   output: {
@@ -117,6 +121,11 @@ export default merge(baseConfig, {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
         use: 'url-loader',
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader',
+      },
     ],
   },
   plugins: [
@@ -152,6 +161,7 @@ export default merge(baseConfig, {
 
     new ReactRefreshWebpackPlugin(),
 
+    //@ts-ignore
     new HtmlWebpackPlugin({
       filename: path.join('index.html'),
       template: path.join(webpackPaths.srcRendererPath, 'html', 'index.ejs'),

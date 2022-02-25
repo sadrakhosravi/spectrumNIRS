@@ -15,6 +15,7 @@ import {
   ColorHEX,
   UIButtonPicture,
   UICheckBox,
+  ColorRGBA,
 } from '@arction/lcjs';
 
 // Methods
@@ -140,6 +141,15 @@ class ChartClass {
         thickness: 1.25,
         fillStyle: new SolidFill({ color: ColorHEX(color) }),
       })
+    );
+  }
+
+  changeChartSeriesBackground(
+    chart: ChartXY<PointMarker, UIBackground>,
+    color: number[]
+  ) {
+    chart.setSeriesBackgroundFillStyle(
+      new SolidFill({ color: ColorRGBA(color[0], color[1], color[2]) })
     );
   }
 

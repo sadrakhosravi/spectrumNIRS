@@ -5,7 +5,6 @@ import BetterSqlite3 from 'better-sqlite3';
 
 let db: BetterSqlite3.Database;
 let insert: BetterSqlite3.Statement<any[]>;
-//@ts-ignore
 let dbTransaction: BetterSqlite3.Transaction;
 
 // Initialize the database file

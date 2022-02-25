@@ -5,7 +5,6 @@ import { ReviewToolbar } from './ReviewToolbar';
 import Separator from '@components/Separator/Separator.component';
 import IconButton from '@components/Buttons/IconButton.component';
 import withTooltip from '@hoc/withTooltip.hoc';
-import TimeDivision from './TimeDivision.component';
 import TimeDiv from './TimeDiv.component';
 
 // Constants
@@ -30,8 +29,8 @@ const ReviewChartToolbar = ({}: ReviewChartToolbarProps) => {
     <>
       {reviewChart && (
         <ToolbarContainer>
-          <div className="flex w-full items-center justify-between h-full px-4">
-            <div className="grid grid-flow-col col-span-4 auto-cols-max items-center gap-1">
+          <div className="flex h-full w-full items-center justify-between px-4">
+            <div className="col-span-4 grid auto-cols-max grid-flow-col items-center gap-3">
               {toolbarMenu.map((option, index) => {
                 if (option.label === 'separator')
                   return <Separator orientation="vertical" key={index} />;
@@ -43,24 +42,14 @@ const ReviewChartToolbar = ({}: ReviewChartToolbarProps) => {
                       option.click &&
                       option.click(reviewChart.chartOptions as ChartOptions)
                     }
-                    tooltip={
-                      option.tooltip === 'timeDivision' ? (
-                        <TimeDivision
-                          chartOptions={
-                            reviewChart.chartOptions as ChartOptions
-                          }
-                        />
-                      ) : (
-                        option.tooltip
-                      )
-                    }
+                    tooltip={option.tooltip}
                     interactive={option.tooltip === 'timeDivision'}
                     key={index}
                     disabled={true}
                   />
                 );
               })}
-              <TimeDiv />
+              <TimeDiv type={ChartType.REVIEW} />
             </div>
           </div>
         </ToolbarContainer>

@@ -71,7 +71,7 @@ function zoomBandChart(this: ReviewChart) {
       fillStyle: new SolidFill({ color: ColorHEX('#007ACD') }),
     });
 
-  band.setFillStyle(new SolidFill({ color: ColorRGBA(255, 255, 255, 25) }));
+  band.setFillStyle(new SolidFill({ color: ColorRGBA(255, 255, 255, 65) }));
   band.setStrokeStyle(bandStrokeStyle(0));
 
   band.onMouseEnter(() => {

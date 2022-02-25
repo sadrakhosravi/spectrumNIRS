@@ -15,6 +15,5 @@ ipcMain.handle(
 
 ipcMain.handle(
   ChartChannels.GetExportRange,
-  async (_event, recordingId) =>
-    await ExportDB.findRangeOfExportData(recordingId)
+  async (_event) => await ExportDB.findRangeOfExportData()
 );

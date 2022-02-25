@@ -50,6 +50,7 @@ export interface IGlobalStore {
   };
   recording: {
     currentRecording: IRecordingData | null;
+    lastTimeStamp: number | undefined;
   };
   probe: {
     currentProbe: CurrentProbe | null;

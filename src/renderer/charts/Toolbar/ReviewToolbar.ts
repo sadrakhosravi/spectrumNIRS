@@ -1,14 +1,9 @@
 // Icons
-import ZoomInIcon from '@icons/zoom-in.svg';
-import ZoomOutIcon from '@icons/zoom-out.svg';
-import ResetZoom from '@icons/reset-zoom.svg';
 import FocusModeIcon from '@icons/focus-mode.svg';
 import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import RawDataIcon from '@icons/raw-data.svg';
 import ExportIcon from '@icons/export-data.svg';
-
-import TimeDivisionIcon from '@icons/time-division.svg';
 
 // Adapters
 import ChartOptions from '../ChartClass/ChartOptions';
@@ -21,32 +16,6 @@ import { ModalConstants } from '@utils/constants';
 import { DialogBoxChannels } from '@utils/channels';
 
 export const ReviewToolbar = [
-  {
-    label: 'Zoom In',
-    tooltip: 'Zoom In',
-    icon: ZoomInIcon,
-    isActive: false,
-    click: () => {},
-  },
-  {
-    label: 'Zoom Out',
-    tooltip: 'Zoom Out',
-    icon: ZoomOutIcon,
-    isActive: false,
-
-    click: () => {},
-  },
-  {
-    label: 'Reset Zoom',
-    tooltip: 'Reset Zoom',
-    icon: ResetZoom,
-    isActive: false,
-
-    click: () => {},
-  },
-  {
-    label: 'separator',
-  },
   {
     label: 'Focus Icon',
     tooltip: 'Focus Mode',
@@ -91,9 +60,9 @@ export const ReviewToolbar = [
     tooltip: 'Export To File (Text / Excel)',
     icon: ExportIcon,
     click: async () => {
-      const recordingId = getState().experimentData.currentRecording.id;
+      const recordingId = getState().global.recording?.currentRecording?.id;
 
-      if (recordingId === -1) {
+      if (recordingId === -1 || !recordingId) {
         window.api.invokeIPC(DialogBoxChannels.MessageBox, {
           title: 'No recording found',
           type: 'error',
@@ -101,7 +70,7 @@ export const ReviewToolbar = [
           detail:
             'No recording found. Either open a recording or create a new one.',
         });
-        // return;
+        return;
       }
 
       dispatch(openModal(ModalConstants.EXPORT_FORM));
@@ -114,14 +83,5 @@ export const ReviewToolbar = [
       //   success: 'Export Completed!',
       // });
     },
-  },
-  {
-    label: 'separator',
-  },
-  {
-    label: 'timeDivision',
-    tooltip: 'timeDivision',
-    icon: TimeDivisionIcon,
-    click: () => {},
   },
 ];

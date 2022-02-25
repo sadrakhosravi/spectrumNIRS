@@ -12,8 +12,6 @@ import { app, BrowserWindow, nativeTheme, screen } from 'electron';
 import path from 'path';
 import 'reflect-metadata';
 import { resolveHtmlPath } from './util';
-require('v8').setFlagsFromString('--expose_gc');
-global.gc = require('vm').runInNewContext('gc');
 
 // Import controllers
 import startControllers from 'controllers';
@@ -27,10 +25,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Force high performance gpu
-app.commandLine.appendSwitch('--force_high_performance_gpu', 'true');
-app.commandLine.appendSwitch('js-flags', '--expose_gc');
-app.commandLine.appendSwitch('trace-warnings');
-process.on('warning', (e) => console.warn(e.stack));
+app.commandLine.appendSwitch('--force_high_performance_gpu');
 
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
@@ -104,6 +99,7 @@ const createDbProcess = async () => {
       partition: 'persist:spectrum',
       contextIsolation: false,
       nodeIntegration: true,
+      nodeIntegrationInWorker: true,
       backgroundThrottling: false,
     },
     icon: getAssetPath('icon.png'),

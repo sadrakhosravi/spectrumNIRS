@@ -34,6 +34,7 @@ const ChannelUI = ({
   reading,
 }: ChannelUIProps) => {
   const dispatch = useAppDispatch();
+
   const handleMaximizeChannel = () => {
     if (isMaximized) {
       dispatch(resetMaximizedChannel());
@@ -69,14 +70,9 @@ const ChannelUI = ({
                 chartPos={chartPos}
               />
 
-              {chartPos.height > 100 && (
+              {reading && chartPos.height > 100 && (
                 <div
-                  className={`absolute top-[40%] left-1/2 my-4 -translate-x-1/2 -translate-y-1/2 text-4xl font-medium ${
-                    reading && reading > 60 && 'animate-pulse'
-                  }`}
-                  style={{
-                    color: reading && reading > 60 ? 'red' : 'white' || 'white',
-                  }}
+                  className={`absolute top-[40%] left-1/2 my-4 -translate-x-1/2 -translate-y-1/2 text-4xl font-medium`}
                 >
                   {reading}
                 </div>

@@ -105,13 +105,11 @@ class ReviewChart extends Chart {
     });
 
     dbWorker.onmessage = (event) => {
-      console.log(event.data);
       calcWorker.postMessage(event.data);
       UIWorkerManager.terminateDatabaseWorker();
     };
 
     calcWorker.onmessage = ({ data }) => {
-      console.log(data);
       this.drawData(data);
       UIWorkerManager.terminateCalcWorker();
     };
@@ -125,7 +123,6 @@ class ReviewChart extends Chart {
         processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
       });
     }
-    console.log(processedData);
     this.series.forEach((series, iSeries) => {
       series.add(processedData[iSeries]);
       this.zoomBandChartSeries[iSeries].add(processedData[iSeries]);

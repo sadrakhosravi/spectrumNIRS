@@ -12,11 +12,13 @@ self.onmessage = ({ data }: { data: EventData }) => {
   db = new SQLite3(data.dbFilePath, { fileMustExist: true, readonly: true });
   if (!db) self.close();
 
-  let selectStmt = db.prepare(
-    `SELECT * FROM recordings_data WHERE recordingId=? ORDER BY timeStamp ASC`
-  );
+  let selectStmt;
 
-  if (!data.limit) {
+  if (data.limit) {
+    selectStmt = db.prepare(
+      `SELECT * FROM recordings_data WHERE recordingId=? ORDER BY timeStamp DESC LIMIT ${data.limit}`
+    );
+  } else {
     selectStmt = db.prepare(
       `SELECT * FROM recordings_data WHERE recordingId=? ORDER BY timeStamp ASC`
     );
@@ -24,6 +26,8 @@ self.onmessage = ({ data }: { data: EventData }) => {
 
   let dbData = selectStmt.all(data.recordingId);
   const dbDataLength = dbData.length;
+
+  if (data.limit) dbData.reverse();
 
   // // Process db data
   for (let i = 0; i < dbDataLength; i += 1) {

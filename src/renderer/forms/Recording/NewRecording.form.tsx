@@ -22,13 +22,21 @@ export enum Steps {
 
 const NewRecordingForm = () => {
   const [step, setStep] = useState(1);
+  const [formError, setFormError] = useState('');
   const dispatch = useAppDispatch();
   const methods = useForm();
 
   const handleFormSubmit = async (data: any) => {
     // Check TOI settings
     if (data.TOI?.threshold) {
-      if (!data.TOI?.minimum || !data.TOI?.maximum) return;
+      if (
+        !data.TOI?.minimum ||
+        !data.TOI?.maximum ||
+        data.TOI.minimum >= data.TOI.maximum
+      ) {
+        setFormError('TOI threshold minimum and maximum range error');
+        return;
+      }
     }
 
     const settingsObj = {
@@ -73,6 +81,7 @@ const NewRecordingForm = () => {
           {/* Recording Settings */}
           <div className="slideLeft" hidden={step !== Steps.RecordingSetting}>
             <NewRecordingSettings />
+            {formError && <div className="z-50 my-2 text-red">{formError}</div>}
 
             <span className="mt-4 flex w-full items-center justify-between">
               <Button

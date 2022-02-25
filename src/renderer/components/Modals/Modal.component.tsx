@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
-import { isLoading } from '@redux/IsLoadingSlice';
 
 // Icons
 import CloseIcon from '@icons/close.svg';
@@ -33,16 +32,19 @@ const Modal: React.FC<IProps> = (props) => {
   // Handle close of the modal
   const handleClose = () => {
     dispatch(closeModal());
-    dispatch(isLoading(false));
   };
 
   return (
     <>
-      <Transition appear show={isOpen}>
+      <Transition
+        appear
+        show={isOpen}
+        className="duration-150 will-change-auto"
+      >
         <Dialog
           open={isOpen}
           as="div"
-          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-70 transition-all duration-100 "
+          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-70 transition-all duration-100 will-change-auto"
           onClose={handleClose}
         >
           <Transition.Child
@@ -66,7 +68,7 @@ const Modal: React.FC<IProps> = (props) => {
               </span>
 
               <div
-                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 border-primary shadow-xl rounded-md ${largeStyles} ${
+                className={`border-primary relative my-8 inline-block transform overflow-hidden rounded-md bg-grey1 py-6 px-12 text-left align-middle text-white shadow-xl transition-all will-change-auto ${largeStyles} ${
                   fixedSize && 'min-h-[50vh] min-w-[50vw]'
                 }`}
               >

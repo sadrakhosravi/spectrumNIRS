@@ -35,6 +35,7 @@ export default merge(baseConfig, {
   entry: {
     main: path.join(webpackPaths.srcRendererPath, 'index.tsx'),
     settings: path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
+    db: path.join(webpackPaths.srcRendererPath, 'db.ts'),
   },
 
   output: {
@@ -101,6 +102,11 @@ export default merge(baseConfig, {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
         use: 'url-loader',
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader',
+      },
     ],
   },
 
@@ -152,7 +158,23 @@ export default merge(baseConfig, {
         removeComments: true,
       },
       isBrowser: false,
+      env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('db.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'db.ejs'),
+      chunks: ['db'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
     }),
     new HtmlWebpackPlugin({
       filename: path.join('settings.html'),

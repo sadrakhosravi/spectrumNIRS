@@ -12,13 +12,19 @@ import StartIcon from '@icons/start.svg';
 import PauseIcon from '@icons/pause.svg';
 // import StopIcon from '@icons/stop.svg';
 import ResetHeightIcon from '@icons/reset-height.svg';
+import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
+import ExportIcon from '@icons/export-data.svg';
+import MarkerIcon from '@icons/marker.svg';
 
 // Constants
-import { ChartType } from '@utils/constants';
-import { RecordChannels } from '@utils/channels';
+import { ChartType, ModalConstants } from '@utils/constants';
+import { DialogBoxChannels, RecordChannels } from '@utils/channels';
 
 // HOC
 import withTooltip from '@hoc/withTooltip.hoc';
+import { useChartContext } from 'renderer/context/ChartProvider';
+import { openModal } from '@redux/ModalStateSlice';
+import { getState, dispatch } from '@redux/store';
 
 const ButtonWithTooltip = withTooltip(Button);
 
@@ -30,6 +36,8 @@ const RecordChartToolbar = ({}: RecordChartToolbarProps) => {
   const recordState = useAppSelector(
     (state) => state.global.recordState?.recordState
   );
+
+  const { recordChart } = useChartContext();
 
   // Handle the start/pause/continue button
   const handleStart = async () => {
@@ -51,16 +59,93 @@ const RecordChartToolbar = ({}: RecordChartToolbarProps) => {
     }
   };
 
+  // Resets all channel's height back to default
+  const resetChartHeights = () => {
+    recordChart?.chartOptions?.resetChartsHeight();
+  };
+
+  const takeScreenShot = () => {
+    recordChart?.chartOptions?.screenshot();
+  };
+
+  const exportData = () => {
+    const recordingId = getState().global.recording?.currentRecording?.id;
+
+    if (recordingId === -1 || !recordingId) {
+      window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+        title: 'No recording found',
+        type: 'error',
+        message: 'No recording found',
+        detail:
+          'No recording found. Either open a recording or create a new one.',
+      });
+      return;
+    }
+
+    dispatch(openModal(ModalConstants.EXPORT_FORM));
+  };
+
+  const addEvent = () => {
+    const currentInterval = recordChart?.charts[0]
+      .getDefaultAxisX()
+      .getInterval();
+    recordChart?.chartOptions?.drawMarker(
+      currentInterval?.end as number,
+      'Hypoxia',
+      '#E61557'
+    );
+  };
+  const addEvent2 = () => {
+    const currentInterval = recordChart?.charts[0]
+      .getDefaultAxisX()
+      .getInterval();
+    recordChart?.chartOptions?.drawMarker(
+      currentInterval?.end as number,
+      'Other Event',
+      '#8E07F0'
+    );
+  };
+
   return (
     <>
       <ToolbarContainer>
         <div className="flex h-full w-full items-center justify-between px-4">
-          <div className="flex w-full items-center gap-4">
-            <ButtonWithTooltip
-              icon={ResetHeightIcon}
-              tooltip={'Reset Channel Heights'}
-            />
-            <TimeDiv />
+          <div className="flex w-full items-center gap-5">
+            <div className="flex gap-2">
+              <ButtonWithTooltip
+                icon={ResetHeightIcon}
+                tooltip={'Reset Channel Heights'}
+                onClick={resetChartHeights}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <ButtonWithTooltip
+                icon={ChartScreenshotIcon}
+                tooltip={'Take a Screenshot'}
+                onClick={takeScreenShot}
+              />
+              <ButtonWithTooltip
+                icon={ExportIcon}
+                tooltip={'Export Data'}
+                onClick={exportData}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <ButtonWithTooltip
+                icon={MarkerIcon}
+                tooltip={'Hypoxia Event'}
+                onClick={addEvent}
+              />
+              <ButtonWithTooltip
+                icon={MarkerIcon}
+                tooltip={'Other Event'}
+                onClick={addEvent2}
+              />
+            </div>
+
+            <TimeDiv type={ChartType.RECORD} />
           </div>
 
           {/* Stop Start Button */}

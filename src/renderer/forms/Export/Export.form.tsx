@@ -62,7 +62,7 @@ const ExportForm = () => {
         ChartChannels.GetExportRange,
         currentRecording.id
       );
-      console.log(range);
+      if (!range) return;
       range.start !== undefined &&
         setExportRange([msToTime(range.start), msToTime(range.end)]);
     })();
@@ -70,7 +70,7 @@ const ExportForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <h3 className="text-xl text-medium pb-3">Select File Type</h3>
+      <h3 className="text-medium pb-3 text-xl">Select File Type</h3>
       <RadioGroup value={exportOption} onChange={setExportOption}>
         <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
         <div className="grid grid-cols-2 gap-6">
@@ -84,8 +84,8 @@ const ExportForm = () => {
                   <div
                     className={`${
                       checked && 'ring-2 ring-accent'
-                    } w-full h-32 bg-grey2 rounded-md flex flex-col items-center justify-center cursor-pointer ${
-                      disabled && 'bg-light bg-opacity-40 cursor-not-allowed'
+                    } flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-md bg-grey2 transition-all duration-150 ${
+                      disabled && 'cursor-not-allowed bg-light bg-opacity-40'
                     }`}
                   >
                     <img
@@ -102,12 +102,12 @@ const ExportForm = () => {
           ))}
         </div>
       </RadioGroup>
-      <h3 className="text-xl text-medium pb-3 mt-8">Select Time Range</h3>
+      <h3 className="text-medium mt-8 pb-3 text-xl">Select Time Range</h3>
       <div>
-        <label className="text-sm inline-block w-1/2 pr-2">
+        <label className="inline-block w-1/2 pr-2 text-sm">
           <span className="block pb-1">Start:</span>
           <input
-            className="py-3 px-2 rounded-md w-full hover:cursor-not-allowed"
+            className="w-full rounded-md py-3 px-2 hover:cursor-not-allowed"
             title="Currently not editable. Will be added in future updates"
             type="text"
             value={exportRange[0]}
@@ -117,10 +117,10 @@ const ExportForm = () => {
             })}
           />
         </label>
-        <label className="text-sm inline-block w-1/2 pr-2">
+        <label className="inline-block w-1/2 pr-2 text-sm">
           <span className="block pb-1">End:</span>
           <input
-            className="py-3 px-2 rounded-md w-full hover:cursor-not-allowed"
+            className="w-full rounded-md py-3 px-2 hover:cursor-not-allowed"
             title="Currently not editable. Will be added in future updates"
             type="text"
             value={exportRange[1]}
@@ -132,7 +132,10 @@ const ExportForm = () => {
         </label>
       </div>
 
-      <SubmitButton text={'Export Data'} />
+      <SubmitButton
+        text={'Export Data'}
+        disabled={exportRange[0] === 'No data found'}
+      />
     </form>
   );
 };

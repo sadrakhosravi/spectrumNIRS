@@ -32,8 +32,8 @@ const ReviewChart = ({
   const currentProbe = useAppSelector(
     (state) => state.sensorState.currentProbe
   );
-  const recordState = useAppSelector(
-    (state) => state.experimentData.currentRecording
+  const recordingId = useAppSelector(
+    (state) => state.global.recording?.currentRecording?.id
   );
   const currentTimeStamp = useAppSelector(
     (state) => state.chartState.currentEventTimeStamp
@@ -63,8 +63,8 @@ const ReviewChart = ({
         containerId
       );
 
-      setReviewChart(chart);
       chart.createReviewChart();
+      setReviewChart(chart);
       requestAnimationFrame(() => chart?.loadInitialData());
 
       // Keep a ref to the chart
@@ -84,7 +84,7 @@ const ReviewChart = ({
       chartRef.current = undefined;
       setChartLoaded(false);
     };
-  }, []);
+  }, [recordingId]);
 
   const resetChartSize = () => {
     requestAnimationFrame(() => {
@@ -105,7 +105,7 @@ const ReviewChart = ({
 
   useEffect(() => {
     !isNewData && setIsNewData(true);
-  }, [recordState]);
+  }, [recordingId]);
 
   useEffect(() => {}, [isNewData]);
 

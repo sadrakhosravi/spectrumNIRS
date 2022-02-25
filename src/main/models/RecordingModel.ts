@@ -11,8 +11,9 @@ import { INewRecordingData } from 'interfaces/interfaces';
 import RecordingsData from 'db/entity/RecordingsData';
 
 export interface ITOIThreshold {
-  min: number;
-  max: number;
+  minimum: number;
+  maximum: number;
+  threshold: boolean;
 }
 
 export interface IRecordingSetting {
@@ -43,10 +44,12 @@ const settings: IRecordingSetting & IRecordingSettingDefault = {
 class RecordingModel {
   currentRecording: IRecordingData | undefined;
   recordingsDataModel: RecordingsDataModel | undefined;
+  lastTimeStamp: number;
 
   constructor() {
     this.currentRecording = undefined;
     this.recordingsDataModel = undefined;
+    this.lastTimeStamp = 0;
   }
 
   /**
@@ -58,7 +61,7 @@ class RecordingModel {
    * Sets the current recording data
    * @param recording - the recording to be set as the current recording
    */
-  public setCurrentRecording = (recording: Recordings | undefined) => {
+  public setCurrentRecording = async (recording: Recordings | undefined) => {
     this.recordingsDataModel = undefined;
     GlobalStore.removeRecording();
 
@@ -78,10 +81,51 @@ class RecordingModel {
     this.recordingsDataModel = new RecordingsDataModel(
       this.currentRecording.id
     );
+
+    // Process the settings
+    this.processRecordingSettings();
+
     GlobalStore.setRecording('currentRecording', this.currentRecording);
-    console.log('NEW RECORDING CREATED');
-    console.log(this.currentRecording.settings);
+
+    const lastTimeStamp = await this.getCurrentRecordingLastTimeStamp();
+    this.lastTimeStamp = lastTimeStamp?.timeStamp || 0;
+
+    GlobalStore.setRecording('lastTimeStamp', this.lastTimeStamp);
   };
+
+  /**
+   * Processes recording settings saved in the database and parses its values
+   */
+  private processRecordingSettings() {
+    const settings = this.currentRecording?.settings;
+    if (!settings) return;
+
+    // Process TOI Threshold values
+    if (settings.TOIThreshold) {
+      settings.TOIThreshold.minimum = ~~settings.TOIThreshold.minimum;
+      settings.TOIThreshold.maximum = ~~settings.TOIThreshold.maximum;
+    }
+  }
+
+  /**
+   * @returns the last timeStamp of the recording or undefined
+   */
+  private getCurrentRecordingLastTimeStamp = async () => {
+    return await getConnection()
+      .createQueryBuilder()
+      .select()
+      .from(RecordingsData, '')
+      .where(`recordingId = ${this.currentRecording?.id}`)
+      .orderBy({
+        timeStamp: 'DESC',
+      })
+      .getRawOne();
+  };
+
+  /**
+   * @returns the cached value of the last timestamp of the current recording
+   */
+  public getLastTimeStamp = () => this.lastTimeStamp;
 
   /**
    * @param recordingId the id of the recording to get the data

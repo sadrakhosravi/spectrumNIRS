@@ -1,10 +1,13 @@
 import {
+  ChartXY,
   ColorHEX,
   ColorRGBA,
   Dashboard,
   FontSettings,
+  PointMarker,
   SolidFill,
   SolidLine,
+  UIBackground,
   UIElementBuilders,
   UIPointableTextBox,
 } from '@arction/lcjs';
@@ -15,19 +18,21 @@ import msToTime from '@utils/msToTime';
 class ChartOptions {
   channels: string[];
   dashboard: Dashboard;
-  charts: any;
+  charts: ChartXY<PointMarker, UIBackground>[];
   series: any;
   customTicks: any[];
   constantLines: any[];
   timeDivision: number;
   isReview: boolean;
+  xAxisChart: ChartXY<PointMarker, UIBackground>;
 
   constructor(
     channels: string[],
     dashboard: any,
     charts: any,
     series: any,
-    isReview: boolean = false
+    isReview: boolean = false,
+    xAxisChart?: any
   ) {
     this.channels = channels;
     this.dashboard = dashboard;
@@ -37,6 +42,7 @@ class ChartOptions {
     this.constantLines = [];
     this.timeDivision = 30 * 1000; // Time in milliseconds - default 30s
     this.isReview = isReview;
+    this.xAxisChart = xAxisChart;
   }
 
   /**
@@ -65,7 +71,7 @@ class ChartOptions {
    * Takes a screenshot of the chart area
    */
   screenshot() {
-    this.dashboard.saveToFile('Sensor Data');
+    this.dashboard.saveToFile('Sensor Data', 'image/png');
   }
 
   /**
@@ -81,21 +87,16 @@ class ChartOptions {
    * @param newTimeDivision - New time division to be set in milliseconds
    */
   setTimeDivision(newTimeDivision: number) {
-    this.timeDivision = newTimeDivision;
-    if (this.charts) {
-      const currentInterval = this.charts[0].getDefaultAxisX().getInterval();
-      console.log(currentInterval);
+    if (!this.isReview) {
       const axisX = this.charts[0].getDefaultAxisX();
+      const currentInterval = axisX.getInterval();
 
       axisX.setInterval(
-        currentInterval.start,
-        currentInterval.start + this.timeDivision,
-        0,
-        true
+        currentInterval.end - this.timeDivision,
+        currentInterval.end
       );
-
-      !this.isReview && axisX.release();
     }
+    this.timeDivision = newTimeDivision;
   }
 
   addMarker(name: string, color: string) {
@@ -115,6 +116,7 @@ class ChartOptions {
         eventState ? `${name}:End` : `${name}:Start`
       );
 
+    //@ts-ignore
     customTick.setMarker((tickMarker: UIPointableTextBox) =>
       tickMarker
         // ^ Above type cast is necessary to access full configuration API of UIPointableTextBox
@@ -151,13 +153,18 @@ class ChartOptions {
   }
 
   drawMarker(xValue: number, name: string, color: string) {
-    const axisX =
-      this.charts && this.charts[this.charts.length - 1].getDefaultAxisX();
+    const axisX = this.xAxisChart?.getDefaultAxisX();
 
     const customTick = axisX
-      .addCustomTick(UIElementBuilders.AxisTick)
+      .addCustomTick()
       .setValue(xValue)
-
+      .setMarker((tickMarker) =>
+        tickMarker.setTextFillStyle(
+          new SolidFill({
+            color: ColorHEX(color),
+          })
+        )
+      )
       .setTextFormatter((_value: any) => name);
 
     this.charts.forEach((chart: any) => {
@@ -169,7 +176,7 @@ class ChartOptions {
 
         .setStrokeStyle(
           new SolidLine({
-            thickness: 4,
+            thickness: 3,
             fillStyle: new SolidFill({ color: ColorHEX(color) }),
           })
         );
@@ -237,6 +244,7 @@ class ChartOptions {
 
     //@ts-ignore
     this.dashboard = undefined;
+    //@ts-ignore
     this.charts = undefined;
     this.series = undefined;
     //@ts-ignore

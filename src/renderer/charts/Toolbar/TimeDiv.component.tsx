@@ -6,6 +6,7 @@ import ButtonMenu, {
 // Icons
 import TimeDivisionIcon from '@icons/time-division.svg';
 import { useChartContext } from 'renderer/context/ChartProvider';
+import { ChartType } from '@utils/constants';
 
 type TimeDiv = {
   label: string;
@@ -49,23 +50,26 @@ const timeDivisions = [
   },
 ];
 
-const TimeDiv = () => {
+const TimeDiv = ({ type }: { type: ChartType }) => {
   const [currentTimeDiv, setCurrentTimeDiv] = useState('');
 
-  const { recordChart } = useChartContext();
+  const chart =
+    useChartContext()[
+      `${type === ChartType.RECORD ? 'recordChart' : 'reviewChart'}`
+    ];
 
   useEffect(() => {
-    const timeDiv = recordChart?.chartOptions?.getTimeDivision() as number;
+    const timeDiv = chart?.chartOptions?.getTimeDivision() as number;
     console.log(timeDiv);
     if (timeDiv) {
       setCurrentTimeDiv(
         timeDivisions.filter((time) => time.value === timeDiv)[0].label
       );
     }
-  }, [recordChart]);
+  }, [chart]);
 
   const setTimeDivision = (time: TimeDiv) => {
-    recordChart?.chartOptions?.setTimeDivision(time.value);
+    chart?.chartOptions?.setTimeDivision(time.value);
     setCurrentTimeDiv(time.label);
   };
 

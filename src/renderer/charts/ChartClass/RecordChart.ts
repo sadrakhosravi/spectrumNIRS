@@ -8,8 +8,14 @@ import { setRecordChartPositions, setTOIValue } from '@redux/RecordChartSlice';
 import UIWorkerManager from 'renderer/UIWorkerManager';
 const { ipcRenderer } = require('electron');
 
-import TOINotification from '../../../sound/TOI_Notification.mp3';
-import { ColorRGBA, SolidFill } from '@arction/lcjs';
+import {
+  ColorHEX,
+  ColorRGBA,
+  LUT,
+  PalettedFill,
+  SolidFill,
+} from '@arction/lcjs';
+import { setIsAppLoading } from '@redux/AppStateSlice';
 
 class RecordChart extends Chart {
   numberOfRows: number;
@@ -18,7 +24,8 @@ class RecordChart extends Chart {
   seriesData: any[];
   TOI: number;
   count: number;
-  TOINotification: HTMLAudioElement;
+  minTOIVal: number | undefined;
+  maxTOIVal: number | undefined;
   constructor(
     containerId: string,
     type: ChartType.RECORD | ChartType.REVIEW,
@@ -34,13 +41,19 @@ class RecordChart extends Chart {
     this.numberOfRows = this.channels.length;
     this.chartOptions = undefined;
     this.stepXAxisFrame = 0;
-    console.log(getState().sensorState.currentProbe?.samplingRate);
 
     this.seriesData = [[], [], [], []];
     this.TOI = 0;
     this.count = 0;
 
-    this.TOINotification = new Audio(TOINotification);
+    //threshold
+    this.minTOIVal =
+      getState().global.recording?.currentRecording?.settings.TOIThreshold?.minimum;
+
+    this.maxTOIVal =
+      getState().global.recording?.currentRecording?.settings.TOIThreshold?.maximum;
+
+    dispatch(setIsAppLoading(true));
   }
 
   // Creates the record chart
@@ -52,15 +65,26 @@ class RecordChart extends Chart {
       this.channels,
       this.dashboard,
       this.charts,
-      this.series
+      this.series,
+      false,
+      this.xAxisChart
     );
-    requestAnimationFrame(() => this.sendChartPositions());
+    requestAnimationFrame(() => {
+      this.sendChartPositions();
+      this.charts[0]
+        .getDefaultAxisX()
+        .setInterval(0, this.chartOptions?.getTimeDivision() || 30 * 1000)
+        .release();
+    });
   }
 
   loadInitialData = async () => {
-    console.log('LOAD INITIAL DATA');
     const recordingId = getState().global.recording?.currentRecording?.id;
-    if (!recordingId) return;
+
+    if (!recordingId) {
+      dispatch(setIsAppLoading(false));
+      return;
+    }
 
     const dbWorker = UIWorkerManager.getDatabaseWorker();
     const calcWorker = UIWorkerManager.getCalcWorker();
@@ -73,14 +97,21 @@ class RecordChart extends Chart {
     });
 
     dbWorker.onmessage = (event) => {
-      console.log(event.data);
+      if (!event.data || event.data.length === 0) {
+        UIWorkerManager.terminateCalcWorker();
+        UIWorkerManager.terminateDatabaseWorker();
+        dispatch(setIsAppLoading(false));
+
+        return;
+      }
       calcWorker.postMessage(event.data);
       UIWorkerManager.terminateDatabaseWorker();
     };
 
     calcWorker.onmessage = ({ data }) => {
-      console.log(data);
       this.drawData(data);
+      dispatch(setIsAppLoading(false));
+
       UIWorkerManager.terminateCalcWorker();
     };
   };
@@ -93,7 +124,6 @@ class RecordChart extends Chart {
         processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
       });
     }
-    console.log(processedData);
     this.series.forEach((series, iSeries) =>
       series.add(processedData[iSeries])
     );
@@ -116,51 +146,46 @@ class RecordChart extends Chart {
 
   listenForData() {
     ipcRenderer.on('device:data', this.handleDeviceData);
-    console.log('LISTENING FOR DATA');
-    const axisX = this.xAxisChart.getDefaultAxisX();
-
-    const addData = () => {
-      this.series.forEach((series, i) => {
-        series.add(this.seriesData[i].splice(0, this.seriesData[i].length - 1));
-      });
-    };
-
-    let xStepPerFrame =
-      // New points count per 1 second
-      (this.samplingRate * 10) /
-      // 60 frames per second (axis is stepped every frame for smoothness)
-      60;
-
-    axisX.setInterval(axisX.getInterval().start, axisX.getInterval().end);
-
-    const stepAxisX = () => {
-      const xCur = axisX.getInterval().end;
-      const xMax = this.series[0].getXMax();
-      const xNext = Math.min(xCur + xStepPerFrame, xMax);
-      if (xNext !== xCur) {
-        axisX.setInterval(
-          xNext - (this.chartOptions?.getTimeDivision() as number),
-          xNext
-        );
-      }
-      addData();
-      this.stepXAxisFrame = requestAnimationFrame(stepAxisX);
-    };
-
-    setTimeout(() => {
-      addData();
-      axisX.setInterval(
-        this.series[0].getXMax() -
-          (this.chartOptions?.getTimeDivision() as number),
-        this.series[0].getXMax()
-      );
-
-      // stepAxisX();
-      requestAnimationFrame(stepAxisX);
-    }, 150);
+    requestAnimationFrame(() => {
+      this.handleDeviceData2();
+    });
   }
 
-  handleDeviceData = async (_event: any, _data: number[][]) => {
+  handleDeviceData2() {
+    let tPrev = performance.now();
+    let newDataModulus = 0;
+    const streamMoreData = () => {
+      const tNow = performance.now();
+      const tDelta = tNow - tPrev;
+      let newDataPointsCount =
+        this.samplingRate * (tDelta / 1000) + newDataModulus;
+      newDataModulus = newDataPointsCount % 1;
+      newDataPointsCount = Math.floor(newDataPointsCount);
+
+      const seriesNewDataPoints: any[] = [];
+      for (let iChannel = 0; iChannel < this.series.length; iChannel++) {
+        const nDataset = this.seriesData[iChannel % this.seriesData.length];
+        const newDataPoints = [];
+        for (let iDp = 0; iDp < newDataPointsCount; iDp++) {
+          const point = nDataset[iDp];
+          if (point) newDataPoints.push(point);
+        }
+        seriesNewDataPoints[iChannel] = newDataPoints;
+      }
+
+      this.series.forEach((nSeries, iSeries) =>
+        nSeries.add(seriesNewDataPoints[iSeries])
+      );
+      this.seriesData.forEach((data) => data.splice(0, newDataPointsCount));
+
+      // Request next frame.
+      tPrev = tNow;
+      this.stepXAxisFrame = requestAnimationFrame(streamMoreData);
+    };
+    streamMoreData();
+  }
+
+  handleDeviceDataWithThreshold = async (_event: any, _data: number[][]) => {
     this.series.forEach(async (_series, i) => {
       const channelData = _data.map((dataPoint) => {
         return { x: dataPoint[0], y: dataPoint[i + 1] };
@@ -171,8 +196,10 @@ class RecordChart extends Chart {
         let TOI = 0;
         channelData.forEach(async (dataPoint) => (TOI += dataPoint.y));
         TOI = Math.round(TOI / channelData.length);
-        if (TOI > 60) {
-          this.TOINotification.play();
+        if (
+          TOI > (this.maxTOIVal as number) ||
+          TOI < (this.minTOIVal as number)
+        ) {
           this.charts[3].setSeriesBackgroundFillStyle(
             new SolidFill({ color: ColorRGBA(60, 0, 0) })
           );
@@ -186,21 +213,30 @@ class RecordChart extends Chart {
     });
   };
 
+  handleDeviceData = async (_event: any, _data: number[][]) => {
+    this.series.forEach(async (_series, i) => {
+      const channelData = _data.map((dataPoint) => {
+        return { x: dataPoint[0], y: dataPoint[i + 1] };
+      });
+      this.seriesData[i].push(...channelData);
+    });
+  };
+
   stopListeningForData() {
-    this.TOINotification.pause();
-    const { ipcRenderer } = require('electron');
     ipcRenderer.removeAllListeners('device:data');
     cancelAnimationFrame(this.stepXAxisFrame);
     setImmediate(() => cancelAnimationFrame(this.stepXAxisFrame));
     dispatch(setTOIValue(undefined));
-    // this.series.forEach((series) => series.clear());
   }
 
   customizeRecordCharts() {
     this.dashboard.setAnimationsEnabled(false);
     this.charts &&
       this.charts.forEach((chart, i) => {
-        this.series && this.series[i].setDataCleaning({ minDataPointCount: 1 });
+        this.series &&
+          this.series[i].setDataCleaning({
+            minDataPointCount: 60 * this.samplingRate,
+          });
         chart
           .setMouseInteractionPan(false)
           .setMouseInteractionRectangleFit(false)
@@ -209,8 +245,34 @@ class RecordChart extends Chart {
         // this.series[i].setDataCleaning({ minDataPointCount: 1});
       });
 
-    this.xAxisChart.setMouseInteractions(false);
-    this.xAxisChart.getDefaultAxisX().setMouseInteractions(false);
+    const TOISeries = this.series.filter(
+      (series) => series.getName() === 'TOI'
+    )[0];
+
+    // Colors
+    const ColorRed = ColorHEX('#FF0000');
+    const ColorWhite = ColorHEX('#FFF');
+    if (this.minTOIVal && this.maxTOIVal) {
+      const yPalette = new PalettedFill({
+        lookUpProperty: 'y',
+        lut: new LUT({
+          interpolate: false,
+          steps: [
+            { value: 0, color: ColorRed },
+            { value: this.minTOIVal, color: ColorWhite },
+            { value: this.maxTOIVal, color: ColorRed },
+          ],
+        }),
+      });
+
+      TOISeries.setStrokeStyle((stroke) => stroke.setFillStyle(yPalette));
+    }
+
+    this.xAxisChart
+      .getDefaultAxisX()
+      .onAxisInteractionAreaMouseDoubleClick(() => {
+        this.charts[0].getDefaultAxisX().release();
+      });
   }
 
   cleanup() {
