@@ -1,4 +1,16 @@
-const dbParser = (
+export interface DBData {
+  timeStamp: number;
+  PDRawData: number[];
+  LEDIntensities: number[];
+  gainValues: string | null;
+  events: string | null;
+  event: 0 | 1;
+  sensor2RawData: string | null;
+  sensor3RawData: string | null;
+  recordingId: number;
+}
+
+const prepareDbData = (
   data: Int32Array,
   batchSize: number,
   numOfElementsPerDataPoint: number,
@@ -30,4 +42,19 @@ const dbParser = (
   return parsedData;
 };
 
-export default dbParser;
+const dbParser = (dbData: DBData[]) => {
+  const dbDataLength = dbData.length;
+
+  for (let i = 0; i < dbDataLength; i += 1) {
+    //@ts-ignore
+    dbData[i].PDRawData = dbData[i].PDRawData.split(',').map((val) => ~~val);
+    //@ts-ignore
+    dbData[i].LEDIntensities = dbData[i].LEDIntensities.split(',').map(
+      (val: any) => ~~val
+    );
+  }
+
+  return dbData;
+};
+
+export { prepareDbData, dbParser };

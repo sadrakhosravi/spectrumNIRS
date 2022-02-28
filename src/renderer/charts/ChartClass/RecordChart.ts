@@ -14,6 +14,7 @@ import {
   LUT,
   PalettedFill,
   SolidFill,
+  SolidLine,
 } from '@arction/lcjs';
 import { setIsAppLoading } from '@redux/AppStateSlice';
 
@@ -109,24 +110,35 @@ class RecordChart extends Chart {
     };
 
     calcWorker.onmessage = ({ data }) => {
-      this.drawData(data);
+      console.log(data);
+      this.drawData(data.filteredData);
+      // this.drawFilteredData(data.filteredData);
       dispatch(setIsAppLoading(false));
 
       UIWorkerManager.terminateCalcWorker();
     };
   };
 
-  drawData(data: number[][]) {
-    const dataLength = data.length;
-    const processedData: any[] = [[], [], [], [], []];
-    for (let i = 0; i < dataLength; i += 1) {
-      this.series.forEach((_series, j) => {
-        processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
-      });
-    }
-    this.series.forEach((series, iSeries) =>
-      series.add(processedData[iSeries])
-    );
+  drawFilteredData(data: any) {
+    const filteredSeries = this.charts[0]
+      .addLineSeries({
+        dataPattern: {
+          allowDataGrouping: true,
+          // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
+          pattern: 'ProgressiveX',
+          // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
+          regularProgressiveStep: true,
+        },
+      })
+      .setStrokeStyle(
+        new SolidLine({
+          thickness: 1.25,
+          fillStyle: new SolidFill({
+            color: ColorHEX('#CCC'),
+          }),
+        })
+      );
+    filteredSeries.add(data);
   }
 
   sendChartPositions = () => {
@@ -146,9 +158,11 @@ class RecordChart extends Chart {
 
   listenForData() {
     ipcRenderer.on('device:data', this.handleDeviceData);
+    // ipcRenderer.on('device:data', this.handleDummyData.bind(this));
     requestAnimationFrame(() => {
       this.handleDeviceData2();
     });
+    this.handleDummyDataFiltered();
   }
 
   handleDeviceData2() {
@@ -219,6 +233,37 @@ class RecordChart extends Chart {
         return { x: dataPoint[0], y: dataPoint[i + 1] };
       });
       this.seriesData[i].push(...channelData);
+      console.log(this.seriesData);
+    });
+  };
+
+  handleDummyData = (_event: any, _data: any) => {
+    console.log(_data);
+    this.series.forEach((series) => series.add(_data));
+  };
+
+  handleDummyDataFiltered = () => {
+    const filteredSeries = this.charts[0]
+      .addLineSeries({
+        dataPattern: {
+          allowDataGrouping: true,
+          // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
+          pattern: 'ProgressiveX',
+          // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
+          regularProgressiveStep: true,
+        },
+      })
+      .setStrokeStyle(
+        new SolidLine({
+          thickness: 1.25,
+          fillStyle: new SolidFill({
+            color: ColorHEX('#CCC'),
+          }),
+        })
+      );
+
+    ipcRenderer.on('device:filtered', (_event, data) => {
+      filteredSeries.add(data);
     });
   };
 

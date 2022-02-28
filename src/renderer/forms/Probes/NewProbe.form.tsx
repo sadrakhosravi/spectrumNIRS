@@ -11,6 +11,7 @@ import InputField from '@components/Form/InputField.component';
 import SensorIcon from '@icons/sensor.svg';
 import toast from 'react-hot-toast';
 import { closeModal } from '@redux/ModalStateSlice';
+import { setIsAppLoading } from '@redux/AppStateSlice';
 import SelectField, {
   SelectOption,
 } from '@components/Form/SelectField.component';
@@ -61,6 +62,10 @@ const NewProbeForm = () => {
       `Probe ${processedData.name} was created and set as the current probe successfully.`
     );
     dispatch(closeModal());
+    dispatch(setIsAppLoading(true));
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (

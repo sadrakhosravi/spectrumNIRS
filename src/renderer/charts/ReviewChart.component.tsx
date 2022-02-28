@@ -1,8 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '@redux/hooks/hooks';
-
-// HOC
-import withLoading from '@hoc/withLoading.hoc';
 
 // Components
 import ReviewChartClass from 'renderer/charts/ChartClass/ReviewChart';
@@ -14,29 +11,18 @@ import { useChartContext } from 'renderer/context/ChartProvider';
 import ReviewChartToolbar from './Toolbar/ReviewChartToolbar.component';
 
 type ChartProps = {
-  type: ChartType.RECORD | ChartType.REVIEW;
-  setLoading?: any;
   children?: JSX.Element | JSX.Element[];
 };
 
 // Prepares and enders the chart
-const ReviewChart = ({
-  type,
-  setLoading,
-  children,
-}: ChartProps): JSX.Element => {
-  const [chartLoaded, setChartLoaded] = useState(false);
-  const [isNewData, setIsNewData] = useState(false);
+const ReviewChart = ({ children }: ChartProps): JSX.Element => {
   const { setReviewChart } = useChartContext();
 
   const currentProbe = useAppSelector(
-    (state) => state.sensorState.currentProbe
+    (state) => state.global.probe?.currentProbe
   );
   const recordingId = useAppSelector(
     (state) => state.global.recording?.currentRecording?.id
-  );
-  const currentTimeStamp = useAppSelector(
-    (state) => state.chartState.currentEventTimeStamp
   );
   const reviewSidebar = useAppSelector((state) => state.appState.reviewSidebar);
   const windowResized = useAppSelector((state) => state.appState.windowResized);
@@ -58,7 +44,6 @@ const ReviewChart = ({
       // Store references to chart components.
       const chart = new ReviewChartClass(
         channels || ['No Channels Found'],
-        type,
         samplingRate,
         containerId
       );
@@ -69,9 +54,6 @@ const ReviewChart = ({
 
       // Keep a ref to the chart
       chartRef.current = chart as any;
-
-      setChartLoaded(true);
-      setLoading(false);
     });
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -82,7 +64,6 @@ const ReviewChart = ({
       console.log('destroy chart');
       chartRef.current?.cleanup();
       chartRef.current = undefined;
-      setChartLoaded(false);
     };
   }, [recordingId]);
 
@@ -97,21 +78,9 @@ const ReviewChart = ({
     resetChartSize();
   }, [reviewSidebar, windowResized, windowMaximized]);
 
-  useEffect(() => {
-    chartRef.current?.setInterval(currentTimeStamp);
-
-    return () => (chartRef.current = undefined);
-  }, [currentTimeStamp]);
-
-  useEffect(() => {
-    !isNewData && setIsNewData(true);
-  }, [recordingId]);
-
-  useEffect(() => {}, [isNewData]);
-
   return (
     <ChartLayout>
-      {chartLoaded && <ReviewChartToolbar type={type} />}
+      <ReviewChartToolbar type={ChartType.REVIEW} />
 
       <ChartContainer type={ChartType.REVIEW}>
         <div className="pointer-events-auto h-full" id={containerId} />
@@ -121,4 +90,4 @@ const ReviewChart = ({
   );
 };
 
-export default withLoading(ReviewChart, 'Loading Engine...');
+export default ReviewChart;

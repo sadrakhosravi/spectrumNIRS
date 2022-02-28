@@ -24,6 +24,8 @@ self.onmessage = ({ data }: { data: EventData }) => {
     );
   }
 
+  // Get the data as raw array
+
   let dbData = selectStmt.all(data.recordingId);
   const dbDataLength = dbData.length;
 

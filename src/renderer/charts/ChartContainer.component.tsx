@@ -20,7 +20,7 @@ export const ChartContainer = ({
   type,
 }: ChartContainerProps & { type: ChartType }) => {
   const currentProbe = useAppSelector(
-    (state) => state.sensorState.currentProbe
+    (state) => state.global.probe?.currentProbe
   );
 
   return (

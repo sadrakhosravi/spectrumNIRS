@@ -18,7 +18,7 @@ import zoomBandChart from './methods/ZoomBandChart';
 import ChartOptions from './ChartOptions';
 // import WorkerManager from 'workers/WorkerManager';
 import { getState, dispatch } from '@redux/store';
-import { setIsLoadingData } from '@redux/AppStateSlice';
+import { setIsAppLoading, setIsLoadingData } from '@redux/AppStateSlice';
 import { ChartChannels } from '@utils/channels';
 import { setAllEvents } from '@redux/ChartSlice';
 import { setReviewChartPositions } from '@redux/ReviewChartSlice';
@@ -36,11 +36,10 @@ class ReviewChart extends Chart {
 
   constructor(
     channels = ['Ch1', 'Ch2', 'Ch3', 'Ch4', 'Ch5'],
-    type: ChartType.RECORD | ChartType.REVIEW,
     samplingRate: number,
     containerId: string
   ) {
-    super(channels, type, samplingRate, containerId);
+    super(channels, ChartType.REVIEW, samplingRate, containerId);
     this.numberOfRows = this.channels.length + 1;
     this.chartOptions = undefined;
     this.zoomBandChart = undefined;
@@ -48,6 +47,7 @@ class ReviewChart extends Chart {
     this.isLoadingData = false;
     this.allData = [];
     this.drawAnimationFrameId = undefined;
+    dispatch(setIsAppLoading(true));
   }
 
   /**
@@ -90,9 +90,12 @@ class ReviewChart extends Chart {
   }
 
   loadInitialData = async () => {
-    console.log('LOAD INITIAL DATA');
     const recordingId = getState().global.recording?.currentRecording?.id;
-    if (!recordingId) return;
+
+    if (!recordingId) {
+      dispatch(setIsAppLoading(false));
+      return;
+    }
 
     const dbWorker = UIWorkerManager.getDatabaseWorker();
     const calcWorker = UIWorkerManager.getCalcWorker();
@@ -101,33 +104,29 @@ class ReviewChart extends Chart {
     dbWorker.postMessage({
       dbFilePath,
       recordingId,
-      limit: undefined, // 30seconds
     });
 
     dbWorker.onmessage = (event) => {
+      if (!event.data || event.data.length === 0) {
+        UIWorkerManager.terminateCalcWorker();
+        UIWorkerManager.terminateDatabaseWorker();
+        dispatch(setIsAppLoading(false));
+
+        return;
+      }
       calcWorker.postMessage(event.data);
       UIWorkerManager.terminateDatabaseWorker();
     };
 
     calcWorker.onmessage = ({ data }) => {
-      this.drawData(data);
+      console.log(data);
+      this.drawData(data.filteredData);
+      // this.drawFilteredData(data.filteredData);
+      dispatch(setIsAppLoading(false));
+
       UIWorkerManager.terminateCalcWorker();
     };
   };
-
-  drawData(data: number[][]) {
-    const dataLength = data.length;
-    const processedData: any[] = [[], [], [], [], []];
-    for (let i = 0; i < dataLength; i += 1) {
-      this.series.forEach((_series, j) => {
-        processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
-      });
-    }
-    this.series.forEach((series, iSeries) => {
-      series.add(processedData[iSeries]);
-      this.zoomBandChartSeries[iSeries].add(processedData[iSeries]);
-    });
-  }
 
   /**
    * Sorts the data array and sends it to the `LCJS` for the chart

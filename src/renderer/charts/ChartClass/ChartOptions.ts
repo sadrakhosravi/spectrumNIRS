@@ -87,16 +87,25 @@ class ChartOptions {
    * @param newTimeDivision - New time division to be set in milliseconds
    */
   setTimeDivision(newTimeDivision: number) {
-    if (!this.isReview) {
-      const axisX = this.charts[0].getDefaultAxisX();
-      const currentInterval = axisX.getInterval();
+    this.timeDivision = newTimeDivision;
+    const axisX = this.charts[0].getDefaultAxisX();
+    const currentInterval = axisX.getInterval();
 
+    if (this.isReview) {
+      axisX.setInterval(
+        currentInterval.start,
+        currentInterval.start + this.timeDivision,
+        0,
+        true
+      );
+    } else {
       axisX.setInterval(
         currentInterval.end - this.timeDivision,
         currentInterval.end
       );
     }
-    this.timeDivision = newTimeDivision;
+
+    axisX.release();
   }
 
   addMarker(name: string, color: string) {

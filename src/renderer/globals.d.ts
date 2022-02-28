@@ -96,6 +96,4 @@ declare namespace api {
 declare module '*.css';
 // global.d.ts
 declare module '*.mp3';
-
-declare module 'typedarray-to-buffer';
-declare module 'thread-stream';
+declare module 'fili';

@@ -43,6 +43,7 @@ class ChartClass {
   containerId: string;
   ChartOptions: any;
   UIPanel: null | UIPanel;
+  zoomBandChartSeries!: LineSeries[];
   xAxisChart!: ChartXY<PointMarker, UIBackground>;
   seriesToggles!: UICheckBox<
     UIBackground,
@@ -65,6 +66,7 @@ class ChartClass {
     this.TOILegend = null;
     this.ChartOptions = null;
     this.UIPanel = null;
+    this.zoomBandChartSeries;
   }
 
   createDashboard(numOfRows: number, container: string): Dashboard {
@@ -75,6 +77,25 @@ class ChartClass {
     this.xAxisChart = xAxisChart.bind(this)();
     customCursor.bind(this)();
     return this.dashboard;
+  }
+
+  drawData(data: number[][]) {
+    const dataLength = data.length;
+    const processedData: any[] = [[], [], [], [], []];
+    for (let i = 0; i < dataLength; i += 1) {
+      this.series.forEach((_series, j) => {
+        processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
+      });
+    }
+    this.series.forEach((series, iSeries) =>
+      series.add(processedData[iSeries])
+    );
+
+    if (this.zoomBandChartSeries) {
+      this.zoomBandChartSeries.forEach((series, iSeries) =>
+        series.add(processedData[iSeries])
+      );
+    }
   }
 
   /**

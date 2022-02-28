@@ -3,6 +3,8 @@ import fs from 'fs';
 import { dialog, BrowserWindow } from 'electron';
 import RecordingsData from 'db/entity/RecordingsData';
 import RecordingModel from './RecordingModel';
+import WorkerManager from './WorkerManager';
+import { dbParser } from '@lib/Stream/DatabaseParser';
 
 class ExportDB {
   constructor() {}
@@ -26,12 +28,17 @@ class ExportDB {
       if (!savePath) return 'canceled';
       if (!recordingId) return 'canceled';
 
+      console.time('exporttimer');
+
       // Create a write stream to write to a text file
       let writeStream = fs.createWriteStream(savePath + '.' + type);
 
       // Settings for querying data from the database.
       let offset = 0;
-      const LIMIT = 50000;
+      const LIMIT = 30000;
+
+      const calcWorkerData = { calcOnly: true, dataBatchSize: LIMIT };
+      const calcWorker = WorkerManager.getCalculationWorker(calcWorkerData);
 
       const columns = [
         'timeStamp',
@@ -45,6 +52,10 @@ class ExportDB {
 
       const columnTitles = [
         'timeStamp',
+        'O2Hb',
+        'HHb',
+        'THb',
+        'TOI',
         'PDRawData1',
         'PDRawData2',
         'PDRawData3',
@@ -77,40 +88,62 @@ class ExportDB {
           .offset(offset)
           .getRawMany();
 
-        const RAW_RECORDS_LENGTH = records.length;
-
         // If there's no recording data, break the loop
+        const RAW_RECORDS_LENGTH = records.length;
         if (RAW_RECORDS_LENGTH === 0) break;
-
-        for (let i = 0; i < RAW_RECORDS_LENGTH - 1; i++) {
-          for (const key in records[i]) {
-            if (key === 'gainValues123') {
-              const gain = JSON.parse(records[i][key]);
-              const hardwareGain = gain.hardware.join(' ');
-              const softwareGain = gain.software;
-
-              writeStream.write(hardwareGain + ',', 'utf-8');
-              writeStream.write(softwareGain + ',', 'utf-8');
-            } else if (key === 'events123') {
-              const events = JSON.parse(records[i][key]);
-              const allEvents = [];
-              for (const key in events) {
-                allEvents.push(`${key}: ${events[key]}`);
-              }
-              writeStream.write(allEvents.join(' ') + ',', 'utf-8');
-              allEvents.length = 0;
-            } else {
-              writeStream.write(records[i][key] + ',', 'utf-8');
-            }
-          }
-          writeStream.write('\n', 'utf-8');
-        }
-
         offset += LIMIT;
+
+        console.log(records.length);
+        console.log('start');
+
+        // Send the data to the calc worker
+        const data = dbParser(records);
+        calcWorker.postMessage(data);
+
+        // Wait for the calculated data
+        await new Promise((resolve, _reject) => {
+          calcWorker.on('message', (data) => {
+            console.log(data.length);
+            console.log('end');
+
+            for (let i = 0; i < RAW_RECORDS_LENGTH; i++) {
+              for (const key in records[i]) {
+                if (key === 'timeStamp') {
+                  writeStream.write(records[i][key] / 1000 + ',', 'utf-8');
+                  writeStream.write(data[i][1] + ',', 'utf-8');
+                  writeStream.write(data[i][2] + ',', 'utf-8');
+                  writeStream.write(data[i][3] + ',', 'utf-8');
+                  writeStream.write(data[i][4] + ',', 'utf-8');
+                } else if (key === 'gainValues123') {
+                  const gain = JSON.parse(records[i][key]);
+                  const hardwareGain = gain.hardware.join(' ');
+                  const softwareGain = gain.software;
+
+                  writeStream.write(hardwareGain + ',', 'utf-8');
+                  writeStream.write(softwareGain + ',', 'utf-8');
+                } else if (key === 'events123') {
+                  const events = JSON.parse(records[i][key]);
+                  const allEvents = [];
+                  for (const key in events) {
+                    allEvents.push(`${key}: ${events[key]}`);
+                  }
+                  writeStream.write(allEvents.join(' ') + ',', 'utf-8');
+                  allEvents.length = 0;
+                } else {
+                  writeStream.write(records[i][key] + ',', 'utf-8');
+                }
+              }
+              writeStream.write('\n', 'utf-8');
+            }
+            resolve(true);
+          });
+        });
       }
 
       // Close the write stream once done.
       writeStream.close();
+      WorkerManager.terminateAllWorkers();
+      console.timeEnd('exporttimer');
 
       return true;
     } catch (error: any) {

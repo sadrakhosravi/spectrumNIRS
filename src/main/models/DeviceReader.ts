@@ -7,7 +7,6 @@ import RecordingModel, {
   IRecordingData,
 } from '@electron/models/RecordingModel';
 import ProbesManager from './ProbesManager';
-// import dbParser from '@lib/Stream/DatabaseParser';
 
 import { Worker } from 'worker_threads';
 import DownSampler from 'calculations/DownSampler';
@@ -15,11 +14,12 @@ import DownSampler from 'calculations/DownSampler';
 import GlobalStore from '@lib/globalStore/GlobalStore';
 import { GeneralChannels } from '@utils/channels';
 import { DeviceAPI } from '@lib/Device/device-api';
-// import dbParser from '@lib/Stream/DatabaseParser';
 import { databaseFile } from '@electron/paths';
-import dbParser from '@lib/Stream/DatabaseParser';
+import { prepareDbData } from '@lib/Stream/DatabaseParser';
 import TimeStampGenerator from '@lib/Device/TimeStampGenerator';
 import V5Calculation from 'calculations/V5/V5Calculation';
+import IIRFilters from 'filters/IIRFilters';
+import AccurateTimer from '@electron/helpers/accurateTimer';
 
 export interface IDeviceInfo {
   samplingRate: number;
@@ -182,8 +182,6 @@ class DeviceReader {
    * Checks the given variables and calls the appropriate device reader function
    */
   readDevice() {
-    const device = this.device;
-
     let isDownSampled = false;
 
     // Check if we should down sample the data
@@ -207,11 +205,14 @@ class DeviceReader {
     // Start the device,
     this.startDevice();
 
-    this.deviceStream = device.Stream.getDeviceStream() as Readable;
-
+    this.deviceStream = this.device.Stream.getDeviceStream() as Readable;
+    console.log(isDownSampled);
     isDownSampled
       ? this.readDeviceDataWithDownSampling(this.deviceStream as Readable)
       : this.readDeviceData(this.deviceStream as Readable);
+
+    // TODO: Add signal generator option instead of commenting/uncommenting
+    // this.generateDummySignal();
 
     GlobalStore.setRecordState('isDeviceStarted', true);
   }
@@ -278,12 +279,14 @@ class DeviceReader {
     if (!recordingId) return;
 
     const V5Calc = new V5Calculation();
+    const filtered: any[] = [];
+    const lowpass = IIRFilters.getLowPassFilter();
 
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', async (chunk: string) => {
         // Parse the data and store it in the Shared Array
         const data = this.device.Parser(chunk, sharedDataBuffer);
-        const parsedData = dbParser(
+        const parsedData = prepareDbData(
           data,
           BATCH_SIZE,
           NUM_OF_DP,
@@ -298,15 +301,21 @@ class DeviceReader {
         // });
         const calculatedData = V5Calc.processRawData(data, BATCH_SIZE);
         let delta = this.timeStamp.getTimeDelta();
-
         calculatedData.forEach((dataPoint) => {
           dataPoint.unshift(this.timeStamp.getTimeStamp() + delta);
+          filtered.push({
+            x: this.timeStamp.getTimeStamp() + delta,
+            y: lowpass.singleStep(dataPoint[1]),
+          });
           delta += 10;
           TOI += dataPoint[dataPoint.length - 1];
           TOICount++;
         });
 
         this.mainWindow.send('device:data', calculatedData);
+        this.mainWindow.send('device:filtered', filtered);
+
+        filtered.length = 0;
         this.timeStamp.generateNextTimeStamp();
 
         // Send average TOI
@@ -355,7 +364,7 @@ class DeviceReader {
       deviceStream.on('data', async (chunk: string) => {
         // Parse the data and store it in the Shared Array
         const data = this.device.Parser(chunk, sharedDataBuffer);
-        // const dbData = dbParser(data, BATCH_SIZE, NUM_OF_DP);
+        // const dbData = prepareDbData(data, BATCH_SIZE, NUM_OF_DP);
 
         if (downSampler.getIsDataReady()) {
           downSampler.getOutput();
@@ -432,6 +441,38 @@ class DeviceReader {
         });
       });
     }
+  }
+
+  generateDummySignal() {
+    GlobalStore.setRecordState('recordState', 'recording');
+
+    const lowpass = IIRFilters.getLowPassFilter();
+    console.log(lowpass);
+
+    const signal = (t: number) => Math.sin(2 * Math.PI * t);
+    const delta = 1;
+    let t = 0;
+
+    const timer = new AccurateTimer(() => {
+      const output: any[] = [];
+      const filtered: any[] = [];
+      for (let i = 0; i < 100; i += 1) {
+        const y = signal(t / 100);
+        output.push({ x: t / 100, y });
+        filtered.push({ x: t / 100, y: lowpass.singleStep(y) });
+
+        t += delta;
+      }
+
+      this.mainWindow.send('device:data', output);
+      this.mainWindow.send('device:filtered', filtered);
+    }, 100);
+
+    timer.start();
+    // Stop after 15 s
+    setTimeout(() => {
+      timer.stop();
+    }, 30 * 1000);
   }
 }
 

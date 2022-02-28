@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
-// import { useAppSelector } from '@redux/hooks/hooks';
+import React, { useEffect, useRef } from 'react';
 
 // Components
 import RecordChartClass from './ChartClass/RecordChart';
@@ -17,7 +16,6 @@ type ChartProps = {};
 
 // Prepares and enders the chart
 const RecordChart = ({}: ChartProps): JSX.Element => {
-  const [_newData, _setNewData] = useState(false);
   const { setRecordChart } = useChartContext();
 
   const recordState = useAppSelector(
@@ -25,6 +23,9 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
   );
   const recordingId = useAppSelector(
     (state) => state.global.recording?.currentRecording?.id
+  );
+  const currentProbeId = useAppSelector(
+    (state) => state.global.probe?.currentProbe?.id
   );
 
   const chartRef = useRef<RecordChartClass | undefined>(undefined);
@@ -39,6 +40,7 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     chart = new RecordChartClass(containerId, ChartType.RECORD);
 
     chart.createRecordChart();
+    chart.listenForData();
     // Attach event listeners
 
     // Keep a ref to the chart
@@ -55,12 +57,10 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
       chartRef.current = undefined;
       setRecordChart(undefined);
     };
-  }, [recordingId]);
+  }, [recordingId, currentProbeId]);
 
   useEffect(() => {
-    recordState === 'recording'
-      ? chartRef.current?.listenForData()
-      : chartRef.current?.stopListeningForData();
+    recordState === 'recording';
   }, [recordState]);
 
   return (

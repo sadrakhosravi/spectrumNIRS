@@ -84,7 +84,6 @@ class V5Calculation {
     for (let i = 0; i < batchSize; i += 1) {
       // Prepare arrays for calculation
       const rawPDValues = dataBatch[i].PDRawData;
-
       const LEDIntValues = dataBatch[i].LEDIntensities;
 
       // Calculate values

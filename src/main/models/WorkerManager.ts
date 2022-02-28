@@ -36,8 +36,8 @@ class WorkerManager {
   }
 
   terminateAllWorkers() {
+    this.calculationWorker?.removeAllListeners();
     this.calculationWorker?.terminate();
-
     //@ts-ignore
     this.calculationWorker = undefined;
   }
