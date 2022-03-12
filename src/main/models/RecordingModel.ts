@@ -10,6 +10,8 @@ import PatientModel from './PatientModel';
 import { INewRecordingData } from 'interfaces/interfaces';
 import RecordingsData from 'db/entity/RecordingsData';
 
+import DBDataParser from './DBDataParser';
+
 export interface ITOIThreshold {
   minimum: number;
   maximum: number;
@@ -87,8 +89,8 @@ class RecordingModel {
 
     GlobalStore.setRecording('currentRecording', this.currentRecording);
 
-    const lastTimeStamp = await this.getCurrentRecordingLastTimeStamp();
-    this.lastTimeStamp = lastTimeStamp?.timeStamp || 0;
+    const lastTimeSequence = await this.getCurrentRecordingLastTimeStamp();
+    this.lastTimeStamp = lastTimeSequence || 0;
 
     GlobalStore.setRecording('lastTimeStamp', this.lastTimeStamp);
   };
@@ -110,16 +112,29 @@ class RecordingModel {
   /**
    * @returns the last timeStamp of the recording or undefined
    */
-  private getCurrentRecordingLastTimeStamp = async () => {
-    return await getConnection()
+  public getCurrentRecordingLastTimeStamp = async () => {
+    const lastRecord = await getConnection()
       .createQueryBuilder()
       .select()
       .from(RecordingsData, '')
       .where(`recordingId = ${this.currentRecording?.id}`)
       .orderBy({
-        timeStamp: 'DESC',
+        timeSequence: 'DESC',
       })
       .getRawOne();
+
+    if (lastRecord) {
+      const lastRecordUnpacked = DBDataParser.parseBlobData(lastRecord.data);
+
+      const lastTimeSequence =
+        lastRecord.timeSequence + lastRecordUnpacked.length * 10;
+      this.lastTimeStamp = lastTimeSequence;
+
+      return lastTimeSequence;
+    }
+
+    this.lastTimeStamp = 0;
+    return 0;
   };
 
   /**

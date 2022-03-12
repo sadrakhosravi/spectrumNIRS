@@ -1,48 +1,77 @@
 import SQLite3 from 'better-sqlite3';
+const BetterSqlite3 = require('better-sqlite3');
 
 let db: SQLite3.Database;
 
-type EventData = {
+type DBDataType = {
   dbFilePath: string;
   recordingId: number;
   limit: number; // 30seconds
+  port: MessagePort;
 };
 
-self.onmessage = ({ data }: { data: EventData }) => {
-  db = new SQLite3(data.dbFilePath, { fileMustExist: true, readonly: true });
+// const ONE_MINUTE = 60; // Seconds
+
+self.onmessage = ({ data }: { data: DBDataType }) => {
+  db = new BetterSqlite3(data.dbFilePath, {
+    fileMustExist: true,
+    readonly: true,
+  });
   if (!db) self.close();
 
-  let selectStmt;
+  const port = data.port;
 
+  // Edit default pragmas to get the fastest read from SQLite 3
+  db.pragma('cache_size = 8192');
+  db.pragma('page_size =8192');
+
+  // Select statements
+  let selectStmt;
+  let timeSelectStmt;
+
+  // Define prepared statements based on if there's a data limit
   if (data.limit) {
     selectStmt = db.prepare(
-      `SELECT * FROM recordings_data WHERE recordingId=? ORDER BY timeStamp DESC LIMIT ${data.limit}`
+      `SELECT data FROM recordings_data WHERE recordingId=? ORDER BY timeStamp DESC LIMIT 12`
+    );
+    timeSelectStmt = db.prepare(
+      `SELECT timeStamp, timeSequence FROM recordings_data WHERE recordingId=? ORDER BY timeStamp DESC LIMIT 12`
     );
   } else {
     selectStmt = db.prepare(
-      `SELECT * FROM recordings_data WHERE recordingId=? ORDER BY timeStamp ASC`
+      `SELECT data FROM recordings_data WHERE recordingId=?`
+    );
+    timeSelectStmt = db.prepare(
+      `SELECT timeStamp, timeSequence FROM recordings_data WHERE recordingId=?`
     );
   }
 
-  // Get the data as raw array
+  // For the fastest performance and easier iterations
+  selectStmt.raw(true); // Array result instead of obj
+  selectStmt.pluck(true); // Flattens the array
 
-  let dbData = selectStmt.all(data.recordingId);
-  const dbDataLength = dbData.length;
+  const dbData = selectStmt.all(data.recordingId);
+  const dbTimeData = timeSelectStmt.all(data.recordingId);
 
-  if (data.limit) dbData.reverse();
-
-  // // Process db data
-  for (let i = 0; i < dbDataLength; i += 1) {
-    dbData[i] = {
-      ...dbData[i],
-      LEDIntensities: dbData[i].LEDIntensities.split(',').map(
-        (intensities: any) => ~~intensities
-      ),
-      PDRawData: dbData[i].PDRawData.split(',').map(
-        (rawPdVal: any) => ~~rawPdVal
-      ),
-    };
+  // The array should be reversed for it to be properly graphed
+  if (data.limit) {
+    dbData.reverse();
+    dbTimeData.reverse();
   }
-  self.postMessage(dbData);
+
+  port.postMessage({
+    data: dbData,
+    timeData: dbTimeData,
+    byteLength: dbData[0]?.byteLength,
+    batchSize: dbData.length,
+  });
+
+  port.onmessage = ({ data }) => {
+    if (data === 'ok') {
+      port.close();
+      self.postMessage('end');
+    }
+  };
+
   db.close();
 };

@@ -81,12 +81,16 @@ class ChartClass {
 
   drawData(data: number[][]) {
     const dataLength = data.length;
-    const processedData: any[] = [[], [], [], [], []];
+    const seriesLength = this.series.length;
+    if (dataLength === 0 || seriesLength === 0) return;
+
+    const processedData: any[] = [[], [], [], []];
     for (let i = 0; i < dataLength; i += 1) {
-      this.series.forEach((_series, j) => {
-        processedData[j].push({ x: data[i][0], y: data[i][j + 1] });
-      });
+      for (let j = 0; j < seriesLength; j += 1) {
+        processedData[j].push({ x: Number(data[i][0]), y: data[i][j + 1] });
+      }
     }
+
     this.series.forEach((series, iSeries) =>
       series.add(processedData[iSeries])
     );

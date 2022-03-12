@@ -1,11 +1,13 @@
 class UIWorkerManager {
-  databaseWorker: undefined | Worker;
-  eventsWorker: undefined | Worker;
-  calcWorker: undefined | Worker;
+  private databaseWorker: undefined | Worker;
+  // private eventsWorker: undefined | Worker;
+  private calcWorker: undefined | Worker;
+  private exportdataWorker: undefined | Worker;
   constructor() {
     this.databaseWorker = undefined;
-    this.eventsWorker = undefined;
+    // this.eventsWorker = undefined;
     this.calcWorker = undefined;
+    this.exportdataWorker = undefined;
   }
 
   /**
@@ -44,6 +46,26 @@ class UIWorkerManager {
     if (this.calcWorker) {
       this.calcWorker.terminate();
       this.calcWorker = undefined;
+    }
+  }
+
+  /**
+   * @returns the UI database worker
+   */
+  getExportdataWorker() {
+    if (!this.exportdataWorker) {
+      this.exportdataWorker = new Worker(
+        //@ts-ignore
+        new URL('../workers/exportdata.worker.ts', import.meta.url)
+      );
+    }
+    return this.exportdataWorker;
+  }
+
+  terminateExportdataWorker() {
+    if (this.exportdataWorker) {
+      this.exportdataWorker.terminate();
+      this.exportdataWorker = undefined;
     }
   }
 }

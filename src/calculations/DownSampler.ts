@@ -1,34 +1,52 @@
+import { DeviceDataType } from '@electron/models/DeviceReader/DeviceDataTypes';
+import EventEmitter from 'events';
+
+/**
+ * Downsampler class that takes in data, downsamples it and
+ * returns the data in an event emitter structure.
+ */
 class DownSampler {
-  deviceSamplingRate: number;
-  downSampledRate: number;
-  downSamplingFactor: number;
-  outputData: number[][];
-  isDataReady: boolean;
-  batchSize: number;
-  elementsPerDP: any;
-  temp: number[];
-  count: number;
-  numOfOutputData: number;
-  sentOutputData: boolean;
+  private deviceSamplingRate: number;
+  private downSampledRate: number;
+  private downSamplingFactor: number;
+
+  private batchSize: number;
+  private temp: DeviceDataType;
+  private output: DeviceDataType;
+  private count: number;
+  private dataEmitter: EventEmitter;
+  private numOfADCChannels: number;
 
   constructor(
     deviceSamplingRate: number = 100,
     downSampledRate: number = 20,
     batchSize: number,
-    elementsPerDP: number
+    numOfADCChannels: number,
+    numOfPDs: number
   ) {
     this.deviceSamplingRate = deviceSamplingRate;
     this.downSampledRate = downSampledRate;
     this.batchSize = batchSize;
-    this.elementsPerDP = elementsPerDP;
+    this.numOfADCChannels = numOfADCChannels;
 
-    this.outputData = [];
-    this.sentOutputData = false;
-    this.temp = new Array(this.elementsPerDP).fill(0);
+    this.dataEmitter = new EventEmitter();
 
-    this.isDataReady = false;
+    //@ts-ignore
+    this.temp = {};
+    //@ts-ignore
+    this.output = {};
+
+    // Create the object based on num of PDs
+    for (let i = 0; i < numOfPDs; i += 1) {
+      this.temp[`ADC${i + 1}` as keyof DeviceDataType] = new Array(
+        numOfADCChannels
+      ).fill(0);
+      this.output[`ADC${i + 1}` as keyof DeviceDataType] = new Array(
+        numOfADCChannels
+      ).fill(0);
+    }
+
     this.count = 0;
-    this.numOfOutputData = 1;
 
     // Check down sampled rate
     if (this.downSampledRate > this.deviceSamplingRate) {
@@ -42,80 +60,54 @@ class DownSampler {
     // Check sampling factor
     if (this.downSamplingFactor % 1 !== 0) {
       throw new Error(
-        'The down sample factor cannot be a decimal. Please make sure that the device sampling rate divided by the down sampled rate produces an integer.'
+        `The down sample factor cannot be a decimal.
+        Please make sure that the device sampling rate divided by the down sampled rate produces an integer.`
       );
     }
-
-    this.calcNumOfOutputData();
   }
 
   /**
-   * @returns the down sampling factor
+   * @returns the data emitter for downsampled data
    */
-  getDownSamplingFactor() {
-    return this.downSamplingFactor;
+  public getDataEmitter() {
+    return this.dataEmitter;
   }
 
-  getOutput() {
-    this.isDataReady = false;
-    this.sentOutputData = true;
-    return this.outputData;
-  }
-
-  getIsDataReady() {
-    return this.isDataReady;
-  }
-
-  downSampleData(data: Int32Array) {
-    if (this.sentOutputData) {
-      this.outputData.length = 0;
-      this.sentOutputData = false;
-    }
-
-    let iData = 0;
+  /**
+   * Downsamples the data that was passed in and returns it
+   * @param data - The data batch to be downsampled
+   */
+  public downSampleData(data: DeviceDataType[]) {
     for (let i = 0; i < this.batchSize; i += 1) {
-      if (this.count === this.downSamplingFactor) {
-        this.outputData.push(
-          this.temp.map((value) => value / this.downSamplingFactor)
-        );
-        this.temp.forEach((_val, index) => (this.temp[index] = 0));
-        this.count = 0;
+      for (const ADC in data[i]) {
+        // Separate ADC data
+        const dataPoint = data[i][ADC as keyof DeviceDataType];
 
-        if (this.numOfOutputData === this.outputData.length) {
-          this.isDataReady = true;
+        // Add the values to the temp value to be averaged
+        for (let j = 0; j < this.numOfADCChannels; j += 1) {
+          this.temp[ADC as keyof DeviceDataType][j] += dataPoint[j];
         }
+        this.count++;
       }
-      // Separate each data point
-      const dataPoint = data.slice(iData, iData + this.elementsPerDP);
 
-      // Average data points
-      this.temp.forEach((value, index) => {
-        this.temp[index] = value + dataPoint[index];
-      });
+      // When the num of data points reach the downsampling factor, average and emit data
+      if (this.downSamplingFactor === this.count) {
+        // For each ADC/PDs, average data
+        for (const ADC in this.temp) {
+          // Average data
+          for (let k = 0; k < this.numOfADCChannels; k += 1) {
+            this.output[ADC as keyof DeviceDataType][k] = Math.round(
+              this.temp[ADC as keyof DeviceDataType][k] /
+                this.downSamplingFactor
+            );
+            this.temp[ADC as keyof DeviceDataType][k] = 0; // reset temp data
+          }
+        }
 
-      iData += this.elementsPerDP;
-      this.count++;
-    }
-  }
-
-  /**
-   * Calculated the number of output data point for optimizing performance
-   */
-  private calcNumOfOutputData() {
-    if (this.downSampledRate > 100) {
-      this.numOfOutputData = 10;
-    }
-
-    if (this.downSampledRate < 100 && this.downSampledRate > 50) {
-      this.numOfOutputData = 5;
-    }
-
-    if (this.downSampledRate < 50 && this.downSampledRate > 20) {
-      this.numOfOutputData = 3;
-    }
-
-    if (this.downSampledRate < 20) {
-      this.numOfOutputData = 1;
+        // Emit when data is ready
+        this.dataEmitter.emit('data', this.output);
+        this.count = 0;
+      }
     }
   }
 }

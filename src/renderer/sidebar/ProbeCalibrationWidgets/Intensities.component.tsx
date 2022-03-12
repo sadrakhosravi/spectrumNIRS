@@ -141,6 +141,8 @@ const Intensities = () => {
                         id={`LED${i}-value`}
                         className="absolute right-0 -bottom-4 w-12 bg-transparent text-base"
                         type="number"
+                        min="1"
+                        max="180"
                         onChange={handleInputChange}
                         defaultValue={intensity}
                       ></input>

@@ -7,12 +7,13 @@ import {
   IServerStatus,
   IDataSize,
   IDataTypes,
-} from '@electron/models/exportServer/ExportServer';
+} from '@electron/models/ExportServer/ExportServer';
 import { IExperimentData } from '@electron/models/ExperimentModel';
 import { IPatientData } from '@electron/models/PatientModel';
 import { IRecordingData } from '@electron/models/RecordingModel';
 import { CurrentProbe } from '@electron/models/ProbesManager';
-import { RecordState } from '@electron/models/DeviceReader';
+import { RecordState } from '@electron/models/DeviceReader/DeviceReader';
+import { ILiveFilter } from 'filters/LiveFilter';
 
 let storePath = '';
 
@@ -56,6 +57,11 @@ export interface IGlobalStore {
     currentProbe: CurrentProbe | null;
   };
   recordState: RecordState;
+  liveFilter: ILiveFilter;
+  filePaths: {
+    dbFile: string;
+    settings: string;
+  };
 }
 
 const initialState = {
@@ -177,6 +183,36 @@ class GlobalStore {
    */
   getRecordState = (key: keyof IGlobalStore['recordState']) =>
     this.store.get(`recordState.${key}`);
+
+  /**
+   * Sets the live filter state value
+   */
+  setLiveFilterState = (
+    key: 'lowpass' | 'highpass',
+    value: ILiveFilter['lowpass'] | ILiveFilter['highpass']
+  ) => this.store.set(`liveFilter.${key}`, value);
+
+  /**
+   * Removes the live filter key and all its values
+   */
+  removeLiveFilterState = () => this.store.set('liveFilter', {});
+
+  /**
+   * Gets a value from the live filter state
+   */
+  getLiveFilterState = (key: keyof IGlobalStore['liveFilter']) =>
+    this.store.get(`liveFilter.${key}`);
+
+  /**
+   * Sets the file path values
+   */
+  setFilePaths = (key: 'dbFile' | 'settings', value: string) =>
+    this.store.set(`filePaths.${key}`, value);
+
+  /**
+   * Removes the file paths and all its values
+   */
+  removeFilePaths = () => this.store.set('filePaths', {});
 }
 
 export type GlobalStoreType = GlobalStore;

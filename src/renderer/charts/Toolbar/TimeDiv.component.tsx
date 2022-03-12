@@ -33,6 +33,10 @@ const timeDivisions = [
     value: 10 * ms,
   },
   {
+    label: '15 s',
+    value: 15 * ms,
+  },
+  {
     label: '30 s',
     value: 30 * ms,
   },
@@ -60,7 +64,6 @@ const TimeDiv = ({ type }: { type: ChartType }) => {
 
   useEffect(() => {
     const timeDiv = chart?.chartOptions?.getTimeDivision() as number;
-    console.log(timeDiv);
     if (timeDiv) {
       setCurrentTimeDiv(
         timeDivisions.filter((time) => time.value === timeDiv)[0].label

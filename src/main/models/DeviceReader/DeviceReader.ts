@@ -1,12 +1,12 @@
 // Devices
 import V5 from 'devices/V5/V5';
-import { BrowserWindow, powerSaveBlocker } from 'electron';
+import { BrowserWindow, ipcMain, powerSaveBlocker } from 'electron';
 import { Readable } from 'stream';
-import WorkerManager from '@electron/models/WorkerManager';
 import RecordingModel, {
   IRecordingData,
 } from '@electron/models/RecordingModel';
-import ProbesManager from './ProbesManager';
+import ProbesManager from '../ProbesManager';
+import WorkerManager from '@electron/models/WorkerManager';
 
 import { Worker } from 'worker_threads';
 import DownSampler from 'calculations/DownSampler';
@@ -15,11 +15,16 @@ import GlobalStore from '@lib/globalStore/GlobalStore';
 import { GeneralChannels } from '@utils/channels';
 import { DeviceAPI } from '@lib/Device/device-api';
 import { databaseFile } from '@electron/paths';
-import { prepareDbData } from '@lib/Stream/DatabaseParser';
 import TimeStampGenerator from '@lib/Device/TimeStampGenerator';
 import V5Calculation from 'calculations/V5/V5Calculation';
-import IIRFilters from 'filters/IIRFilters';
-import AccurateTimer from '@electron/helpers/accurateTimer';
+
+import { DBDataModel } from '@lib/dataTypes/BinaryData';
+import LiveFilter from 'filters/LiveFilter';
+import { defaultLPCoef } from 'filters/filterConstants';
+
+// Deep copies an object in a performant way
+import { exportServer } from 'controllers/exportServer';
+import copyDeviceDataObject from '@electron/helpers/copyDeviceDataObj';
 
 export interface IDeviceInfo {
   samplingRate: number;
@@ -54,13 +59,14 @@ class DeviceReader {
    */
   probeCalibrationSamples: number;
   powerSaveBlocker: number;
-  timeStamp: TimeStampGenerator;
+  timeStamp!: TimeStampGenerator;
   calcWorker: Worker | undefined;
   recordingId: number | undefined;
   currentRecording: IRecordingData | undefined;
   events: { hypoxia: boolean; event2: boolean };
+  deviceData: any[];
 
-  constructor(lastTimeStamp?: number) {
+  constructor(_lastTimeStamp?: number) {
     this.currentRecording = RecordingModel.getCurrentRecording();
     this.recordingSettings = this.currentRecording?.settings as
       | JSON
@@ -82,6 +88,8 @@ class DeviceReader {
     this.deviceStream = undefined;
     this.deviceLogStream = undefined;
 
+    this.deviceData = [];
+
     // Sampling data
     this.deviceSamplingRate =
       this.recordingSettings?.device?.defaultSamplingRate || 100;
@@ -93,22 +101,19 @@ class DeviceReader {
     this.probeCalibrationSamples = 10;
     this.powerSaveBlocker = 0;
 
-    this.timeStamp = new TimeStampGenerator(
-      this.device.Stream.getDataBatchSize(),
-      lastTimeStamp || RecordingModel.getLastTimeStamp() || 0
-    );
-
     this.calcWorker = undefined;
     this.events = {
       hypoxia: false,
       event2: false,
     };
+
+    console.log('DEVICE READER CREATED');
   }
 
   /**
    * Starts the device and registers its input commands
    */
-  startDevice() {
+  startDevice = async () => {
     // Start the device
     this.device.Device.startDevice();
     // Connect to device input listener
@@ -118,18 +123,23 @@ class DeviceReader {
     }, this.device.Device.getStartupDelay());
 
     GlobalStore.setRecordState('isDeviceStarted', true);
-  }
+  };
 
   /**
    * Stops the physical device and cleans all the listeners
    */
   stopDevice() {
+    exportServer?.getIsStreaming() && exportServer?.stopStream();
+
     console.log('DEVICE STOPPED');
     this.terminateDevice();
 
     powerSaveBlocker.stop(this.powerSaveBlocker);
   }
 
+  /**
+   * Terminates the active device reader and sets the states accordingly
+   */
   terminateDevice() {
     this.deviceStream?.removeAllListeners();
     this.deviceLogStream?.removeAllListeners();
@@ -143,13 +153,23 @@ class DeviceReader {
     this.calcWorker?.removeListener('message', this.listenForCalcWorkerData);
     this.calcWorker = undefined;
 
+    const dbProcess = BrowserWindow.getAllWindows()[1];
+
+    this.deviceData.length !== 0 && this.sendDbData(dbProcess);
+    dbProcess.webContents.send('db:close');
+
+    ipcMain.removeAllListeners('calc:live-filter-lowpass');
+    ipcMain.removeAllListeners('calc:live-filter-highpass');
     WorkerManager.terminateAllWorkers();
   }
 
   pauseDevice() {
+    exportServer?.pauseStream();
+
     this.terminateDevice();
     GlobalStore.setRecordState('recordState', 'pause');
     GlobalStore.setRecordState('isDeviceStarted', false);
+
     powerSaveBlocker.stop(this.powerSaveBlocker);
   }
 
@@ -181,8 +201,15 @@ class DeviceReader {
   /**
    * Checks the given variables and calls the appropriate device reader function
    */
-  readDevice() {
+  readDevice = async () => {
     let isDownSampled = false;
+
+    const lastTimeStamp =
+      await RecordingModel.getCurrentRecordingLastTimeStamp();
+    this.timeStamp = new TimeStampGenerator(
+      this.device.Stream.getDataBatchSize(),
+      lastTimeStamp || 0
+    );
 
     // Check if we should down sample the data
     if (this.downSampleFactor !== 1) {
@@ -203,10 +230,14 @@ class DeviceReader {
     this.powerSaveBlocker = powerSaveBlocker.start('prevent-app-suspension');
 
     // Start the device,
-    this.startDevice();
+    await this.startDevice();
 
     this.deviceStream = this.device.Stream.getDeviceStream() as Readable;
-    console.log(isDownSampled);
+
+    if (exportServer && exportServer.getDoesHaveActiveListeners()) {
+      exportServer.startStream();
+    }
+
     isDownSampled
       ? this.readDeviceDataWithDownSampling(this.deviceStream as Readable)
       : this.readDeviceData(this.deviceStream as Readable);
@@ -215,7 +246,7 @@ class DeviceReader {
     // this.generateDummySignal();
 
     GlobalStore.setRecordState('isDeviceStarted', true);
-  }
+  };
 
   /**
    * @returns the database and calculation worker
@@ -233,6 +264,7 @@ class DeviceReader {
       numOfElementsPerDataPoint:
         this.device.Stream.getNumOfElementsPerDataPoint(),
       dbFilePath: databaseFile,
+      recordingId: RecordingModel.getCurrentRecording()?.id,
     };
 
     // DB initialization
@@ -257,8 +289,10 @@ class DeviceReader {
     const device = this.device;
 
     // Device number of elements and number of data points send to NodeJS
-    const NUM_OF_DP = device.Stream.getNumOfElementsPerDataPoint();
     const BATCH_SIZE = device.Stream.getDataBatchSize();
+    const SAMPLING_RATE = this.recordingSettings?.samplingRate || 100;
+    const DB_SAVE_INTERVAL = SAMPLING_RATE * 5; // Saves every 5 seconds of data as one packet;
+    const TIME_DELTA = this.timeStamp.getTimeDelta();
 
     // TOI Value
     const TOIAverageFactor =
@@ -268,55 +302,75 @@ class DeviceReader {
 
     // The size of the Shared Array buffer used to speed of communication between
     // multiple threads.
-    const SAB_SIZE = NUM_OF_DP * BATCH_SIZE;
-    const SAB = new SharedArrayBuffer(SAB_SIZE * Int32Array.BYTES_PER_ELEMENT);
-    const sharedDataBuffer = new Int32Array(SAB);
 
     // Start workers
+    //@ts-ignore
     const { dbProcess } = this.startWorkers();
 
     const recordingId = RecordingModel.getCurrentRecording()?.id;
     if (!recordingId) return;
 
-    const V5Calc = new V5Calculation();
-    const filtered: any[] = [];
-    const lowpass = IIRFilters.getLowPassFilter();
+    const LEDIntensities = ProbesManager.getCurrentProbe()
+      ?.intensities as number[];
+
+    // Calculations
+    const V5Calc = new V5Calculation(LEDIntensities);
+    const filters = new LiveFilter(5);
+    filters.createLowpassFilters(
+      SAMPLING_RATE,
+      defaultLPCoef.Fc,
+      defaultLPCoef.order
+    );
+
+    ipcMain.on('calc:live-filter-lowpass', (_event, data) => {
+      filters.createLowpassFilters(SAMPLING_RATE, data.Fc, data.order);
+    });
+    ipcMain.on('calc:live-filter-highpass', (_event, data) => {
+      filters.createHighpassFilters(SAMPLING_RATE, data.Fc, data.order);
+      console.log('HIGHPASS TRIGGERED');
+    });
+
+    let dataPointCount = 0;
 
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', async (chunk: string) => {
+        // Send data to the database writer every 5 second
+        if (dataPointCount === DB_SAVE_INTERVAL) {
+          this.sendDbData(dbProcess);
+          dataPointCount = 0;
+        }
+
         // Parse the data and store it in the Shared Array
-        const data = this.device.Parser(chunk, sharedDataBuffer);
-        const parsedData = prepareDbData(
-          data,
-          BATCH_SIZE,
-          NUM_OF_DP,
-          this.timeStamp.addTimeDelta,
-          recordingId
-        );
-        dbProcess.webContents.send('db:data', parsedData);
-        // calcWorker.postMessage({
-        //   data,
-        //   timeStamp: this.timeStamp.getTimeStamp(),
-        //   timeDelta: this.timeStamp.getTimeDelta(),
-        // });
-        const calculatedData = V5Calc.processRawData(data, BATCH_SIZE);
-        let delta = this.timeStamp.getTimeDelta();
+        const data = this.device.Parser(chunk);
+        this.deviceData.push(...data);
+
+        //@ts-ignore
+        const data_copy = copyDeviceDataObject(data, BATCH_SIZE);
+
+        // Filter then calc data
+        const filteredData = filters.filterData(data_copy);
+        const calculatedData = V5Calc.processRawData(filteredData, BATCH_SIZE);
+
+        // Add timeStamp to the data that is going to be graphed
+        let tDelta = 0;
         calculatedData.forEach((dataPoint) => {
-          dataPoint.unshift(this.timeStamp.getTimeStamp() + delta);
-          filtered.push({
-            x: this.timeStamp.getTimeStamp() + delta,
-            y: lowpass.singleStep(dataPoint[1]),
-          });
-          delta += 10;
+          dataPoint[0] = this.timeStamp.getTimeStamp() + tDelta;
+          tDelta += TIME_DELTA;
           TOI += dataPoint[dataPoint.length - 1];
           TOICount++;
         });
 
         this.mainWindow.send('device:data', calculatedData);
-        this.mainWindow.send('device:filtered', filtered);
 
-        filtered.length = 0;
-        this.timeStamp.generateNextTimeStamp();
+        if (exportServer) {
+          const calcData = V5Calc.processRawData(
+            data,
+            BATCH_SIZE,
+            this.timeStamp.getTimeStamp(),
+            TIME_DELTA
+          );
+          exportServer?.send(calcData, calcData.length);
+        }
 
         // Send average TOI
         if (TOICount === TOIAverageFactor) {
@@ -324,8 +378,36 @@ class DeviceReader {
           TOI = 0;
           TOICount = 0;
         }
+
+        // Add counters
+        this.timeStamp.generateNextTimeStamp();
+        dataPointCount += BATCH_SIZE;
       });
     }
+  }
+
+  /**
+   * Send the device data buffer to the db process
+   * @param dbProcess - The db renderer process to send data to
+   */
+  sendDbData(dbProcess: Electron.BrowserWindow) {
+    console.time('startCompress');
+
+    const dbDataBuffer = DBDataModel.toBuffer(this.deviceData);
+    // const dbBuffer = Buffer.from(buffer);
+
+    const timeSequence =
+      this.timeStamp.getTimeStamp() -
+      this.deviceData.length * this.timeStamp.getTimeDelta();
+
+    dbProcess.webContents.send('db:data', {
+      data: dbDataBuffer,
+      timeSequence: timeSequence,
+      timeStamp: Date.now(),
+    });
+
+    this.deviceData.length = 0;
+    console.timeEnd('startCompress');
   }
 
   /**
@@ -337,14 +419,12 @@ class DeviceReader {
     const device = this.device;
 
     // Device number of elements and number of data points send to NodeJS
-    const NUM_OF_DP = device.Stream.getNumOfElementsPerDataPoint();
     const BATCH_SIZE = device.Stream.getDataBatchSize();
+    const ADC_CHANNELS = this.device.Device.getADCNumOfChannels();
+    const NUM_OF_PDs = this.device.Device.getNumOfPDs();
 
     // The size of the Shared Array buffer used to speed of communication between
     // multiple threads.
-    const SAB_SIZE = NUM_OF_DP * BATCH_SIZE;
-    const SAB = new SharedArrayBuffer(SAB_SIZE * Int32Array.BYTES_PER_ELEMENT);
-    const sharedDataBuffer = new Int32Array(SAB);
 
     // const deviceSamplingRate = device.Device.getDefaultSamplingRate();
     // const probeSamplingRate = ProbesManager.currentProbe
@@ -354,7 +434,8 @@ class DeviceReader {
       100,
       this.probeCalibrationSamples,
       BATCH_SIZE,
-      NUM_OF_DP
+      ADC_CHANNELS,
+      NUM_OF_PDs
     );
 
     // Start workers
@@ -363,18 +444,18 @@ class DeviceReader {
     if (deviceStream instanceof Readable) {
       deviceStream.on('data', async (chunk: string) => {
         // Parse the data and store it in the Shared Array
-        const data = this.device.Parser(chunk, sharedDataBuffer);
+        const data = this.device.Parser(chunk);
         // const dbData = prepareDbData(data, BATCH_SIZE, NUM_OF_DP);
-
-        if (downSampler.getIsDataReady()) {
-          downSampler.getOutput();
-        }
 
         downSampler.downSampleData(data);
       });
     }
   }
 
+  /**
+   * Toggles the specified event to be saved
+   * @param event - The event object
+   */
   toggleEvent(event: object | any) {
     const eventName = Object.keys(event)[0] as keyof typeof this.events;
     const eventState = event[eventName] as boolean;
@@ -385,48 +466,46 @@ class DeviceReader {
    * Reads the device data without saving/processing it
    * Used mainly for probe calibration
    */
-  readDeviceDataOnly() {
+  readDeviceDataOnly = async () => {
     // Update state
     GlobalStore.setRecordState('isCalibrating', true);
 
     // Start the device first and register its input
-    this.startDevice();
+    await this.startDevice();
 
     const deviceName = this.device.Device.getDeviceName();
 
     this.deviceStream = this.device.Stream.getDeviceStream();
-    const deviceParser = this.device.Parser;
+    const Parser = this.device.Parser;
 
-    // Device number of elements and number of data points send to NodeJS
-    const NUM_OF_DP = this.device.Stream.getNumOfElementsPerDataPoint();
+    // Get device stream info
     const BATCH_SIZE = this.device.Stream.getDataBatchSize();
-
-    const SIZE = NUM_OF_DP * BATCH_SIZE;
-    const typedArray = new Int32Array(SIZE);
+    const ADC_CHANNELS = this.device.Device.getADCNumOfChannels();
+    const NUM_OF_PDs = this.device.Device.getNumOfPDs();
 
     // Average data to 2Hz
     const downSampler = new DownSampler(
       this.device.Device.getDefaultSamplingRate(),
       this.probeCalibrationSamples,
       BATCH_SIZE,
-      NUM_OF_DP
+      ADC_CHANNELS,
+      NUM_OF_PDs
     );
 
+    const downSamplerData = downSampler.getDataEmitter();
+
+    // Listen for when the downsampled data is ready
+    downSamplerData.on('data', (data) =>
+      this.mainWindow.send('device:calibration', data)
+    );
+
+    // If device reader stream is readable, read data
     if (this.deviceStream instanceof Readable) {
       this.deviceStream.on('data', (chunk: string) => {
-        if (downSampler.getIsDataReady()) {
-          const outputData = downSampler.getOutput();
-
-          if (outputData.length > 1)
-            throw Error(
-              'Something went wrong. Down sampling engine did not produce the right value'
-            );
-
-          this.mainWindow.send('device:calibration', outputData[0].slice(0, 6));
-        }
-
-        const data = deviceParser(chunk, typedArray);
+        console.time('downsample');
+        const data = Parser(chunk);
         downSampler.downSampleData(data);
+        console.timeEnd('downsample');
       });
     }
 
@@ -441,39 +520,7 @@ class DeviceReader {
         });
       });
     }
-  }
-
-  generateDummySignal() {
-    GlobalStore.setRecordState('recordState', 'recording');
-
-    const lowpass = IIRFilters.getLowPassFilter();
-    console.log(lowpass);
-
-    const signal = (t: number) => Math.sin(2 * Math.PI * t);
-    const delta = 1;
-    let t = 0;
-
-    const timer = new AccurateTimer(() => {
-      const output: any[] = [];
-      const filtered: any[] = [];
-      for (let i = 0; i < 100; i += 1) {
-        const y = signal(t / 100);
-        output.push({ x: t / 100, y });
-        filtered.push({ x: t / 100, y: lowpass.singleStep(y) });
-
-        t += delta;
-      }
-
-      this.mainWindow.send('device:data', output);
-      this.mainWindow.send('device:filtered', filtered);
-    }, 100);
-
-    timer.start();
-    // Stop after 15 s
-    setTimeout(() => {
-      timer.stop();
-    }, 30 * 1000);
-  }
+  };
 }
 
 export default DeviceReader;

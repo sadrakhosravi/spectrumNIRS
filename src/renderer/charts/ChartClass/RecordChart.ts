@@ -17,6 +17,7 @@ import {
   SolidLine,
 } from '@arction/lcjs';
 import { setIsAppLoading } from '@redux/AppStateSlice';
+import SeriesToggle from './methods/SeriesToggles';
 
 class RecordChart extends Chart {
   numberOfRows: number;
@@ -27,6 +28,8 @@ class RecordChart extends Chart {
   count: number;
   minTOIVal: number | undefined;
   maxTOIVal: number | undefined;
+  dummySeries: any[];
+  dummySeriesData: any[];
   constructor(
     containerId: string,
     type: ChartType.RECORD | ChartType.REVIEW,
@@ -53,6 +56,9 @@ class RecordChart extends Chart {
 
     this.maxTOIVal =
       getState().global.recording?.currentRecording?.settings.TOIThreshold?.maximum;
+
+    this.dummySeries = [];
+    this.dummySeriesData = [[], [], [], []];
 
     dispatch(setIsAppLoading(true));
   }
@@ -81,6 +87,8 @@ class RecordChart extends Chart {
 
   loadInitialData = async () => {
     const recordingId = getState().global.recording?.currentRecording?.id;
+    const recordingSettings = getState().global.recording?.currentRecording
+      ?.settings as any;
 
     if (!recordingId) {
       dispatch(setIsAppLoading(false));
@@ -90,34 +98,55 @@ class RecordChart extends Chart {
     const dbWorker = UIWorkerManager.getDatabaseWorker();
     const calcWorker = UIWorkerManager.getCalcWorker();
     const dbFilePath = await window.api.invokeIPC('get-database-path');
+    const msgChannel = new MessageChannel();
 
-    dbWorker.postMessage({
-      dbFilePath,
-      recordingId,
-      limit: 30 * this.samplingRate, // 30seconds
-    });
+    dbWorker.postMessage(
+      {
+        dbFilePath,
+        recordingId,
+        limit: 30 * this.samplingRate,
+        port: msgChannel.port1,
+      },
+      { transfer: [msgChannel.port1] }
+    );
 
-    dbWorker.onmessage = (event) => {
-      if (!event.data || event.data.length === 0) {
+    calcWorker.postMessage(
+      {
+        port: msgChannel.port2,
+        samplingRate:
+          (typeof recordingSettings === 'string' &&
+            JSON.parse(recordingSettings).probe?.samplingRate) ||
+          100,
+      },
+      { transfer: [msgChannel.port2] }
+    );
+    msgChannel.port1.start();
+    msgChannel.port2.start();
+
+    dbWorker.onmessage = ({ data }) => {
+      if (!data || data === 'end') {
         UIWorkerManager.terminateCalcWorker();
         UIWorkerManager.terminateDatabaseWorker();
         dispatch(setIsAppLoading(false));
+        msgChannel.port1.close();
+        msgChannel.port2.close();
 
         return;
       }
-      calcWorker.postMessage(event.data);
-      UIWorkerManager.terminateDatabaseWorker();
     };
 
     calcWorker.onmessage = ({ data }) => {
-      console.log(data);
-      this.drawData(data.filteredData);
+      this.drawData(data);
       // this.drawFilteredData(data.filteredData);
       dispatch(setIsAppLoading(false));
 
-      UIWorkerManager.terminateCalcWorker();
+      // UIWorkerManager.terminateCalcWorker();
     };
   };
+
+  stopChartLoading() {
+    dispatch(setIsAppLoading(false));
+  }
 
   drawFilteredData(data: any) {
     const filteredSeries = this.charts[0]
@@ -158,11 +187,14 @@ class RecordChart extends Chart {
 
   listenForData() {
     ipcRenderer.on('device:data', this.handleDeviceData);
-    // ipcRenderer.on('device:data', this.handleDummyData.bind(this));
-    requestAnimationFrame(() => {
+    this.seriesToggles = SeriesToggle.bind(this)();
+
+    // ipcRenderer.on('device:calcData', this.handleDummyData.bind(this));
+    this.stepXAxisFrame = requestAnimationFrame(() => {
       this.handleDeviceData2();
     });
-    this.handleDummyDataFiltered();
+
+    // this.handleDummyDataFiltered();
   }
 
   handleDeviceData2() {
@@ -187,10 +219,28 @@ class RecordChart extends Chart {
         seriesNewDataPoints[iChannel] = newDataPoints;
       }
 
+      const dummySeriesDataPoints: any[] = [];
+      for (let iChannel = 0; iChannel < this.dummySeries.length; iChannel++) {
+        const nDataset =
+          this.dummySeriesData[iChannel % this.dummySeriesData.length];
+        const newDataPoints = [];
+        for (let iDp = 0; iDp < newDataPointsCount; iDp++) {
+          const point = nDataset[iDp];
+          if (point) newDataPoints.push(point);
+        }
+        dummySeriesDataPoints[iChannel] = newDataPoints;
+      }
+
       this.series.forEach((nSeries, iSeries) =>
         nSeries.add(seriesNewDataPoints[iSeries])
       );
+      this.dummySeries.forEach((nSeries, iSeries) =>
+        nSeries.add(dummySeriesDataPoints[iSeries])
+      );
       this.seriesData.forEach((data) => data.splice(0, newDataPointsCount));
+      this.dummySeriesData.forEach((data) =>
+        data.splice(0, newDataPointsCount)
+      );
 
       // Request next frame.
       tPrev = tNow;
@@ -233,42 +283,52 @@ class RecordChart extends Chart {
         return { x: dataPoint[0], y: dataPoint[i + 1] };
       });
       this.seriesData[i].push(...channelData);
-      console.log(this.seriesData);
     });
   };
 
   handleDummyData = (_event: any, _data: any) => {
-    console.log(_data);
     this.series.forEach((series) => series.add(_data));
   };
 
   handleDummyDataFiltered = () => {
-    const filteredSeries = this.charts[0]
-      .addLineSeries({
-        dataPattern: {
-          allowDataGrouping: true,
-          // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
-          pattern: 'ProgressiveX',
-          // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
-          regularProgressiveStep: true,
-        },
-      })
-      .setStrokeStyle(
-        new SolidLine({
-          thickness: 1.25,
-          fillStyle: new SolidFill({
-            color: ColorHEX('#CCC'),
-          }),
+    this.dummySeries = this.charts.map((chart, i) =>
+      chart
+        .addLineSeries({
+          dataPattern: {
+            allowDataGrouping: true,
+            // pattern: 'ProgressiveX' => Each consecutive data point has increased X coordinate.
+            pattern: 'ProgressiveX',
+            // regularProgressiveStep: true => The X step between each consecutive data point is regular (for example, always `1.0`).
+            regularProgressiveStep: true,
+          },
         })
-      );
+        .setName(this.channels[i] + ' Unfiltered')
+        .setStrokeStyle(
+          new SolidLine({
+            thickness: 1.25,
+            fillStyle: new SolidFill({
+              color: ColorHEX('#CCC'),
+            }),
+          })
+        )
+    );
 
-    ipcRenderer.on('device:filtered', (_event, data) => {
-      filteredSeries.add(data);
+    ipcRenderer.on('device:calcData', (_event, _data) => {
+      this.dummySeries.forEach(async (_series, i) => {
+        const channelData = _data.map((dataPoint: any) => {
+          return { x: dataPoint[0], y: dataPoint[i + 1] };
+        });
+        this.dummySeriesData[i].push(...channelData);
+      });
     });
   };
 
   stopListeningForData() {
+    ipcRenderer.removeListener('device:data', this.handleDeviceData);
     ipcRenderer.removeAllListeners('device:data');
+    ipcRenderer.removeAllListeners('device:calcData');
+    this.dummySeries.forEach((series) => series.dispose());
+    this.dummySeries.length = 0;
     cancelAnimationFrame(this.stepXAxisFrame);
     setImmediate(() => cancelAnimationFrame(this.stepXAxisFrame));
     dispatch(setTOIValue(undefined));

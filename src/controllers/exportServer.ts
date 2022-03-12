@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
-import ExportServer from '@electron/models/exportServer/ExportServer';
+import ExportServer from '@electron/models/ExportServer/ExportServer';
 import { ExportServerChannels } from '@utils/channels';
 
-let exportServer: ExportServer | undefined;
+export let exportServer: ExportServer | undefined;
 
 // Starts the server and sends the initial data to the UI
 const startServer = async () => {
@@ -29,21 +29,6 @@ ipcMain.handle(ExportServerChannels.StartServer, () => {
     startServer();
   }
 });
-
-// Stream data to all sockets
-ipcMain.handle(ExportServerChannels.StartStream, () =>
-  exportServer?.startStream()
-);
-
-// Stream data to all sockets
-ipcMain.handle(ExportServerChannels.StopStream, () =>
-  exportServer?.stopStream()
-);
-
-// Stream data to all sockets
-ipcMain.handle(ExportServerChannels.PauseStream, () =>
-  exportServer?.pauseStream()
-);
 
 // Stops the server
 ipcMain.handle(ExportServerChannels.StopServer, () => stopServer());

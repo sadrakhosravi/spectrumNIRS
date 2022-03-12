@@ -11,6 +11,7 @@ import ChartLayout, { ChartContainer } from './ChartContainer.component';
 import { useChartContext } from 'renderer/context/ChartProvider';
 import RecordChartToolbar from './Toolbar/RecordChartToolbar.component';
 import { useAppSelector } from '@redux/hooks/hooks';
+import { getState } from '@redux/store';
 
 type ChartProps = {};
 
@@ -40,14 +41,19 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     chart = new RecordChartClass(containerId, ChartType.RECORD);
 
     chart.createRecordChart();
-    chart.listenForData();
-    // Attach event listeners
 
     // Keep a ref to the chart
     chartRef.current = chart as RecordChartClass;
     setRecordChart(chart);
-
     chart.loadInitialData();
+
+    const recordState = getState().global.recordState?.recordState;
+
+    if (recordState !== 'continue' && recordState !== 'recording') {
+      chart.loadInitialData();
+    } else {
+      chart.stopChartLoading();
+    }
 
     // Return function that will destroy the chart when component is unmounted.
     return () => {
@@ -60,7 +66,11 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
   }, [recordingId, currentProbeId]);
 
   useEffect(() => {
-    recordState === 'recording';
+    if (recordState === 'recording' || recordState === 'continue') {
+      chartRef.current?.listenForData();
+    } else {
+      chartRef.current?.stopListeningForData();
+    }
   }, [recordState]);
 
   return (

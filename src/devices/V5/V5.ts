@@ -16,9 +16,11 @@ import {
 import { Readable } from 'stream';
 import { app } from 'electron';
 import net from 'node:net';
+import { DeviceDataType } from '@electron/models/DeviceReader/DeviceDataTypes';
 
 // Constants
-const NUM_OF_DATAPOINTS_PER_CHUNK = 10;
+const BATCH_SIZE = 10;
+const PD_CHANNELS = 5;
 const NUM_OF_ELEMENTS_PER_DATAPOINT = 12;
 
 /**
@@ -30,8 +32,8 @@ class V5Device implements INIRSDevice {
   version: string;
   samplingRates: number[];
   defaultSamplingRate: number;
-  PDs: { name: string; location: string }[];
-  LEDs: number[];
+  PDs: { name: string; location: string; channels: number }[];
+  LEDWaveLengths: number[];
   startupDelay: number;
   spawnedDevices: ChildProcessWithoutNullStreams[];
 
@@ -41,8 +43,8 @@ class V5Device implements INIRSDevice {
     this.version = '1.0.0';
     this.samplingRates = [1.0, 5.0, 25.0, 50.0, 100.0];
     this.defaultSamplingRate = 100;
-    this.PDs = [{ name: 'main', location: 'main' }];
-    this.LEDs = [680, 740, 810, 840, 950];
+    this.PDs = [{ name: 'main', location: 'main', channels: 5 }];
+    this.LEDWaveLengths = [680, 740, 810, 840, 950];
     this.startupDelay = 500;
 
     this.spawnedDevices = [];
@@ -81,11 +83,15 @@ class V5Device implements INIRSDevice {
 
   public getDeviceSerialNumber = () => this.serialNumber;
 
-  public getNumberOfLEDs = () => this.LEDs.length;
+  public getNumOfLEDs = () => this.LEDWaveLengths.length;
+
+  public getADCNumOfChannels = () => 6;
+
+  public getNumOfPDs = () => 1;
 
   public getPDs = () => this.PDs;
 
-  public getNumberOfPD = () => this.PDs.length;
+  public getNumOfPD = () => this.PDs.length;
 
   public getSupportedSamplingRates = () => this.samplingRates;
 
@@ -169,7 +175,7 @@ class V5Stream implements IDeviceStream {
     this.streamType = 'stdout';
     this.sampleBufferSizeInBytes = 1350;
     this.outputBufferSizeToUIInBytes = 220;
-    this.dataBatchSize = NUM_OF_DATAPOINTS_PER_CHUNK;
+    this.dataBatchSize = BATCH_SIZE;
     this.numOfElementsPerDataPoint = NUM_OF_ELEMENTS_PER_DATAPOINT;
     this.deviceStream = undefined;
     this.deviceLogStream = undefined;
@@ -221,24 +227,25 @@ class V5Stream implements IDeviceStream {
 /**
  * Device parser
  */
-const V5Parser = (
-  chunk: String,
-  sharedBuffer?: SharedArrayBuffer | Int32Array
-): Int32Array => {
+const V5Parser = (chunk: String): DeviceDataType[] => {
   const lines = chunk.split('\r\n');
 
-  const dataArray = new Int32Array(sharedBuffer as SharedArrayBuffer);
+  const dataArray: DeviceDataType[] = new Array(BATCH_SIZE);
 
-  let arrayIndex = 0;
-  // Use a for loop for the best performance
-  for (let i = 0; i < NUM_OF_DATAPOINTS_PER_CHUNK; i += 1) {
+  // Parse text to numbers and object
+  for (let i = 0; i < BATCH_SIZE; i += 1) {
     const data = lines[i].split(',');
+    const parsedData = new Array(NUM_OF_ELEMENTS_PER_DATAPOINT).fill(0);
 
     for (let j = 0; j < NUM_OF_ELEMENTS_PER_DATAPOINT; j += 1) {
-      // Parse numbers
-      dataArray[arrayIndex] = ~~data[j];
-      arrayIndex += 1;
+      parsedData[j] = ~~data[j]; // Parse numbers
     }
+
+    const dp: DeviceDataType = {
+      ADC1: parsedData.slice(0, PD_CHANNELS + 1),
+    };
+
+    dataArray[i] = dp;
   }
 
   return dataArray;

@@ -16,57 +16,106 @@ import ExportTextIcon from '@icons/export-txt.svg';
 import msToTime from '@utils/msToTime';
 
 // Constants
-import { ChartChannels } from '@utils/channels';
+import { ChartChannels, DialogBoxChannels } from '@utils/channels';
+
+import UIWorkerManager from 'renderer/UIWorkerManager';
+import { getState } from '@redux/store';
+
+const exportOptions = [
+  {
+    type: 'Text File (TXT)',
+    icon: ExportTextIcon,
+    extension: 'txt',
+  },
+  {
+    type: 'Excel File (CSV)',
+    icon: ExportExcelIcon,
+    extension: 'csv',
+  },
+];
 
 const ExportForm = () => {
+  const [exportOption, setExportOption] = useState(exportOptions[0].extension);
   const [exportRange, setExportRange] = useState([
     'No data found',
     'No data found',
   ]);
-  const currentRecording = useAppSelector(
-    (state) => state.experimentData.currentRecording
-  );
-  const exportOptions = [
-    {
-      type: 'Text File (TXT)',
-      icon: ExportTextIcon,
-      extension: 'txt',
-    },
-    {
-      type: 'Excel File (CSV)',
-      icon: ExportExcelIcon,
-      extension: 'csv',
-    },
-  ];
-  const [exportOption, setExportOption] = useState(exportOptions[0].extension);
   const { register, handleSubmit } = useForm();
-
-  const onSubmit = async (_data: any) => {
-    toast.loading('Exporting. This might take a while', { duration: Infinity });
-
-    const result = await window.api.invokeIPC(ChartChannels.ExportAll, {
-      recordingId: currentRecording.id,
-      type: exportOption,
-    });
-
-    toast.dismiss();
-    result === 'canceled' && toast.error('Export was canceled');
-    result === true && toast.success('Data exported successfully');
-
-    console.log(result);
-  };
+  const currentRecording = useAppSelector(
+    (state) => state.global.recording?.currentRecording
+  );
 
   useEffect(() => {
-    (async () => {
+    const checkExportRange = async () => {
       const range = await window.api.invokeIPC(
         ChartChannels.GetExportRange,
-        currentRecording.id
+        currentRecording?.id
       );
       if (!range) return;
       range.start !== undefined &&
         setExportRange([msToTime(range.start), msToTime(range.end)]);
+    };
+
+    (async () => {
+      // Get the export range
+      await checkExportRange();
     })();
+
+    return () => UIWorkerManager.terminateExportdataWorker();
   }, []);
+
+  // Handles form submit
+  const onSubmit = async (_data: any) => {
+    // const result = await window.api.invokeIPC(ChartChannels.ExportAll, {
+    //   recordingId: currentRecording?.id,
+    //   type: exportOption,
+    // });
+
+    const result = await handleExportData();
+
+    console.log(result);
+  };
+
+  // Handles the export of data
+  const handleExportData = async () => {
+    const savePath = await window.api.invokeIPC(
+      DialogBoxChannels.GetSaveDialog
+    );
+    if (!savePath) return;
+
+    toast.loading('Exporting. This might take a while', { duration: Infinity });
+
+    const dbFilePath = getState().global.filePaths?.dbFile;
+    const recordingSetting = getState().global.recording?.currentRecording
+      ?.settings as string | undefined;
+    let samplingRate = 100;
+
+    if (recordingSetting) {
+      samplingRate = JSON.parse(recordingSetting).probe.samplingRate;
+    }
+
+    const exportWorker = UIWorkerManager.getExportdataWorker();
+    const workerData = {
+      dbFilePath,
+      savePath,
+      type: exportOption,
+      samplingRate,
+      recordingId: currentRecording?.id,
+    };
+    exportWorker.postMessage(workerData);
+
+    exportWorker.onmessage = ({ data }) => {
+      if (data === 'end') {
+        toast.dismiss();
+        // result === 'canceled' && toast.error('Export was canceled');
+        toast.success('Data exported successfully');
+      }
+      UIWorkerManager.terminateExportdataWorker();
+      exportWorker.terminate();
+    };
+
+    return true;
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

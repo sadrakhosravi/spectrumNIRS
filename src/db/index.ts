@@ -7,6 +7,7 @@ import Probes from './entity/Probes';
 
 // Paths
 import { databaseFile } from '../main/paths';
+import GlobalStore from '@lib/globalStore/GlobalStore';
 
 const createDBConnection = async () => {
   const connection = await createConnection({
@@ -19,6 +20,9 @@ const createDBConnection = async () => {
     migrations: ['src/db/migration/**/*.ts'],
     subscribers: ['src/db/subscriber/**/*.ts'],
   });
+
+  // Set the file path
+  GlobalStore.setFilePaths('dbFile', databaseFile);
 
   setTimeout(async () => {
     await connection.query('PRAGMA auto_vacuum = INCREMENTAL;');

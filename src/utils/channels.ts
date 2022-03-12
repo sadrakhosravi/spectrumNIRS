@@ -70,6 +70,7 @@ const dialogBoxBase = 'dialog:';
 export const DialogBoxChannels = {
   MessageBox: dialogBoxBase + 'message-box',
   MessageBoxSync: dialogBoxBase + 'message-box-sync',
+  GetSaveDialog: dialogBoxBase + 'get-save-dialog-path',
 };
 
 // USB Detection

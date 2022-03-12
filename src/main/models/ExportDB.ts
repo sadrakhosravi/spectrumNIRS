@@ -3,8 +3,8 @@ import fs from 'fs';
 import { dialog, BrowserWindow } from 'electron';
 import RecordingsData from 'db/entity/RecordingsData';
 import RecordingModel from './RecordingModel';
-import WorkerManager from './WorkerManager';
 import { dbParser } from '@lib/Stream/DatabaseParser';
+import DBDataParser from './DBDataParser';
 
 class ExportDB {
   constructor() {}
@@ -36,9 +36,6 @@ class ExportDB {
       // Settings for querying data from the database.
       let offset = 0;
       const LIMIT = 30000;
-
-      const calcWorkerData = { calcOnly: true, dataBatchSize: LIMIT };
-      const calcWorker = WorkerManager.getCalculationWorker(calcWorkerData);
 
       const columns = [
         'timeStamp',
@@ -98,51 +95,40 @@ class ExportDB {
 
         // Send the data to the calc worker
         const data = dbParser(records);
-        calcWorker.postMessage(data);
 
-        // Wait for the calculated data
-        await new Promise((resolve, _reject) => {
-          calcWorker.on('message', (data) => {
-            console.log(data.length);
-            console.log('end');
+        for (let i = 0; i < RAW_RECORDS_LENGTH; i++) {
+          for (const key in records[i]) {
+            if (key === 'timeStamp') {
+              writeStream.write(records[i][key] / 1000 + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+            } else if (key === 'gainValues123') {
+              const gain = JSON.parse(records[i][key]);
+              const hardwareGain = gain.hardware.join(' ');
+              const softwareGain = gain.software;
 
-            for (let i = 0; i < RAW_RECORDS_LENGTH; i++) {
-              for (const key in records[i]) {
-                if (key === 'timeStamp') {
-                  writeStream.write(records[i][key] / 1000 + ',', 'utf-8');
-                  writeStream.write(data[i][1] + ',', 'utf-8');
-                  writeStream.write(data[i][2] + ',', 'utf-8');
-                  writeStream.write(data[i][3] + ',', 'utf-8');
-                  writeStream.write(data[i][4] + ',', 'utf-8');
-                } else if (key === 'gainValues123') {
-                  const gain = JSON.parse(records[i][key]);
-                  const hardwareGain = gain.hardware.join(' ');
-                  const softwareGain = gain.software;
-
-                  writeStream.write(hardwareGain + ',', 'utf-8');
-                  writeStream.write(softwareGain + ',', 'utf-8');
-                } else if (key === 'events123') {
-                  const events = JSON.parse(records[i][key]);
-                  const allEvents = [];
-                  for (const key in events) {
-                    allEvents.push(`${key}: ${events[key]}`);
-                  }
-                  writeStream.write(allEvents.join(' ') + ',', 'utf-8');
-                  allEvents.length = 0;
-                } else {
-                  writeStream.write(records[i][key] + ',', 'utf-8');
-                }
+              writeStream.write(hardwareGain + ',', 'utf-8');
+              writeStream.write(softwareGain + ',', 'utf-8');
+            } else if (key === 'events123') {
+              const events = JSON.parse(records[i][key]);
+              const allEvents = [];
+              for (const key in events) {
+                allEvents.push(`${key}: ${events[key]}`);
               }
-              writeStream.write('\n', 'utf-8');
+              writeStream.write(allEvents.join(' ') + ',', 'utf-8');
+              allEvents.length = 0;
+            } else {
+              writeStream.write(records[i][key] + ',', 'utf-8');
             }
-            resolve(true);
-          });
-        });
+          }
+          writeStream.write('\n', 'utf-8');
+        }
       }
 
       // Close the write stream once done.
       writeStream.close();
-      WorkerManager.terminateAllWorkers();
       console.timeEnd('exporttimer');
 
       return true;
@@ -164,21 +150,25 @@ class ExportDB {
     try {
       const start = await getConnection()
         .createQueryBuilder()
-        .select(['timeStamp'])
+        .select(['timeSequence'])
         .from(RecordingsData, '')
         .where('recordingId = :recordingId', { recordingId })
-        .orderBy({ timeStamp: 'ASC' })
+        .orderBy({ timeSequence: 'ASC' })
         .getRawOne();
 
       const end = await getConnection()
         .createQueryBuilder()
-        .select(['timeStamp'])
+        .select(['timeSequence, data'])
         .from(RecordingsData, '')
         .where('recordingId = :recordingId', { recordingId })
-        .orderBy({ timeStamp: 'DESC' })
+        .orderBy({ timeSequence: 'DESC' })
         .getRawOne();
 
-      return { start: start?.timeStamp, end: end?.timeStamp };
+      const parsedData = DBDataParser.parseBlobData(end.data);
+      const numOfDataPoints = parsedData.length;
+      const endTimeSequence = end.timeSequence + numOfDataPoints * 10;
+
+      return { start: start?.timeSequence, end: endTimeSequence };
     } catch (error: any) {
       throw new Error(error.message);
     }

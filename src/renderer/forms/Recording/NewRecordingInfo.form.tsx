@@ -9,7 +9,7 @@ import DateField from '@components/Form/DateField.component';
 import TextAreaField from '@components/Form/TextAreaField.component';
 
 // Adapters
-import getCurrentDate from '@lib/helper/getCurrentDate';
+import getCurrentDate from '@lib/helpers/getCurrentDate';
 
 type NewRecordingInfoProps = {};
 

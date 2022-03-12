@@ -8,6 +8,7 @@ import lcjs, {
   VisibleTicks,
 } from '@arction/lcjs';
 import { devices } from '@electron/configs/devices';
+import { DeviceDataType } from '@electron/models/DeviceReader/DeviceDataTypes';
 import {
   spectrumTheme,
   uiMinorTickFont,
@@ -26,17 +27,19 @@ const {
 } = lcjs;
 
 class ProbeCalibrationChart {
-  containerId: string;
-  LEDs: string[];
-  chart: undefined | ChartXY<PointMarker, UIBackground>;
-  barChart: undefined;
-  rectangleSeries: undefined | lcjs.RectangleSeries;
-  redColor: lcjs.SolidFill;
-  blueColor: lcjs.SolidFill;
-  LEDRectangles: (lcjs.RectangleFigure | undefined)[] | undefined;
-  PD_THRESHOLD_VALUE: number;
-  UIElement: (lcjs.UITextBox<UIBackground> & lcjs.UIElement) | undefined;
-  greenColor: lcjs.SolidFill;
+  private containerId: string;
+  private LEDs: string[];
+  private chart: undefined | ChartXY<PointMarker, UIBackground>;
+  private rectangleSeries: undefined | lcjs.RectangleSeries;
+  private redColor: lcjs.SolidFill;
+  private blueColor: lcjs.SolidFill;
+  private LEDRectangles: lcjs.RectangleFigure[] | undefined;
+  private ADCThresholdValue: number;
+  private UIElement:
+    | (lcjs.UITextBox<UIBackground> & lcjs.UIElement)
+    | undefined;
+  private greenColor: lcjs.SolidFill;
+  private ambientThreshold: number;
 
   constructor(containerId: string) {
     this.LEDs = new Array(devices[0].LEDs).fill('LED');
@@ -48,13 +51,14 @@ class ProbeCalibrationChart {
     this.greenColor = new SolidFill().setColor(ColorRGBA(25, 255, 100));
     this.LEDRectangles = undefined;
     this.UIElement = undefined;
-    this.PD_THRESHOLD_VALUE = 2000;
+    this.ADCThresholdValue = 2000;
+    this.ambientThreshold = 500;
   }
 
   /**
    * Creates the chart used to test probe intensities
    */
-  createProbeCalibrationChart() {
+  public createProbeCalibrationChart() {
     this.chart = lightningChart()
       .ChartXY({
         container: this.containerId,
@@ -75,9 +79,78 @@ class ProbeCalibrationChart {
   }
 
   /**
+   * Listens for incoming device data
+   */
+  public listenForData() {
+    console.log('LISTENING');
+    window.api.onIPCData(
+      'device:calibration',
+      (_event, data: DeviceDataType) => {
+        const LEDRectangles = this.LEDRectangles as lcjs.RectangleFigure[];
+        const ambientPos = data['ADC1'].length - 1;
+        const ambient = data['ADC1'][ambientPos];
+
+        const ambientRect = LEDRectangles[ambientPos];
+
+        // Add all wavelengths on the chart except ambient
+        for (let i = 0; i < data['ADC1'].length - 1; i += 1) {
+          const LEDRectangleDimensions =
+            LEDRectangles[i].getDimensionsPositionAndSize();
+          const height = data['ADC1'][i] - ambient;
+
+          LEDRectangles[i].setDimensions({ ...LEDRectangleDimensions, height });
+
+          // Check the value and assign the color accordingly
+          if (height > this.ADCThresholdValue) {
+            this.setRectangleColor(LEDRectangles[i], this.blueColor);
+          } else {
+            this.setRectangleColor(LEDRectangles[i], this.redColor);
+          }
+        }
+
+        // Add ambient on the chart
+        const ambientDims = ambientRect.getDimensionsPositionAndSize();
+        ambientRect.setDimensions({
+          ...ambientDims,
+          height: ambient,
+        });
+
+        // Check the value and assign the color accordingly
+        if (ambient > this.ambientThreshold) {
+          this.setRectangleColor(ambientRect, this.redColor);
+        } else {
+          this.setRectangleColor(ambientRect, this.greenColor);
+        }
+
+        // Remove threshold element when LED 1 goes over it
+        data['ADC1'][0] - ambient + 200 > this.ADCThresholdValue
+          ? this.UIElement?.dispose()
+          : this.UIElement?.restore();
+      }
+    );
+  }
+
+  /**
+   * Stops listening for data
+   */
+  public stopListening() {
+    window.api.removeListeners('device:calibration');
+  }
+
+  /**
+   * Cleanups the memory and disposes the chart
+   */
+  public cleanup() {
+    window.api.removeListeners('device:calibration');
+    this.chart?.dispose();
+    this.rectangleSeries = undefined;
+    this.chart = undefined;
+  }
+
+  /**
    * Customizes the x axis of the chart
    */
-  customizeXAxis() {
+  private customizeXAxis() {
     const axisX = this.chart?.getDefaultAxisX() as lcjs.Axis;
 
     axisX
@@ -92,7 +165,7 @@ class ProbeCalibrationChart {
   /**
    * Customizes the Y axis of the chart
    */
-  customizeYAxis() {
+  private customizeYAxis() {
     const axisY = this.chart?.getDefaultAxisY() as lcjs.Axis;
     axisY
       .setTitle('Raw PD Values (mV)')
@@ -102,7 +175,7 @@ class ProbeCalibrationChart {
 
     axisY
       .addConstantLine(false)
-      .setValue(this.PD_THRESHOLD_VALUE)
+      .setValue(this.ADCThresholdValue)
       .setMouseInteractions(false)
       .setStrokeStyle(
         new SolidLine({
@@ -141,7 +214,7 @@ class ProbeCalibrationChart {
   /**
    * Resets the data on the graph
    */
-  resetData() {
+  public resetData() {
     this.LEDRectangles &&
       this.LEDRectangles.forEach((_, i) => {
         this.LEDRectangles &&
@@ -157,7 +230,7 @@ class ProbeCalibrationChart {
   /**
    * Adds UI element to the chart
    */
-  addUIElements() {
+  private addUIElements() {
     this.UIElement = this.chart
       ?.addUIElement(UIElementBuilders.TextBox, {
         x: this.chart.getDefaultAxisX(),
@@ -166,7 +239,7 @@ class ProbeCalibrationChart {
       .setDraggingMode(UIDraggingModes.notDraggable)
       .setPosition({
         x: 0.3,
-        y: this.PD_THRESHOLD_VALUE - 135,
+        y: this.ADCThresholdValue - 135,
       })
       .setText('Threshold Value');
   }
@@ -174,20 +247,20 @@ class ProbeCalibrationChart {
   /**
    * Creates rectangle series for the chart
    */
-  createRectangleSeries() {
+  private createRectangleSeries() {
     if (this.chart) this.rectangleSeries = this.chart.addRectangleSeries();
   }
 
   /**
    * Adds bar charts for each LED
    */
-  addLEDRectangles() {
+  private addLEDRectangles() {
     const axisX = this.chart?.getDefaultAxisX() as lcjs.Axis;
     const width = 0.6;
     let count = 0;
     const LEDRectangles = this.LEDs.map((LED, i) => {
-      const rectangle = this.rectangleSeries
-        ?.add({
+      const rectangle = (this.rectangleSeries as lcjs.RectangleSeries)
+        .add({
           x: count,
           y: 0,
           height: 0,
@@ -211,7 +284,7 @@ class ProbeCalibrationChart {
       return rectangle;
     });
 
-    const ambient = this.rectangleSeries?.add({
+    const ambient = (this.rectangleSeries as lcjs.RectangleSeries).add({
       x: count,
       y: 0,
       height: 0,
@@ -235,55 +308,15 @@ class ProbeCalibrationChart {
   }
 
   /**
-   * Listens for incoming device data
+   * Changes the color of the given rectangle series by the given color
+   * @param Rectangle the rectangle figure
+   * @param color lcjs solid fill color
    */
-  listenForData() {
-    console.log('LISTENING');
-    window.api.onIPCData('device:calibration', (_event, data: number[]) => {
-      data.forEach((dataPoint, i) => {
-        this.LEDRectangles &&
-          this.LEDRectangles[i]?.setDimensions({
-            ...(this.LEDRectangles[
-              i
-            ]?.getDimensionsPositionAndSize() as lcjs.RectanglePositionAndSize),
-            height:
-              i === data.length - 1 ? data[i] : data[i] - data[data.length - 1],
-          });
-        i !== data.length - 1 &&
-          this.LEDRectangles &&
-          this.LEDRectangles[i]?.setFillStyle(
-            dataPoint > this.PD_THRESHOLD_VALUE ? this.blueColor : this.redColor
-          );
-
-        i === data.length - 1 &&
-          this.LEDRectangles &&
-          this.LEDRectangles[data.length - 1]?.setFillStyle(
-            dataPoint > 350 ? this.redColor : this.greenColor
-          );
-
-        data[0] > this.PD_THRESHOLD_VALUE - 100
-          ? this.UIElement?.dispose()
-          : this.UIElement?.restore();
-      });
-      console.log(data);
-    });
-  }
-
-  /**
-   * Stops listening for data
-   */
-  stopListening() {
-    window.api.removeListeners('probe-calibration-data');
-  }
-
-  /**
-   * Cleanups the memory and disposes the chart
-   */
-  cleanup() {
-    window.api.removeListeners('probe-calibration-data');
-    this.chart?.dispose();
-    this.rectangleSeries = undefined;
-    this.chart = undefined;
+  private setRectangleColor(
+    Rectangle: lcjs.RectangleFigure,
+    color: lcjs.SolidFill
+  ) {
+    Rectangle.setFillStyle(color);
   }
 }
 

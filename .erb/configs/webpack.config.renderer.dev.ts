@@ -161,6 +161,21 @@ export default merge(baseConfig, {
 
     new ReactRefreshWebpackPlugin(),
 
+    new HtmlWebpackPlugin({
+      filename: 'startup.html',
+      chunks: ['none'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'startup.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+
     //@ts-ignore
     new HtmlWebpackPlugin({
       filename: path.join('index.html'),

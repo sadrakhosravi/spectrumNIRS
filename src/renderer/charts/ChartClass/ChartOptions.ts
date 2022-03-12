@@ -90,8 +90,8 @@ class ChartOptions {
     this.timeDivision = newTimeDivision;
     const axisX = this.charts[0].getDefaultAxisX();
     const currentInterval = axisX.getInterval();
-
     if (this.isReview) {
+      console.log('REVIEW');
       axisX.setInterval(
         currentInterval.start,
         currentInterval.start + this.timeDivision,
@@ -99,13 +99,16 @@ class ChartOptions {
         true
       );
     } else {
-      axisX.setInterval(
-        currentInterval.end - this.timeDivision,
-        currentInterval.end
-      );
-    }
+      const xMax = this.series[0].getXMax();
+      const xMin = this.series[0].getXMin();
+      if (xMax <= this.timeDivision) {
+        axisX.setInterval(xMin, xMin + this.timeDivision);
+      } else {
+        axisX.setInterval(xMax - this.timeDivision, xMax);
+      }
 
-    axisX.release();
+      axisX.release();
+    }
   }
 
   addMarker(name: string, color: string) {

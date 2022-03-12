@@ -1,58 +1,133 @@
 import React from 'react';
-import { ReviewToolbar } from './ReviewToolbar';
+import { dispatch, getState } from '@redux/store';
+
+import { openModal } from '@redux/ModalStateSlice';
 
 // Components
-import Separator from '@components/Separator/Separator.component';
-import IconButton from '@components/Buttons/IconButton.component';
+import ToolbarContainer from '@components/Toolbar/ToolbarContainer.component';
+import Button from '@components/Buttons/Button.component';
 import withTooltip from '@hoc/withTooltip.hoc';
 import TimeDiv from './TimeDiv.component';
 
+// import StopIcon from '@icons/stop.svg';
+import ResetHeightIcon from '@icons/reset-height.svg';
+import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
+import ExportIcon from '@icons/export-data.svg';
+import MarkerIcon from '@icons/marker.svg';
+
 // Constants
-import { ChartType } from '@utils/constants';
-import { useAppSelector } from '@redux/hooks/hooks';
+import { ChartType, ModalConstants } from '@utils/constants';
+import { DialogBoxChannels } from '@utils/channels';
+
 import { useChartContext } from 'renderer/context/ChartProvider';
-import ChartOptions from '../ChartClass/ChartOptions';
-import ToolbarContainer from '@components/Toolbar/ToolbarContainer.component';
 
 // Buttons with tooltip
-const IconButtonWithTooltip = withTooltip(IconButton);
+const ButtonWithTooltip = withTooltip(Button);
 
 type ReviewChartToolbarProps = {
   type?: ChartType.RECORD | ChartType.REVIEW;
 };
 const ReviewChartToolbar = ({}: ReviewChartToolbarProps) => {
-  const chartState = useAppSelector((state) => state.chartState) as any;
-  const toolbarMenu = ReviewToolbar;
   const reviewChart = useChartContext().reviewChart;
+
+  // Resets all channel's height back to default
+  const resetChartHeights = () => {
+    reviewChart?.chartOptions?.resetChartsHeight();
+  };
+
+  const takeScreenShot = () => {
+    reviewChart?.chartOptions?.screenshot();
+  };
+
+  const exportData = () => {
+    const recordingId = getState().global.recording?.currentRecording?.id;
+
+    if (recordingId === -1 || !recordingId) {
+      window.api.invokeIPC(DialogBoxChannels.MessageBox, {
+        title: 'No recording found',
+        type: 'error',
+        message: 'No recording found',
+        detail:
+          'No recording found. Either open a recording or create a new one.',
+      });
+      return;
+    }
+
+    dispatch(openModal(ModalConstants.EXPORT_FORM));
+  };
+
+  const addEvent = () => {
+    const currentInterval = reviewChart?.charts[0]
+      .getDefaultAxisX()
+      .getInterval();
+    reviewChart?.chartOptions?.drawMarker(
+      currentInterval?.end as number,
+      'Hypoxia',
+      '#E61557'
+    );
+  };
+  const addEvent2 = () => {
+    const currentInterval = reviewChart?.charts[0]
+      .getDefaultAxisX()
+      .getInterval();
+    reviewChart?.chartOptions?.drawMarker(
+      currentInterval?.end as number,
+      'Other Event',
+      '#8E07F0'
+    );
+  };
 
   return (
     <>
       {reviewChart && (
-        <ToolbarContainer>
-          <div className="flex h-full w-full items-center justify-between px-4">
-            <div className="col-span-4 grid auto-cols-max grid-flow-col items-center gap-3">
-              {toolbarMenu.map((option, index) => {
-                if (option.label === 'separator')
-                  return <Separator orientation="vertical" key={index} />;
-                return (
-                  <IconButtonWithTooltip
-                    icon={option.icon}
-                    isActive={chartState[option.label] || false}
-                    onClick={() =>
-                      option.click &&
-                      option.click(reviewChart.chartOptions as ChartOptions)
-                    }
-                    tooltip={option.tooltip}
-                    interactive={option.tooltip === 'timeDivision'}
-                    key={index}
-                    disabled={true}
+        <>
+          <ToolbarContainer>
+            <div className="flex h-full w-full items-center justify-between px-4">
+              <div className="flex w-full items-center gap-5">
+                <div className="flex gap-2">
+                  <ButtonWithTooltip
+                    icon={ResetHeightIcon}
+                    tooltip={'Reset Channel Heights'}
+                    onClick={resetChartHeights}
                   />
-                );
-              })}
-              <TimeDiv type={ChartType.REVIEW} />
+                </div>
+
+                <div className="flex gap-2">
+                  <ButtonWithTooltip
+                    icon={ChartScreenshotIcon}
+                    tooltip={'Take a Screenshot'}
+                    onClick={takeScreenShot}
+                  />
+                  <ButtonWithTooltip
+                    icon={ExportIcon}
+                    tooltip={'Export Data'}
+                    onClick={exportData}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <ButtonWithTooltip
+                    icon={MarkerIcon}
+                    tooltip={'Hypoxia Event'}
+                    onClick={addEvent}
+                  />
+                  <ButtonWithTooltip
+                    icon={MarkerIcon}
+                    tooltip={'Other Event'}
+                    onClick={addEvent2}
+                  />
+                </div>
+
+                <TimeDiv type={ChartType.REVIEW} />
+              </div>
+
+              {/* Stop Start Button */}
+              <div className="col-span-2 grid auto-cols-max grid-flow-col items-center justify-end gap-3">
+                <div className="grid auto-cols-max grid-flow-col gap-3"></div>
+              </div>
             </div>
-          </div>
-        </ToolbarContainer>
+          </ToolbarContainer>
+        </>
       )}
     </>
   );

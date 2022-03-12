@@ -30,6 +30,9 @@ export class Recordings extends BaseEntity {
   date: Date;
 
   @Column({ type: 'blob', nullable: true })
+  deviceSettings: JSON | string | any;
+
+  @Column({ type: 'blob', nullable: true })
   settings: JSON | string | any;
 
   @ManyToOne(() => Patients, { onDelete: 'CASCADE' })
@@ -40,5 +43,8 @@ export class Recordings extends BaseEntity {
 
   @UpdateDateColumn({ select: false })
   public updatedAt: Date;
+
+  @Column({ type: 'blob', nullable: true })
+  other: JSON | string | any;
 }
 export default Recordings;

@@ -7,8 +7,7 @@ import getLocalIP, { INetwork } from '@lib/network/getLocalIP';
 
 // Constants
 import { ExportServerChannels, GeneralChannels } from '@utils/channels';
-import AccurateTimer from '@electron/helpers/accurateTimer';
-import DummyData from '../DummyData';
+// import AccurateTimer from '@electron/helpers/accurateTimer';
 
 // Store
 import GlobalStore from '../../../lib/globalStore/GlobalStore';
@@ -49,21 +48,19 @@ export interface IWebSocket extends WebSocket, IInterface {
   appName: string | undefined;
   status?: string | undefined;
 }
-
 export interface IProtocol {
   name: string;
-  outputDataSize: string;
   samplingRate: number;
   parameters: string[];
   protocolVersion: string;
+  batchSize: number;
   payloadType: string;
 }
-
 export type Commands = 'start' | 'pause' | 'stop' | 'get-protocol-version';
 
 export type IDataSize = {
   label: string;
-  value: 'batch' | 'sdp';
+  value: 'batch' | 'batch50' | 'batch100' | 'sdp';
 };
 
 export type IDataTypes = {
@@ -85,25 +82,25 @@ export const sendTo = [{ label: 'All Clients', value: 'all' }];
 // Define protocols
 
 class ExportServer {
-  #securityPhrase: 'beastspectrum-export-stream+'; // Private
-  mainWindow: Electron.BrowserWindow | undefined;
-  ip: INetwork[] | null;
-  port: number | null;
-  server: Server | null;
-  sockets: IWebSocket[];
-  readySockets: IWebSocket[];
-  isListening: boolean;
-  isStreamingData: IServerStatus['isStreamingData'];
-  protocols: IProtocol[];
-  currentProtocol: IProtocol | null;
-  nextId: number;
-  curDataPointIndex: number;
-  batchSize: number;
-  dummyData: DummyData;
-  data: any;
+  private securityPhrase: 'beastspectrum-export-stream+'; // Private
+  private mainWindow: Electron.BrowserWindow | undefined;
+  private ip: INetwork[] | null;
+  private port: number | null;
+  private server: Server | null;
+  private sockets: IWebSocket[];
+  private readySockets: IWebSocket[];
+  private isListening: boolean;
+  private isStreamingData: IServerStatus['isStreamingData'];
+  private protocols: IProtocol[];
+  private currentProtocol: IProtocol | null;
+  private nextId: number;
+  private curDataPointIndex: number;
+  private batchSize: number;
+  private outputData: any[];
+  private sendFunc: undefined | any;
 
   constructor() {
-    this.#securityPhrase = 'beastspectrum-export-stream+';
+    this.securityPhrase = 'beastspectrum-export-stream+';
     this.mainWindow = BrowserWindow.getAllWindows()[0];
 
     // Server Info
@@ -122,12 +119,10 @@ class ExportServer {
     this.batchSize = 25;
 
     // Sample data
-    this.dummyData = new DummyData('30min');
-    this.data = null;
-    setTimeout(
-      async () => (this.data = await this.dummyData.getDummyDataFromDb()),
-      250
-    );
+    this.outputData = [];
+    this.sendFunc = undefined;
+
+    setTimeout(async () => {}, 250);
   }
 
   /* ------------ GETTERS ------------ */
@@ -177,6 +172,8 @@ class ExportServer {
    * Starts streaming of data
    */
   public startStream = () => {
+    if (this.isStreamingData) return;
+
     // Dont start another stream if one is active
     if (this.isStreamingData === 'streaming') {
       this.sendServerError(
@@ -189,40 +186,35 @@ class ExportServer {
       'outputDataSize'
     ) as string;
 
-    const outputDataType = GlobalStore.getExportServer('outputDataType') as
-      | 'JSON'
-      | 'string';
-
     if (this.readySockets.length > 0) {
       this.sendCommand('start');
       this.isStreamingData = 'streaming';
 
-      // Default to batch data
-      let dataPointFormatter: (dataObj: any) => any =
-        this.formatDataPointAsJSON;
-      let formatDataFunc: (dataPointFormatter: (dataObj: any) => any) => any[] =
-        this.formatBatchData;
+      switch (outputDataSize) {
+        case 'batch':
+          this.batchSize = 25;
+          break;
 
-      if (outputDataSize === 'batch') {
-        this.batchSize = 25;
-        formatDataFunc = this.formatBatchData;
+        case 'batch50':
+          this.batchSize = 50;
+          break;
+
+        case 'batch100':
+          this.batchSize = 100;
+          break;
+
+        case 'sdp':
+          this.batchSize = 1;
+          break;
+
+        default:
+          this.batchSize = 25;
+          break;
       }
 
-      if (outputDataSize === 'sdp') {
-        this.batchSize = 1;
-        formatDataFunc = this.formatSinglePointData;
-      }
+      this.sendFunc = this.getSendFunction();
 
-      if (outputDataSize === 'JSON') {
-        dataPointFormatter = this.formatDataPointAsJSON;
-      }
-
-      if (outputDataType === 'string') {
-        dataPointFormatter = this.formatDataPointAsString;
-      }
-
-      const sendFunc = this.getSendFunction();
-      this.streamData(formatDataFunc, dataPointFormatter, sendFunc);
+      this.mainWindow?.webContents.send(ExportServerChannels.StartStream);
       this.updateStatus();
     }
   };
@@ -235,6 +227,9 @@ class ExportServer {
       this.sendServerError('error:The are no active streams to stop.');
       return;
     }
+    this.mainWindow?.webContents.send(ExportServerChannels.StopServer);
+
+    console.log('CALLED STOP');
     this.curDataPointIndex = 0;
     this.isStreamingData = null;
     this.sendCommand('stop');
@@ -262,6 +257,44 @@ class ExportServer {
     const sendFunc = this.getSendFunction();
     sendFunc(command);
   };
+
+  /**
+   * Prepares the data and sends it to active sockets
+   */
+  public send = (data: number[][], dataLength: number) => {
+    for (let i = 0; i < dataLength; i += 1) {
+      this.outputData.push({
+        timeStamp: data[i][0],
+        O2Hb: data[i][1],
+        HHb: data[i][2],
+        THb: data[i][3],
+        TOI: data[i][4],
+        Hbdiff: 0,
+        PI: 0,
+        SCORx: 0,
+        SCPRx: 0,
+      });
+
+      if (this.outputData.length === this.batchSize) {
+        this.sendFunc(this.outputData);
+        this.outputData.length = 0;
+      }
+    }
+  };
+
+  /**
+   * @returns a boolean to see if the export server has active clients
+   */
+  public getDoesHaveActiveListeners = () =>
+    this.readySockets.length > 0 ? true : false;
+
+  /**
+   * @returns a boolean to see if the export server has active clients
+   */
+  public getIsStreaming = () =>
+    this.isStreamingData === 'continued' || this.isStreamingData === 'streaming'
+      ? true
+      : false;
 
   /**
    * A send function that sends a message only to the selected socket/sockets
@@ -292,35 +325,28 @@ class ExportServer {
   /**
    * Starts streaming a batch of data to the socket.
    */
-  private streamData = async (
+  streamData = async (
     formatData: (dataPointFormatter: (obj: any) => any) => any[],
     dataPointFormatter: (obj: any) => any,
     sendFunc: (data: any) => void
   ) => {
-    const timer = new AccurateTimer(() => {
-      // Check stream time to stop before any other code execution
-      if (this.isStreamingData === null || this.isStreamingData === 'paused') {
-        timer.stop();
-        return;
-      }
-
-      // Since this loop executes one last time after the stop is called,
-      // a check is done to make sure no extra data is sent to the sockets.
-      // TODO: Fix this issue
-      const batchData = formatData(dataPointFormatter);
-      sendFunc(batchData);
-    }, 10 * this.batchSize);
-    timer.start();
+    // Since this loop executes one last time after the stop is called,
+    // a check is done to make sure no extra data is sent to the sockets.
+    // TODO: Fix this issue
+    const batchData = formatData(dataPointFormatter);
+    sendFunc(batchData);
   };
 
   /**
    * Formats the data in a batch
    */
-  private formatBatchData = (dataPointFormatter: (dataObj: any) => any) => {
+  public formatBatchData = (dataPointFormatter: (dataObj: any) => any) => {
     const batchData = new Array(this.batchSize).fill(0);
     // Create the batch to be sent
     for (let j = 0; j < this.batchSize; j++) {
-      batchData[j] = dataPointFormatter(this.data[this.curDataPointIndex]);
+      batchData[j] = dataPointFormatter(
+        this.outputData[this.curDataPointIndex]
+      );
       this.curDataPointIndex += 1;
     }
 
@@ -330,13 +356,15 @@ class ExportServer {
   /**
    * Formats the data in a batch
    */
-  private formatSinglePointData = (
+  public formatSinglePointData = (
     dataPointFormatter: (dataObj: any) => any
   ) => {
     const batchData = new Array(this.batchSize).fill(0);
     // Create the batch to be sent
     for (let j = 0; j < this.batchSize; j++) {
-      batchData[j] = dataPointFormatter(this.data[this.curDataPointIndex]);
+      batchData[j] = dataPointFormatter(
+        this.outputData[this.curDataPointIndex]
+      );
       this.curDataPointIndex += 1;
     }
     return batchData;
@@ -347,7 +375,7 @@ class ExportServer {
    * @param dataObj - The data point object from the database
    * @returns - A data point array `[Timestamp, O2Hb, HHb, THb, TOI, ...]`
    */
-  private formatDataPointAsJSON = (dataObj: any) => {
+  public formatDataPointAsJSON = (dataObj: any) => {
     return {
       timeStamp: dataObj.timeStamp,
       O2Hb: dataObj.O2Hb,
@@ -361,7 +389,7 @@ class ExportServer {
     };
   };
 
-  private formatDataPointAsString = (dataObj: any) => {
+  public formatDataPointAsString = (dataObj: any) => {
     return `[${dataObj.timeStamp},${dataObj.O2Hb},${dataObj.HHb},${
       dataObj.THb
     },${dataObj.TOI},${0},${0},${0},${0}]`;
@@ -383,6 +411,7 @@ class ExportServer {
   public stop = async () => {
     this.sockets.forEach((socket) => {
       socket.send('server:Shutting down');
+      socket.removeAllListeners();
       socket.close();
     });
     this.server?.close();
@@ -432,11 +461,21 @@ class ExportServer {
     const secKey = 'security-phrase';
 
     this.server?.on('connection', (socket: IWebSocket, request) => {
-      const isTrustable = request.headers[secKey] === this.#securityPhrase;
+      const isTrustable = request.headers[secKey] === this.securityPhrase;
       const appName = request.headers['app-name'] as string | undefined;
       const protocolVersion = request.headers['protocol-version'] as
         | string
         | undefined;
+
+      // Send client header to UI to be logged
+      let headerString = '';
+      for (const key in request.headers) {
+        headerString += `${key}: ${request.headers[key]} \n`;
+      }
+      const message = appName + ': ' + headerString;
+      this.mainWindow?.webContents.send(GeneralChannels.LogMessage, {
+        message,
+      });
 
       // Check if the request contains the security headers. If not refuse connection.
       if (!isTrustable) {
@@ -481,6 +520,19 @@ class ExportServer {
           this.sendServerError('error:Header not supported.');
           return;
       }
+
+      socket.on('close', () => {
+        this.stopStream();
+      });
+
+      // Log data in UI
+      socket.on('message', (data) => {
+        console.log('socket message ' + data);
+        this.mainWindow?.webContents.send(
+          GeneralChannels.LogMessage,
+          `${appName}: ${data.toString()}`
+        );
+      });
 
       // Keep track of each socket.
       this.sockets.push(socket as IWebSocket);
@@ -531,23 +583,21 @@ class ExportServer {
     const dataType = GlobalStore.getExportServer('outputDataType');
     const dataSize = GlobalStore.getExportServer('outputDataSize');
 
-    const headers = {
-      samplingRate: 100,
-      parameters: [
-        'Time Stamp',
-        'O2Hb',
-        'HHb',
-        'THb',
-        'TOI',
-        'Hbdiff',
-        'PI',
-        'SCORx',
-        'SCPRx',
-      ],
-      protocolVersion: this.currentProtocol?.name,
-      payloadType: dataType,
-      dataSize: dataSize,
-    };
+    const headers = V1;
+
+    // TODO: Adjust the batch size dynamically based on the selection
+    if (dataSize === 'batch') {
+      headers['batchSize'] = 25;
+    } else if (dataSize === 'batch50') {
+      headers['batchSize'] = 50;
+    } else if (dataSize === 'batch100') {
+      headers['batchSize'] = 100;
+    } else {
+      headers['batchSize'] = 1;
+    }
+
+    headers['payloadType'] = dataType as string;
+
     socket.send(JSON.stringify(headers));
 
     socket.status = 'Waiting for confirmation';
@@ -597,11 +647,6 @@ class ExportServer {
           this.sendServerError('error:Unsupported command!');
           break;
       }
-
-      const message = socket.appName + ': ' + data.toString();
-      this.mainWindow?.webContents.send(GeneralChannels.LogMessage, {
-        message,
-      });
     });
   };
 
@@ -610,8 +655,25 @@ class ExportServer {
    * @param socket - The socket connection to add listeners to
    */
   private addSocketListeners = (socket: IWebSocket) => {
-    socket.on('close', () => this.removeSocket(socket.id));
-    socket.on('error', (_error) => {});
+    socket.on('close', () => {
+      this.removeSocket(socket.id);
+      this.mainWindow?.webContents.send(
+        GeneralChannels.LogMessage,
+        `Socket ${socket.appName} closed`
+      );
+    });
+    socket.on('error', (error) => {
+      this.mainWindow?.webContents.send(
+        GeneralChannels.LogMessage,
+        `${socket.appName} Error: ${error}`
+      );
+    });
+    socket.on('unexpected-response', (_, response) => {
+      this.mainWindow?.webContents.send(
+        GeneralChannels.LogMessage,
+        `${socket.appName} Unexpected Response: ${response}`
+      );
+    });
   };
 
   /**
@@ -631,6 +693,7 @@ class ExportServer {
     if (socketIndex === -1) return;
 
     // Close socket and remove it
+    this.sockets[socketIndex].removeAllListeners();
     this.sockets[socketIndex].close();
     this.sockets.splice(socketIndex, 1);
 

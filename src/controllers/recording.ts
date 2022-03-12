@@ -3,7 +3,7 @@ import { BrowserWindow, dialog, ipcMain } from 'electron';
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
 
-import DeviceReader from '@electron/models/DeviceReader';
+import DeviceReader from '@electron/models/DeviceReader/DeviceReader';
 import RecordingModel from '@electron/models/RecordingModel';
 import GlobalStore from '@lib/globalStore/GlobalStore';
 
@@ -17,59 +17,25 @@ export type CurrentRecording = {
 let deviceReader: DeviceReader | undefined;
 let lastTimeStamp = 0;
 
-const startDeviceReader = (timeStamp: number = 0) => {
+export const initDeviceReader = (timeStamp: number = 0) => {
   if (!deviceReader) {
     deviceReader = new DeviceReader(timeStamp);
-
     return;
   }
-  // If a reader already exists
-  deviceReader = undefined;
-  setImmediate(() => {
-    deviceReader = new DeviceReader(timeStamp);
-  });
 };
 
-// Initialize device reader
-ipcMain.handle(RecordChannels.Init, (_event, _args) => {
-  const recordingId = RecordingModel.getCurrentRecording()?.id;
-  console.log(recordingId);
-  if (!recordingId) {
-    dialog.showMessageBox(BrowserWindow.getFocusedWindow() as BrowserWindow, {
-      title: 'No Recording Found',
-      message: 'No Recording Found',
-      detail: 'Please create a recording first',
-      type: 'error',
-    });
-    return;
-  }
-
-  startDeviceReader(0);
-});
-
-// Start recording
-ipcMain.handle(RecordChannels.Start, () => {
+export const startDeviceReader = () => {
   console.log('START READER');
   deviceReader?.readDevice();
-});
+};
 
-// Stop recording
-ipcMain.handle(RecordChannels.Stop, () => {
-  GlobalStore.removeRecordState();
-  deviceReader?.stopDevice();
-  deviceReader = undefined;
-  lastTimeStamp = 0;
-});
-
-// Pause recording
-ipcMain.handle(RecordChannels.Pause, () => {
+export const pauseDeviceReader = () => {
   lastTimeStamp = deviceReader?.timeStamp.getTheLastTimeStamp() as number;
   deviceReader?.pauseDevice();
   deviceReader = undefined;
-});
+};
 
-// Continue recording
-ipcMain.handle(RecordChannels.Continue, () => {
+export const continueDeviceReader = () => {
   const recordingId = RecordingModel.getCurrentRecording()?.id;
 
   if (!recordingId) {
@@ -87,9 +53,44 @@ ipcMain.handle(RecordChannels.Continue, () => {
   }
 
   console.log('CONTINUE COMMAND');
-  startDeviceReader(lastTimeStamp);
+  initDeviceReader(lastTimeStamp);
   deviceReader?.readDevice();
+};
+
+export const stopDeviceReader = () => {
+  GlobalStore.removeRecordState();
+  deviceReader?.stopDevice();
+  deviceReader = undefined;
+  lastTimeStamp = 0;
+};
+
+// Initialize device reader
+ipcMain.handle(RecordChannels.Init, (_event, _args) => {
+  const recordingId = RecordingModel.getCurrentRecording()?.id;
+  if (!recordingId) {
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow() as BrowserWindow, {
+      title: 'No Recording Found',
+      message: 'No Recording Found',
+      detail: 'Please create a recording first',
+      type: 'error',
+    });
+    return;
+  }
+
+  initDeviceReader();
 });
+
+// Start recording
+ipcMain.handle(RecordChannels.Start, () => startDeviceReader());
+
+// Stop recording
+ipcMain.handle(RecordChannels.Stop, () => stopDeviceReader());
+
+// Pause recording
+ipcMain.handle(RecordChannels.Pause, () => pauseDeviceReader());
+
+// Continue recording
+ipcMain.handle(RecordChannels.Continue, () => continueDeviceReader());
 
 // Display Raw Data
 ipcMain.handle(RecordChannels.RawData, () => {});
@@ -121,3 +122,13 @@ ipcMain.handle(RecordChannels.ProbeCalibration, (_event, isActive) => {
 
 // Hypoxia Event
 ipcMain.on(ChartChannels.Event, (_event, _data: Object) => {});
+
+const RecordingFunctions = {
+  initDeviceReader,
+  startDeviceReader,
+  pauseDeviceReader,
+  continueDeviceReader,
+  stopDeviceReader,
+};
+
+export default RecordingFunctions;

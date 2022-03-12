@@ -13,7 +13,6 @@ const ClientLog = () => {
 
   useEffect(() => {
     window.api.onIPCData(GeneralChannels.LogMessage, (_, data) => {
-      console.log(data);
       if (textAreaRef.current) {
         const span = document.createElement('span');
         span.className = 'my-1 px-2 break-words w-full';

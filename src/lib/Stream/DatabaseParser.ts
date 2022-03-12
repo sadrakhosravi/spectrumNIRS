@@ -11,11 +11,9 @@ export interface DBData {
 }
 
 const prepareDbData = (
-  data: Int32Array,
+  data: any,
   batchSize: number,
-  numOfElementsPerDataPoint: number,
-  addTimeDelta: () => number,
-  recordingId: number
+  numOfElementsPerDataPoint: number
 ) => {
   let index = 0;
   const parsedData = new Array(batchSize);
@@ -28,15 +26,14 @@ const prepareDbData = (
     }
 
     parsedData[i] = {
-      timeStamp: addTimeDelta(),
-      PDRawData: dataPoint.slice(0, 6).join(','),
-      LEDIntensities: dataPoint.slice(6, 11).join(','),
-      gainValues: null,
-      events: null,
-      event: 0,
-      sensor2RawData: null,
-      sensor3RawData: null,
-      recordingId,
+      PDRawData: dataPoint.slice(0, 6),
+      LEDIntensities: dataPoint.slice(6, 11),
+      // gainValues: null,
+      // events: null,
+      // event: 0,
+      // sensor2RawData: null,
+      // sensor3RawData: null,
+      // recordingId,
     };
   }
   return parsedData;

@@ -31,6 +31,16 @@ export interface IPhysicalDevice {
   getDeviceName: () => string;
 
   /**
+   * @returns the number of ADC channels
+   */
+  getADCNumOfChannels: () => number;
+
+  /**
+   * @returns the number of ADCs on the device
+   */
+  getNumOfADCs?: () => number;
+
+  /**
    * @returns the serial number of the device
    */
   getDeviceSerialNumber: () => string;

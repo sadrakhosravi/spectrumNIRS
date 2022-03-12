@@ -10,67 +10,10 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
 
     <title>Spectrum</title>
-    <style>
-      /* Loading Animation */
-      .lds-ring {
-        display: inline-block;
-        position: relative;
-        width: 60px;
-        height: 60px;
-      }
-      .lds-ring div {
-        box-sizing: border-box;
-        display: block;
-        position: absolute;
-        width: 44px;
-        height: 44px;
-        margin: 8px;
-        border: 6px solid #fff;
-        border-radius: 50%;
-        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        border-color: #fff transparent transparent transparent;
-      }
-      .lds-ring div:nth-child(1) {
-        animation-delay: -0.45s;
-      }
-      .lds-ring div:nth-child(2) {
-        animation-delay: -0.3s;
-      }
-      .lds-ring div:nth-child(3) {
-        animation-delay: -0.15s;
-      }
-
-      .lds-large {
-        width: 85px;
-        height: 85px;
-      }
-
-      .lds-large div {
-        box-sizing: border-box;
-        display: block;
-        position: absolute;
-        width: 68px;
-        height: 68px;
-        margin: 8px;
-        border: 8px solid #fff;
-        border-radius: 50%;
-        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        border-color: #fff transparent transparent transparent;
-      }
-
-      @keyframes lds-ring {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" class="font-sans text-white h-full w-full">
+    <div id="root" class="h-full w-full font-sans text-white">
       <div
         style="
           position: absolute;
@@ -87,16 +30,10 @@
           background-color: #1e1e1e;
         "
       >
-        <div style="display: block" className="lds-ring">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
         <div style="display: block">Starting Engine ...</div>
       </div>
     </div>
     <div id="modal"></div>
-    <div class="z-[500] fixed top-0 left-0" id="contextMenu"></div>
+    <div class="fixed top-0 left-0 z-[500]" id="contextMenu"></div>
   </body>
 </html>

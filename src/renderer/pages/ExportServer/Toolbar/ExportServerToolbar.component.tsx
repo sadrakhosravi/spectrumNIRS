@@ -11,8 +11,6 @@ import StopIcon from '@icons/stop.svg';
 import PauseIcon from '@icons/pause.svg';
 
 // Channels
-import { ExportServerChannels } from '@utils/channels';
-import toast from 'react-hot-toast';
 
 const ExportServerToolbar = () => {
   const isStreaming = useAppSelector(
@@ -22,55 +20,30 @@ const ExportServerToolbar = () => {
     (state) => state.global.exportServer?.serverStatus
   );
 
-  const clients = useAppSelector(
-    (state) => state.global.exportServer?.clientStatus
-  );
-
-  const handleStartStreamBtnClick = async () => {
-    if (clients?.length === 0 || status?.currentProtocol !== 'v1') {
-      toast.error(
-        'No clients has been initialized yet. Cannot start the stream'
-      );
-      return;
-    }
-    await window.api.invokeIPC(
-      isStreaming !== null
-        ? ExportServerChannels.StopStream
-        : ExportServerChannels.StartStream
-    );
-  };
-
-  const handlePauseBtnClick = async () => {
-    await window.api.invokeIPC(
-      isStreaming !== 'paused'
-        ? ExportServerChannels.PauseStream
-        : ExportServerChannels.StartStream
-    );
-  };
-
   return (
     <ToolbarContainer>
-      <div className="grid grid-cols-6 items-center w-full h-full px-6">
+      <div className="grid h-full w-full grid-cols-6 items-center px-6">
         <div className="text-lg">Export Server</div>
-        <div className="col-start-5 col-span-2 flex justify-end items-center gap-2">
+        <div className="col-span-2 col-start-5 flex items-center justify-end gap-2">
           {status && (
             <>
               {/** Pause Button - only show if the export server is streaming */}
               <Button
+                disabled={true}
                 text={'Pause'}
                 className="bg-accent"
                 icon={PauseIcon}
                 isActive={isStreaming === 'paused'}
-                disabled={!isStreaming}
-                onClick={handlePauseBtnClick}
+                onClick={undefined}
                 title={isStreaming ? undefined : 'Start streaming first'}
               />
               <Button
+                disabled={true}
                 text={isStreaming ? 'Stop Streaming' : 'Start Streaming'}
                 className="bg-accent"
                 icon={isStreaming ? StopIcon : StartIcon}
                 isActive={isStreaming !== null}
-                onClick={handleStartStreamBtnClick}
+                onClick={undefined}
               />
             </>
           )}

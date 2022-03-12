@@ -7,7 +7,9 @@ interface IGlobalStateSlice {
   recording: IGlobalStore['recording'] | null;
   recordState: IGlobalStore['recordState'] | null;
   probe: IGlobalStore['probe'] | null;
+  liveFilter: IGlobalStore['liveFilter'] | null;
   exportServer: IGlobalStore['exportServer'] | null;
+  filePaths: IGlobalStore['filePaths'] | null;
 }
 
 const initialState: IGlobalStateSlice = {
@@ -16,7 +18,9 @@ const initialState: IGlobalStateSlice = {
   recording: null,
   probe: null,
   recordState: null,
+  liveFilter: null,
   exportServer: null,
+  filePaths: null,
 };
 
 export const GlobalStateSlice = createSlice({

@@ -149,6 +149,21 @@ export default merge(baseConfig, {
     }),
 
     new HtmlWebpackPlugin({
+      filename: 'startup.html',
+      chunks: ['none'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'startup.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+
+    new HtmlWebpackPlugin({
       filename: 'index.html',
       chunks: ['main'],
       template: path.join(webpackPaths.srcRendererPath, 'html', 'index.ejs'),

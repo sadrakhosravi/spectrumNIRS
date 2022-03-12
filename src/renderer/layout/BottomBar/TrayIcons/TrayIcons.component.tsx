@@ -16,6 +16,7 @@ import RecordingTrayIcon from './RecordingTrayIcon.component';
 // Constants
 import { USBDetectionChannels } from '@utils/channels';
 import { setDetectedSensor } from '@redux/SensorStateSlice';
+import exportServerListeners from './ExportServerListeners';
 
 const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
@@ -23,13 +24,14 @@ const TrayIcons = () => {
   const dispatch = useAppDispatch();
   const sensorState = useAppSelector((state) => state.sensorState);
 
+  exportServerListeners();
+
   // Get sensor info on mount.
   useEffect(() => {
     // Send a request to the controller to get the sensor info and set it in the state.
     const checkUSBDevices = async () => {
-      const connectedSensor = await window.api.invokeIPC(
-        USBDetectionChannels.CHECK_USB
-      );
+      console.log(USBDetectionChannels);
+      const connectedSensor = null;
       dispatch(setDetectedSensor(connectedSensor));
     };
 

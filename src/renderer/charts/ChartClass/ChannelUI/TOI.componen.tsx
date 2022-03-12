@@ -52,6 +52,7 @@ const TOIChannel = ({
         // Check for minimum and maximum
         if (TOI < TOIThreshold.minimum || TOI > TOIThreshold.maximum) {
           setTOIWarning(true);
+          TOINotif.play();
         } else {
           setTOIWarning(false);
           TOINotif.pause();
@@ -61,6 +62,7 @@ const TOIChannel = ({
 
     // Add TOI value event listener
     window.api.onIPCData('device:TOI', (_event, TOI: number) => {
+      if (!TOIValRef.current) return;
       //TOI Warning
       handleTOIValue(TOI);
 
@@ -73,7 +75,7 @@ const TOIChannel = ({
 
   useEffect(() => {
     //@ts-ignore
-    TOIValRef.current.innerText = '';
+    if (TOIValRef.current) TOIValRef.current.innerText = '';
   }, [recordState]);
 
   const handleMaximizeChannel = () => {

@@ -91,6 +91,8 @@ class ReviewChart extends Chart {
 
   loadInitialData = async () => {
     const recordingId = getState().global.recording?.currentRecording?.id;
+    const recordingSettings = getState().global.recording?.currentRecording
+      ?.settings as any;
 
     if (!recordingId) {
       dispatch(setIsAppLoading(false));
@@ -100,31 +102,48 @@ class ReviewChart extends Chart {
     const dbWorker = UIWorkerManager.getDatabaseWorker();
     const calcWorker = UIWorkerManager.getCalcWorker();
     const dbFilePath = await window.api.invokeIPC('get-database-path');
+    const msgChannel = new MessageChannel();
 
-    dbWorker.postMessage({
-      dbFilePath,
-      recordingId,
-    });
+    dbWorker.postMessage(
+      {
+        dbFilePath,
+        recordingId,
+        port: msgChannel.port1,
+      },
+      { transfer: [msgChannel.port1] }
+    );
 
-    dbWorker.onmessage = (event) => {
-      if (!event.data || event.data.length === 0) {
+    calcWorker.postMessage(
+      {
+        port: msgChannel.port2,
+        samplingRate:
+          (typeof recordingSettings === 'string' &&
+            JSON.parse(recordingSettings).probe?.samplingRate) ||
+          100,
+      },
+      { transfer: [msgChannel.port2] }
+    );
+    msgChannel.port1.start();
+    msgChannel.port2.start();
+
+    dbWorker.onmessage = ({ data }) => {
+      if (!data || data === 'end') {
         UIWorkerManager.terminateCalcWorker();
         UIWorkerManager.terminateDatabaseWorker();
         dispatch(setIsAppLoading(false));
+        msgChannel.port1.close();
+        msgChannel.port2.close();
 
         return;
       }
-      calcWorker.postMessage(event.data);
-      UIWorkerManager.terminateDatabaseWorker();
     };
 
     calcWorker.onmessage = ({ data }) => {
-      console.log(data);
-      this.drawData(data.filteredData);
+      this.drawData(data);
       // this.drawFilteredData(data.filteredData);
       dispatch(setIsAppLoading(false));
 
-      UIWorkerManager.terminateCalcWorker();
+      // UIWorkerManager.terminateCalcWorker();
     };
   };
 

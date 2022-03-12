@@ -1,30 +1,61 @@
 import { BrowserWindow, ipcMain } from 'electron';
 
-// Controllers
-import startup from './startup';
-
 const startControllers = async () => {
-  await import('./store');
-  await startup();
-  await import('./db');
-  await import('./probes');
-  await import('./chart');
+  // Attach window events
   await import('./window');
-  await import('./experiment');
-  await import('./recording');
-  await import('./dialogBox');
-  await import('./usbDetection');
-  await import('./exportServer');
-  await import('./others');
-  await import('./settingsWindow');
-  // await import('./reviewTab');
+
+  // Start global and main process stores
+  await import('./store');
+
+  // Run initial startup checks
+  const startup = (await import('./startup')).default;
+  await startup();
+
+  // Load probe controller
+  const probesController = import('./probes');
+
+  // Load Experiment & Recording controllers
+  const experimentController = import('./experiment');
+  const recordingController = import('./recording');
+
+  // Load dialog box listeners
+  const dialogBoxController = import('./dialogBox');
+
+  // Load Export server settings
+  const exportServerController = import('./exportServer');
+
+  // Load settings window listeners
+  const settingsWindowController = import('./settingsWindow');
+
+  // Load chart listeners
+  const chartController = import('./chart');
+
+  // Load DB listeners
+  const dbFunctionController = import('./db');
+
+  // Load other listeners
+  const otherListenersController = import('./others');
+
+  // Version issue - FIXME: Use the right version of USB detection compiled for electron
+  // await import('./usbDetection');
 
   // Let UI know that main has finished loading
   let mainWindow = BrowserWindow.getAllWindows()[0];
-  mainWindow.webContents.send('main-loaded');
-  ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
 
-  // const WorkerManager = (await import('../main/models/WorkerManager')).default;
+  // Wait for all modules to load and inform the UI
+  Promise.all([
+    probesController,
+    experimentController,
+    recordingController,
+    dialogBoxController,
+    exportServerController,
+    settingsWindowController,
+    chartController,
+    dbFunctionController,
+    otherListenersController,
+  ]).then(() => mainWindow.webContents.send('main-loaded'));
+
+  ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
 };
 
 export default startControllers;

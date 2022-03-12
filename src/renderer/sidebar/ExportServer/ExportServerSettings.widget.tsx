@@ -17,7 +17,7 @@ import { useAppSelector } from '@redux/hooks/hooks';
 import {
   IDataSize,
   IDataTypes,
-} from '@electron/models/exportServer/ExportServer';
+} from '@electron/models/ExportServer/ExportServer';
 
 //Renders the filter widget on the sidebar
 const ExportServerSettings = () => {
@@ -31,12 +31,11 @@ const ExportServerSettings = () => {
 
   const dataSize: IDataSize[] = [
     { label: 'Batch (25samples)', value: 'batch' },
+    { label: 'Batch (50samples)', value: 'batch50' },
+    { label: 'Batch (100samples)', value: 'batch100' },
     { label: 'Single Data Point', value: 'sdp' },
   ];
-  const dataTypes: IDataTypes[] = [
-    { label: 'JSON', value: 'JSON' },
-    { label: 'String', value: 'string' },
-  ];
+  const dataTypes: IDataTypes[] = [{ label: 'JSON', value: 'JSON' }];
 
   const [outputDataSize, setOutputDataSize] = useState(dataSize[0]);
   const [outputDataType, setOutputDataType] = useState(dataTypes[0]);
@@ -69,7 +68,7 @@ const ExportServerSettings = () => {
               <DisabledOverlay title="You cannot access settings while the data stream is active" />
             )}
           </>
-          <div className="pt-1 w-full">
+          <div className="w-full pt-1">
             <p className="mb-2">Output Data Size: </p>
             <ButtonMenu text={outputDataSize.label} width="290px">
               {dataSize.map((size) => (
@@ -86,7 +85,7 @@ const ExportServerSettings = () => {
               ))}
             </ButtonMenu>
           </div>
-          <div className="w-full mt-4">
+          <div className="mt-4 w-full">
             <p className="mb-2">Send Data To: </p>
             <ButtonMenu text={sendTo} width="290px">
               <>
@@ -112,7 +111,7 @@ const ExportServerSettings = () => {
               </>
             </ButtonMenu>
           </div>
-          <div className="w-full mt-4">
+          <div className="mt-4 w-full">
             <p className="mb-2">Output Data Type: </p>
             <ButtonMenu text={outputDataType.label} width="290px">
               {dataTypes.map((type) => (

@@ -1,9 +1,12 @@
+import { DeviceDataType } from '@electron/models/DeviceReader/DeviceDataTypes';
 import { Matrix, pseudoInverse } from 'ml-matrix';
 import { col2, col3 } from './e_coef';
 /**
  * Calculations of the V5 device channels
  */
 class V5Calculation {
+  private LEDIntensities: number[];
+
   private NUM_OF_LEDs: number;
   /**
    * The wavelengths of the V5 sensor LEDs
@@ -29,7 +32,8 @@ class V5Calculation {
    * The number of data points in the dataBatch array.
    */
 
-  constructor() {
+  constructor(LEDIntensities: number[]) {
+    this.LEDIntensities = LEDIntensities;
     this.NUM_OF_LEDs = 5;
     this.wavelengths = new Uint16Array([950, 730, 810, 850, 650]);
     this.c_beta = new Float32Array([
@@ -47,52 +51,23 @@ class V5Calculation {
    * @returns
    */
   public processRawData = (
-    dataBatch: Int32Array,
-    batchSize: number
+    data: DeviceDataType[],
+    batchSize: number,
+    timeStamp = 0,
+    timeDelta = 10
   ): number[][] => {
-    let arrayIndex = 0;
-    const NUM_OF_RAW_PD_VALUES = 6; // Number of elements per each sample data point
-
     const calculatedData: any[] = new Array(batchSize);
+    let tDelta = 0;
     // For each batch, go through individual data point and calculate the values
     for (let i = 0; i < batchSize; i += 1) {
-      // Prepare arrays for calculation
-      const rawPDValues = dataBatch.slice(
-        arrayIndex,
-        arrayIndex + NUM_OF_RAW_PD_VALUES
-      );
-      arrayIndex += NUM_OF_RAW_PD_VALUES;
-
-      const LEDIntValues = dataBatch.slice(
-        arrayIndex,
-        arrayIndex + this.NUM_OF_LEDs
-      );
-      arrayIndex += this.NUM_OF_LEDs + 1;
-
       // Calculate values
-      const dataArray = this.calcHemodynamics(rawPDValues);
-      dataArray.push(this.calcTOI(rawPDValues, LEDIntValues));
+      const dataArray = this.calcHemodynamics(data[i].ADC1);
+      dataArray[dataArray.length - 1] = this.calcTOI(data[i].ADC1);
+      dataArray[0] = timeStamp + tDelta;
       calculatedData[i] = dataArray;
+
+      tDelta += timeDelta;
     }
-    return calculatedData;
-  };
-
-  public processDbData = (dataBatch: any[]) => {
-    const batchSize = dataBatch.length;
-    const calculatedData: any[] = new Array(batchSize);
-
-    for (let i = 0; i < batchSize; i += 1) {
-      // Prepare arrays for calculation
-      const rawPDValues = dataBatch[i].PDRawData;
-      const LEDIntValues = dataBatch[i].LEDIntensities;
-
-      // Calculate values
-      const dataArray = this.calcHemodynamics(rawPDValues);
-      dataArray.push(this.calcTOI(rawPDValues, LEDIntValues));
-      dataArray.unshift(dataBatch[i].timeStamp);
-      calculatedData[i] = dataArray;
-    }
-
     return calculatedData;
   };
 
@@ -145,7 +120,7 @@ class V5Calculation {
    * Calculates the O2Hb, HHb, and THb values from the raw intensities read from the sensor
    * uses the Raw PD readings (ADC) values.
    */
-  public calcHemodynamics = (rawPDValues: Int32Array) => {
+  public calcHemodynamics = (rawPDValues: number[]) => {
     const data = new Float32Array(rawPDValues.slice(0, rawPDValues.length - 1));
     const baseline = rawPDValues[rawPDValues.length - 1];
 
@@ -171,25 +146,8 @@ class V5Calculation {
     O2Hb = Math.abs(O2Hb);
     HHb = Math.abs(HHb) * -5;
 
-    // Check for values to make sense
-    // if (O2Hb < 0.1 && O2Hb > 0.01) {
-    //   O2Hb = O2Hb * 100;
-    // }
-
-    // if (O2Hb < 0.01) {
-    //   O2Hb = O2Hb * 1000;
-    // }
-
-    // if (HHb < 0.1 && HHb > 0.01) {
-    //   HHb = HHb * 100;
-    // }
-
-    // if (HHb < 0.01) {
-    //   HHb = HHb * 1000;
-    // }
-
     const THb = O2Hb + Math.abs(HHb);
-    const calculatedData = [O2Hb, HHb, THb]; // The last value (0) will be filled by TOI
+    const calculatedData = [0, O2Hb, HHb, THb, 0]; // The last value (0) will be filled by TOI
 
     return calculatedData;
   };
@@ -198,13 +156,13 @@ class V5Calculation {
    * Calculates the Tissue Oxygenation Index from the intensities and raw PD (ADC) values
    * @returns the TOI calculated from the intensities and raw PD (ADC) values from the sensor
    */
-  private calcTOI = (rawPDValues: Int32Array, LEDIntValues: Int32Array) => {
+  private calcTOI = (rawPDValues: number[]) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (LEDIntValues[0] / 255) * 4095,
-      (LEDIntValues[1] / 255) * 4095,
-      (LEDIntValues[3] / 255) * 4095,
-      (LEDIntValues[4] / 255) * 4095,
+      (this.LEDIntensities[0] / 255) * 4095,
+      (this.LEDIntensities[1] / 255) * 4095,
+      (this.LEDIntensities[3] / 255) * 4095,
+      (this.LEDIntensities[4] / 255) * 4095,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here
@@ -235,7 +193,7 @@ class V5Calculation {
     if (!TOI || TOI === Infinity) TOI = 0;
 
     // FIXME: Fix TOI Coefficients
-    TOI = TOI / 2.6;
+    TOI = TOI / 2.25;
 
     return TOI;
   };

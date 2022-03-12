@@ -8,7 +8,7 @@ import ListButton from '@components/Buttons/ListButton';
 import WebSocketIcon from '@icons/websocket.svg';
 import { DialogBoxChannels, ExportServerChannels } from '@utils/channels';
 import GlobalStore from '@lib/globalStore/GlobalStore';
-import { IClientStatus } from '@electron/models/exportServer/ExportServer';
+import { IClientStatus } from '@electron/models/ExportServer/ExportServer';
 import DisabledOverlay from '@components/Overlay/DisabledOverlay.component';
 
 const ClientStatus = () => {
@@ -79,7 +79,7 @@ const ClientStatus = () => {
                 }
                 text={formatName(status?.appName as string) || 'Client'}
                 description={
-                  <ul className="ml-4 text-sm list-disc">
+                  <ul className="ml-4 list-disc text-sm">
                     <li>
                       Connection:{' '}
                       {status.state === 1 ? 'Open' : 'Not connected'}{' '}
