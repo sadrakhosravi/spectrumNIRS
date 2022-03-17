@@ -11,9 +11,7 @@ import {
   UIElementBuilders,
   UIPointableTextBox,
 } from '@arction/lcjs';
-import { setAllEvents } from '@redux/ChartSlice';
-import { getState, dispatch } from '@redux/store';
-import msToTime from '@utils/msToTime';
+import { getState } from '@redux/store';
 
 class ChartOptions {
   channels: string[];
@@ -188,57 +186,13 @@ class ChartOptions {
 
         .setStrokeStyle(
           new SolidLine({
-            thickness: 3,
+            thickness: 2,
             fillStyle: new SolidFill({ color: ColorHEX(color) }),
           })
         );
       this.constantLines.push(cl);
     });
     return customTick;
-  }
-
-  /**
-   * Adds the given events to each chart
-   * @param events Array of events
-   */
-  addEventsToCharts(data: any[]) {
-    const DATA_LENGTH = data.length;
-    const eventsArr = [];
-    let hypoxia = false;
-    let event2 = false;
-    // Using for loop for maximum performance
-    for (let i = 0; i < DATA_LENGTH; i++) {
-      const events = JSON.parse(data[i].events);
-      if (events.hypoxia && !hypoxia) {
-        this.drawMarker(data[i].timeStamp, 'Hypoxia: Start', '#FFF');
-        eventsArr.push({
-          timeStamp: data[i].timeStamp,
-          time: msToTime(data[i].timeStamp),
-          name: 'Hypoxia',
-          color: '#FFF',
-        });
-        hypoxia = true;
-      }
-      if (!events.hypoxia && hypoxia) {
-        this.drawMarker(data[i].timeStamp, 'Hypoxia: End', '#FFF');
-        hypoxia = false;
-      }
-      if (events.event2 && !event2) {
-        this.drawMarker(data[i].timeStamp, 'Event2', '#333');
-        event2 = true;
-        eventsArr.push({
-          timeStamp: data[i].timeStamp,
-          time: msToTime(data[i].timeStamp),
-          name: 'Event2',
-          color: '#FFF',
-        });
-      }
-      if (!events.event2 && event2) {
-        this.drawMarker(data[i].timeStamp, 'Event2: End', '#333');
-        event2 = false;
-      }
-    }
-    dispatch(setAllEvents(eventsArr));
   }
 
   clearCharts() {

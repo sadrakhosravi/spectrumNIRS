@@ -6,7 +6,9 @@ import { RecordState } from '@utils/constants';
 import Indicator from './Indicator.component';
 
 const RecordingIndicator = () => {
-  const recordState = useAppSelector((state) => state.recordState.value);
+  const recordState = useAppSelector(
+    (state) => state.global.recordState?.recordState
+  );
 
   // Check conditions
   const isActive =

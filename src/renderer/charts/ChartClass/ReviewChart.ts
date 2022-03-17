@@ -23,6 +23,9 @@ import { ChartChannels } from '@utils/channels';
 import { setAllEvents } from '@redux/ChartSlice';
 import { setReviewChartPositions } from '@redux/ReviewChartSlice';
 import UIWorkerManager from 'renderer/UIWorkerManager';
+import EventManager, {
+  IEvents,
+} from '@electron/models/DeviceReader/EventManager';
 
 class ReviewChart extends Chart {
   numberOfRows: number;
@@ -61,7 +64,8 @@ class ReviewChart extends Chart {
       this.dashboard,
       this.charts,
       this.series,
-      true
+      true,
+      this.xAxisChart
     );
     this.customizeCharts();
     this.zoomBandChart = zoomBandChart.bind(this)();
@@ -91,10 +95,13 @@ class ReviewChart extends Chart {
 
   loadInitialData = async () => {
     const recordingId = getState().global.recording?.currentRecording?.id;
-    const recordingSettings = getState().global.recording?.currentRecording
-      ?.settings as any;
+    const currentRecording = getState().global.recording;
 
-    if (!recordingId) {
+    if (
+      !recordingId ||
+      (currentRecording?.lastTimeStamp === 0 &&
+        !currentRecording.currentRecording?.probeSettings)
+    ) {
       dispatch(setIsAppLoading(false));
       return;
     }
@@ -103,28 +110,29 @@ class ReviewChart extends Chart {
     const calcWorker = UIWorkerManager.getCalcWorker();
     const dbFilePath = await window.api.invokeIPC('get-database-path');
     const msgChannel = new MessageChannel();
+    const eventMsgChannel = new MessageChannel();
 
     dbWorker.postMessage(
       {
         dbFilePath,
-        recordingId,
+        currentRecording: currentRecording?.currentRecording,
         port: msgChannel.port1,
+        eventPort: eventMsgChannel.port2,
       },
-      { transfer: [msgChannel.port1] }
+      { transfer: [msgChannel.port1, eventMsgChannel.port2] }
     );
 
     calcWorker.postMessage(
       {
         port: msgChannel.port2,
-        samplingRate:
-          (typeof recordingSettings === 'string' &&
-            JSON.parse(recordingSettings).probe?.samplingRate) ||
-          100,
+        currentRecording: currentRecording?.currentRecording,
       },
       { transfer: [msgChannel.port2] }
     );
     msgChannel.port1.start();
     msgChannel.port2.start();
+    eventMsgChannel.port1.start();
+    eventMsgChannel.port2.start();
 
     dbWorker.onmessage = ({ data }) => {
       if (!data || data === 'end') {
@@ -140,11 +148,26 @@ class ReviewChart extends Chart {
 
     calcWorker.onmessage = ({ data }) => {
       this.drawData(data);
-      // this.drawFilteredData(data.filteredData);
       dispatch(setIsAppLoading(false));
-
-      // UIWorkerManager.terminateCalcWorker();
     };
+
+    eventMsgChannel.port1.onmessage = ({ data }) => {
+      const events = EventManager.parseEvents(data);
+      this.addEvents(events);
+      eventMsgChannel.port1.close();
+      eventMsgChannel.port2.close();
+    };
+  };
+
+  addEvents = (events: IEvents[]) => {
+    dispatch(setAllEvents(events));
+    for (let i = 0; i < events.length; i += 1) {
+      this.chartOptions?.drawMarker(
+        events[i].timeSequence as number,
+        events[i].name,
+        '#CCC'
+      );
+    }
   };
 
   /**

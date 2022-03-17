@@ -13,7 +13,6 @@ import TimeDiv from './TimeDiv.component';
 import ResetHeightIcon from '@icons/reset-height.svg';
 import ChartScreenshotIcon from '@icons/chart-screenshot.svg';
 import ExportIcon from '@icons/export-data.svg';
-import MarkerIcon from '@icons/marker.svg';
 
 // Constants
 import { ChartType, ModalConstants } from '@utils/constants';
@@ -56,27 +55,6 @@ const ReviewChartToolbar = ({}: ReviewChartToolbarProps) => {
     dispatch(openModal(ModalConstants.EXPORT_FORM));
   };
 
-  const addEvent = () => {
-    const currentInterval = reviewChart?.charts[0]
-      .getDefaultAxisX()
-      .getInterval();
-    reviewChart?.chartOptions?.drawMarker(
-      currentInterval?.end as number,
-      'Hypoxia',
-      '#E61557'
-    );
-  };
-  const addEvent2 = () => {
-    const currentInterval = reviewChart?.charts[0]
-      .getDefaultAxisX()
-      .getInterval();
-    reviewChart?.chartOptions?.drawMarker(
-      currentInterval?.end as number,
-      'Other Event',
-      '#8E07F0'
-    );
-  };
-
   return (
     <>
       {reviewChart && (
@@ -102,19 +80,6 @@ const ReviewChartToolbar = ({}: ReviewChartToolbarProps) => {
                     icon={ExportIcon}
                     tooltip={'Export Data'}
                     onClick={exportData}
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <ButtonWithTooltip
-                    icon={MarkerIcon}
-                    tooltip={'Hypoxia Event'}
-                    onClick={addEvent}
-                  />
-                  <ButtonWithTooltip
-                    icon={MarkerIcon}
-                    tooltip={'Other Event'}
-                    onClick={addEvent2}
                   />
                 </div>
 

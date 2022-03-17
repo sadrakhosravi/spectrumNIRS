@@ -7,6 +7,7 @@ import Probes from './entity/Probes';
 
 // Paths
 import { databaseFile } from '../main/paths';
+
 import GlobalStore from '@lib/globalStore/GlobalStore';
 
 const createDBConnection = async () => {

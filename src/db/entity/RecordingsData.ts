@@ -19,7 +19,13 @@ export class RecordingsData extends BaseEntity {
   timeSequence: number;
 
   @Column({ type: 'blob' })
-  data: Blob;
+  data: any;
+
+  @Column({ type: 'blob', nullable: true })
+  events: any;
+
+  @Column({ type: 'blob', nullable: true })
+  other: any;
 
   @Column({ type: 'bigint', nullable: true })
   timeStamp: BigInt;

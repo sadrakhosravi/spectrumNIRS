@@ -17,8 +17,11 @@ import { ILiveFilter } from 'filters/LiveFilter';
 
 let storePath = '';
 
+console.log(process.type);
+
 (async () => {
   if (process.type === 'renderer') {
+    console.log('STORE PATH');
     storePath = await window.api.invokeIPC('get-settings-path');
   } else {
     const paths = await import('@electron/paths');

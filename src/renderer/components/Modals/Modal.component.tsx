@@ -9,7 +9,7 @@ import { closeModal } from '@redux/ModalStateSlice';
 interface IProps {
   title: string;
   id: string;
-  size?: 'large' | undefined;
+  size?: 'large' | 'small' | undefined;
   fixedSize?: boolean;
 }
 
@@ -20,10 +20,21 @@ const Modal: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const openedModal = useAppSelector((state) => state.modalState.value);
 
-  const largeStyles =
-    size === 'large'
-      ? 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto'
-      : 'w-1/2 max-h-3/4 overflow-y-auto';
+  let styles = 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto';
+
+  switch (size) {
+    case 'large':
+      styles = 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto';
+      break;
+
+    case 'small':
+      styles = 'w-1/3 max-h-5/6 h-5/6 overflow-y-auto';
+      break;
+
+    default:
+      styles = 'w-1/2 max-h-5/6 h-5/6 overflow-y-auto';
+      break;
+  }
 
   useEffect(() => {
     openedModal === id ? setIsOpen(true) : setIsOpen(false);
@@ -68,7 +79,7 @@ const Modal: React.FC<IProps> = (props) => {
               </span>
 
               <div
-                className={`border-primary relative my-8 inline-block transform overflow-hidden rounded-md bg-grey1 py-6 px-12 text-left align-middle text-white shadow-xl transition-all will-change-auto ${largeStyles} ${
+                className={`border-primary relative my-8 inline-block transform overflow-hidden rounded-md bg-grey1 py-6 px-12 text-left align-middle text-white shadow-xl transition-all will-change-auto ${styles} ${
                   fixedSize && 'min-h-[50vh] min-w-[50vw]'
                 }`}
               >

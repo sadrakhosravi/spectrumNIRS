@@ -1,11 +1,9 @@
 class UIWorkerManager {
   private databaseWorker: undefined | Worker;
-  // private eventsWorker: undefined | Worker;
   private calcWorker: undefined | Worker;
   private exportdataWorker: undefined | Worker;
   constructor() {
     this.databaseWorker = undefined;
-    // this.eventsWorker = undefined;
     this.calcWorker = undefined;
     this.exportdataWorker = undefined;
   }

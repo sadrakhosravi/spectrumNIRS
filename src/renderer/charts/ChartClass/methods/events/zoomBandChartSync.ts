@@ -14,6 +14,13 @@ function zoomBandChartSync(
   band.setValueStart(bandValueStart);
   band.setValueEnd(bandValueEnd);
 
+  const subToScaleChange = () =>
+    this.xAxisChart.getDefaultAxisX().onScaleChange((start, end) => {
+      band.setValueStart(start);
+      band.setValueEnd(end);
+    });
+
+  let xAxisScaleChangeToken = subToScaleChange();
   let valueChangeToken: Token;
 
   // Only change xAxisChart interval on mouse enter to prevent infinite loop
@@ -23,25 +30,31 @@ function zoomBandChartSync(
       bandValueStart = start;
       bandValueEnd = end;
     });
+
+    this.xAxisChart.getDefaultAxisX().offScaleChange(xAxisScaleChangeToken);
   });
 
   // Cleanup listener on mouse leave
   band.onMouseLeave(() => {
     band.offValueChange(valueChangeToken);
+    xAxisScaleChangeToken = subToScaleChange();
   });
 
   // Add jump to a point on click
   zoomBandChart.onSeriesBackgroundMouseClick(() => {
     const nearestPoint = zoomBandChart.solveNearest();
+    const interval = this.xAxisChart.getDefaultAxisX().getInterval();
+    const timeDiv = (interval.end - interval.start) / 2;
+
     if (nearestPoint) {
       const { location } = nearestPoint;
-      console.log(location);
       const bandValueMiddle = (bandValueEnd - bandValueStart) / 2;
       band.setValueStart(location.x - bandValueMiddle);
       band.setValueEnd(location.x + bandValueMiddle);
+
       this.xAxisChart
         ?.getDefaultAxisX()
-        .setInterval(location.x - 30000, location.x + 30000, false, true);
+        .setInterval(location.x - timeDiv, location.x + timeDiv, false, true);
     }
   });
 }

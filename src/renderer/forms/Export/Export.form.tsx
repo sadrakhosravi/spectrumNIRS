@@ -66,18 +66,6 @@ const ExportForm = () => {
 
   // Handles form submit
   const onSubmit = async (_data: any) => {
-    // const result = await window.api.invokeIPC(ChartChannels.ExportAll, {
-    //   recordingId: currentRecording?.id,
-    //   type: exportOption,
-    // });
-
-    const result = await handleExportData();
-
-    console.log(result);
-  };
-
-  // Handles the export of data
-  const handleExportData = async () => {
     const savePath = await window.api.invokeIPC(
       DialogBoxChannels.GetSaveDialog
     );
@@ -86,21 +74,14 @@ const ExportForm = () => {
     toast.loading('Exporting. This might take a while', { duration: Infinity });
 
     const dbFilePath = getState().global.filePaths?.dbFile;
-    const recordingSetting = getState().global.recording?.currentRecording
-      ?.settings as string | undefined;
-    let samplingRate = 100;
-
-    if (recordingSetting) {
-      samplingRate = JSON.parse(recordingSetting).probe.samplingRate;
-    }
+    const currentRecording = getState().global.recording?.currentRecording;
 
     const exportWorker = UIWorkerManager.getExportdataWorker();
     const workerData = {
       dbFilePath,
       savePath,
       type: exportOption,
-      samplingRate,
-      recordingId: currentRecording?.id,
+      currentRecording,
     };
     exportWorker.postMessage(workerData);
 

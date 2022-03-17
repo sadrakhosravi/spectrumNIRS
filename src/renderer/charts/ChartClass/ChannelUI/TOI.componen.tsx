@@ -156,9 +156,7 @@ const TOIChannel = ({
               <p
                 className="w-[10px] -rotate-90 text-xs"
                 hidden={chartPos.height <= 40}
-              >
-                Units
-              </p>
+              ></p>
             </div>
           </div>
           {TOIWarning &&

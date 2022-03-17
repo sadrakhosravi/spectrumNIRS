@@ -25,6 +25,7 @@ import withTooltip from '@hoc/withTooltip.hoc';
 import { useChartContext } from 'renderer/context/ChartProvider';
 import { openModal } from '@redux/ModalStateSlice';
 import { getState, dispatch } from '@redux/store';
+import Utilities from 'renderer/UIModels/Utilities';
 
 const ButtonWithTooltip = withTooltip(Button);
 
@@ -85,25 +86,8 @@ const RecordChartToolbar = ({}: RecordChartToolbarProps) => {
     dispatch(openModal(ModalConstants.EXPORT_FORM));
   };
 
-  const addEvent = () => {
-    const currentInterval = recordChart?.charts[0]
-      .getDefaultAxisX()
-      .getInterval();
-    recordChart?.chartOptions?.drawMarker(
-      currentInterval?.end as number,
-      'Hypoxia',
-      '#E61557'
-    );
-  };
-  const addEvent2 = () => {
-    const currentInterval = recordChart?.charts[0]
-      .getDefaultAxisX()
-      .getInterval();
-    recordChart?.chartOptions?.drawMarker(
-      currentInterval?.end as number,
-      'Other Event',
-      '#8E07F0'
-    );
+  const openCustomEventForm = () => {
+    dispatch(openModal(ModalConstants.CUSTOM_EVENT_FORM));
   };
 
   return (
@@ -135,13 +119,10 @@ const RecordChartToolbar = ({}: RecordChartToolbarProps) => {
             <div className="flex gap-2">
               <ButtonWithTooltip
                 icon={MarkerIcon}
-                tooltip={'Hypoxia Event'}
-                onClick={addEvent}
-              />
-              <ButtonWithTooltip
-                icon={MarkerIcon}
-                tooltip={'Other Event'}
-                onClick={addEvent2}
+                tooltip={'Add Event'}
+                onClick={() =>
+                  Utilities.checkIfRecordingNotActive(openCustomEventForm)
+                }
               />
             </div>
 

@@ -13,7 +13,7 @@ export enum AppState {
 // Record state
 export enum RecordState {
   IDLE = 'idle',
-  RECORD = 'record',
+  RECORD = 'recording',
   PAUSED = 'pause',
   CONTINUE = 'continue',
 }
@@ -30,6 +30,7 @@ export enum ModalConstants {
   GENERALMODAL = 'general-modal',
   EXPERIMENTSETTINGS = 'experiment-settings',
   EXPORT_FORM = 'export-form',
+  CUSTOM_EVENT_FORM = 'custom_event_form',
 }
 
 // Chart types available

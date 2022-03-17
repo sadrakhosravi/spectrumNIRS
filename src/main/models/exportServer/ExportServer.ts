@@ -227,7 +227,7 @@ class ExportServer {
       this.sendServerError('error:The are no active streams to stop.');
       return;
     }
-    this.mainWindow?.webContents.send(ExportServerChannels.StopServer);
+    this.mainWindow?.webContents.send(ExportServerChannels.ServerStopped);
 
     console.log('CALLED STOP');
     this.curDataPointIndex = 0;
@@ -276,7 +276,7 @@ class ExportServer {
       });
 
       if (this.outputData.length === this.batchSize) {
-        this.sendFunc(this.outputData);
+        this.sendFunc && this.sendFunc(this.outputData);
         this.outputData.length = 0;
       }
     }
@@ -301,9 +301,11 @@ class ExportServer {
    * @returns A send function based on the selected send to socket option
    */
   private getSendFunction = () => {
-    const sendTo = GlobalStore.getExportServer('sendTo') as
+    let sendTo = GlobalStore.getExportServer('sendTo') as
       | 'All Clients'
       | string;
+
+    if (!sendTo) sendTo = 'All Clients';
 
     let sendFunc: (data: any) => void;
 
@@ -318,7 +320,7 @@ class ExportServer {
       ) as IWebSocket;
       sendFunc = (data: any) => selectedSocket.send(JSON.stringify(data));
     }
-
+    console.log(sendFunc);
     return sendFunc;
   };
 
@@ -409,6 +411,8 @@ class ExportServer {
    * Stops the server and cleans up the memory
    */
   public stop = async () => {
+    this.mainWindow?.webContents.send(ExportServerChannels.ServerStopped);
+
     this.sockets.forEach((socket) => {
       socket.send('server:Shutting down');
       socket.removeAllListeners();

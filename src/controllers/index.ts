@@ -37,7 +37,7 @@ const startControllers = async () => {
   const otherListenersController = import('./others');
 
   // Version issue - FIXME: Use the right version of USB detection compiled for electron
-  // await import('./usbDetection');
+  // import('./usbDetection');
 
   // Let UI know that main has finished loading
   let mainWindow = BrowserWindow.getAllWindows()[0];
@@ -53,9 +53,10 @@ const startControllers = async () => {
     chartController,
     dbFunctionController,
     otherListenersController,
-  ]).then(() => mainWindow.webContents.send('main-loaded'));
-
-  ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
+  ]).then(() => {
+    mainWindow.webContents.send('main-loaded');
+    ipcMain.on('is-main-loaded', (event) => event.sender.send('main-loaded'));
+  });
 };
 
 export default startControllers;

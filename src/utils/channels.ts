@@ -121,6 +121,7 @@ export const ExportServerChannels = {
   StartStream: ExportServerBase + 'start-stream',
   StopStream: ExportServerBase + 'stop-stream',
   PauseStream: ExportServerBase + 'pause-stream',
+  ServerStopped: ExpChannelBase + 'server-stopped',
 };
 
 // User Settings

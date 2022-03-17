@@ -120,8 +120,10 @@ ipcMain.handle(RecordChannels.ProbeCalibration, (_event, isActive) => {
   }
 });
 
-// Hypoxia Event
-ipcMain.on(ChartChannels.Event, (_event, _data: Object) => {});
+ipcMain.handle(ChartChannels.Event, (_event, _data) => {
+  console.log(_data);
+  deviceReader?.addEvents(_data);
+});
 
 const RecordingFunctions = {
   initDeviceReader,

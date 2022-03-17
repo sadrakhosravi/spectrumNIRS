@@ -144,7 +144,7 @@ class V5Calculation {
     }
 
     O2Hb = Math.abs(O2Hb);
-    HHb = Math.abs(HHb) * -5;
+    HHb = Math.abs(HHb) * 5;
 
     const THb = O2Hb + Math.abs(HHb);
     const calculatedData = [0, O2Hb, HHb, THb, 0]; // The last value (0) will be filled by TOI

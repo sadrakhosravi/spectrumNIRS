@@ -10,6 +10,7 @@ import OpenPatient from '@forms/OpenExperiment/OpenPatient.modal';
 import ExportModal from '@forms/Export/ExportModal.modal';
 import SelectProbe from '@forms/Probes/SelectProbe.modal';
 import NewProbe from '@forms/Probes/NewProbe.modal';
+import CustomEventModal from '@forms/Events/CustomEvent.modal';
 
 const ModalsContainer = (): JSX.Element => {
   return (
@@ -22,6 +23,7 @@ const ModalsContainer = (): JSX.Element => {
       <OpenExperiment />
       <OpenPatient />
       <ExportModal />
+      <CustomEventModal />
       <IsLoadingModal />
     </>
   );

@@ -8,6 +8,8 @@ import './App.css';
 //Component import
 import LoadingIndicator from '@components/Loaders/LoadingIndicator.component';
 import useLoadState from 'renderer/startup/useLoadStates';
+// import useLoadUIModels from './startup/useLoadUIModels';
+
 import TitleBar from './layout/TitleBar/TitleBar.component';
 import BottomBar from './layout/BottomBar/BottomBar.component';
 import MainNavigation from './layout/MainNavigation/MainNavigation.component';
@@ -26,6 +28,7 @@ const ReviewPage = React.lazy(() => import('@pages/Review/Review.page'));
 
 const App = () => {
   useLoadState();
+  // useLoadUIModels();
 
   return (
     <div className="relative h-full w-full">

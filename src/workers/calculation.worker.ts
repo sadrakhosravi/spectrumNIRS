@@ -1,33 +1,33 @@
-//@ts-nocheck
-import { DBDataModel } from '@lib/dataTypes/BinaryData';
+import { IRecordingData } from '@electron/models/RecordingModel';
 import V5Calculation from 'calculations/V5/V5Calculation';
 import IIRFilter from '../filters/IIRFilters';
-import Snappy from 'snappy-electron';
+import DatabaseOperations from '../main/models/Database/DatabaseOperations';
 
 type CalcDataType = {
   port: MessagePort;
-  samplingRate: number;
+  currentRecording: IRecordingData;
 };
 
 const ONE_MS = 1000;
 let timeDelta = 10;
 
-//@ts-ignore
-const v5Calc = new V5Calculation([120, 141, 123, 120, 169]);
-
+let v5Calc: V5Calculation;
 const lpFilters = new IIRFilter(5);
 
+type Data = {
+  timeData: {
+    timeStamp: number;
+    timeSequence: number;
+  }[];
+  data: Uint8Array[];
+  byteLength: number;
+  batchSize: number;
+};
+
 //@ts-ignore
-const processData = (data: any) => {
-  console.log(data.data.length, data.timeData.length);
-  console.time('decoding');
-
+const processData = (data: Data) => {
   for (let i = 0; i < data.batchSize; i += 1) {
-    //@ts-ignore
-
-    const unCompressedData = Snappy.uncompressSync(data.data[i]) as Buffer;
-    const rawData = DBDataModel.fromBuffer(unCompressedData);
-
+    const rawData = DatabaseOperations.parseData(data.data[i] as Buffer);
     const filteredData = lpFilters.filterData(rawData);
     const processedData = v5Calc.processRawData(
       filteredData,
@@ -40,12 +40,17 @@ const processData = (data: any) => {
 };
 
 self.onmessage = ({ data }: { data: CalcDataType }) => {
+  v5Calc = new V5Calculation(data.currentRecording.probeSettings.intensities);
   timeDelta = ONE_MS / 100;
-  lpFilters.createLowPassFilters(data.samplingRate, 5, 6);
+  lpFilters.createLowPassFilters(
+    data.currentRecording.probeSettings.samplingRate,
+    5,
+    6
+  );
   const port = data.port;
   data.port.onmessage = ({ data }) => {
     processData(data);
 
-    port.postMessage('ok');
+    port.postMessage('done');
   };
 };

@@ -45,10 +45,10 @@ const RecordChart = ({}: ChartProps): JSX.Element => {
     // Keep a ref to the chart
     chartRef.current = chart as RecordChartClass;
     setRecordChart(chart);
-    chart.loadInitialData();
 
     const recordState = getState().global.recordState?.recordState;
-
+    const recordSettings = getState().global.recording?.currentRecording;
+    console.log(recordSettings);
     if (recordState !== 'continue' && recordState !== 'recording') {
       chart.loadInitialData();
     } else {

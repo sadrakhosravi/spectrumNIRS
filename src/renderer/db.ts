@@ -21,7 +21,7 @@ ipcRenderer.on('db:init', (_event, configs) => {
       db.pragma('memory_shrink');
 
       insert = db.prepare(
-        'INSERT INTO recordings_data (data, timeStamp, timeSequence, recordingId) VALUES (?, ?, ?, ?)'
+        'INSERT INTO recordings_data (data, events, other, timeStamp, timeSequence, recordingId) VALUES (?, ?, ?, ?, ?, ?)'
       );
 
       // Set current recording's Id
@@ -30,10 +30,12 @@ ipcRenderer.on('db:init', (_event, configs) => {
       // Create the db transaction function
       dbTransaction = db.transaction(function (
         dbData: Buffer,
+        events: Buffer | null,
+        other: Buffer | null,
         timeStamp: number,
         timeSequence: number
       ) {
-        insert.run(dbData, timeStamp, timeSequence, recordingId);
+        insert.run(dbData, events, other, timeStamp, timeSequence, recordingId);
 
         return;
       });
@@ -48,8 +50,20 @@ ipcRenderer.on('db:init', (_event, configs) => {
  */
 function handleDbData(_event: Electron.IpcRendererEvent, data: any) {
   const compressedDbData = Snappy.compressSync(data.data);
+  let eventsCompressed;
 
-  dbTransaction(compressedDbData, data.timeStamp, data.timeSequence);
+  if (data.events.length !== 0) {
+    const events = JSON.stringify(data.events);
+    eventsCompressed = Snappy.compressSync(events);
+  }
+
+  dbTransaction(
+    compressedDbData,
+    eventsCompressed || null,
+    data.other,
+    data.timeStamp,
+    data.timeSequence
+  );
 }
 
 // Handle incoming data to be saved to the database

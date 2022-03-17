@@ -1,9 +1,8 @@
 import path from 'path';
 import { app } from 'electron';
-import { appName } from '~/package.json';
 
 // Constants
-
+const appName = 'Beast Spectrum';
 // Resources path
 export const initialFilesPath = path.join(
   __dirname,

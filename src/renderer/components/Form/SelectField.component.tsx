@@ -13,7 +13,7 @@ const SelectField = (props: SelectFieldProps): JSX.Element => {
     <select
       defaultValue={defaultValue || undefined}
       {...register}
-      className={`h-40px w-full rounded-sm px-3 py-2 ring-accent focus:ring-2 ${
+      className={`h-[35px] w-full rounded-sm px-3 py-2 ring-accent focus:ring-2 ${
         className || 'bg-light text-dark'
       }`}
       id={register ? register.name : undefined}

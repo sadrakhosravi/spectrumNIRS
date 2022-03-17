@@ -25,6 +25,8 @@ import { defaultLPCoef } from 'filters/filterConstants';
 // Deep copies an object in a performant way
 import { exportServer } from 'controllers/exportServer';
 import copyDeviceDataObject from '@electron/helpers/copyDeviceDataObj';
+import { IPDs } from '@lib/Device/NIRSDevice';
+import { IEvents } from './EventManager';
 
 export interface IDeviceInfo {
   samplingRate: number;
@@ -37,6 +39,17 @@ export interface RecordState {
   isDeviceStarted: boolean;
   isCalibrating: boolean;
   recordState: 'idle' | 'recording' | 'pause' | 'continue';
+}
+
+export interface IDeviceSettings {
+  deviceName: string;
+  devicePDs: IPDs[];
+  numOfDeviceADCs: number | undefined;
+  supportedSamplingRates: number[];
+  numOfLEDs: number;
+  deviceVersion: string;
+  dataBatchSize: number;
+  defaultSamplingRate: number;
 }
 
 class DeviceReader {
@@ -63,8 +76,8 @@ class DeviceReader {
   calcWorker: Worker | undefined;
   recordingId: number | undefined;
   currentRecording: IRecordingData | undefined;
-  events: { hypoxia: boolean; event2: boolean };
   deviceData: any[];
+  eventsData: IEvents[];
 
   constructor(_lastTimeStamp?: number) {
     this.currentRecording = RecordingModel.getCurrentRecording();
@@ -89,6 +102,7 @@ class DeviceReader {
     this.deviceLogStream = undefined;
 
     this.deviceData = [];
+    this.eventsData = [];
 
     // Sampling data
     this.deviceSamplingRate =
@@ -102,10 +116,6 @@ class DeviceReader {
     this.powerSaveBlocker = 0;
 
     this.calcWorker = undefined;
-    this.events = {
-      hypoxia: false,
-      event2: false,
-    };
 
     console.log('DEVICE READER CREATED');
   }
@@ -113,7 +123,7 @@ class DeviceReader {
   /**
    * Starts the device and registers its input commands
    */
-  startDevice = async () => {
+  public startDevice = async () => {
     // Start the device
     this.device.Device.startDevice();
     // Connect to device input listener
@@ -128,7 +138,7 @@ class DeviceReader {
   /**
    * Stops the physical device and cleans all the listeners
    */
-  stopDevice() {
+  public stopDevice() {
     exportServer?.getIsStreaming() && exportServer?.stopStream();
 
     console.log('DEVICE STOPPED');
@@ -140,7 +150,7 @@ class DeviceReader {
   /**
    * Terminates the active device reader and sets the states accordingly
    */
-  terminateDevice() {
+  public terminateDevice() {
     this.deviceStream?.removeAllListeners();
     this.deviceLogStream?.removeAllListeners();
     this.deviceStream = undefined;
@@ -163,7 +173,10 @@ class DeviceReader {
     WorkerManager.terminateAllWorkers();
   }
 
-  pauseDevice() {
+  /**
+   * Stops the device but changes the state to pause
+   */
+  public pauseDevice() {
     exportServer?.pauseStream();
 
     this.terminateDevice();
@@ -177,7 +190,7 @@ class DeviceReader {
    * Syncs the intensities and gain values of the software with the
    * hardware controller
    */
-  syncIntensitiesAndGainWithController() {
+  public syncIntensitiesAndGainWithController() {
     const currentProbe = ProbesManager.getCurrentProbe();
 
     // Check for no probe
@@ -194,14 +207,48 @@ class DeviceReader {
    * Sends a command/message to the opened device
    * @param message the command to be sent to the device
    */
-  sendCommandToDevice(message: string) {
+  public sendCommandToDevice(message: string) {
     return this.device.Input.sendToDevice(message);
+  }
+
+  public addEvents(event: IEvents) {
+    if (!event?.timeSequence && !event?.timeStamp) {
+      event.timeSequence = this.timeStamp.getTimeStamp();
+    }
+    this.eventsData.push(event);
+  }
+
+  /**
+   * @returns an object containing current device settings and supported options
+   */
+  private getDeviceSettings(): IDeviceSettings {
+    const deviceName = this.device.Device.getDeviceName();
+    const devicePDs = this.device.Device.getPDs();
+    const numOfDeviceADCs =
+      this.device.Device.getNumOfADCs && this.device.Device.getNumOfADCs();
+    const supportedSamplingRates =
+      this.device.Device.getSupportedSamplingRates();
+    const numOfLEDs = this.device.Device.getNumOfLEDs();
+    const deviceVersion = this.device.Device.getVersion();
+    const dataBatchSize = this.device.Stream.getDataBatchSize();
+    const defaultSamplingRate = this.device.Device.getDefaultSamplingRate();
+
+    return {
+      deviceName,
+      devicePDs,
+      numOfDeviceADCs,
+      supportedSamplingRates,
+      numOfLEDs,
+      deviceVersion,
+      dataBatchSize,
+      defaultSamplingRate,
+    };
   }
 
   /**
    * Checks the given variables and calls the appropriate device reader function
    */
-  readDevice = async () => {
+  public readDevice = async () => {
     let isDownSampled = false;
 
     const lastTimeStamp =
@@ -229,6 +276,9 @@ class DeviceReader {
     // Keeps system active but allows screen to be turned off.
     this.powerSaveBlocker = powerSaveBlocker.start('prevent-app-suspension');
 
+    // Save device/probe settings
+    await RecordingModel.saveDeviceSettings(this.getDeviceSettings());
+
     // Start the device,
     await this.startDevice();
 
@@ -251,7 +301,7 @@ class DeviceReader {
   /**
    * @returns the database and calculation worker
    */
-  startWorkers() {
+  private startWorkers() {
     const dbProcess = BrowserWindow.getAllWindows()[1];
 
     // Prepare workers' data
@@ -276,7 +326,7 @@ class DeviceReader {
     return { calcWorker: this.calcWorker, dbProcess };
   }
 
-  listenForCalcWorkerData(calculatedData: any) {
+  private listenForCalcWorkerData(calculatedData: any) {
     this.mainWindow.send('device:data', calculatedData);
   }
 
@@ -284,7 +334,7 @@ class DeviceReader {
    * Reads and processes the device data at the maximum sampling rate
    * @param deviceStream the stream instance of the device
    */
-  readDeviceData(deviceStream: Readable | null | undefined) {
+  private readDeviceData(deviceStream: Readable | null | undefined) {
     GlobalStore.setRecordState('recordState', 'recording');
     const device = this.device;
 
@@ -390,11 +440,10 @@ class DeviceReader {
    * Send the device data buffer to the db process
    * @param dbProcess - The db renderer process to send data to
    */
-  sendDbData(dbProcess: Electron.BrowserWindow) {
+  private sendDbData(dbProcess: Electron.BrowserWindow) {
     console.time('startCompress');
 
     const dbDataBuffer = DBDataModel.toBuffer(this.deviceData);
-    // const dbBuffer = Buffer.from(buffer);
 
     const timeSequence =
       this.timeStamp.getTimeStamp() -
@@ -404,9 +453,12 @@ class DeviceReader {
       data: dbDataBuffer,
       timeSequence: timeSequence,
       timeStamp: Date.now(),
+      events: this.eventsData,
     });
 
     this.deviceData.length = 0;
+    this.eventsData.length = 0;
+
     console.timeEnd('startCompress');
   }
 
@@ -415,7 +467,9 @@ class DeviceReader {
    * down samples it to the user defined sampling rate
    * @param deviceStream the stream instance of the device
    */
-  readDeviceDataWithDownSampling(deviceStream: Readable | null | undefined) {
+  private readDeviceDataWithDownSampling(
+    deviceStream: Readable | null | undefined
+  ) {
     const device = this.device;
 
     // Device number of elements and number of data points send to NodeJS
@@ -453,20 +507,10 @@ class DeviceReader {
   }
 
   /**
-   * Toggles the specified event to be saved
-   * @param event - The event object
-   */
-  toggleEvent(event: object | any) {
-    const eventName = Object.keys(event)[0] as keyof typeof this.events;
-    const eventState = event[eventName] as boolean;
-    this.events[eventName] = eventState;
-  }
-
-  /**
    * Reads the device data without saving/processing it
    * Used mainly for probe calibration
    */
-  readDeviceDataOnly = async () => {
+  public readDeviceDataOnly = async () => {
     // Update state
     GlobalStore.setRecordState('isCalibrating', true);
 

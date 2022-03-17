@@ -10,6 +10,8 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 
 import { Patients } from './Patients';
@@ -24,16 +26,25 @@ export class Recordings extends BaseEntity {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  description: Date;
+  description: string;
 
-  @Column({ type: 'datetime', nullable: true })
-  date: Date;
+  @Column({ type: 'int', nullable: true })
+  startTime: number;
+
+  @Column({ type: 'int', nullable: true })
+  endTime: number;
 
   @Column({ type: 'blob', nullable: true })
-  deviceSettings: JSON | string | any;
+  deviceSettings: string;
+
+  @Column({ type: 'blob', nullable: true })
+  probeSettings: string;
 
   @Column({ type: 'blob', nullable: true })
   settings: JSON | string | any;
+
+  @Column({ type: 'blob', nullable: true })
+  other: string;
 
   @ManyToOne(() => Patients, { onDelete: 'CASCADE' })
   patient: Patients | number;
@@ -41,10 +52,23 @@ export class Recordings extends BaseEntity {
   @CreateDateColumn({ select: false })
   public createdAt: Date;
 
-  @UpdateDateColumn({ select: false })
+  @Column({ type: 'text', nullable: true })
+  lastUpdate: string;
+
+  @UpdateDateColumn({ type: 'datetime' })
   public updatedAt: Date;
 
-  @Column({ type: 'blob', nullable: true })
-  other: JSON | string | any;
+  @BeforeInsert()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
+  @BeforeUpdate()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
 }
 export default Recordings;

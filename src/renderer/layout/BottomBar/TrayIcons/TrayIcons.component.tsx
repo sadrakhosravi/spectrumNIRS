@@ -1,66 +1,50 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '@redux/hooks/hooks';
-
-// HOC
-import withTooltip from '@hoc/withTooltip.hoc';
-
-// Icons
-import SensorIcon from '@icons/sensor.svg';
 
 // Components
-import TrayIconButtons from './TrayIconButton.component';
 import ExperimentTrayIcon from './ExperimentTrayIcon.component';
 import PatientTrayIcon from './PatientTrayIcon.component copy';
 import RecordingTrayIcon from './RecordingTrayIcon.component';
 
 // Constants
-import { USBDetectionChannels } from '@utils/channels';
-import { setDetectedSensor } from '@redux/SensorStateSlice';
 import exportServerListeners from './ExportServerListeners';
 
-const TrayIconWithTooltip = withTooltip(TrayIconButtons);
+// const TrayIconWithTooltip = withTooltip(TrayIconButtons);
 
 const TrayIcons = () => {
-  const dispatch = useAppDispatch();
-  const sensorState = useAppSelector((state) => state.sensorState);
-
   exportServerListeners();
 
   // Get sensor info on mount.
   useEffect(() => {
-    // Send a request to the controller to get the sensor info and set it in the state.
-    const checkUSBDevices = async () => {
-      console.log(USBDetectionChannels);
-      const connectedSensor = null;
-      dispatch(setDetectedSensor(connectedSensor));
-    };
-
-    const handleUSBStatus = (_event: any, data: any) => {
-      dispatch(setDetectedSensor(data));
-    };
-
-    window.api.onIPCData(USBDetectionChannels.NIRSV5, handleUSBStatus);
-    checkUSBDevices();
-    return () => window.api.removeListeners(USBDetectionChannels.NIRSV5);
+    // // Send a request to the controller to get the sensor info and set it in the state.
+    // const checkUSBDevices = async () => {
+    //   const connectedSensor = null;
+    //   dispatch(setDetectedSensor(connectedSensor));
+    // };
+    // const handleUSBStatus = (_event: any, data: any) => {
+    //   dispatch(setDetectedSensor(data));
+    // };
+    // window.api.onIPCData(USBDetectionChannels.NIRSV5, handleUSBStatus);
+    // checkUSBDevices();
+    // return () => window.api.removeListeners(USBDetectionChannels.NIRSV5);
   }, []);
 
-  // Tooltip for sensor icon.
-  const sensorTooltip = (
-    <div className="px-2 py-2 text-left">
-      <h2 className="mb-1 text-xl text-accent">Sensor Information</h2>
+  // // Tooltip for sensor icon.
+  // const sensorTooltip = (
+  //   <div className="px-2 py-2 text-left">
+  //     <h2 className="mb-1 text-xl text-accent">Sensor Information</h2>
 
-      <div className="ml-4">
-        {!sensorState.detectedSensor && <p>No sensor found!</p>}
-        {sensorState.detectedSensor && (
-          <>
-            <p>Name: {sensorState.detectedSensor?.name}</p>
-            <p>Channels: </p>
-            <p>Rate: 100 samples/s</p>
-          </>
-        )}
-      </div>
-    </div>
-  );
+  //     <div className="ml-4">
+  //       {!sensorState.detectedSensor && <p>No sensor found!</p>}
+  //       {sensorState.detectedSensor && (
+  //         <>
+  //           <p>Name: {sensorState.detectedSensor?.name}</p>
+  //           <p>Channels: </p>
+  //           <p>Rate: 100 samples/s</p>
+  //         </>
+  //       )}
+  //     </div>
+  //   </div>
+  // );
 
   // Fix layout issue with margin bottom.
   const SeparatorBar = <div className="mb-[5px]"></div>;
@@ -72,7 +56,7 @@ const TrayIcons = () => {
         <PatientTrayIcon />
         <RecordingTrayIcon />
         {SeparatorBar}
-        <TrayIconWithTooltip
+        {/* <TrayIconWithTooltip
           icon={SensorIcon}
           text={`${
             sensorState.detectedSensor?.name
@@ -81,7 +65,7 @@ const TrayIcons = () => {
           }`}
           tooltip={sensorTooltip}
           interactive
-        />
+        /> */}
       </div>
     </div>
   );

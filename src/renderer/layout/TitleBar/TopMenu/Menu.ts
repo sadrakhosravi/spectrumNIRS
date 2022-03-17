@@ -20,12 +20,14 @@ export const TopMenu = [
     submenu: [
       {
         label: 'Open',
+        checkRecording: true,
         click: () => {
           dispatch(openModal(ModalConstants.OPEN_EXPERIMENT));
         },
       },
       {
         label: 'Close',
+        checkRecording: true,
         click: async () => {
           await window.api.invokeIPC(RecordChannels.Stop);
 
@@ -45,12 +47,14 @@ export const TopMenu = [
       },
       {
         label: 'Reload',
+        checkRecording: true,
         click: () => {
           window.location.reload();
         },
       },
       {
         label: 'Exit',
+        checkRecording: true,
         click: () => {
           window.api.window.close();
         },
@@ -62,10 +66,14 @@ export const TopMenu = [
     submenu: [
       {
         label: 'Experiment',
+        checkRecording: true,
+
         click: () => dispatch(openModal(ModalConstants.NEWEXPERIMENT)),
       },
       {
         label: 'Patient',
+        checkRecording: true,
+
         click: () =>
           getState().global.experiment?.currentExp?.name
             ? dispatch(openModal(ModalConstants.NEWPATIENT))
@@ -73,6 +81,8 @@ export const TopMenu = [
       },
       {
         label: 'Recording',
+        checkRecording: true,
+
         click: () =>
           getState().global.patient?.currentPatient?.name
             ? dispatch(openModal(ModalConstants.NEWRECORDING))
@@ -85,12 +95,16 @@ export const TopMenu = [
     submenu: [
       {
         label: 'Select Probe',
+        checkRecording: true,
+
         click: () => {
           dispatch(openModal(ModalConstants.SELECT_PROBE));
         },
       },
       {
         label: 'New Probe',
+        checkRecording: true,
+
         click: () => {
           dispatch(openModal(ModalConstants.NEW_PROBE));
         },
@@ -99,9 +113,11 @@ export const TopMenu = [
   },
   {
     label: 'Database',
+
     submenu: [
       {
         label: 'Optimize',
+        checkRecording: true,
         click: async () => {
           toast.loading('Optimizing database ...');
           await window.api.invokeIPC('database-vacuum');
@@ -118,6 +134,8 @@ export const TopMenu = [
     submenu: [
       {
         label: 'About',
+        checkRecording: false,
+
         click: () =>
           window.api.invokeIPC(DialogBoxChannels.MessageBox, {
             title: 'Photon Lab Software',
@@ -129,6 +147,7 @@ export const TopMenu = [
       },
       {
         label: 'Check for Updates',
+        checkRecording: false,
         click: () => window.api.sendIPC(UpdaterChannels.CheckForUpdate),
       },
     ],

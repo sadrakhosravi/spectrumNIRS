@@ -4,7 +4,6 @@ import { combineReducers } from 'redux';
 
 // State slices
 import AppStateReducer from '@redux/AppStateSlice';
-import RecordStateReducer from '@redux/RecordStateSlice';
 import SensorStateReducer from '@redux/SensorStateSlice';
 import ModalStateReducer from '@redux/ModalStateSlice';
 import ExperimentDataReducer from '@redux/ExperimentDataSlice';
@@ -17,7 +16,6 @@ import { experimentsApi } from './api/experimentsApi';
 
 const reducers = combineReducers({
   appState: AppStateReducer,
-  recordState: RecordStateReducer,
   sensorState: SensorStateReducer,
   modalState: ModalStateReducer,
   experimentData: ExperimentDataReducer,
@@ -56,6 +54,6 @@ const store = configureStore({
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
 
-const { dispatch, getState } = store;
-export { dispatch, getState };
+const { dispatch, getState, subscribe, replaceReducer } = store;
+export { dispatch, getState, subscribe, replaceReducer };
 export default store;

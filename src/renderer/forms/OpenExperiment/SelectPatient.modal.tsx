@@ -46,7 +46,6 @@ const SelectPatient = ({
       ExperimentChannels.getAllRecordings,
       patientId
     );
-    console.log(recordings);
     setRecordings(recordings);
   };
 
@@ -120,7 +119,7 @@ const SelectPatient = ({
               key={recording + index}
             >
               <button
-                className="flex w-full  items-center gap-4 rounded-sm bg-grey1 text-left hover:bg-accent"
+                className="flex w-full items-center gap-4 rounded-sm bg-grey1 pr-14 text-left hover:bg-accent"
                 key={recording.id}
               >
                 <div
@@ -137,17 +136,18 @@ const SelectPatient = ({
                     {recording.updatedAt.split(' ')[0]}
                   </span>
                 </div>
-                <DeleteButton
-                  onClick={async () => {
-                    await deleteRecordingAndData(recording.id, recording.name);
-                    // Refresh the list
-                    setTimeout(() => {
-                      getAllRecordings(patient.id);
-                    }, 300);
-                  }}
-                  title="Delete Recording and its Data"
-                />
               </button>
+              <DeleteButton
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={async () => {
+                  await deleteRecordingAndData(recording.id, recording.name);
+                  // Refresh the list
+                  setTimeout(() => {
+                    getAllRecordings(patient.id);
+                  }, 300);
+                }}
+                title="Delete Recording and its Data"
+              />
             </div>
           ))}
         {recordings?.length === 0 && (

@@ -2,14 +2,13 @@ import React from 'react';
 import { useAppDispatch } from '@redux/hooks/hooks';
 import { closeModal, openModal } from '@redux/ModalStateSlice';
 import { resetExperimentData } from '@redux/ExperimentDataSlice';
-import { changeRecordState } from '@redux/RecordStateSlice';
 import { deleteExperimentAndData } from '@adapters/experimentAdapter';
 
 // Icons
 import RecentFileIcon from '@icons/recent-file.svg';
 
 // Constants
-import { ModalConstants, RecordState } from '@utils/constants';
+import { ModalConstants } from '@utils/constants';
 import { ExperimentChannels, RecordChannels } from '@utils/channels';
 import ListButton from '@components/Buttons/ListButton';
 
@@ -34,7 +33,6 @@ const RecentExperiment: React.FC<IProps> = ({
 
   const handleOpenExperimentButton = async () => {
     dispatch(resetExperimentData());
-    dispatch(changeRecordState(RecordState.IDLE));
 
     // Get the experiment from DB
     await window.api.invokeIPC(

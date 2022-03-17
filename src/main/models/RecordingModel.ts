@@ -8,9 +8,13 @@ import PatientModel from './PatientModel';
 
 // Interfaces
 import { INewRecordingData } from 'interfaces/interfaces';
+import { IDeviceSettings } from './DeviceReader/DeviceReader';
+
 import RecordingsData from 'db/entity/RecordingsData';
 
 import DBDataParser from './DBDataParser';
+
+import DatabaseError from './DatabaseError';
 
 export interface ITOIThreshold {
   minimum: number;
@@ -22,7 +26,7 @@ export interface IRecordingSetting {
   TOIThreshold: ITOIThreshold | undefined;
 }
 
-export interface IRecordingSettingDefault {
+export interface IProbeSettings {
   probe: CurrentProbe | undefined;
 }
 
@@ -33,13 +37,16 @@ export interface IRecordingData {
   id: number;
   name: string;
   patient: number;
-  settings: IRecordingSetting & IRecordingSettingDefault;
+  settings: any;
+  probeSettings: any;
+  deviceSettings: any;
+  other: any;
+  lastUpdate: string;
   updatedAt: string;
 }
 
 // The default settings
-const settings: IRecordingSetting & IRecordingSettingDefault = {
-  probe: undefined,
+const settings: IRecordingSetting = {
   TOIThreshold: undefined,
 };
 
@@ -47,11 +54,16 @@ class RecordingModel {
   currentRecording: IRecordingData | undefined;
   recordingsDataModel: RecordingsDataModel | undefined;
   lastTimeStamp: number;
+  defaultCompressionAlgorithm: string;
+  defaultSerializationAlgorithm: string;
 
   constructor() {
     this.currentRecording = undefined;
     this.recordingsDataModel = undefined;
     this.lastTimeStamp = 0;
+
+    this.defaultCompressionAlgorithm = 'snappy';
+    this.defaultSerializationAlgorithm = 'avro';
   }
 
   /**
@@ -93,20 +105,36 @@ class RecordingModel {
     this.lastTimeStamp = lastTimeSequence || 0;
 
     GlobalStore.setRecording('lastTimeStamp', this.lastTimeStamp);
+
+    console.log(this.currentRecording);
+    console.log(this.lastTimeStamp);
   };
 
   /**
    * Processes recording settings saved in the database and parses its values
    */
   private processRecordingSettings() {
-    const settings = this.currentRecording?.settings;
-    if (!settings) return;
+    if (!this.currentRecording) return;
 
-    // Process TOI Threshold values
-    if (settings.TOIThreshold) {
-      settings.TOIThreshold.minimum = ~~settings.TOIThreshold.minimum;
-      settings.TOIThreshold.maximum = ~~settings.TOIThreshold.maximum;
-    }
+    const settings = this.currentRecording.settings;
+    const probeSettings = this.currentRecording.probeSettings;
+    const deviceSettings = this.currentRecording.deviceSettings;
+    const other = this.currentRecording.other;
+
+    if (typeof settings === 'string')
+      this.currentRecording.settings = JSON.parse(
+        this.currentRecording?.settings
+      );
+    if (typeof probeSettings === 'string')
+      this.currentRecording.probeSettings = JSON.parse(
+        this.currentRecording.probeSettings
+      );
+    if (typeof deviceSettings === 'string')
+      this.currentRecording.deviceSettings = JSON.parse(
+        this.currentRecording.deviceSettings
+      );
+    if (typeof other === 'string')
+      this.currentRecording.other = JSON.parse(this.currentRecording.other);
   }
 
   /**
@@ -123,7 +151,7 @@ class RecordingModel {
       })
       .getRawOne();
 
-    if (lastRecord) {
+    if (lastRecord && lastRecord.data.length !== 0) {
       const lastRecordUnpacked = DBDataParser.parseBlobData(lastRecord.data);
 
       const lastTimeSequence =
@@ -181,8 +209,6 @@ class RecordingModel {
 
       // Add probe info to the recording settings
       // Should be added last for it not to be overwritten
-      const probeInfo = ProbesManager.getCurrentProbe();
-      settings.probe = probeInfo;
 
       // Stringify the settings before inserting it to the DB
       _newRecording.settings = JSON.stringify(settings);
@@ -195,6 +221,59 @@ class RecordingModel {
       return true;
     } catch (error: any) {
       throw new Error(error.message);
+    }
+  };
+
+  public saveDeviceSettings = async (deviceSettings: IDeviceSettings) => {
+    try {
+      // Current recording
+      const recordingId = this.getCurrentRecording()?.id;
+      if (!recordingId) return;
+
+      // Current probe object
+      const currentProbe = ProbesManager.getCurrentProbe();
+      if (!currentProbe) return;
+
+      // Check if the current recording has data
+      const currentRec = await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(Recordings, '')
+        .where(`id = ${this.currentRecording?.id}`)
+        .getRawOne<Recordings>();
+
+      // If there's already a probe/device settings return
+      if (currentRec?.probeSettings || currentRec?.deviceSettings) return;
+
+      const other = {
+        compression: this.defaultCompressionAlgorithm,
+        serialization: this.defaultSerializationAlgorithm,
+      };
+
+      const currentProbeAsString = JSON.stringify(currentProbe);
+      const deviceSettingsAsString = JSON.stringify(deviceSettings);
+      const otherAsString = JSON.stringify(other);
+
+      await getConnection()
+        .createQueryBuilder()
+        .update(Recordings)
+        .set({
+          probeSettings: currentProbeAsString,
+          deviceSettings: deviceSettingsAsString,
+          other: otherAsString,
+        })
+        .where(`id = ${this.currentRecording?.id}`)
+        .execute();
+
+      if (!this.currentRecording) return;
+
+      this.currentRecording.probeSettings = currentProbe;
+      this.currentRecording.deviceSettings = deviceSettings;
+      this.currentRecording.other = other;
+
+      GlobalStore.setRecording('currentRecording', this.currentRecording);
+    } catch (error: any) {
+      new DatabaseError(error.message);
     }
   };
 

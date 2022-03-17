@@ -105,6 +105,7 @@ class WindowManger {
         nodeIntegration: true,
         nodeIntegrationInWorker: true,
         backgroundThrottling: false,
+        preload: path.join(__dirname, 'preload.js'),
       },
       icon: getAssetPath('icon.png'),
     }) as IBrowserWindow;

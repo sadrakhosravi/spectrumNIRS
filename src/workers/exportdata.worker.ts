@@ -4,17 +4,32 @@
 import BetterSqlite3 from 'better-sqlite3';
 import fs from 'fs';
 
-import { DBDataModel } from '@lib/dataTypes/BinaryData';
-import Snappy from 'snappy-electron';
-
 import V5Calculations from '../calculations/V5/V5Calculation';
+import DatabaseOperations from '@electron/models/Database/DatabaseOperations';
+import { IRecordingData } from '@electron/models/RecordingModel';
+import columnify from 'columnify';
+
+// Characters
+const NEWLINE_CHAR = '\n';
+
+// Global Variables
+let writeStream: fs.WriteStream;
+
+const calcColumns = ['', 'O2Hb', 'HHb', 'THb', 'TOI'];
+const ADCColumns = [
+  'ADC1_Ch1',
+  'ADC1_Ch2',
+  'ADC1_Ch3',
+  'ADC1_Ch4',
+  'ADC1_Ch5',
+  'Ambient',
+];
 
 type DataType = {
   dbFilePath: string;
-  recordingId: number;
+  currentRecording: IRecordingData;
   savePath: number;
-  type: string;
-  samplingRate: number;
+  type: 'txt' | 'csv';
 };
 
 self.onmessage = ({ data }: { data: DataType }) => {
@@ -23,14 +38,131 @@ self.onmessage = ({ data }: { data: DataType }) => {
     readonly: true,
   });
 
+  switch (data.type) {
+    case 'csv':
+      handleExcelExport(db, data);
+      break;
+
+    case 'txt':
+      handleTextExport(db, data);
+      break;
+
+    default:
+      handleTextExport(db, data);
+      break;
+  }
+
+  writeStream.close();
+
+  writeStream.on('close', () => {
+    db.close();
+    setTimeout(() => self.postMessage('end'), 100);
+  });
+};
+
+const handleTextExport = (db: BetterSqlite3.Database, data: DataType) => {
   // Determine the time delta in ms
-
-  //@ts-ignore
-  const timeDelta = 1000 / data.samplingRate;
-  //@ts-ignore
+  const timeDelta = 1000 / data.currentRecording.probeSettings.samplingRate;
   let timeSequence = 0;
-  const calc = new V5Calculations([140, 150, 150, 125, 160]);
+  const calc = new V5Calculations(
+    data.currentRecording.probeSettings.intensities
+  );
 
+  // Edit default pragmas to get the fastest read from SQLite 3
+  db.pragma('cache_size = 8192');
+  db.pragma('page_size =8192');
+
+  const selectStmt = db.prepare(
+    `SELECT data, timeStamp, events, other FROM recordings_data WHERE recordingId=?`
+  ) as any;
+
+  selectStmt.raw(true);
+
+  // Create a write stream to write to a text file
+  writeStream = fs.createWriteStream(data.savePath + '.' + data.type);
+
+  const dbData = selectStmt.all(data.currentRecording.id);
+  const DbDataLength = dbData.length;
+
+  // Add data headers
+  const intervalFormat = `Interval = \t ${timeDelta / 1000} s`;
+  const startTimeOfDay = `Start Time of Day = ${new Date(dbData[0][1])}`;
+  const LEDInt = `LED Intensities = ${data.currentRecording.probeSettings.intensities.join(
+    ','
+  )}`;
+
+  writeStream.write(intervalFormat + NEWLINE_CHAR, 'utf-8');
+  writeStream.write(startTimeOfDay.toString() + NEWLINE_CHAR, 'utf-8');
+  writeStream.write(LEDInt + NEWLINE_CHAR, 'utf-8');
+  writeStream.write(NEWLINE_CHAR + NEWLINE_CHAR, 'utf-8');
+
+  let firstOutput = true;
+
+  // Loops through all the db data
+  for (let i = 0; i < DbDataLength; i++) {
+    const data = DatabaseOperations.parseData(dbData[i][0] as Buffer);
+    const dataLength = data.length;
+    const calcData = calc.processRawData(data, dataLength, 0, 0);
+
+    if (calcData.length !== dataLength) return; // Something went wrong
+    const dataPoints: any[] = [];
+
+    // Loops through all data packet data point
+    for (let j = 0; j < dataLength; j += 1) {
+      const dataObj: any = {};
+
+      // Add timeSequence
+      dataObj.Time = timeSequence / 1000; // in seconds
+
+      // Add calculated data
+      calcData[j].forEach((value, ind) => {
+        if (ind !== 0) dataObj[calcColumns[ind]] = value.toFixed(12);
+      });
+
+      // Add PD raw data
+      data[j].ADC1.forEach((value, ind) => {
+        dataObj[ADCColumns[ind]] = value;
+      });
+
+      // Add hardware gain
+      dataObj.Gain = 0;
+
+      dataPoints.push(dataObj);
+
+      if (dataPoints.length === 50) {
+        const columns = columnify(dataPoints, {
+          showHeaders: firstOutput,
+          preserveNewLines: true,
+          minWidth: 15,
+        });
+        firstOutput = false;
+        // Write to file
+        writeStream.write(columns + NEWLINE_CHAR, 'utf-8');
+
+        dataPoints.length = 0;
+      }
+
+      timeSequence += timeDelta;
+    }
+
+    const columns = columnify(dataPoints, {
+      showHeaders: firstOutput,
+      preserveNewLines: true,
+      minWidth: 15,
+    });
+
+    dataPoints.length = 0;
+    // Write to file
+    writeStream.write(columns + NEWLINE_CHAR, 'utf-8');
+  }
+};
+
+const handleExcelExport = (db: BetterSqlite3.Database, data: DataType) => {
+  const timeDelta = 1000 / data.currentRecording.probeSettings.samplingRate;
+  let timeSequence = 0;
+  const calc = new V5Calculations(
+    data.currentRecording.probeSettings.intensities
+  );
   // Edit default pragmas to get the fastest read from SQLite 3
   db.pragma('cache_size = 8192');
   db.pragma('page_size =8192');
@@ -41,56 +173,54 @@ self.onmessage = ({ data }: { data: DataType }) => {
   selectStmt.raw(true);
 
   // Create a write stream to write to a text file
-  let writeStream = fs.createWriteStream(data.savePath + '.' + data.type);
+  writeStream = fs.createWriteStream(data.savePath + '.' + data.type);
 
   // Settings for querying data from the database.
   //  let offset = 0;
   //  const LIMIT = 30000;
 
   const columnTitles = [
-    'Time Sequence',
+    'Time(s)',
     'O2Hb',
     'HHb',
     'THb',
     'TOI',
-    'PD1RawData',
-    'PD2RawData',
-    'PD3RawData',
-    'PD4RawData',
-    'PD5RawData',
+    'ADC1_CH1',
+    'ADC1_CH2',
+    'ADC1_CH3',
+    'ADC1_CH4',
+    'ADC1_CH5',
     'Ambient',
-    'LED1 Intensity',
-    'LED2 Intensity',
-    'LED3 Intensity',
-    'LED4 Intensity',
-    'LED5 Intensity',
-    'Hardware Gain',
+    'Gain',
     'Events',
-    'Other Data1',
-    'Other Data 2',
   ];
 
-  // Add column title
-  writeStream.write(columnTitles.join(',') + '\n', 'utf-8');
-
-  const dbData = selectStmt.all(data.recordingId);
+  const dbData = selectStmt.all(data.currentRecording.id);
   const DbDataLength = dbData.length;
 
-  const deviceInfo = {
-    LEDIntensities: [120, 140, 150, 160, 120],
-  };
+  // Add data headers
+  const intervalFormat = `Interval, \t ${timeDelta / 1000} s`;
+  const startTimeOfDay = `Start Time of Day, ${new Date(dbData[0][1])}`;
+  const LEDInt = `LED Intensities, ${data.currentRecording.probeSettings.intensities.join(
+    ','
+  )}`;
+
+  writeStream.write(intervalFormat + NEWLINE_CHAR, 'utf-8');
+  writeStream.write(startTimeOfDay.toString() + NEWLINE_CHAR, 'utf-8');
+  writeStream.write(LEDInt + NEWLINE_CHAR, 'utf-8');
+  writeStream.write(NEWLINE_CHAR + NEWLINE_CHAR, 'utf-8');
 
   // FORMAT
-  //'timeStamp','timeSequence','O2Hb','HHb','THb','TOI','PDRawData1','PDRawData2','PDRawData3','PDRawData4','PDRawData5','Ambient','LED1 Intensity','LED2 Intensity','LED3 Intensity','LED4 Intensity','LED5 Intensity','Hardware Gain','events','sensor2RawData','sensor3RawData',
+  // 'Time(s)','O2Hb','HHb','THb','TOI','ADC1_CH1','ADC1_CH2','ADC1_CH3','ADC1_CH4','ADC1_CH5','Ambient','Gain','Events'
+
+  // Add column title
+  writeStream.write(columnTitles.join(',') + NEWLINE_CHAR, 'utf-8');
 
   // Loops through all the db data
   for (let i = 0; i < DbDataLength; i++) {
-    const uncompressedData = Snappy.uncompressSync(dbData[i][0]) as Buffer;
-    const data = DBDataModel.fromBuffer(uncompressedData) as any[]; // Data packets
+    const data = DatabaseOperations.parseData(dbData[i][0] as Buffer);
     const dataLength = data.length;
     const calcData = calc.processRawData(data, dataLength, 0, 0);
-
-    console.log(calcData);
 
     if (calcData.length !== dataLength) return; // Something went wrong
 
@@ -99,7 +229,7 @@ self.onmessage = ({ data }: { data: DataType }) => {
       const dataPoint: any[] = [];
 
       // Add timeSequence
-      dataPoint.push(timeSequence);
+      dataPoint.push(timeSequence / 1000);
 
       // Add calculated data
       calcData[j].forEach((value, ind) => ind !== 0 && dataPoint.push(value));
@@ -107,32 +237,16 @@ self.onmessage = ({ data }: { data: DataType }) => {
       // Add PD raw data
       data[j].ADC1.forEach((pdValue: number) => dataPoint.push(pdValue));
 
-      // Add Intensities
-      deviceInfo.LEDIntensities.forEach((intValue: number) =>
-        dataPoint.push(intValue)
-      );
-
       // Add hardware gain
-      dataPoint.push(data[j].Gain);
+      dataPoint.push(0);
 
       // Add events
       dataPoint.push('');
 
-      // Add other hardware data
-      dataPoint.push('');
-      dataPoint.push('');
-
       // Write to file
-      writeStream.write(dataPoint.join(',') + '\n', 'utf-8');
+      writeStream.write(dataPoint.join(',') + NEWLINE_CHAR, 'utf-8');
 
       timeSequence += timeDelta;
     }
   }
-
-  writeStream.close();
-  db.close();
-
-  writeStream.on('close', () => {
-    setTimeout(() => self.postMessage('end'), 100);
-  });
 };

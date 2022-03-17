@@ -100,6 +100,8 @@ class ChartClass {
         series.add(processedData[iSeries])
       );
     }
+
+    processedData.length = 0;
   }
 
   /**

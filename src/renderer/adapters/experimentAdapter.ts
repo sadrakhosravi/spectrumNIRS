@@ -1,55 +1,14 @@
 import { dispatch, getState } from '@redux/store';
 import toast from 'react-hot-toast';
 
-import {
-  setRecordingData,
-  resetRecordingData,
-  resetExperimentData,
-} from '@redux/ExperimentDataSlice';
+import { resetExperimentData } from '@redux/ExperimentDataSlice';
 import { setCurrentProbe } from '@redux/SensorStateSlice';
 import { closeModal } from '@redux/ModalStateSlice';
-import { setInitialState } from '@redux/ChartSlice';
-import { changeRecordState } from '@redux/RecordStateSlice';
 
 // Constants
-import { AppState, RecordState } from 'utils/constants';
-import {
-  DialogBoxChannels,
-  ExperimentChannels,
-  RecordChannels,
-} from '@utils/channels';
+import { AppState } from 'utils/constants';
+import { DialogBoxChannels, ExperimentChannels } from '@utils/channels';
 import { changeAppState } from '@redux/AppStateSlice';
-
-// Interfaces
-import { INewRecordingData } from 'interfaces/interfaces';
-
-/**
- * Sets the recording status in the experimentDataState
- * @param data - Recording data from Recording form
- */
-export const newRecording = async (data: INewRecordingData) => {
-  // Add the current patient Id to the data
-  const patientId = getState().experimentData.currentPatient.id;
-  const recordState = getState().recordState.value;
-  data.patient = patientId;
-
-  // Send the data to the controller
-  const newRecording = await window.api.invokeIPC(
-    ExperimentChannels.NewRecording,
-    data
-  );
-
-  console.log(newRecording);
-  dispatch(resetRecordingData());
-  dispatch(setRecordingData(newRecording));
-  dispatch(setInitialState());
-
-  recordState !== RecordState.IDLE &&
-    recordState !== RecordState.PAUSED &&
-    window.api.sendIPC(RecordChannels.Stop);
-  dispatch(changeRecordState(RecordState.IDLE));
-  dispatch(closeModal());
-};
 
 /**
  * Deleted the selected experiment and its relevant data

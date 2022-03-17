@@ -10,7 +10,8 @@ const exportServerListeners = () => {
     });
 
     // Handle stop of device reader
-    window.api.onIPCData(ExportServerChannels.StopServer, async () => {
+    window.api.onIPCData(ExportServerChannels.ServerStopped, async () => {
+      console.log('STOP RECORDING');
       await window.api.invokeIPC(RecordChannels.Stop);
     });
 
