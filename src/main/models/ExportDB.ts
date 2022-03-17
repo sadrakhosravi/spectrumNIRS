@@ -2,6 +2,9 @@ import { getConnection } from 'typeorm';
 import fs from 'fs';
 import { dialog, BrowserWindow } from 'electron';
 import RecordingsData from 'db/entity/RecordingsData';
+import RecordingModel from './RecordingModel';
+import { dbParser } from '@lib/Stream/DatabaseParser';
+import DBDataParser from './DBDataParser';
 
 class ExportDB {
   constructor() {}
@@ -11,7 +14,7 @@ class ExportDB {
    * @param recordingId - The id of the recording to get the data from
    */
   public static async exportToFile(
-    recordingId: number,
+    _recordingId: number = 20,
     type: string
   ): Promise<boolean | 'canceled'> {
     try {
@@ -19,25 +22,23 @@ class ExportDB {
       const savePath = dialog.showSaveDialogSync(
         BrowserWindow.getAllWindows()[0]
       );
-
-      console.log(recordingId, type);
+      const recordingId = RecordingModel.getCurrentRecording()?.id;
 
       // If the path was undefined, the export was canceled.
       if (!savePath) return 'canceled';
+      if (!recordingId) return 'canceled';
+
+      console.time('exporttimer');
 
       // Create a write stream to write to a text file
       let writeStream = fs.createWriteStream(savePath + '.' + type);
 
       // Settings for querying data from the database.
       let offset = 0;
-      const LIMIT = 50000;
+      const LIMIT = 30000;
 
       const columns = [
         'timeStamp',
-        'O2Hb',
-        'HHb',
-        'THb',
-        'TOI',
         'PDRawData',
         'LEDIntensities',
         'gainValues',
@@ -85,22 +86,32 @@ class ExportDB {
           .getRawMany();
 
         // If there's no recording data, break the loop
-        if (records.length === 0) break;
+        const RAW_RECORDS_LENGTH = records.length;
+        if (RAW_RECORDS_LENGTH === 0) break;
         offset += LIMIT;
-        console.log(records[1]);
-        // Calculate the length once so that the for loop doesn't need to calculate it on
-        // every iteration
-        const RECORDS_LENGTH = records.length;
-        for (let i = 0; i < RECORDS_LENGTH - 1; i++) {
+
+        console.log(records.length);
+        console.log('start');
+
+        // Send the data to the calc worker
+        const data = dbParser(records);
+
+        for (let i = 0; i < RAW_RECORDS_LENGTH; i++) {
           for (const key in records[i]) {
-            if (key === 'gainValues') {
+            if (key === 'timeStamp') {
+              writeStream.write(records[i][key] / 1000 + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+              writeStream.write(data[i] + ',', 'utf-8');
+            } else if (key === 'gainValues123') {
               const gain = JSON.parse(records[i][key]);
               const hardwareGain = gain.hardware.join(' ');
               const softwareGain = gain.software;
 
               writeStream.write(hardwareGain + ',', 'utf-8');
               writeStream.write(softwareGain + ',', 'utf-8');
-            } else if (key === 'events') {
+            } else if (key === 'events123') {
               const events = JSON.parse(records[i][key]);
               const allEvents = [];
               for (const key in events) {
@@ -118,6 +129,7 @@ class ExportDB {
 
       // Close the write stream once done.
       writeStream.close();
+      console.timeEnd('exporttimer');
 
       return true;
     } catch (error: any) {
@@ -131,25 +143,32 @@ class ExportDB {
    * @param recordingId - The id of the recording to get the data from
    * @returns the start and end of the recording data or undefined
    */
-  public static findRangeOfExportData = async (recordingId: number) => {
+  public static findRangeOfExportData = async () => {
+    const recordingId = RecordingModel.getCurrentRecording()?.id;
+    if (!recordingId) return;
+
     try {
       const start = await getConnection()
         .createQueryBuilder()
-        .select(['timeStamp'])
+        .select(['timeSequence'])
         .from(RecordingsData, '')
         .where('recordingId = :recordingId', { recordingId })
-        .orderBy({ timeStamp: 'ASC' })
+        .orderBy({ timeSequence: 'ASC' })
         .getRawOne();
 
       const end = await getConnection()
         .createQueryBuilder()
-        .select(['timeStamp'])
+        .select(['timeSequence, data'])
         .from(RecordingsData, '')
         .where('recordingId = :recordingId', { recordingId })
-        .orderBy({ timeStamp: 'DESC' })
+        .orderBy({ timeSequence: 'DESC' })
         .getRawOne();
 
-      return { start: start?.timeStamp, end: end?.timeStamp };
+      const parsedData = DBDataParser.parseBlobData(end.data);
+      const numOfDataPoints = parsedData.length;
+      const endTimeSequence = end.timeSequence + numOfDataPoints * 10;
+
+      return { start: start?.timeSequence, end: endTimeSequence };
     } catch (error: any) {
       throw new Error(error.message);
     }

@@ -1,4 +1,5 @@
 import { ipcMain, BrowserWindow, IpcMainEvent, app } from 'electron';
+import DialogBox from '../main/models/DialogBox';
 
 // Minimize window on minimize icon click
 ipcMain.on('window:minimize', (event: IpcMainEvent) => {
@@ -7,7 +8,13 @@ ipcMain.on('window:minimize', (event: IpcMainEvent) => {
 
 // Close/quit window on minimize icon click
 ipcMain.on('window:close', () => {
-  app.quit();
+  DialogBox.exitConfirmation() && BrowserWindow.getFocusedWindow()?.close();
+});
+
+// Close/quit window on minimize icon click
+ipcMain.handle('window:maximize', () => {
+  const window = BrowserWindow.getFocusedWindow();
+  window?.isMaximized ? window.restore() : window?.maximize();
 });
 
 // Restore window on minimize icon click

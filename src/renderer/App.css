@@ -1,18 +1,58 @@
+@import '../../assets/inter/inter.css';
 @import 'tippy.js/dist/tippy.css';
-@import 'tippy.js/themes/light.css';
 
 /** Using tailwind css utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .border-primary {
+    @apply border-[1px] border-white border-opacity-[0.12];
+  }
+  .border-t-primary {
+    @apply border-t-[1px] border-white border-opacity-[0.12];
+  }
+  .border--r-primary {
+    @apply border-r-[1px] border-white border-opacity-[0.12];
+  }
+  .border-b-primary {
+    @apply border-b-[1px] border-white border-opacity-[0.12];
+  }
+  .border-l-primary {
+    @apply border-l-[1px] border-white border-opacity-[0.12];
+  }
+  .title-description p {
+    @apply text-white/50;
+  }
+}
+
+:root {
+  --title-bar-size: 30px;
+  --main-navigation-size: 45px;
+}
+
+html {
+  @apply h-screen w-full scroll-smooth bg-dark antialiased;
+}
+
 body {
+  width: 100vw;
+  height: 100vh;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 /** Custom Styles */
 div {
   position: relative;
+}
+
+img {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 input:focus,
@@ -26,54 +66,60 @@ input[type]:focus-visible {
   @apply ring-2 ring-accent;
 }
 
+.calc-height {
+  height: calc(100% + 0px);
+}
+
 .window-button {
-  width: 48px;
-  height: 40px;
+  width: 46px;
+  height: var(--title-bar-size);
   display: inline-block;
   padding: 0px 15px;
-  transition: 0.15s ease;
   -webkit-app-region: no-drag;
+  pointer-events: all;
 }
 
 .window-button:hover {
   cursor: pointer;
 }
 
-.header {
+.header,
+.window-drag {
   -webkit-app-region: drag;
 }
 
-.top-menu {
+.top-menu,
+.no-drag {
   -webkit-app-region: no-drag;
-}
-
-.main-navigation {
-  position: fixed;
-  top: 40px;
-  left: 0;
-  height: calc(100% - 70px);
-  width: 60px;
-  background-color: #333;
 }
 
 .main-container {
   position: absolute;
-  top: 40px;
-  left: 60px;
-  width: calc(100% - 60px);
-  height: calc(100% - 70px);
-  max-height: calc(100% - 70px);
-  margin-left: auto;
+  top: var(--title-bar-size);
+  left: var(--main-navigation-size);
+  width: calc(100% - var(--main-navigation-size));
+  height: calc(100% - var(--title-bar-size) * 2);
   overflow-y: hidden;
   overflow-x: hidden;
 }
 
+.border-bottom-1 {
+  @apply border-b-[1px] border-grey5;
+}
+
+.border-light {
+  @apply border-[1px] border-white border-opacity-10;
+}
+
+.border-bottom-light {
+  @apply border-b-[1px] border-white border-opacity-10;
+}
+
 .icon-button {
-  width: 4rem;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-  border-left: 5px solid #333;
-  transition: 0.15s ease;
+  width: var(--main-navigation-size);
+  padding: 0.3rem 0;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid #333;
 }
 
 .icon-button svg {
@@ -81,7 +127,6 @@ input[type]:focus-visible {
   margin-right: auto;
   padding-right: 5px;
   fill: #7f7f7f;
-  transition: 0.15s ease;
 }
 
 .icon-button:hover svg {
@@ -89,15 +134,11 @@ input[type]:focus-visible {
 }
 
 .icon-button-active {
-  border-left: 5px solid #fff;
+  border-left: 4px solid #fff;
 }
 
 .icon-button-active svg {
   fill: white;
-}
-
-.fit-to-container {
-  height: calc(100% - 40px);
 }
 
 .custom-height {
@@ -203,6 +244,35 @@ input[type]:focus-visible {
   display: none;
 }
 
+.chart-scrollbar::-webkit-scrollbar {
+  @apply border-1 border-grey5;
+  width: 16px;
+}
+
+.chart-scrollbar::-webkit-scrollbar-track {
+  @apply bg-dark;
+}
+
+/* scrollbar itself */
+.chart-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3a3a3a;
+  border-radius: 1px;
+  border: none;
+  width: 12px;
+}
+/* scrollbar itself */
+.chart-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #555555;
+}
+
+/* scrollbar itself */
+.chart-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: #707070;
+}
+
+.placeholder-disabled::placeholder {
+  @apply text-dark;
+}
 /** Custom media queries */
 @media only screen and (max-width: 1600px) {
   html {
@@ -218,11 +288,16 @@ input[type]:focus-visible {
 
 @keyframes slideLeft {
   0% {
-    transform: translateX(15px);
-    opacity: 0;
+    transform: translateX(12px);
+    opacity: 0.3;
   }
   100% {
     transform: translateX(0px);
     opacity: 1;
   }
+}
+
+/* In order for tailwindCSS to include dynamically selected classes from react a dummy class is defined */
+.dummy1 {
+  @apply bg-green-300 bg-rose-300 bg-violet-300 bg-green-600 bg-rose-600 bg-violet-600 text-green-800 text-rose-800 text-violet-800;
 }

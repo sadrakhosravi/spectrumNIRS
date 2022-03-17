@@ -98,6 +98,9 @@ export const ExperimentDataSlice = createSlice({
     setPreviousData: (state, { payload }: { payload: PreviousData }) => {
       state.previousRecording = payload;
     },
+    resetPatientData: (state) => {
+      state.currentPatient = initialState.currentPatient;
+    },
     resetRecordingData: (state) => {
       state.currentRecording = initialState.currentRecording;
       state.previousRecording = initialState.previousRecording;
@@ -112,6 +115,7 @@ export const {
   setPatientData,
   setRecordingData,
   setPreviousData,
+  resetPatientData,
   resetRecordingData,
   resetExperimentData,
 } = ExperimentDataSlice.actions;

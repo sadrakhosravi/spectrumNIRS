@@ -1,84 +1,95 @@
-import React, { useEffect, useState } from 'react';
-import { signalQualityMonitor } from '@adapters/recordAdapter';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
-import { setRecordSidebar } from '@redux/AppStateSlice';
-import WidgetsContainer from '@chart/Widgets/WidgetsContainer.component';
 
 // Chart
-import ProbeCalibrationChart from '@chart/ChartClass/ProbeCalibrationChart';
+import Page from '@components/Page/Page.component';
+import ProbeCalibrationChart from 'renderer/charts/ChartClass/ProbeCalibrationChart';
 
 // Constants
-import { ChartType } from '@utils/constants';
-import IconTextButton from '@components/Buttons/IconTextButton.component';
+import { SidebarType } from '@utils/constants';
+import ActionButton from '@components/Buttons/ActionButton.component';
 
 // Icons
 import StartIcon from '@icons/start.svg';
 import PauseIcon from '@icons/pause.svg';
+
 import { RecordChannels } from '@utils/channels';
+import { setProbeCalibrationSidebar } from '@redux/AppStateSlice';
+import ToolbarContainer from '@components/Toolbar/ToolbarContainer.component';
 
 const ProbeCalibrationPage = () => {
-  const [isQualityChecking, setIsQualityChecking] = useState(false);
   const containerId = 'probeCalibrationChart';
-  const isSidebarActive = useAppSelector(
-    (state) => state.appState.recordSidebar
-  );
   const dispatch = useAppDispatch();
-  let chart: ProbeCalibrationChart | undefined;
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  const chartRef = useRef<ProbeCalibrationChart | undefined>(undefined);
+
+  const sidebarState = useAppSelector(
+    (state) => state.appState.probeCalibrationSidebar
+  );
+  const isCalibrating = useAppSelector(
+    (state) => state.global.recordState?.isCalibrating
+  );
+
   useEffect(() => {
-    chart = new ProbeCalibrationChart(containerId);
-    chart.createSignalMonitorChart();
+    const chart = new ProbeCalibrationChart(containerId);
+    chart.createProbeCalibrationChart();
+
+    chartRef.current = chart;
 
     return () => {
-      window.api.sendIPC(RecordChannels.Stop);
+      window.api.invokeIPC(RecordChannels.ProbeCalibration, true);
+      chartRef.current = undefined;
       chart?.cleanup();
     };
   }, []);
 
-  const handleStartMonitoring = async () => {
-    const isStarted = await signalQualityMonitor(!isQualityChecking);
-    isStarted && chart?.resetData();
-    isStarted && setIsQualityChecking(!isQualityChecking);
+  useEffect(() => {
+    if (isCalibrating) {
+      chartRef.current?.listenForData();
+    } else {
+      chartRef.current?.stopListening();
+      setTimeout(() => chartRef.current?.resetData(), 1000);
+    }
+  }, [isCalibrating]);
+
+  const handleDeviceCalibration = async () => {
+    !isDisabled &&
+      (await window.api.invokeIPC(
+        RecordChannels.ProbeCalibration,
+        isCalibrating
+      ));
+    setIsDisabled(true);
+    setTimeout(() => setIsDisabled(false), 800);
   };
 
   return (
-    <div className="h-full">
-      <div className={`absolute top-0 left-0 h-full w-full flex`}>
-        <div
-          id={containerId}
-          className={`h-full relative ${
-            isSidebarActive
-              ? 'w-[calc(100%-350px)] mr-[15px]'
-              : 'w-[calc(100%-20px)]'
-          }`}
-        >
-          <div className="absolute top-2 right-7 z-30 flex items-center gap-4">
-            {isQualityChecking && (
-              <p className="w-full text-sm">Refresh Rate: 0.5s</p>
-            )}
-            <span className="w-28">
-              <IconTextButton
-                icon={isQualityChecking ? PauseIcon : StartIcon}
-                text={isQualityChecking ? 'Stop' : 'Start'}
-                onClick={() => {
-                  handleStartMonitoring();
-                }}
-                isActive={isQualityChecking}
-              />
-            </span>
+    <Page
+      sidebarType={SidebarType.PROBE_CALIBRATION}
+      sidebarState={sidebarState}
+      onSidebarClick={() => dispatch(setProbeCalibrationSidebar(!sidebarState))}
+    >
+      <ToolbarContainer>
+        <div className="flex w-full items-center justify-end">
+          {isCalibrating && (
+            <p className="ml-auto mr-4 inline-block text-sm">
+              Refresh Rate: 0.1s
+            </p>
+          )}
+          <div className="mr-4 inline-block">
+            <ActionButton
+              icon={isCalibrating ? PauseIcon : StartIcon}
+              text={isCalibrating ? 'Stop' : 'Start'}
+              onClick={() => handleDeviceCalibration()}
+              isActive={isCalibrating}
+              disabled={isDisabled}
+            />
           </div>
         </div>
-        <div
-          className={`h-calc(100%-2rem) mt-6 ${
-            isSidebarActive
-              ? 'w-[325px]'
-              : 'w-[20px] bg-grey1 hover:bg-accent hover:cursor-pointer'
-          }`}
-          onClick={() => !isSidebarActive && dispatch(setRecordSidebar(true))}
-        >
-          <WidgetsContainer type={ChartType.RECORD} />
-        </div>
-      </div>
-    </div>
+      </ToolbarContainer>
+
+      <div className="h-[calc(100%-50px)] w-full" id={containerId}></div>
+    </Page>
   );
 };
 export default ProbeCalibrationPage;

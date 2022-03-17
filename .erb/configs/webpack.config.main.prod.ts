@@ -13,7 +13,7 @@ import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
 
 checkNodeEnv('production');
-deleteSourceMaps();
+// deleteSourceMaps();
 
 const devtoolsConfig =
   process.env.DEBUG_PROD === 'true'

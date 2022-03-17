@@ -25,6 +25,10 @@ export default {
           },
         },
       },
+      {
+        test: /\.node$/,
+        loader: 'node-loader',
+      },
     ],
   },
 
@@ -42,6 +46,10 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    fallback: {
+      path: require.resolve('path-browserify'),
+    },
+
     // fallback: {
     //   crypto: false,
     //   'crypto-browserify': require.resolve('crypto-browserify'), //if you want to use this module also don't forget npm i crypto-browserify

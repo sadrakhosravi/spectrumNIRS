@@ -42,23 +42,31 @@ export default merge(baseConfig, {
 
   mode: 'development',
 
-  target: ['web', 'electron-renderer'],
+  target: 'electron-renderer',
 
-  entry: [
-    `webpack-dev-server/client?http://localhost:${port}/dist`,
-    'webpack/hot/only-dev-server',
-    'core-js',
-    'regenerator-runtime/runtime',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
-  ],
+  entry: {
+    main: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRendererPath, 'index.tsx'),
+    ],
+    db: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRendererPath, 'db.ts'),
+    ],
+    settings: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
+    ],
+  },
 
   output: {
     path: webpackPaths.distRendererPath,
     publicPath: '/',
-    filename: 'renderer.dev.js',
-    library: {
-      type: 'umd',
-    },
+    filename: '[name].dev.js',
+    chunkFilename: '[name].chunk.js',
   },
 
   module: {
@@ -113,6 +121,11 @@ export default merge(baseConfig, {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
         use: 'url-loader',
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader',
+      },
     ],
   },
   plugins: [
@@ -149,8 +162,53 @@ export default merge(baseConfig, {
     new ReactRefreshWebpackPlugin(),
 
     new HtmlWebpackPlugin({
+      filename: 'startup.html',
+      chunks: ['none'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'startup.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+
+    //@ts-ignore
+    new HtmlWebpackPlugin({
       filename: path.join('index.html'),
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'index.ejs'),
+      chunks: ['main'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('db.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'db.ejs'),
+      chunks: ['db'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('settings.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'settings.ejs'),
+      chunks: ['settings'],
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,

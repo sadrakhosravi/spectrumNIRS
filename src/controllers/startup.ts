@@ -1,37 +1,33 @@
-import fsPromises from 'fs/promises';
-import { ipcMain } from 'electron';
-import Store from 'electron-store';
+import fs from 'fs';
+import createDBConnection from '../db/index';
+import firstRun from './firstRun';
 
 // Constants
-import { appDataPath, databasePath, settingsPath } from '../main/paths';
-import { UserSettingsChannels } from '../utils/channels';
+import {
+  databaseFile,
+  databasePath,
+  documentsSettingsPath,
+  settingsPath,
+} from '../main/paths';
 
-(async () => {
-  // Create the main application data folder
-  await fsPromises.mkdir(appDataPath, { recursive: true });
+const startup = async () => {
+  try {
+    // Check if the spectrum files and folders exist
+    if (
+      !fs.existsSync(databaseFile) ||
+      !fs.existsSync(databasePath) ||
+      !fs.existsSync(settingsPath) ||
+      !fs.existsSync(documentsSettingsPath)
+    ) {
+      await firstRun();
+    }
+    // Check for initial data and insert necessary data
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
 
-  // Create the database folder
-  await fsPromises.mkdir(databasePath, { recursive: true });
+  // Create connection
+  await createDBConnection();
+};
 
-  // Create the settings folder
-  await fsPromises.mkdir(settingsPath, { recursive: true });
-
-  const userSettings = new Store({
-    name: 'user-settings',
-    fileExtension: 'json',
-    cwd: settingsPath,
-  });
-  console.log(settingsPath);
-  userSettings.set('1', 'Test');
-  console.log(userSettings.get('1'));
-
-  ipcMain.handle(UserSettingsChannels.AddSetting, (_event, { key, value }) =>
-    userSettings.set(key, value)
-  );
-  ipcMain.handle(UserSettingsChannels.GetSetting, (_event, key) =>
-    userSettings.get(key)
-  );
-  ipcMain.handle(UserSettingsChannels.RemoveSetting, (_event, key) =>
-    userSettings.delete(key)
-  );
-})();
+export default startup;

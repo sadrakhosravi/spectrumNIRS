@@ -4,10 +4,13 @@ import { AppState } from 'utils/constants';
 type AppStateSlice = {
   value: AppState;
   windowResized: number;
+  windowMaximized: boolean;
   recordChartLoaded: boolean;
   reviewChartLoaded: boolean;
+  sidebar: boolean;
   recordSidebar: boolean;
   reviewSidebar: boolean;
+  probeCalibrationSidebar: boolean;
   reviewTabInNewWindow: boolean;
   isLoadingData: boolean;
   isLoading: boolean;
@@ -16,10 +19,13 @@ type AppStateSlice = {
 const initialState: AppStateSlice = {
   value: AppState.HOME,
   windowResized: 0,
+  windowMaximized: true,
   recordChartLoaded: false,
   reviewChartLoaded: false,
+  sidebar: true,
   recordSidebar: true,
   reviewSidebar: true,
+  probeCalibrationSidebar: true,
   reviewTabInNewWindow: false,
   isLoadingData: false,
   isLoading: false,
@@ -34,6 +40,10 @@ export const AppStateSlice = createSlice({
     },
     setWindowResized: (state, { payload }: { payload: number }) => {
       state.windowResized = payload;
+      console.log(payload);
+    },
+    setWindowMaximized: (state, { payload }: { payload: boolean }) => {
+      state.windowMaximized = payload;
     },
     setRecordChartLoaded: (state, { payload }: { payload: boolean }) => {
       state.recordChartLoaded = payload;
@@ -41,11 +51,17 @@ export const AppStateSlice = createSlice({
     setReviewChartLoaded: (state, { payload }: { payload: boolean }) => {
       state.reviewChartLoaded = payload;
     },
+    setSidebar: (state, { payload }: { payload: boolean }) => {
+      state.sidebar = payload;
+    },
     setRecordSidebar: (state, { payload }: { payload: boolean }) => {
       state.recordSidebar = payload;
     },
     setReviewSidebar: (state, { payload }: { payload: boolean }) => {
       state.reviewSidebar = payload;
+    },
+    setProbeCalibrationSidebar: (state, { payload }: { payload: boolean }) => {
+      state.probeCalibrationSidebar = payload;
     },
     setReviewTabInNewWindow: (state, { payload }: { payload: boolean }) => {
       state.reviewTabInNewWindow = payload;
@@ -62,10 +78,13 @@ export const AppStateSlice = createSlice({
 export const {
   changeAppState,
   setWindowResized,
+  setWindowMaximized,
+  setSidebar,
   setRecordChartLoaded,
   setReviewChartLoaded,
   setRecordSidebar,
   setReviewSidebar,
+  setProbeCalibrationSidebar,
   setReviewTabInNewWindow,
   setIsAppLoading,
   setIsLoadingData,

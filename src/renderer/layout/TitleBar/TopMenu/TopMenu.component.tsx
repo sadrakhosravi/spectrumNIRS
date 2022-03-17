@@ -7,36 +7,37 @@ import { TopMenu } from './Menu';
 import { Menu } from '@headlessui/react';
 
 // Import top menu and submenu item containers.
-import TopMenuButton from './TopMenuButton/TopMenuButton.component';
-import SubMenuItem from './SubMenuItem/SubMenuItem.component';
-
-// Menu import
-// import FileMenu from './File/File.menu';
-// import HelpMenu from './Help/Help.menu';
-// import NewMenu from './New/New.menu';
+import TopMenuButton from './TopMenuButton.component';
+import SubMenuItem from '@components/Menu/SubMenuItem.component';
+import MenuSeparator from '@components/Separator/MenuSeparator.component';
+import Utilities from 'renderer/UIModels/Utilities';
 
 const TopMenuContainer = (): JSX.Element => {
   return (
-    <nav className="inline-block h-40px">
-      <ul className="top-menu h-full my-auto ml-3 ">
+    <nav className="inline-block h-[30px]">
+      <ul className="top-menu my-auto h-full ">
         {TopMenu.map((menuItem, i) => (
-          <Menu as="li" className="h-full inline-block" key={i}>
-            <TopMenuButton label={menuItem.label} />
-            <Menu.Items className="absolute w-72 mt-0 origin-bottom-left z-50 bg-grey3 shadow-xl py-2">
-              {menuItem.submenu.map((submenu) => (
-                <SubMenuItem
-                  label={submenu.label}
-                  onClick={submenu.click || undefined}
-                  key={submenu.label}
-                />
-              ))}
+          <Menu as="li" className="inline-block h-full" key={i}>
+            <TopMenuButton label={menuItem.label} onClick={undefined} />
+            <Menu.Items className="absolute z-50 mt-0 w-72 origin-bottom-left bg-grey3 py-2 shadow-xl">
+              {menuItem.submenu.map((submenu, i) =>
+                submenu.label === 'separator' ? (
+                  <MenuSeparator key={i + 'top-menu'} />
+                ) : (
+                  <SubMenuItem
+                    label={submenu.label}
+                    onClick={() =>
+                      submenu.checkRecording
+                        ? Utilities.checkIfRecordingActive(submenu.click)
+                        : submenu.click || undefined
+                    }
+                    key={submenu.label}
+                  />
+                )
+              )}
             </Menu.Items>
           </Menu>
         ))}
-
-        {/* <FileMenu />
-        <NewMenu />
-        <HelpMenu /> */}
       </ul>
     </nav>
   );

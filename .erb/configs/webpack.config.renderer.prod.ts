@@ -30,15 +30,17 @@ export default merge(baseConfig, {
 
   mode: 'production',
 
-  target: ['web'],
+  target: 'electron-renderer',
 
   entry: {
     main: path.join(webpackPaths.srcRendererPath, 'index.tsx'),
+    settings: path.join(webpackPaths.srcRendererPath, 'settings.tsx'),
+    db: path.join(webpackPaths.srcRendererPath, 'db.ts'),
   },
 
   output: {
     path: webpackPaths.distRendererPath,
-    publicPath: '/',
+    publicPath: './',
     filename: '[name].bundle.js',
     chunkFilename: '[name].chunk.js',
   },
@@ -100,10 +102,18 @@ export default merge(baseConfig, {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
         use: 'url-loader',
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader',
+      },
     ],
   },
 
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
     minimize: true,
     minimizer: [
       new TerserPlugin({
@@ -129,7 +139,7 @@ export default merge(baseConfig, {
     }),
 
     new MiniCssExtractPlugin({
-      filename: 'style.css',
+      filename: '[name].css',
     }),
 
     new BundleAnalyzerPlugin({
@@ -139,15 +149,61 @@ export default merge(baseConfig, {
     }),
 
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+      filename: 'startup.html',
+      chunks: ['none'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'startup.ejs'),
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
         removeComments: true,
       },
       isBrowser: false,
+      env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      chunks: ['main'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'index.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('db.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'db.ejs'),
+      chunks: ['db'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join('settings.html'),
+      chunks: ['settings'],
+      template: path.join(webpackPaths.srcRendererPath, 'html', 'settings.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
     }),
   ],
 });

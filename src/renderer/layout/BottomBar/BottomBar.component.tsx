@@ -3,7 +3,6 @@ import { useAppSelector } from '@redux/hooks/hooks';
 
 // Components
 import TrayIcons from './TrayIcons/TrayIcons.component';
-import ToastNotifications from '@components/Toast/ToastNotifications.component';
 
 // Icons
 import UpdateIcon from '@icons/update.svg';
@@ -14,7 +13,7 @@ const BottomBar = () => {
   const isLoadingData = useAppSelector((state) => state.appState.isLoadingData);
   return (
     <>
-      <div className="fixed bottom-0 left-0 px-2 h-30px w-full grid grid-cols-12 items-center bg-accent text-base z-50">
+      <footer className="fixed bottom-0 left-0 px-2 h-30px w-full grid grid-cols-12 items-center bg-accent z-50">
         <div className="ml-2 col-span-3 flex items-center">
           <p className="mr-6">Version: {version}</p>
           {isLoadingData && (
@@ -35,8 +34,7 @@ const BottomBar = () => {
         <span className="col-span-9 h-30px">
           <TrayIcons />
         </span>
-      </div>
-      <ToastNotifications />
+      </footer>
     </>
   );
 };

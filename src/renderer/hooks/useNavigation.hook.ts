@@ -3,15 +3,14 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 /**
- * Checks the app state and navigates based on the current state.
- * @returns {String} - checkNavigation
+ * A hook that navigates the app on AppState change
  */
 const useNavigation = () => {
   const appState = useSelector((state: any) => state.appState.value);
   const history = useHistory();
 
   useEffect(() => {
-    history.push(`${appState}`);
+    history.push(appState);
   }, [appState]);
 
   return useNavigation;

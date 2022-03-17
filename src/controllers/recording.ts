@@ -1,11 +1,11 @@
-import { ipcMain } from 'electron';
-
-// Models
-import DataReader from '../main/models/DataReader';
-import RecordingsData from '@electron/models/RecordingsData';
+import { BrowserWindow, dialog, ipcMain } from 'electron';
 
 // Constants
 import { ChartChannels, RecordChannels } from '@utils/channels';
+
+import DeviceReader from '@electron/models/DeviceReader/DeviceReader';
+import RecordingModel from '@electron/models/RecordingModel';
+import GlobalStore from '@lib/globalStore/GlobalStore';
 
 export type CurrentRecording = {
   id: number;
@@ -14,110 +14,123 @@ export type CurrentRecording = {
   date: string;
 };
 
-type RecordInit = {
-  sensorId: number;
-  patientId: number;
-  currentRecording: CurrentRecording;
-  isRawData: boolean;
-  lastTimeStamp: number;
+let deviceReader: DeviceReader | undefined;
+let lastTimeStamp = 0;
+
+export const initDeviceReader = (timeStamp: number = 0) => {
+  if (!deviceReader) {
+    deviceReader = new DeviceReader(timeStamp);
+    return;
+  }
 };
 
-// Store
-let reader: DataReader;
+export const startDeviceReader = () => {
+  console.log('START READER');
+  deviceReader?.readDevice();
+};
 
-// Select the sensor
-ipcMain.handle(
-  RecordChannels.Init,
-  (
-    event,
-    {
-      sensorId,
-      patientId,
-      currentRecording,
-      isRawData,
-      lastTimeStamp,
-    }: RecordInit
-  ) => {
-    console.log('Reader');
-    reader = new DataReader(
-      patientId,
-      sensorId,
-      currentRecording,
-      isRawData,
-      lastTimeStamp,
-      event.sender
-    );
+export const pauseDeviceReader = () => {
+  lastTimeStamp = deviceReader?.timeStamp.getTheLastTimeStamp() as number;
+  deviceReader?.pauseDevice();
+  deviceReader = undefined;
+};
+
+export const continueDeviceReader = () => {
+  const recordingId = RecordingModel.getCurrentRecording()?.id;
+
+  if (!recordingId) {
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow() as BrowserWindow, {
+      title: 'No Recording Found',
+      message: 'No Recording Found',
+      detail: 'Please create a recording first',
+      type: 'error',
+    });
+
+    deviceReader?.stopDevice();
+    deviceReader = undefined;
+    GlobalStore.removeRecordState;
+    return;
   }
-);
+
+  console.log('CONTINUE COMMAND');
+  initDeviceReader(lastTimeStamp);
+  deviceReader?.readDevice();
+};
+
+export const stopDeviceReader = () => {
+  GlobalStore.removeRecordState();
+  deviceReader?.stopDevice();
+  deviceReader = undefined;
+  lastTimeStamp = 0;
+};
+
+// Initialize device reader
+ipcMain.handle(RecordChannels.Init, (_event, _args) => {
+  const recordingId = RecordingModel.getCurrentRecording()?.id;
+  if (!recordingId) {
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow() as BrowserWindow, {
+      title: 'No Recording Found',
+      message: 'No Recording Found',
+      detail: 'Please create a recording first',
+      type: 'error',
+    });
+    return;
+  }
+
+  initDeviceReader();
+});
 
 // Start recording
-ipcMain.on(RecordChannels.Recording, () => {
-  reader.startRecording(); // All necessary functionality of reading NIRS sensor data.
-});
-
-// Start quality monitor
-ipcMain.on(RecordChannels.QualityMonitor, (_event, active: boolean) => {
-  if (!reader) return;
-  active && reader.startQualityMonitor();
-  !active && reader && reader.stopRecording();
-});
+ipcMain.handle(RecordChannels.Start, () => startDeviceReader());
 
 // Stop recording
-ipcMain.on(RecordChannels.Stop, () => {
-  reader && reader.stopRecording();
-});
+ipcMain.handle(RecordChannels.Stop, () => stopDeviceReader());
 
 // Pause recording
-ipcMain.on(RecordChannels.Pause, () => {
-  reader && reader.pauseRecording();
-});
+ipcMain.handle(RecordChannels.Pause, () => pauseDeviceReader());
 
 // Continue recording
-ipcMain.on(RecordChannels.Continue, () => {
-  console.log('Continue');
-  reader.continueRecording();
-});
+ipcMain.handle(RecordChannels.Continue, () => continueDeviceReader());
 
 // Display Raw Data
-ipcMain.on(RecordChannels.RawData, () => {
-  reader && reader.toggleRawData();
-});
+ipcMain.handle(RecordChannels.RawData, () => {});
 
 // Gain Sync
 ipcMain.handle(
-  RecordChannels.SyncGain,
-  async (_event, data: string[]) =>
-    reader && (await reader.syncGainsWithHardware(data))
+  RecordChannels.SyncIntensitiesAndGain,
+  async (_event, data: string[]) => {
+    console.log(data.join(','));
+    return deviceReader?.sendCommandToDevice(data.join(','));
+  }
 );
 
-// Checks if the current recording has data and sends the data back to the chart.
-ipcMain.handle(
-  ChartChannels.CheckForData,
-  async (_event, recordingId: number) =>
-    await RecordingsData.checkForRecordingData(recordingId)
-);
+// Start calibration monitor
+ipcMain.handle(RecordChannels.ProbeCalibration, (_event, isActive) => {
+  if (!deviceReader && !isActive) {
+    deviceReader = new DeviceReader();
+    deviceReader.readDeviceDataOnly();
+    console.log('RECREATED');
+  }
 
-// Get RecordingsData based on the given interval
-ipcMain.handle(
-  ChartChannels.GetDataForInterval,
-  async (_event, { recordingId, start, end }) =>
-    await RecordingsData.getRecordingDataForInterval(recordingId, start, end)
-);
+  if (deviceReader && isActive) {
+    GlobalStore.removeRecordState();
 
-// Get all events
-ipcMain.handle(
-  ChartChannels.GetAllEvents,
-  async (_event, recordingId) => await RecordingsData.getAllEvents(recordingId)
-);
-
-// Get RecordingsData based on the given interval
-ipcMain.on(
-  ChartChannels.StreamData,
-  async (event, recordingId) =>
-    await RecordingsData.streamRecordingData(recordingId, event.sender)
-);
-
-// Hypoxia Event
-ipcMain.on(ChartChannels.Event, (_event, data: Object) => {
-  reader.toggleEvent(data);
+    deviceReader.stopDevice();
+    deviceReader = undefined;
+  }
 });
+
+ipcMain.handle(ChartChannels.Event, (_event, _data) => {
+  console.log(_data);
+  deviceReader?.addEvents(_data);
+});
+
+const RecordingFunctions = {
+  initDeviceReader,
+  startDeviceReader,
+  pauseDeviceReader,
+  continueDeviceReader,
+  stopDeviceReader,
+};
+
+export default RecordingFunctions;

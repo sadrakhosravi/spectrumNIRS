@@ -1,29 +1,8 @@
-const colors = require('tailwindcss/colors');
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx,ejs}'],
   theme: {
-    colors: {
-      ...colors,
-      light: '#C4C4C4',
-      light2: '#7F7F7F',
-      grey1: '#3D3D3D',
-      grey2: '#333333',
-      grey3: '#272727',
-      grey4: '#7f7f7f',
-      dark: '#1E1E1E',
-      dark2: '#1c1b1b',
-      black: '#000000',
-      white: '#FFFFFF',
-      accent: '#007ACD',
-      'accent-hover': '#0084de',
-      red: 'red',
-      'chart-1': '#E3170A',
-      'chart-2': '#ABFF4F',
-      'chart-3': '#00FFFF',
-      'chart-4': '#FFFFFF',
-    },
     fontFamily: {
-      sans: ['Inter', 'system-ui'],
+      sans: ['Inter', 'SegeoUI', '--apple-system', 'system-ui'],
       serif: ['ui-serif', 'Georgia'],
       mono: ['ui-monospace', 'SFMono-Regular'],
     },
@@ -56,6 +35,33 @@ module.exports = {
     },
 
     extend: {
+      colors: {
+        light: '#C4C4C4',
+        light2: '#7F7F7F',
+        grey0: '#5D5D5D',
+        grey1: '#3D3D3D',
+        grey2: '#333333',
+        grey3: '#272727',
+        grey4: '#7f7f7f',
+        grey5: '#323232',
+        dark: '#1E1E1E',
+        dark2: '#111111',
+        black: '#000000',
+        white: '#FFFFFF',
+        accent: '#007ACD',
+        current: '#007ACD',
+
+        'accent-hover': '#0084de',
+        red: 'red',
+        'chart-1': '#E3170A',
+        'chart-2': '#ABFF4F',
+        'chart-3': '#00FFFF',
+        'chart-4': '#FFFFFF',
+      },
+      borderWidth: {
+        1: '1px',
+      },
+
       margin: {
         0.1: '0.2rem',
       },
@@ -76,10 +82,17 @@ module.exports = {
       gridAutoColumns: {
         3070: 'minmax(max-content, 1fr)',
       },
+      animation: {
+        'pulse-fast': 'pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;',
+      },
     },
   },
   variants: {
     extend: {
+      ringWidth: ['focus-visible'],
+      ringColor: ['focus-visible'],
+      ringOffsetWidth: ['focus-visible'],
+      ringOffsetColor: ['focus-visible'],
       backgroundColor: ['active'],
     },
   },

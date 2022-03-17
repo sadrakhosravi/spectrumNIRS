@@ -9,6 +9,8 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { Experiments } from './Experiments';
 import { Recordings } from './Recordings';
@@ -31,11 +33,27 @@ export class Patients extends BaseEntity {
   @ManyToOne(() => Experiments, { onDelete: 'CASCADE' })
   experiment: Experiments;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   public createdAt: Date;
 
-  @UpdateDateColumn()
+  @Column({ type: 'text', nullable: true })
+  lastUpdate: string;
+
+  @UpdateDateColumn({ type: 'datetime' })
   public updatedAt: Date;
+
+  @BeforeInsert()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
+  @BeforeUpdate()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
 }
 
 export default Patients;

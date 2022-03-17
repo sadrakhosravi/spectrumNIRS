@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks/hooks';
-import { isLoading } from '@redux/IsLoadingSlice';
 
 // Icons
 import CloseIcon from '@icons/close.svg';
@@ -10,38 +9,53 @@ import { closeModal } from '@redux/ModalStateSlice';
 interface IProps {
   title: string;
   id: string;
-  size?: 'large' | undefined;
+  size?: 'large' | 'small' | undefined;
+  fixedSize?: boolean;
 }
 
 const Modal: React.FC<IProps> = (props) => {
-  const { title, size, id } = props;
+  const { title, size, id, fixedSize = false } = props;
   const dispatch = useAppDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
-  const whichModal = useAppSelector((state) => state.modalState.value);
+  const openedModal = useAppSelector((state) => state.modalState.value);
 
-  const largeStyles =
-    size === 'large'
-      ? 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto'
-      : 'w-1/2 max-h-3/4 overflow-y-auto';
+  let styles = 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto';
+
+  switch (size) {
+    case 'large':
+      styles = 'w-3/4 max-h-5/6 h-5/6 overflow-y-auto';
+      break;
+
+    case 'small':
+      styles = 'w-1/3 max-h-5/6 h-5/6 overflow-y-auto';
+      break;
+
+    default:
+      styles = 'w-1/2 max-h-5/6 h-5/6 overflow-y-auto';
+      break;
+  }
 
   useEffect(() => {
-    whichModal === id ? setIsOpen(true) : setIsOpen(false);
-  }, [whichModal]);
+    openedModal === id ? setIsOpen(true) : setIsOpen(false);
+  }, [openedModal]);
 
   // Handle close of the modal
   const handleClose = () => {
     dispatch(closeModal());
-    dispatch(isLoading(false));
   };
 
   return (
     <>
-      <Transition appear show={isOpen}>
+      <Transition
+        appear
+        show={isOpen}
+        className="duration-150 will-change-auto"
+      >
         <Dialog
           open={isOpen}
           as="div"
-          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-70 transition-all duration-100 "
+          className="fixed inset-0 z-50 overflow-y-auto bg-dark bg-opacity-70 transition-all duration-100 will-change-auto"
           onClose={handleClose}
         >
           <Transition.Child
@@ -65,17 +79,20 @@ const Modal: React.FC<IProps> = (props) => {
               </span>
 
               <div
-                className={`inline-block relative py-6 px-12 my-8 overflow-hidden text-left align-middle transition-all transform text-white bg-grey1 shadow-xl rounded-md ${largeStyles}`}
+                className={`border-primary relative my-8 inline-block transform overflow-hidden rounded-md bg-grey1 py-6 px-12 text-left align-middle text-white shadow-xl transition-all will-change-auto ${styles} ${
+                  fixedSize && 'min-h-[50vh] min-w-[50vw]'
+                }`}
               >
                 <Dialog.Title as="h1" className="text-3xl font-bold">
                   {title}
                 </Dialog.Title>
 
                 <button
-                  className="absolute right-4 top-4 p-2"
+                  className="absolute right-4 top-4 p-2 opacity-70 hover:opacity-100"
+                  title="Close"
                   onClick={handleClose}
                 >
-                  <img src={CloseIcon} width="44px" alt="CloseIcon" />
+                  <img src={CloseIcon} width="32px" alt="CloseIcon" />
                 </button>
 
                 <div className="mt-10">{props.children}</div>

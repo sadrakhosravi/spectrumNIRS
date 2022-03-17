@@ -12,3 +12,9 @@ ipcMain.handle(DialogBoxChannels.MessageBoxSync, (_, options) => {
   if (focusedWindow) return dialog.showMessageBoxSync(focusedWindow, options);
   return null;
 });
+
+// Pops up a save dialog box and return the user select path
+ipcMain.handle(DialogBoxChannels.GetSaveDialog, () =>
+  // Show save dialog to get the export file path.
+  dialog.showSaveDialogSync(BrowserWindow.getFocusedWindow() as BrowserWindow)
+);

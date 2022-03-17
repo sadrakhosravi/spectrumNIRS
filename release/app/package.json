@@ -1,23 +1,30 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.4.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "name": "spectrum-nirs",
+  "productName": "Beast Spectrum",
+  "version": "0.3.0-Alpha-2",
+  "description": "Spectrum NIRS data acquisition software",
   "main": "./dist/main/main.js",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Sadra Khosravi",
+    "email": "sadrakh@outlook.com",
+    "url": "https://github.com/sadrakhosravi"
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "rebuild": "electron-rebuild -f -v 15.3.0 -w usb-detection",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "license": "MIT",
   "dependencies": {
-    "better-sqlite3": "^7.4.5",
+    "better-sqlite3": "^7.5.0",
+    "snappy": "^7.1.1",
+    "snappy-electron": "^7.1.1",
     "typeorm": "^0.2.41",
-    "usb": "^1.9.1",
-    "usb-detection": "^4.13.0"
+    "ws": "^8.4.2"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.6",
+    "utf-8-validate": "^5.0.8"
   }
 }

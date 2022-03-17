@@ -3,7 +3,13 @@ import LogoPNG from '@img/Logo.png';
 
 const Logo = () => {
   return (
-    <img src={LogoPNG} className="pl-3 inline-block" alt="NIRS Software" />
+    <img
+      src={LogoPNG}
+      width="26px"
+      height="26px"
+      className="mx-2 inline-block"
+      alt="NIRS Software"
+    />
   );
 };
 

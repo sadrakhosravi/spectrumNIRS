@@ -4,7 +4,9 @@ import {
   BaseEntity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  ManyToOne,
+  BeforeInsert,
+  BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,38 +19,52 @@ export class Probes extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
+  @Column({ type: 'blob' })
+  intensities: any;
+
   @Column({ type: 'text' })
-  LEDs: string;
+  preGain: string;
 
   @Column({ type: 'int' })
-  defaultSamplingRate: number;
+  gain: number;
 
-  @Column({ type: 'int', nullable: true })
-  savedSamplingRate: number;
-
-  @Column({ type: 'text', nullable: true })
-  defaultIntensities: string;
+  @Column({ type: 'int' })
+  samplingRate: number;
 
   @Column({ type: 'text', nullable: true })
-  savedIntensities: string;
+  channels: string;
 
   @Column({ type: 'text', nullable: true })
-  defaultGain: string;
+  channelColors: string;
+
+  @Column({ type: 'tinyint', nullable: true })
+  isDefault: number;
+
+  @Column({ type: 'tinyint', nullable: true })
+  deviceId: number;
 
   @Column({ type: 'text', nullable: true })
-  defaultChannels: string;
+  lastUpdate: string;
 
-  @Column({ type: 'text', nullable: true })
-  savedChannels: string;
-
-  @Column({ type: 'text', nullable: true })
-  driver: string;
-
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'datetime', select: false })
   public createdAt: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn({ type: 'datetime', select: false })
   public updatedAt: Date;
+
+  @BeforeInsert()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
+
+  @BeforeUpdate()
+  private setlastUpdate(): void {
+    this.lastUpdate = new Date().toLocaleString('en-US', {
+      hour12: false,
+    });
+  }
 }
 
 export default Probes;

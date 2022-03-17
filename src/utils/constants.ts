@@ -4,15 +4,16 @@ export enum AppState {
   RECORDING = '/main/recording',
   RECORD = '/main/recording/record',
   REVIEW = '/main/recording/review',
+  EXPORT_SERVER = '/main/export-server',
   RECORD_TAB = '/tabs/recording/record',
   REVIEW_TAB = '/tabs/recording/review',
-  PROBE_CALIBRATION = '/main/signal-quality-monitor',
+  PROBE_CALIBRATION = '/main/probe-calibration',
 }
 
 // Record state
 export enum RecordState {
   IDLE = 'idle',
-  RECORD = 'record',
+  RECORD = 'recording',
   PAUSED = 'pause',
   CONTINUE = 'continue',
 }
@@ -22,17 +23,30 @@ export enum ModalConstants {
   NEWEXPERIMENT = 'new-experiment',
   NEWPATIENT = 'new-patient',
   NEWRECORDING = 'new-recording',
+  SELECT_PROBE = 'select-probe',
+  NEW_PROBE = 'new-probe',
   OPEN_EXPERIMENT = 'open-experiment',
   OPEN_PATIENT = 'open-patient',
   GENERALMODAL = 'general-modal',
   EXPERIMENTSETTINGS = 'experiment-settings',
   EXPORT_FORM = 'export-form',
+  CUSTOM_EVENT_FORM = 'custom_event_form',
 }
 
 // Chart types available
 export enum ChartType {
   RECORD = 'record',
   REVIEW = 'review',
+  PROBE_CALIBRATION = 'probeCalibration',
+  NONE = 'none',
+}
+
+export enum SidebarType {
+  RECORD = 'record',
+  REVIEW = 'review',
+  PROBE_CALIBRATION = 'probeCalibration',
+  EXPORT_SERVER = 'exportServer',
+  NONE = 'none',
 }
 
 // Redux Thunk status

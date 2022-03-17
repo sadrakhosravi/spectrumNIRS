@@ -1,79 +1,78 @@
-import { ipcMain, BrowserWindow } from 'electron';
-import usbDetect from 'usb-detection';
+// import { ipcMain, BrowserWindow } from 'electron';
+// import usbDetect from 'usb-detection';
+// import { devices } from '@electron/configs/devices';
+// import { USBDetectionChannels } from '../utils/channels';
 
-import { devices } from '@electron/configs/devices';
-import { USBDetectionChannels } from '../utils/channels';
+// // Starts listening for insert/remove events of USB devices.
+// usbDetect.startMonitoring();
 
-// Starts listening for insert/remove events of USB devices.
-usbDetect.startMonitoring();
+// /**
+//  * Checks the hardware devices to match any of the available sensor device
+//  * @param device
+//  * @returns - The first available device.
+//  */
+// const checkConnectedDevice = async (
+//   device: any
+// ): Promise<null | typeof devices[0]> => {
+//   // If the device is not available return null.
+//   if (!device) return null;
 
-type ConnectedDevice = {
-  id: number;
-  name: string;
-  samplingRate: number;
-  channels: string[];
-  driverName: string;
-};
+//   // Check if any of the sensors are available in the list.
+//   const connectedDevices = devices.filter((availableDevice) =>
+//     availableDevice.driverName.includes(device.deviceName.split(' ')[0])
+//   );
 
-const checkConnectedDevice = (device: any): null | ConnectedDevice => {
-  // If the device is not available return null.
-  if (!device) return null;
+//   // If any sensor is available, return the first one.
+//   const availableDevices =
+//     connectedDevices.length === 0 ? null : connectedDevices[0];
 
-  // Check if any of the sensors are available in the list.
-  const connectedSensor = devices.filter((sensor) =>
-    sensor.driverName?.includes(device.deviceName.split(' ')[0])
-  );
+//   // TODO: Available devices should return all the available device
+//   // not just the first one.
+//   return availableDevices;
+// };
 
-  // If any sensor is available, return the first one.
-  const availableSensor =
-    connectedSensor.length === 0 ? null : connectedSensor[0];
+// /**
+//  * Sends the device status to every available page
+//  * @param deviceStatus Status of the device to be sent
+//  */
+// const sendDataToUI = (deviceStatus: null | typeof devices[0]) => {
+//   // Send the result to the UI.
+//   const windows = BrowserWindow.getAllWindows();
+//   windows.forEach((window) => {
+//     window.webContents.send(USBDetectionChannels.NIRSV5, deviceStatus);
+//   });
+// };
 
-  return availableSensor;
-};
+// // Detect USB insert
+// usbDetect.on('add', async (device: any) => {
+//   // Check if the connected device is a sensor.
+//   const deviceStatus = await checkConnectedDevice(device);
 
-/**
- * Sends the sensor status to every available page
- * @param sensorStatus Status of the sensor to be sent
- */
-const sendDataToUI = (sensorStatus: null | ConnectedDevice) => {
-  // Send the result to the UI.
-  const windows = BrowserWindow.getAllWindows();
-  windows.forEach((window) => {
-    window.webContents.send(USBDetectionChannels.NIRSV5, sensorStatus);
-  });
-};
+//   // Send the result to the UI.
+//   sendDataToUI(deviceStatus);
+// });
 
-// Detect USB insert
-usbDetect.on('add', function (device: any) {
-  // Check if the connected device is a sensor.
-  const sensorStatus = checkConnectedDevice(device);
+// // Detect USB insert
+// usbDetect.on('remove', async (device: any) => {
+//   // Check if the removed device is a sensor.
+//   const deviceStatus = await checkConnectedDevice(device);
+//   const isNIRSV5 = deviceStatus ? null : deviceStatus;
+//   // Send the result to the UI.
+//   sendDataToUI(isNIRSV5);
+// });
 
-  // Send the result to the UI.
-  sendDataToUI(sensorStatus);
-});
+// // Look for the sensor in the connected devices list.
+// ipcMain.handle(USBDetectionChannels.CHECK_USB, async () => {
+//   // Get all the connected devices.
+//   const USBDevices = await usbDetect.find();
+//   console.log('Check for USB');
 
-// Detect USB insert
-usbDetect.on('remove', function (device: any) {
-  // Check if the removed device is a sensor.
-  const sensorStatus = checkConnectedDevice(device);
-  const isNIRSV5 = sensorStatus ? null : sensorStatus;
-  // Send the result to the UI.
-  sendDataToUI(isNIRSV5);
-});
+//   // TODO: Make this function dynamic so that it checks all available sensors.
+//   // Check if NIRSV5 is available in the list.
+//   const checkForNIRSV5 = USBDevices.filter((device) =>
+//     device.deviceName.includes('STM32')
+//   );
 
-// Look for the sensor in the connected devices list.
-ipcMain.handle(USBDetectionChannels.CHECK_USB, async () => {
-  // Get all the connected devices.
-  const USBDevices = await usbDetect.find();
-  console.log('Check for USB');
-
-  // TODO: Make this function dynamic so that it checks all available sensors.
-  // Check if NIRSV5 is available in the list.
-  const checkForNIRSV5 = USBDevices.filter((device) =>
-    device.deviceName.includes('STM32')
-  );
-
-  // Check if the device is connected and send the result.
-  const sensorStatus = checkConnectedDevice(checkForNIRSV5[0]);
-  return sensorStatus;
-});
+//   // Check if the device is connected and send the result.
+//   return await checkConnectedDevice(checkForNIRSV5[0]);
+// });
