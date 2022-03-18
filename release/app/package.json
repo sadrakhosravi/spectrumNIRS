@@ -11,7 +11,7 @@
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
-    "rebuild": "electron-rebuild -f -v 15.3.0 -w usb-detection",
+    "rebuild": "electron-rebuild -f -v 16.0.10 -w usb-detection",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
@@ -21,7 +21,7 @@
     "snappy": "^7.1.1",
     "snappy-electron": "^7.1.1",
     "typeorm": "^0.2.41",
-    "ws": "^8.4.2"
+    "ws": "^8.5.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.6",
