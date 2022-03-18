@@ -9,6 +9,7 @@ import ClientLog from './Shared/ClientLog.widget';
 
 // Constants
 import { SidebarType } from '@utils/constants';
+import RecordChartSettingsWidget from './RecordWidgets/RecordChartSettings.widget';
 
 //The container for each widget to be rendered in
 const WidgetsContainer = ({
@@ -24,6 +25,7 @@ const WidgetsContainer = ({
           {type === SidebarType.RECORD && (
             <>
               <Filter />
+              <RecordChartSettingsWidget />
             </>
           )}
           {type === SidebarType.REVIEW && (

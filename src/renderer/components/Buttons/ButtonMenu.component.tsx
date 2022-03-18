@@ -3,6 +3,7 @@ import { Menu, Transition } from '@headlessui/react';
 
 // Icons
 import ChevronDownIcon from '@icons/chevron-down.svg';
+import CheckMarkIcon from '@icons/checkmark.svg';
 
 type ButtonMenuProps = {
   text?: string | number | undefined;
@@ -63,12 +64,13 @@ export default ButtonMenu;
 type ButtonMenuItemProps = {
   text?: string | number;
   icon?: string;
+  isActive?: boolean;
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined | any;
 };
 
 export const ButtonMenuItem = ({
   text,
-  icon,
+  isActive = false,
   onClick,
 }: ButtonMenuItemProps) => {
   return (
@@ -79,7 +81,7 @@ export const ButtonMenuItem = ({
             active ? 'bg-grey1 ' : ''
           } group flex  w-full items-center gap-1 rounded-md px-2 py-[0.35rem] text-sm text-white transition-colors duration-150 focus:ring-2 focus:ring-accent`}
         >
-          {icon && <img src={icon} className="w-4" />}
+          {isActive && <img src={CheckMarkIcon} className="w-4" />}
           {text && text}
         </button>
       )}
