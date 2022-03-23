@@ -20,6 +20,13 @@ import { ChartChannels, DialogBoxChannels } from '@utils/channels';
 
 import UIWorkerManager from 'renderer/UIWorkerManager';
 import { getState } from '@redux/store';
+import InputField from '@components/Form/InputField.component';
+import FormGroup from '@components/Form/FormGroup.component';
+import SelectField, {
+  SelectOption,
+} from '@components/Form/SelectField.component';
+
+import { IExportOptions } from '@electron/models/Export/Export';
 
 const exportOptions = [
   {
@@ -65,7 +72,11 @@ const ExportForm = () => {
   }, []);
 
   // Handles form submit
-  const onSubmit = async (_data: any) => {
+  const onSubmit = async (_data: IExportOptions) => {
+    console.log(_data);
+    const isValidSamplingRate = checkDownsampledRate(~~_data.downSampledRate);
+    if (!isValidSamplingRate) return;
+
     const savePath = await window.api.invokeIPC(
       DialogBoxChannels.GetSaveDialog
     );
@@ -82,6 +93,7 @@ const ExportForm = () => {
       savePath,
       type: exportOption,
       currentRecording,
+      options: _data,
     };
     exportWorker.postMessage(workerData);
 
@@ -94,6 +106,27 @@ const ExportForm = () => {
       UIWorkerManager.terminateExportdataWorker();
       exportWorker.terminate();
     };
+
+    return true;
+  };
+
+  const checkDownsampledRate = (samplingRate: number) => {
+    const currSamplingRate =
+      getState().global.recording?.currentRecording?.probeSettings
+        ?.samplingRate;
+    if (samplingRate > currSamplingRate) {
+      toast.error(
+        'Down sampling rate cannot be greater than the recorded sampling rate'
+      );
+      return false;
+    }
+
+    if (currSamplingRate % samplingRate !== 0) {
+      toast.error(
+        'Down sampling rate should be a factor of the original sampling rate'
+      );
+      return false;
+    }
 
     return true;
   };
@@ -132,35 +165,95 @@ const ExportForm = () => {
           ))}
         </div>
       </RadioGroup>
+      <h3 className="text-medium mt-8 pb-3 text-xl">Options</h3>
+      <FormGroup>
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          <div>
+            <label className="inline-block w-full pr-2 text-sm">
+              Downsampled Rate
+            </label>
+            <InputField
+              type="number"
+              register={register('downSampledRate', {
+                required: true,
+                value: 100,
+              })}
+            />
+          </div>
+          <div>
+            <label className="inline-block w-full pr-2 text-sm">Splitter</label>
+            <SelectField
+              register={register('splitter', {
+                required: true,
+                value: 'Comma',
+              })}
+            >
+              <SelectOption name="Comma" value={'Comma'} />
+              <SelectOption name="Space" value={'Space'} />
+            </SelectField>
+          </div>
+          <div>
+            <label className="inline-block w-full pr-2 text-sm">
+              Add Parameter Names
+            </label>
+            <SelectField
+              register={register('parameterNames', {
+                required: true,
+              })}
+              defaultValue="Yes"
+            >
+              <SelectOption name="Yes" value={'Yes'} />
+              <SelectOption name="No" value={'No'} />
+            </SelectField>
+          </div>
+          <div>
+            <label className="inline-block w-full pr-2 text-sm">
+              Add Recording Info Header
+            </label>
+            <SelectField
+              register={register('headers', {
+                required: true,
+              })}
+              defaultValue="Yes"
+            >
+              <SelectOption name="Yes" value={'Yes'} />
+              <SelectOption name="No" value={'No'} />
+            </SelectField>
+          </div>
+        </div>
+      </FormGroup>
+
       <h3 className="text-medium mt-8 pb-3 text-xl">Select Time Range</h3>
-      <div>
-        <label className="inline-block w-1/2 pr-2 text-sm">
-          <span className="block pb-1">Start:</span>
-          <input
-            className="w-full rounded-md py-3 px-2 hover:cursor-not-allowed"
-            title="Currently not editable. Will be added in future updates"
-            type="text"
-            value={exportRange[0]}
-            {...register('export.start', {
-              required: true,
-              disabled: true,
-            })}
-          />
-        </label>
-        <label className="inline-block w-1/2 pr-2 text-sm">
-          <span className="block pb-1">End:</span>
-          <input
-            className="w-full rounded-md py-3 px-2 hover:cursor-not-allowed"
-            title="Currently not editable. Will be added in future updates"
-            type="text"
-            value={exportRange[1]}
-            {...register('export.end', {
-              required: true,
-              disabled: true,
-            })}
-          />
-        </label>
-      </div>
+      <FormGroup>
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          <label className="inline-block pr-2 text-sm">
+            <span className="block pb-1">Start:</span>
+            <input
+              className="w-full rounded-md py-3 px-2 hover:cursor-not-allowed"
+              title="Currently not editable. Will be added in future updates"
+              type="text"
+              value={exportRange[0]}
+              {...register('start', {
+                required: true,
+                disabled: true,
+              })}
+            />
+          </label>
+          <label className="inline-block pr-2 text-sm">
+            <span className="block pb-1">End:</span>
+            <input
+              className="w-full rounded-md py-3 px-2 hover:cursor-not-allowed"
+              title="Currently not editable. Will be added in future updates"
+              type="text"
+              value={exportRange[1]}
+              {...register('end', {
+                required: true,
+                disabled: true,
+              })}
+            />
+          </label>
+        </div>
+      </FormGroup>
 
       <SubmitButton
         text={'Export Data'}

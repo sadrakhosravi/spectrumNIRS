@@ -46,6 +46,8 @@ class DownSampler {
       ).fill(0);
     }
 
+    console.log(this.temp);
+
     this.count = 0;
 
     // Check down sampled rate
@@ -109,6 +111,44 @@ class DownSampler {
         this.count = 0;
       }
     }
+  }
+
+  public downSampleDataSync(data: DeviceDataType[]) {
+    const tempData: DeviceDataType[] = [];
+    for (let i = 0; i < this.batchSize; i += 1) {
+      for (const ADC in data[i]) {
+        // Separate ADC data
+        const dataPoint = data[i][ADC as keyof DeviceDataType];
+        // Add the values to the temp value to be averaged
+        for (let j = 0; j < this.numOfADCChannels; j += 1) {
+          this.temp['ADC1'][j] += dataPoint[j];
+        }
+        this.count++;
+      }
+
+      // When the num of data points reach the downsampling factor, average and emit data
+      if (this.downSamplingFactor === this.count) {
+        // For each ADC/PDs, average data
+        for (const ADC in this.temp) {
+          const adcData = new Array(this.numOfADCChannels).fill(0);
+
+          // Average data
+          for (let k = 0; k < this.numOfADCChannels; k += 1) {
+            adcData[k] =
+              this.temp[ADC as keyof DeviceDataType][k] /
+              this.downSamplingFactor;
+            this.temp[ADC as keyof DeviceDataType][k] = 0; // reset temp data
+          }
+
+          tempData.push({ [ADC as keyof DeviceDataType]: adcData });
+        }
+
+        // Emit when data is ready
+        this.count = 0;
+      }
+    }
+    console.log(tempData.slice());
+    return tempData;
   }
 }
 
