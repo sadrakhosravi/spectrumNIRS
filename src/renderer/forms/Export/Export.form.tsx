@@ -147,7 +147,7 @@ const ExportForm = () => {
                   <div
                     className={`${
                       checked && 'ring-2 ring-accent'
-                    } flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-md bg-grey2 transition-all duration-150 ${
+                    } border-primary flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-md bg-grey2 transition-all duration-150 ${
                       disabled && 'cursor-not-allowed bg-light bg-opacity-40'
                     }`}
                   >
@@ -167,10 +167,10 @@ const ExportForm = () => {
       </RadioGroup>
       <h3 className="text-medium mt-8 pb-3 text-xl">Options</h3>
       <FormGroup>
-        <div className="col-span-2 grid grid-cols-2 gap-4">
+        <div className="col-span-2 grid grid-cols-2 gap-6">
           <div>
             <label className="inline-block w-full pr-2 text-sm">
-              Downsampled Rate
+              Exported Sampling Rate
             </label>
             <InputField
               type="number"
@@ -218,6 +218,20 @@ const ExportForm = () => {
             >
               <SelectOption name="Yes" value={'Yes'} />
               <SelectOption name="No" value={'No'} />
+            </SelectField>
+          </div>
+          <div>
+            <label className="inline-block w-full pr-2 text-sm">
+              Fix Sampling Rate
+            </label>
+            <SelectField
+              register={register('fixSamplingRate', {
+                required: true,
+              })}
+              defaultValue="No"
+            >
+              <SelectOption name="No" value={'No'} />
+              <SelectOption name="Yes" value={'Yes'} />
             </SelectField>
           </div>
         </div>

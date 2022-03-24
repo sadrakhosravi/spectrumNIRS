@@ -10,7 +10,6 @@ async function spacedExport(this: Export) {
   if (!this.writeStream || !this.timeDelta) return;
 
   const timer = (ms: number) => new Promise((res) => setTimeout(res, ms));
-  console.log('SPACED EXPORT');
 
   const calcColumns = ['', 'O2Hb', 'HHb', 'THb', 'TOI'];
   const ADCColumns = [
@@ -32,8 +31,6 @@ async function spacedExport(this: Export) {
   );
   const dataLength = this.unPackedData.length;
 
-  console.log('Calculated');
-
   // If this is not true, something has gone wrong here!
   if (dataLength !== calcDataBatch.length) return;
 
@@ -48,7 +45,7 @@ async function spacedExport(this: Export) {
     const dataObj: any = {};
 
     // Add timeSequence
-    dataObj.Time = (this.timeSequence / 1000).toFixed(6); // in seconds
+    dataObj.Time = (this.timeSequence / 1000).toFixed(4); // in seconds
 
     // Add calculated data
     calcData.forEach((value, ind) => {
@@ -86,21 +83,17 @@ async function spacedExport(this: Export) {
     }
   }
 
-  if (dataPoints.length !== 0) {
-    const columns = columnify(dataPoints, {
-      showHeaders: firstOutput,
-      preserveNewLines: true,
-      minWidth: 15,
-    });
+  const columns = columnify(dataPoints, {
+    showHeaders: firstOutput,
+    preserveNewLines: true,
+    minWidth: 15,
+  });
 
-    // Write to file
-    this.writeStream.write(columns + SEPARATOR_CHAR.NEW_LINE);
+  // Write to file
+  this.writeStream.write(columns + SEPARATOR_CHAR.NEW_LINE);
 
-    firstOutput = false;
-    dataPoints.length = 0;
-  }
-
-  console.log('Done');
+  firstOutput = false;
+  dataPoints.length = 0;
 }
 
 export default spacedExport;

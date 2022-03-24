@@ -46,8 +46,6 @@ class DownSampler {
       ).fill(0);
     }
 
-    console.log(this.temp);
-
     this.count = 0;
 
     // Check down sampled rate
@@ -147,7 +145,6 @@ class DownSampler {
         this.count = 0;
       }
     }
-    console.log(tempData.slice());
     return tempData;
   }
 }

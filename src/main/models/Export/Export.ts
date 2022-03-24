@@ -7,6 +7,7 @@ import spacedExport from './formats/spacedExport';
 import commaExport from './formats/commaExport';
 import DownSampler from 'calculations/DownSampler';
 import DatabaseOperations from '../Database/DatabaseOperations';
+import FixSamplingRate from '@lib/Device/FixSamplingRate';
 import msToTime from '@utils/msToTime';
 
 export type ExportTypes = 'csv' | 'txt';
@@ -16,6 +17,7 @@ export interface IExportOptions {
   downSampledRate: string;
   splitter: 'Space' | 'Comma';
   parameterNames: YesNo;
+  fixSamplingRate: YesNo;
   headers: YesNo;
   start: undefined; // For now
   end: undefined; // For now
@@ -52,6 +54,8 @@ class Export {
   writeStream: null | fs.WriteStream;
   timeSequence: number;
   timeDelta: number;
+  duration: number;
+
   calc: V5Calculation;
   separator: SEPARATOR_CHAR;
 
@@ -77,14 +81,13 @@ class Export {
     this.writeStream = null;
     this.timeSequence = 0;
     this.timeDelta = 0;
+    this.duration = 0;
 
     this.calc = new V5Calculation(this.recording.probeSettings.intensities);
     this.separator = SEPARATOR_CHAR.COMMA;
 
     this.spacedExport = spacedExport.bind(this);
     this.commaExport = commaExport.bind(this);
-
-    console.log(this.options);
   }
 
   /**
@@ -108,8 +111,21 @@ class Export {
       // Calculated the time data
       this.calcTimeDelta();
 
+      if (this.options.fixSamplingRate === 'Yes') {
+        // Fixes the sampling rate if it is not consistent
+        const fixSampler = new FixSamplingRate(
+          this.unPackedData,
+          this.duration,
+          this.recording.probeSettings.samplingRate
+        );
+        fixSampler.addMissingSamples();
+      }
+
       // Check and down sample if needed
       this.checkAndDownSample();
+
+      // Calculated the time data
+      this.calcTimeDelta();
 
       // Write headers
       this.writeFileHeaders();
@@ -135,15 +151,12 @@ class Export {
     this.headerData.push(this.data[0]);
     this.headerData.push(this.data[this.data.length - 1]);
 
-    console.log(this.headerData);
-
     for (let i = 0; i < dataLength; i += 1) {
       this.unPackedData.push(DatabaseOperations.parseData(this.data[i][0]));
       this.data[i] = null;
     }
 
     this.unPackedData = this.unPackedData.flat();
-    console.log('Unpacked Data');
   }
 
   /**
@@ -162,8 +175,8 @@ class Export {
         this.recording.deviceSettings.devicePDs[0].channels + 1,
         1
       );
-
-      this.unPackedData = downSampler.downSampleDataSync(this.unPackedData);
+      const test = downSampler.downSampleDataSync(this.unPackedData);
+      this.unPackedData = test;
     }
   }
 
@@ -201,12 +214,13 @@ class Export {
    * Assumes the samples are consistent
    */
   private calcTimeDelta() {
-    const ONE_MS = 1000;
     const startTime = this.headerData[0][1] - 5000;
     const endTime = this.headerData[1][1];
 
     const durationInMS = endTime - startTime;
     const totalDataPoints = this.unPackedData.length;
+    const timeDelta = durationInMS / totalDataPoints;
+    this.duration = durationInMS;
 
     // If downsampled has been specified
     if (
@@ -220,17 +234,16 @@ class Export {
         );
       }
 
-      this.timeDelta = ONE_MS / this.downSampledRate;
+      this.timeDelta = ~~timeDelta.toFixed(2);
       return;
     }
-
-    this.timeDelta = durationInMS / totalDataPoints;
+    this.timeDelta = ~~timeDelta.toFixed(2);
   }
 
   /**
    * Writes data headers to file
    */
-  public writeFileHeaders() {
+  private writeFileHeaders() {
     // Interval
     const intervalFormat = `Interval= ${this.separator} ${
       this.timeDelta / 1000
@@ -241,8 +254,8 @@ class Export {
     const endTime = new Date(this.headerData[1][1]);
     const duration = this.headerData[1][1] - this.headerData[0][1];
 
-    const startTimeOfDay = `Start Time of Day= ${startTime.toLocaleString()}.${startTime.getMilliseconds()}`;
-    const endTimeOfDay = `End Time of Day= ${endTime.toLocaleString()}.${startTime.getMilliseconds()}`;
+    const startTimeOfDay = `Start Time of Day= ${startTime.toLocaleString()} + ${startTime.getMilliseconds()} ms`;
+    const endTimeOfDay = `End Time of Day= ${endTime.toLocaleString()} + ${startTime.getMilliseconds()} ms`;
 
     // LED Intensities
     const LEDInt = `LED Intensities= ${this.recording.probeSettings.intensities.join(
@@ -254,17 +267,19 @@ class Export {
       this.writeStream?.write(
         `${intervalFormat} ${SEPARATOR_CHAR.NEW_LINE}${startTimeOfDay} ${SEPARATOR_CHAR.NEW_LINE}${endTimeOfDay} ${SEPARATOR_CHAR.NEW_LINE}`
       );
-      this.writeStream?.write(`Duration=, ${msToTime(duration)}`);
+      this.writeStream?.write(
+        `Duration=, ${msToTime(duration)}, ${duration}(milliseconds) ${
+          SEPARATOR_CHAR.NEW_LINE
+        }`
+      );
       this.writeStream?.write(`${LEDInt} ${SEPARATOR_CHAR.NEW_LINE}`);
     }
-
-    console.log('Wrote Headers');
   }
 
   /**
    * Determines which export parser to run based on this.type
    */
-  public async runExportParser() {
+  private async runExportParser() {
     switch (this.options.splitter) {
       case 'Comma':
         await this.commaExport();
@@ -283,7 +298,7 @@ class Export {
   /**
    * Cleanup of the data and other functions
    */
-  public cleanup() {
+  private cleanup() {
     this.writeStream?.close();
     this.data.length = 0;
   }

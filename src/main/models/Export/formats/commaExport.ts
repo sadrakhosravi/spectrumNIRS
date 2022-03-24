@@ -55,7 +55,7 @@ async function commaExport(this: Export) {
     const calcData = calcDataBatch[i];
 
     // Add timeSequence
-    dataPoint.push((this.timeSequence / 1000).toFixed(6));
+    dataPoint.push((this.timeSequence / 1000).toFixed(4));
 
     // Add calculated data
     calcData.forEach((value, ind) => ind !== 0 && dataPoint.push(value));
@@ -79,17 +79,15 @@ async function commaExport(this: Export) {
       dataBatch.length = 0;
       count = 0;
 
-      await timer(500);
+      await timer(300);
     }
 
     this.timeSequence += this.timeDelta;
   }
 
-  if (dataPoint.length !== 0) {
-    this.writeStream.write(dataBatch.join(','));
-    dataBatch.length = 0;
-    count = 0;
-  }
+  this.writeStream.write(dataBatch.join('\n'));
+  dataBatch.length = 0;
+  count = 0;
 }
 
 export default commaExport;
