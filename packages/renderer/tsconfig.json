@@ -8,19 +8,19 @@
     "strict": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-
+    "jsx": "react",
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "/@/*": ["./src/*"]
+      "/@/*": ["main-ui/*"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
 
   "include": [
-    "src/**/*.ts",
-    "src/**/*.js",
-    "src/**/*.tsx",
+    "main-ui/**/*.ts",
+    "main-ui/**/*.js",
+    "main-ui/**/*.tsx",
     "types/**/*.d.ts",
     "../../types/**/*.d.ts",
     "../preload/contracts.d.ts"

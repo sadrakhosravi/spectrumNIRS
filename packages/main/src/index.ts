@@ -1,7 +1,7 @@
-import { app, session } from 'electron';
+import { app } from 'electron';
 import './security-restrictions';
 import { restoreOrCreateWindow } from '/@/mainWindow';
-import { join } from 'path';
+// import { join } from 'path';
 
 /**
  * Prevent multiple instances
@@ -48,16 +48,15 @@ if (import.meta.env.DEV) {
   app
     .whenReady()
     .then(async () => {
-      const MobXDevTools = join(
-        'C:/Users/sadra/AppData/Local/Google/Chrome/User Data/Default/Extensions/pfgnfdagidkfgccljigdamigbcnndkod/0.9.26_0',
-      );
-      const ReactDevTools = join(
-        'C:/Users/sadra/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.24.3_0',
-      );
-
-      console.log(MobXDevTools);
-      await session.defaultSession.loadExtension(MobXDevTools);
-      await session.defaultSession.loadExtension(ReactDevTools);
+      // const MobXDevTools = join(
+      //   'C:/Users/sadra/AppData/Local/Google/Chrome/User Data/Default/Extensions/pfgnfdagidkfgccljigdamigbcnndkod/0.9.26_0',
+      // );
+      // const ReactDevTools = join(
+      //   'C:/Users/sadra/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.24.3_0',
+      // );
+      // console.log(MobXDevTools);
+      // await session.defaultSession.loadExtension(MobXDevTools);
+      // await session.defaultSession.loadExtension(ReactDevTools);
     })
     .catch((e) => console.log('Failed to load the extension: ' + e));
 }

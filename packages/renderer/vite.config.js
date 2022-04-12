@@ -1,10 +1,13 @@
 /* eslint-env node */
 
-import { node } from '../../.electron-vendors.cache.json';
+import { chrome } from '../../.electron-vendors.cache.json';
 import { join } from 'path';
 import { builtinModules } from 'module';
+
+// Plugins
 import reactVite from '@vitejs/plugin-react';
 import electronRenderer from 'vite-plugin-electron/renderer';
+import checker from 'vite-plugin-checker';
 
 const PACKAGE_ROOT = __dirname;
 
@@ -17,10 +20,21 @@ const config = {
   root: PACKAGE_ROOT,
   resolve: {
     alias: {
-      '/@/': join(PACKAGE_ROOT, 'src') + '/',
+      '/@/': join(PACKAGE_ROOT, 'main-ui') + '/',
     },
   },
-  plugins: [reactVite(), electronRenderer()],
+  css: {
+    postcss: 'postcss.config.js',
+  },
+  plugins: [
+    reactVite({}),
+    electronRenderer(),
+    checker({
+      typescript: {
+        tsconfigPath: './tsconfig.json',
+      },
+    }),
+  ],
   base: '',
   server: {
     fs: {
@@ -29,13 +43,14 @@ const config = {
   },
   build: {
     sourcemap: true,
-    target: `node${node}`,
+    target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',
     rollupOptions: {
       input: {
         main: join(PACKAGE_ROOT, 'index.html'),
       },
+
       external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
     emptyOutDir: true,

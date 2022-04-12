@@ -4,6 +4,18 @@ import { URL } from 'url';
 async function createWindow() {
   const browserWindow = new BrowserWindow({
     show: true, // Use 'ready-to-show' event to show window
+    titleBarStyle: 'hidden',
+    minHeight: 400,
+    minWidth: 450,
+    titleBarOverlay: {
+      color: '#232323',
+      symbolColor: '#F1F1F1',
+      height: 35,
+    },
+    movable: true,
+    frame: false,
+    darkTheme: true,
+
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

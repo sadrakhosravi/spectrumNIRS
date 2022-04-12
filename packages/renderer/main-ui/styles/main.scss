@@ -1,0 +1,50 @@
+@import '../../assets/fonts/inter.css';
+@import './variables.scss';
+*,
+:before,
+:after {
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-weight: 300;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body,
+.main-window {
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+  font-size: 95%;
+  @apply bg-mainBg text-titleBarText;
+  overflow: hidden;
+}
+
+button {
+  cursor: default;
+}
+
+.content-container {
+  position: absolute;
+  top: $titleBarHeight;
+  left: 65px;
+  height: calc(100% - 35px);
+  width: calc(100% - 65px);
+}
+
+.main-window,
+.content-container {
+  overflow: hidden;
+}
+
+.view-container {
+  width: 100%;
+  height: calc(100% - 30px);
+}
+
+.statusbar-container {
+  width: 100%;
+  height: 30px;
+}

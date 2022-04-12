@@ -1,0 +1,51 @@
+@import '../../styles/variables.scss';
+
+.LeftPanel {
+  position: absolute;
+  top: $titleBarHeight;
+  left: 0;
+  width: 65px;
+  height: calc(100vh - $titleBarHeight);
+  border-right: solid 2px #333333;
+  font-size: 13px;
+  @apply text-leftNavTextColor;
+}
+
+.LeftPanelNavContainer {
+  height: 75%;
+}
+
+.LeftPanelSettingsContainer {
+  height: 25%;
+  display: flex;
+
+  @apply justify-end flex-col;
+}
+
+.LeftPanelNavButton {
+  width: 100%;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  text-align: center;
+  @apply mx-auto;
+
+  svg {
+    @apply mx-auto mb-0.5;
+  }
+}
+
+.LeftPanelNavButton:hover {
+  @apply bg-grey3 text-white;
+
+  svg {
+    @apply stroke-white;
+  }
+}
+
+.LeftPanelNavButton:active {
+  @apply bg-grey3 text-accent;
+
+  svg {
+    @apply stroke-accent;
+  }
+}

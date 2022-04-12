@@ -1,0 +1,41 @@
+@import '../../styles/variables.scss';
+
+.MenuContainer {
+  height: $titleBarHeight;
+  display: flex;
+  align-items: center;
+}
+
+.MenuItem {
+  -webkit-app-region: no-drag;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  @apply hover:bg-grey0 px-2;
+}
+
+.MenuItemActive {
+  @apply bg-grey0;
+}
+
+.SubMenu {
+  position: absolute;
+  top: $titleBarHeight;
+  left: 0;
+  min-width: 250px;
+  z-index: 1000;
+  @apply bg-grey3 py-2;
+}
+
+.SubMenuItem {
+  display: flex;
+  justify-content: space-between;
+  @apply px-6 py-0.5 hover:bg-accent;
+}
+
+.SubMenuItemSeparator {
+  width: 93%;
+  height: 1px;
+  @apply bg-white/30 my-2 mx-auto;
+}

@@ -1,0 +1,42 @@
+@import '../../styles/variables.scss';
+
+.TitleBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: $titleBarHeight;
+  app-region: drag;
+  user-select: none;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  @apply text-titleBarText;
+}
+
+.TitleBarContainer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  @apply bg-titleBarBg px-2 flex items-center gap-2;
+}
+
+.Logo {
+  width: 40px;
+}
+
+.TopMenu {
+  max-width: 350px;
+  width: 350px;
+  height: 100%;
+}
+
+.Filename {
+  position: absolute;
+  height: $titleBarHeight;
+  left: 50%;
+  transform: translateX(-50%);
+  -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  @apply gap-2;
+}
