@@ -1,14 +1,15 @@
-@import '../../styles/variables.scss';
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$button-height: 70px;
 
 .LeftPanel {
   position: absolute;
-  top: $titleBarHeight;
+  top: $size-title-bar;
   left: 0;
-  width: 65px;
-  height: calc(100vh - $titleBarHeight);
-  border-right: solid 2px #333333;
-  font-size: 13px;
-  @apply text-leftNavTextColor;
+  width: $size-lef-nav;
+  height: calc(100vh - $size-title-bar);
+  border-right: solid $border-primary-width $border-primary-color;
 }
 
 .LeftPanelNavContainer {
@@ -18,34 +19,54 @@
 .LeftPanelSettingsContainer {
   height: 25%;
   display: flex;
-
-  @apply justify-end flex-col;
+  justify-content: flex-end;
+  flex-direction: column;
 }
 
 .LeftPanelNavButton {
   width: 100%;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  height: $button-height;
   text-align: center;
-  @apply mx-auto;
+  margin: 0 auto;
+  font-size: $size-font-xs;
+  @include hover-state;
 
   svg {
-    @apply mx-auto mb-0.5;
+    margin: 0 auto $gap-2xs auto;
+  }
+
+  &:hover {
+    color: $color-text-white;
+
+    svg {
+      stroke: $color-white;
+    }
+  }
+
+  &:active,
+  &_Active {
+    @include active-state;
+    color: $color-primary;
+    svg {
+      stroke: $color-primary;
+    }
+
+    &:hover {
+      @include active-state;
+      color: $color-primary;
+      svg {
+        stroke: $color-primary;
+      }
+    }
   }
 }
 
-.LeftPanelNavButton:hover {
-  @apply bg-grey3 text-white;
-
-  svg {
-    @apply stroke-white;
-  }
-}
-
-.LeftPanelNavButton:active {
-  @apply bg-grey3 text-accent;
-
-  svg {
-    @apply stroke-accent;
-  }
+.LeftPanelActiveIndicator {
+  position: absolute;
+  top: 0;
+  right: -2.5px;
+  height: $button-height;
+  width: 4px;
+  background: $color-primary;
+  transition: top 0.25s cubic-bezier(0.69, 0.07, 0.62, 1.31);
 }

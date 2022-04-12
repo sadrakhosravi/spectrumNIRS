@@ -12,12 +12,18 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "/@/*": ["main-ui/*"]
+      "/@/*": ["main-ui/*"],
+      "@models/*": ["../models/*"],
+      "@controllers/*": ["../controllers/*"],
+      "@utils/*": ["../utils/*"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
 
   "include": [
+    "../models/**/*",
+    "../controllers/**/*",
+    "../utils/**/*",
     "main-ui/**/*.ts",
     "main-ui/**/*.js",
     "main-ui/**/*.tsx",

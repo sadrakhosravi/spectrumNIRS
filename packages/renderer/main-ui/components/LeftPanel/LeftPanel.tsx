@@ -1,30 +1,41 @@
 import React from 'react';
+import { AppStatesController } from '@controllers/AppStatesController';
 
 // Styles
 import * as styles from './leftPanel.module.scss';
 
 // Components
-import { LeftPanelNavButton } from './';
+import { LeftPanelNavButton, LeftPanelActiveIndicator } from './';
 
 // Icons
 import { FiActivity, FiHome, FiSearch, FiSettings } from 'react-icons/fi';
 
+// Types
+import type { IconType } from 'react-icons/lib';
+import type { AppNavStates } from '@utils/types/AppStateTypes';
+
+type NavigationItems = {
+  text: string;
+  icon: IconType;
+  path: AppNavStates;
+};
+
 // Main navigation routes
-const navigationItems = [
+const navigationItems: NavigationItems[] = [
   {
     text: 'Home',
     icon: FiHome,
-    path: '/',
+    path: '',
   },
   {
     text: 'Record',
     icon: FiActivity,
-    path: '/',
+    path: 'record',
   },
   {
     text: 'Review',
     icon: FiSearch,
-    path: '/review',
+    path: 'review',
   },
 ];
 
@@ -48,13 +59,8 @@ export const LeftPanel = () => {
         ))}
       </div>
 
-      <div className={styles.LeftPanelSettingsContainer}>
-        <LeftPanelNavButton
-          text="Settings"
-          icon={<FiSettings size={iconSize} strokeWidth={iconStrokeWidth} color={iconColor} />}
-          path={'/settings'}
-        />
-      </div>
+      <div className={styles.LeftPanelSettingsContainer}></div>
+      <LeftPanelActiveIndicator />
     </div>
   );
 };

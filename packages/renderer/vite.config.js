@@ -1,13 +1,16 @@
 /* eslint-env node */
 
 import { chrome } from '../../.electron-vendors.cache.json';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { builtinModules } from 'module';
 
 // Plugins
 import reactVite from '@vitejs/plugin-react';
 import electronRenderer from 'vite-plugin-electron/renderer';
 import checker from 'vite-plugin-checker';
+
+// SCSS configs
+const scssVariables = resolve(__dirname, './main-ui/styles/variables.scss');
 
 const PACKAGE_ROOT = __dirname;
 
@@ -21,11 +24,12 @@ const config = {
   resolve: {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'main-ui') + '/',
+      '@models/': join(PACKAGE_ROOT, '../models') + '/',
+      '@controllers/': join(PACKAGE_ROOT, '../controllers') + '/',
+      '@utils/': join(PACKAGE_ROOT, '../utils') + '/',
     },
   },
-  css: {
-    postcss: 'postcss.config.js',
-  },
+
   plugins: [
     reactVite({}),
     electronRenderer(),

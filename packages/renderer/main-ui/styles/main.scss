@@ -1,13 +1,16 @@
+@import './preflight';
 @import '../../assets/fonts/inter.css';
-@import './variables.scss';
+@import './variables';
+
 *,
 :before,
 :after {
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  font-weight: 300;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  font-size: 62.5%; // 1rem = 16px;
+  font-size: $size-font-base;
 }
 
 html,
@@ -17,21 +20,28 @@ body,
   height: 100vh;
   user-select: none;
   -webkit-user-select: none;
-  font-size: 95%;
-  @apply bg-mainBg text-titleBarText;
+  background: $color-bg-primary;
+  color: $color-text-primary;
   overflow: hidden;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Arial;
+  font-weight: 400;
 }
 
 button {
   cursor: default;
+  * {
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+  }
 }
 
 .content-container {
   position: absolute;
-  top: $titleBarHeight;
-  left: 65px;
-  height: calc(100% - 35px);
-  width: calc(100% - 65px);
+  top: $size-title-bar;
+  left: $size-lef-nav;
+  height: calc(100% - $size-title-bar);
+  width: calc(100% - $size-lef-nav);
 }
 
 .main-window,
@@ -41,10 +51,10 @@ button {
 
 .view-container {
   width: 100%;
-  height: calc(100% - 30px);
+  height: calc(100% - $size-bottom-bar);
 }
 
 .statusbar-container {
   width: 100%;
-  height: 30px;
+  height: $size-bottom-bar;
 }

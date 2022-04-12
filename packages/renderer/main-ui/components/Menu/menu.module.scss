@@ -1,7 +1,7 @@
 @import '../../styles/variables.scss';
 
 .MenuContainer {
-  height: $titleBarHeight;
+  height: 100%;
   display: flex;
   align-items: center;
 }
@@ -12,30 +12,36 @@
   display: flex;
   align-items: center;
   position: relative;
-  @apply hover:bg-grey0 px-2;
+  padding: 0 $gap-base;
 }
 
+.MenuItem:hover,
 .MenuItemActive {
-  @apply bg-grey0;
+  background: $color-bg-tertiary;
 }
 
 .SubMenu {
   position: absolute;
-  top: $titleBarHeight;
+  top: 100%;
   left: 0;
   min-width: 250px;
   z-index: 1000;
-  @apply bg-grey3 py-2;
+  background: $color-bg-secondary;
+  padding: $gap-lg 0;
+  box-shadow: rgba(0, 0, 0, 0.3) 3px 3px 5px;
 }
 
 .SubMenuItem {
   display: flex;
   justify-content: space-between;
-  @apply px-6 py-0.5 hover:bg-accent;
+  padding: 2px $gap-2xl;
+
+  &:hover {
+    background: $color-primary;
+  }
 }
 
 .SubMenuItemSeparator {
   width: 93%;
   height: 1px;
-  @apply bg-white/30 my-2 mx-auto;
 }

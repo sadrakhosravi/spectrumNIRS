@@ -1,34 +1,39 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import AppMenuModel from '@models/AppMenuModel';
 
 // Styles
 import * as styles from './menu.module.scss';
 
 // Modules
-import { MenuItem, SubMenu, SubMenuItem, SubMenuItemSeparator } from './';
+import { MenuItem, SubMenu, SubMenuItem } from './';
 
-export const Menu = () => {
+export const Menu = observer(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className={styles.MenuContainer}>
-      <MenuItem text="Test" isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}>
-        <SubMenu>
-          <SubMenuItem text="Test" shortcut="Ctrl + R" />
-          <SubMenuItem text="Test" shortcut="Ctrl + R" />
-          <SubMenuItemSeparator />
-
-          <SubMenuItem text="Test" />
-        </SubMenu>
-      </MenuItem>
-      <MenuItem text="Test" isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}>
-        <SubMenu>
-          <SubMenuItem text="Test" shortcut="Ctrl + R" />
-          <SubMenuItem text="Test" shortcut="Ctrl + R" />
-          <SubMenuItemSeparator />
-
-          <SubMenuItem text="Test" />
-        </SubMenu>
-      </MenuItem>
+      {AppMenuModel.menu.map((menuItem) => (
+        <MenuItem
+          text={menuItem.label}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+          key={menuItem.label + 'menu'}
+        >
+          <>
+            {menuItem.submenu && (
+              <SubMenu>
+                {menuItem.submenu.map((subMenuItem) => (
+                  <SubMenuItem
+                    text={subMenuItem.label}
+                    key={subMenuItem.label + subMenuItem.accelerator}
+                  />
+                ))}
+              </SubMenu>
+            )}
+          </>
+        </MenuItem>
+      ))}
     </div>
   );
-};
+});

@@ -1,23 +1,26 @@
-@import '../../styles/variables.scss';
+@import '../../styles/variables';
 
 .TitleBar {
   position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
-  height: $titleBarHeight;
+  height: $size-title-bar;
   app-region: drag;
   user-select: none;
   -webkit-app-region: drag;
   -webkit-user-select: none;
-  @apply text-titleBarText;
 }
 
 .TitleBarContainer {
   position: relative;
   height: 100%;
   width: 100%;
-  @apply bg-titleBarBg px-2 flex items-center gap-2;
+  background: $color-bg-secondary;
+  padding: 0 $gap-xl;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .Logo {
@@ -32,11 +35,11 @@
 
 .Filename {
   position: absolute;
-  height: $titleBarHeight;
+  height: 100%;
   left: 50%;
   transform: translateX(-50%);
   -webkit-app-region: drag;
   display: flex;
   align-items: center;
-  @apply gap-2;
+  gap: $gap-xs;
 }

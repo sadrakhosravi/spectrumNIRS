@@ -1,0 +1,21 @@
+@import './variables';
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin default-transition {
+  transition: background 0.15s ease-in-out;
+}
+
+@mixin hover-state {
+  @include default-transition;
+  &:hover {
+    background: $color-bg-tertiary;
+  }
+}
+
+@mixin active-state {
+  background: $color-bg-tertiary;
+}
