@@ -9,7 +9,7 @@ import { StatusBar } from '/@/components/StatusBar';
 import './styles/main.scss';
 
 // Screens
-// import { HomeScreen } from '/@/views';
+import { ViewRouter } from './views';
 
 const App = () => {
   return (
@@ -18,7 +18,9 @@ const App = () => {
       <LeftPanel />
 
       <div className="content-container">
-        <div className="view-container"></div>
+        <div className="view-container">
+          <ViewRouter />
+        </div>
         <div className="statusbar-container">
           <StatusBar />
         </div>

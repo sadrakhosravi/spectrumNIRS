@@ -1,2 +1,2 @@
 export { ViewRouter } from './ViewRouter';
-export { HomeScreen } from './HomeScreen';
+export { HomeScreen } from './Home/HomeScreen';

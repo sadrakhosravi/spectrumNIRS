@@ -1,0 +1,25 @@
+@import './variables';
+
+.text-larger {
+  font-size: $size-font-lg;
+}
+
+.relative {
+  position: relative;
+}
+
+.mb {
+  margin-bottom: $gap-lg;
+}
+
+.mt {
+  margin-top: $gap-lg;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-full {
+  width: 100%;
+}

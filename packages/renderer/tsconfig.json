@@ -10,9 +10,10 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "types": ["node"],
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "/@/*": ["main-ui/*"],
+      "@styles/*": ["main-ui/styles/*"],
       "@models/*": ["../models/*"],
       "@controllers/*": ["../controllers/*"],
       "@utils/*": ["../utils/*"]
@@ -23,7 +24,9 @@
   "include": [
     "../models/**/*",
     "../controllers/**/*",
+    "../database/**/*",
     "../utils/**/*",
+    "main-ui/**/*.scss",
     "main-ui/**/*.ts",
     "main-ui/**/*.js",
     "main-ui/**/*.tsx",

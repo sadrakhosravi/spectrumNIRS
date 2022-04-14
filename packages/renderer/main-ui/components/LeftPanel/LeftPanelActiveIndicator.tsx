@@ -25,6 +25,10 @@ export const LeftPanelActiveIndicator = observer(() => {
         setTopPos(navButtonHeight * 2);
         break;
 
+      case 'calibration':
+        setTopPos(navButtonHeight * 3);
+        break;
+
       default:
         break;
     }

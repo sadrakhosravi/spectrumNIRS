@@ -8,7 +8,7 @@ import * as styles from './leftPanel.module.scss';
 import { LeftPanelNavButton, LeftPanelActiveIndicator } from './';
 
 // Icons
-import { FiActivity, FiHome, FiSearch, FiSettings } from 'react-icons/fi';
+import { FiActivity, FiHome, FiSearch, FiTool } from 'react-icons/fi';
 
 // Types
 import type { IconType } from 'react-icons/lib';
@@ -36,6 +36,11 @@ const navigationItems: NavigationItems[] = [
     text: 'Review',
     icon: FiSearch,
     path: 'review',
+  },
+  {
+    text: 'Calibration',
+    icon: FiTool,
+    path: 'calibration',
   },
 ];
 

@@ -14,8 +14,22 @@
   &:hover {
     background: $color-bg-tertiary;
   }
+
+  &:active {
+    background: $color-bg-secondary;
+  }
 }
 
 @mixin active-state {
   background: $color-bg-tertiary;
+}
+
+@mixin ring {
+  outline: 2px solid $color-primary;
+  border-radius: 5px;
+}
+
+@mixin border-primary {
+  border: $border-primary-width solid $border-primary-color;
+  border-radius: 5px;
 }

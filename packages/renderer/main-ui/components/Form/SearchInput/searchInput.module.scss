@@ -1,0 +1,19 @@
+@import '../../../styles/variables';
+
+.SearchInput {
+  background: $color-bg-secondary;
+  padding-left: 4rem;
+  width: 100%;
+}
+
+.SearchIcon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  stroke: $color-text-tertiary;
+}
+
+.SearchInput:hover + .SearchIcon {
+  stroke: $color-text-white;
+}

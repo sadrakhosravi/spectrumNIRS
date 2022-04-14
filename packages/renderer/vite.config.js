@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { chrome } from '../../.electron-vendors.cache.json';
+import { node } from '../../.electron-vendors.cache.json';
 import { join, resolve } from 'path';
 import { builtinModules } from 'module';
 
@@ -24,8 +24,10 @@ const config = {
   resolve: {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'main-ui') + '/',
+      '@styles/': join(PACKAGE_ROOT, 'main-ui', 'styles') + '/',
       '@models/': join(PACKAGE_ROOT, '../models') + '/',
       '@controllers/': join(PACKAGE_ROOT, '../controllers') + '/',
+      '@database/': join(PACKAGE_ROOT, '../database') + '/',
       '@utils/': join(PACKAGE_ROOT, '../utils') + '/',
     },
   },
@@ -47,7 +49,7 @@ const config = {
   },
   build: {
     sourcemap: true,
-    target: `chrome${chrome}`,
+    target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
     rollupOptions: {

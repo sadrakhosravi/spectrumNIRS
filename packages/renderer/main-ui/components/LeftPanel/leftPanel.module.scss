@@ -49,6 +49,8 @@ $button-height: 70px;
     color: $color-primary;
     svg {
       stroke: $color-primary;
+      fill: $color-primary;
+      fill-opacity: 0.35;
     }
 
     &:hover {
@@ -64,7 +66,7 @@ $button-height: 70px;
 .LeftPanelActiveIndicator {
   position: absolute;
   top: 0;
-  right: -2.5px;
+  right: -2px;
   height: $button-height;
   width: 4px;
   background: $color-primary;

@@ -16,9 +16,9 @@ type LeftPanelNavButtonProps = {
 };
 
 export const LeftPanelNavButton = observer(({ text, icon, path }: LeftPanelNavButtonProps) => {
-  console.log(AppStatesModel.route);
   return (
     <button
+      tabIndex={1}
       className={`${styles.LeftPanelNavButton} ${
         AppStatesModel.route === path && styles.LeftPanelNavButton_Active
       }`}
