@@ -4,9 +4,7 @@
 $button-height: 70px;
 
 .LeftPanel {
-  position: absolute;
-  top: $size-title-bar;
-  left: 0;
+  position: relative;
   width: $size-lef-nav;
   height: calc(100vh - $size-title-bar);
   border-right: solid $border-primary-width $border-primary-color;

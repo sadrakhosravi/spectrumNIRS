@@ -24,6 +24,13 @@
   background: $color-bg-tertiary;
 }
 
+@mixin active-focus-state {
+  &:focus,
+  &:active {
+    @include ring;
+  }
+}
+
 @mixin ring {
   outline: 2px solid $color-primary;
   border-radius: 5px;

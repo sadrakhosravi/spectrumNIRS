@@ -13,20 +13,16 @@ export const LeftPanelActiveIndicator = observer(() => {
 
   React.useEffect(() => {
     switch (AppStatesModel.route) {
-      case '':
+      case 'record':
         setTopPos(0);
         break;
 
-      case 'record':
-        setTopPos(navButtonHeight);
-        break;
-
       case 'review':
-        setTopPos(navButtonHeight * 2);
+        setTopPos(navButtonHeight * 1);
         break;
 
       case 'calibration':
-        setTopPos(navButtonHeight * 3);
+        setTopPos(navButtonHeight * 2);
         break;
 
       default:

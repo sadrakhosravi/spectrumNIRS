@@ -3,6 +3,8 @@
 @import './variables';
 @import './mixins';
 @import './utilities';
+@import './scrollbar';
+@import './channel.css';
 
 *,
 :before,
@@ -87,12 +89,17 @@ h3 {
   font-size: $size-font-lg;
 }
 
-.content-container {
+.main-container {
   position: absolute;
   top: $size-title-bar;
-  left: $size-lef-nav;
+  left: 0;
   height: calc(100% - $size-title-bar);
-  width: calc(100% - $size-lef-nav);
+  width: 100%;
+  display: flex;
+}
+
+.content-container {
+  width: 100%;
 }
 
 .main-window,

@@ -5,20 +5,23 @@ async function createWindow() {
   const browserWindow = new BrowserWindow({
     show: true, // Use 'ready-to-show' event to show window
     titleBarStyle: 'hidden',
-    minHeight: 400,
-    minWidth: 450,
+    minHeight: 600,
+    minWidth: 800,
+    height: 600,
+    width: 800,
     titleBarOverlay: {
       color: '#232323',
       symbolColor: '#F1F1F1',
       height: 35,
     },
-    movable: true,
     frame: false,
     darkTheme: true,
 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      backgroundThrottling: false,
+      enableBlinkFeatures: '',
 
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
       // preload: join(__dirname, '../../preload/dist/index.cjs'),
@@ -32,6 +35,7 @@ async function createWindow() {
    * @see https://github.com/electron/electron/issues/25012
    */
   browserWindow.on('ready-to-show', () => {
+    browserWindow?.maximize();
     browserWindow?.show();
     browserWindow.focus();
 

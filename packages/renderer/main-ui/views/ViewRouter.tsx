@@ -3,8 +3,14 @@ import { observer } from 'mobx-react-lite';
 import AppStatesModel from '@models/AppStatesModel';
 
 // Views
-import { HomeScreen } from './';
+import { HomeView } from './';
+import { ScreenView } from '../components/ScreenView';
 
 export const ViewRouter = observer(() => {
-  return <div className="h-full w-full">{AppStatesModel.route === '' && <HomeScreen />}</div>;
+  return (
+    <div className="h-full w-full">
+      {AppStatesModel.route === '' && <HomeView />}{' '}
+      {AppStatesModel.route !== '' && <ScreenView enableWidgets />}
+    </div>
+  );
 });

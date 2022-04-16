@@ -15,11 +15,33 @@
   // 	],
   // 	"description": "Log output to console"
   // }
-
+  "Functional Component React": {
+    "prefix": "fc",
+    "body": [
+      "import * as React from 'react';",
+      "",
+      "export const ${TM_FILENAME_BASE} = () => {",
+      "return (",
+      "<${2:div}></${2:div}>",
+      ")};"
+    ],
+    "description": "Class Component Template"
+  },
   "SCSS modules": {
     "scope": "javascript,typescript,typescriptreact",
     "prefix": "scss",
     "body": ["import * as styles from './$1.module.scss';"],
+    "description": "Quick way to load scss styles"
+  },
+  "ModelComments": {
+    "scope": "javascript,typescript,typescriptreact",
+    "prefix": "mdlcmt",
+    "body": [
+      "/*---------------------------------------------------------------------------------------------",
+      "*  Singleton $1 Model.",
+      "*  Uses MobX observable pattern",
+      "*--------------------------------------------------------------------------------------------*/"
+    ],
     "description": "Quick way to load scss styles"
   }
 }

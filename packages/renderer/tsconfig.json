@@ -8,6 +8,8 @@
     "strict": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "jsx": "react",
     "types": ["node"],
     "baseUrl": "./",
@@ -16,6 +18,8 @@
       "@styles/*": ["main-ui/styles/*"],
       "@models/*": ["../models/*"],
       "@controllers/*": ["../controllers/*"],
+      "@charts/*": ["./main-ui/charts/*"],
+      "@widgets/*": ["./main-ui/widgets/*"],
       "@utils/*": ["../utils/*"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]

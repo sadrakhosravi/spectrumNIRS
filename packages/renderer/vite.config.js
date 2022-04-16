@@ -28,12 +28,14 @@ const config = {
       '@models/': join(PACKAGE_ROOT, '../models') + '/',
       '@controllers/': join(PACKAGE_ROOT, '../controllers') + '/',
       '@database/': join(PACKAGE_ROOT, '../database') + '/',
+      '@charts/': join(PACKAGE_ROOT, 'main-ui', 'charts') + '/',
+      '@widgets/': join(PACKAGE_ROOT, 'main-ui', 'widgets') + '/',
       '@utils/': join(PACKAGE_ROOT, '../utils') + '/',
     },
   },
 
   plugins: [
-    reactVite({}),
+    reactVite(),
     electronRenderer(),
     checker({
       typescript: {

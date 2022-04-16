@@ -7,6 +7,7 @@ import { StatusBar } from '/@/components/StatusBar';
 
 // Global styles
 import './styles/main.scss';
+import 'tippy.js/dist/tippy.css'; // optional
 
 // Screens
 import { ViewRouter } from './views';
@@ -15,14 +16,14 @@ const App = () => {
   return (
     <div className="main-window">
       <TitleBar />
-      <LeftPanel />
+      <div className="main-container">
+        <LeftPanel />
 
-      <div className="content-container">
         <div className="view-container">
           <ViewRouter />
-        </div>
-        <div className="statusbar-container">
-          <StatusBar />
+          <div className="statusbar-container">
+            <StatusBar />
+          </div>
         </div>
       </div>
     </div>

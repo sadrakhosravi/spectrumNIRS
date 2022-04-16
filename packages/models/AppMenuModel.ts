@@ -1,5 +1,9 @@
-import { makeAutoObservable } from 'mobx';
+/*---------------------------------------------------------------------------------------------
+ *  Singleton AppMenu Model.
+ *  Uses MobX observable pattern
+ *--------------------------------------------------------------------------------------------*/
 
+import { makeAutoObservable } from 'mobx';
 export interface ISubMenu {
   label: string;
   accelerator?: string;

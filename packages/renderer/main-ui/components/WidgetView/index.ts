@@ -1,1 +1,0 @@
-export { WidgetView } from './WidgetView';

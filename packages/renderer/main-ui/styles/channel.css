@@ -1,0 +1,18 @@
+.channel-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: calc(100% + 0px);
+  width: 40px;
+  background: #333;
+}
+
+.channel-tick {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-50%);
+  background-color: #fff;
+  width: 25px;
+  height: 5px;
+}

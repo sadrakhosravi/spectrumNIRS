@@ -1,0 +1,22 @@
+@import '@styles/variables';
+
+.ChartViewContainer {
+  height: calc(100% - $size-toolbar);
+}
+
+.ChartView {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  overflow: auto;
+}
+
+.ChartContainer {
+  height: 100%;
+  width: calc(100% - 150px);
+}
+
+.ChartChannels {
+  height: 100%;
+  width: 150px;
+}
