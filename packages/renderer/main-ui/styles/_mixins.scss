@@ -32,11 +32,31 @@
 }
 
 @mixin ring {
-  outline: 2px solid $color-primary;
+  outline: 1.7px solid $color-primary;
   border-radius: 5px;
 }
 
 @mixin border-primary {
   border: $border-primary-width solid $border-primary-color;
   border-radius: 5px;
+}
+
+@mixin border-secondary {
+  border: 1px solid $border-primary-color;
+  border-radius: 3px;
+}
+
+@mixin slide-left {
+  animation: slideLeft 0.3s forwards;
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(12px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
 }

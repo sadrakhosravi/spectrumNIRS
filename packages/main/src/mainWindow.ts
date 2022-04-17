@@ -38,10 +38,6 @@ async function createWindow() {
     browserWindow?.maximize();
     browserWindow?.show();
     browserWindow.focus();
-
-    if (import.meta.env.DEV) {
-      browserWindow?.webContents.openDevTools();
-    }
   });
 
   /**

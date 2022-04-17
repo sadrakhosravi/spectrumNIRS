@@ -6,7 +6,7 @@ import { Toolbar, ToolbarSection, ToolbarButton } from '/@/components/Toolbar';
 // Icons
 import { FiMinimize2 } from 'react-icons/fi';
 
-const iconSize = '22px';
+const iconSize = '18px';
 const iconStrokeColor = '#ccc';
 const iconStrokeWidth = 2;
 

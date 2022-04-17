@@ -12,7 +12,7 @@ export const ChannelLanes = observer(() => {
   return (
     <div className={styles.Channel}>
       {ChartModel.charts.map((_chart, i) => (
-        <ChannelLaneItem chartIndex={i} />
+        <ChannelLaneItem key={i} chartIndex={i} />
       ))}
     </div>
   );

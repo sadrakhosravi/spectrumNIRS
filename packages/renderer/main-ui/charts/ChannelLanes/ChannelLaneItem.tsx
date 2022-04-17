@@ -5,6 +5,9 @@ import ChartModel from '@models/ChartModel';
 // Styles
 import * as styles from './channelLanes.module.scss';
 
+// Components
+import { ChannelSettings } from './ChannelSettings';
+
 // Types
 import type { Chart } from '../Chart';
 
@@ -15,6 +18,8 @@ type ChannelLaneItemType = {
 export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) => {
   const [top, setTop] = React.useState(0);
   const [height, setHeight] = React.useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const channelInfoRef = React.useRef<HTMLButtonElement>(null);
   let timeoutRef: null | NodeJS.Timeout = null;
 
   React.useEffect(() => {
@@ -22,9 +27,11 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
     const size = (ChartModel.chartInstance as Chart).getChartSize(chart);
 
     const token = chart.onResize(() => {
-      const size = (ChartModel.chartInstance as Chart).getChartSize(chart);
-      setTop(size.y);
-      setHeight(size.height);
+      setTimeout(() => {
+        const size = (ChartModel.chartInstance as Chart).getChartSize(chart);
+        setTop(size.y);
+        setHeight(size.height);
+      }, 50);
     });
 
     setTop(size.y);
@@ -37,27 +44,24 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
 
   // Handles the chart resize separator click
   const handleChannelSeparatorClick = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      const dashboard = (ChartModel.chartInstance as Chart).getDashboard();
-
-      // Get the initial mouse position
-      const initialY = e.pageY;
-      const initialRelativeHeight = dashboard.getRowHeight(chartIndex);
+    (_e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      // TODO: Add chart resize by drag functionality
 
       const separator = document.getElementById(`channel-separator-${chartIndex}`);
       separator?.classList.add(styles.ChannelSeparatorActive);
       document.body.style.cursor = 'ns-resize';
 
-      // Assign mouse move listeners
-      const onMouseMove = (mouseMoveEvent: MouseEvent) => {
-        requestAnimationFrame(() => {
-          const diff = (mouseMoveEvent.pageY - initialY) / 10;
-          const change = diff + initialRelativeHeight;
+      let lastTimeStamp = 0;
 
-          if (change >= 0.4) {
-            const diff = (mouseMoveEvent.pageY - initialY) / 100;
-            dashboard.setRowHeight(chartIndex, diff + initialRelativeHeight);
+      // Assign mouse move listeners
+      const onMouseMove = (_mouseMoveEvent: MouseEvent) => {
+        requestAnimationFrame((timeStamp) => {
+          // Only re-render every 10 ms
+          if (!(timeStamp - lastTimeStamp > 10)) {
+            return;
           }
+
+          lastTimeStamp = timeStamp;
         });
       };
 
@@ -84,6 +88,7 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
     }
   }, []);
 
+  // Mouse enter on separator
   const handleSeparatorOnMouseEnter = React.useCallback(() => {
     timeoutRef = setTimeout(() => {
       const separator = document.getElementById(`channel-separator-${chartIndex}`);
@@ -91,6 +96,7 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
     }, 400);
   }, []);
 
+  // Mouse leave on separator
   const handleSeparatorOnMouseLeave = React.useCallback(() => {
     window.clearTimeout(timeoutRef as any);
     setImmediate(() => window.clearTimeout(timeoutRef as any));
@@ -98,23 +104,42 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
     separator?.classList.remove(styles.ChannelSeparatorActive);
   }, []);
 
+  // Handles the on channel name click
+  const handleOpenChannelSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
+
   return (
-    <div className={styles.ChannelLaneItem} style={{ top, height }}>
-      <div className={styles.ChannelUI}>
-        <button className={styles.ChannelInfo}>
-          <span />
-          <span>Name</span>
-        </button>
+    <>
+      <div className={styles.ChannelLaneItem} style={{ top, height }}>
+        <div className={styles.ChannelUI}>
+          <div style={{ position: 'relative' }}>
+            <button
+              className={styles.ChannelInfo}
+              onClick={handleOpenChannelSettings}
+              ref={channelInfoRef}
+            >
+              <span />
+              <span>Name</span>
+            </button>
+          </div>
+        </div>
+        <div
+          title="Double click to reset all channel heights"
+          id={`channel-separator-${chartIndex}`}
+          className={styles.ChannelLanesSeparatorButton}
+          onMouseDownCapture={handleChannelSeparatorClick}
+          onDoubleClick={handleChannelSeparatorDblClick}
+          onMouseEnter={handleSeparatorOnMouseEnter}
+          onMouseLeave={handleSeparatorOnMouseLeave}
+        />
       </div>
-      <div
-        title="Double click to reset all channel heights"
-        id={`channel-separator-${chartIndex}`}
-        className={styles.ChannelLanesSeparatorButton}
-        onMouseDownCapture={handleChannelSeparatorClick}
-        onDoubleClick={handleChannelSeparatorDblClick}
-        onMouseEnter={handleSeparatorOnMouseEnter}
-        onMouseLeave={handleSeparatorOnMouseLeave}
-      />
-    </div>
+      {isSettingsOpen && (
+        <ChannelSettings
+          parentRef={channelInfoRef.current as HTMLButtonElement}
+          closeSetter={setIsSettingsOpen}
+        />
+      )}
+    </>
   );
 });

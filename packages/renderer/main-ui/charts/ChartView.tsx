@@ -11,10 +11,11 @@ import { ChannelLanes } from './ChannelLanes/ChannelLanes';
 export const ChartView = () => {
   React.useEffect(() => {
     const chart = new Chart('main-chart-container');
-
     ChartController.setChartInstance(chart);
 
-    return () => chart.cleanup();
+    return () => {
+      chart.cleanup();
+    };
   }, []);
 
   return (

@@ -2,6 +2,7 @@
 @import '@styles/mixins';
 
 $channel-ui-width: 150px;
+$channel-info-height: 25px;
 
 .Channel {
   position: relative;
@@ -36,10 +37,12 @@ $channel-ui-width: 150px;
 }
 
 .ChannelInfo {
-  padding: $gap-sm $gap-2xl $gap-sm $gap-sm;
+  padding-left: $gap-sm;
   gap: $gap-xs;
+  margin-top: 3px;
   border-radius: $border-primary-radius;
   width: 100%;
+  height: $channel-info-height;
   @include flex-center;
   @include hover-state;
   @include active-focus-state;
@@ -51,6 +54,7 @@ $channel-ui-width: 150px;
   span:first-child {
     width: 15px;
     height: 15px;
+    border-radius: 2px;
     background: $border-secondary-color;
   }
 }
@@ -63,10 +67,46 @@ $channel-ui-width: 150px;
   height: 6px;
   cursor: ns-resize;
   transition: background 0.1s ease;
+  z-index: 5;
 }
 
 .ChannelSeparatorActive {
   background: $color-primary;
   height: 6px;
   bottom: -3px;
+}
+
+.ChannelSettings {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 450px;
+  height: 250px;
+  background: $color-bg-secondary;
+  @include border-primary;
+  z-index: 51;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.8);
+  @include slide-left;
+}
+
+.ChannelSettingsIndicatorTop {
+  border-bottom: 15px solid $color-bg-secondary;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  content: '';
+  display: inline-block;
+  left: 60px;
+  position: absolute;
+  top: -10px;
+}
+
+.ChannelSettingsIndicatorBottom {
+  border-top: 15px solid $color-bg-secondary;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  content: '';
+  display: inline-block;
+  left: 60px;
+  position: absolute;
+  bottom: -10px;
 }
