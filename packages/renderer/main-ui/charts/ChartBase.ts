@@ -4,7 +4,6 @@
  *
  * @author Sadra Khosravi
  * @version 0.1.0-Alpha.1
- * @
  */
 
 import {
@@ -14,6 +13,7 @@ import {
   emptyLine,
   emptyTick,
   lightningChart as lcjs,
+  translatePoint,
 } from '@arction/lcjs';
 import type { Dashboard } from '@arction/lcjs';
 
@@ -25,6 +25,9 @@ import { ChartType } from './types';
 
 // Structures
 import { SortedNumberSet } from '@utils/structures';
+
+// Controller
+import { ChartController } from '@controllers/ChartController';
 
 /**
  *
@@ -56,20 +59,10 @@ export class ChartBase {
   }
 
   /**
-   * Creates a dashboard instance of LCJS
+   * @returns the dashboard instance
    */
-  protected createDashboard(chartContainerId: string) {
-    this.dashboard = lcjs().Dashboard({
-      numberOfColumns: 1,
-      numberOfRows: this.maxRowCount,
-      disableAnimations: true,
-      maxFps: 40,
-      antialias: true,
-      container: chartContainerId,
-      lineAntiAlias: true,
-      devicePixelRatio: true,
-      theme: spectrumTheme,
-    });
+  public getDashboard() {
+    return this.dashboard as Dashboard;
   }
 
   /**
@@ -86,6 +79,8 @@ export class ChartBase {
     this.charts?.push(chart);
     this.setChartDefaults(chart);
     this.updateChartsHeight();
+
+    ChartController.addChart(chart);
   }
 
   /**
@@ -104,6 +99,23 @@ export class ChartBase {
     series.setDataCleaning({ minDataPointCount: 1 });
 
     return series;
+  }
+
+  /**
+   * Creates a dashboard instance of LCJS
+   */
+  protected createDashboard(chartContainerId: string) {
+    this.dashboard = lcjs().Dashboard({
+      numberOfColumns: 1,
+      numberOfRows: this.maxRowCount,
+      disableAnimations: true,
+      maxFps: 40,
+      antialias: true,
+      container: chartContainerId,
+      lineAntiAlias: true,
+      devicePixelRatio: true,
+      theme: spectrumTheme,
+    });
   }
 
   /**
@@ -144,10 +156,28 @@ export class ChartBase {
     chart.setTitleFillStyle(emptyFill);
 
     // Remove padding
-    chart.setPadding(0);
+    chart.setPadding({ top: 3, bottom: 5, left: 150, right: 0 });
 
     // Remove splitter
     this.dashboard?.setSplitterStyle(emptyLine);
+  }
+
+  /**
+   * Gets the size of the chart passed in
+   */
+  public getChartSize(chart: ChartType) {
+    // Get each chart position needed for aligning the ChannelUI elements
+    // Get the top left corner
+    const posEngine = translatePoint({ x: 0, y: 0 }, chart.uiScale, chart.engine.scale);
+    const posDocument = chart.engine.engineLocation2Client(posEngine.x, posEngine.y);
+
+    const posEngine2 = translatePoint({ x: 100, y: 100 }, chart.uiScale, chart.engine.scale);
+    const posDocument2 = chart.engine.engineLocation2Client(posEngine2.x, posEngine2.y);
+
+    const height = Math.abs(posDocument2.y - posDocument.y);
+    const width = Math.abs(posDocument2.x - posDocument.x);
+
+    return { x: posDocument.x, y: posDocument2.y - 95, height, width };
   }
 
   /**

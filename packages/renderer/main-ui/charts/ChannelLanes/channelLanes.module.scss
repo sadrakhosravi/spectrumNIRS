@@ -1,0 +1,72 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+$channel-ui-width: 150px;
+
+.Channel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.ChannelLanes {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.ChannelLaneItem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.075);
+  z-index: 11;
+}
+
+.ChannelUI {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $channel-ui-width;
+  height: 100%;
+  border-right: solid $border-primary-width $border-primary-color;
+  padding: $gap-xs $gap-base;
+}
+
+.ChannelInfo {
+  padding: $gap-sm $gap-2xl $gap-sm $gap-sm;
+  gap: $gap-xs;
+  border-radius: $border-primary-radius;
+  width: 100%;
+  @include flex-center;
+  @include hover-state;
+  @include active-focus-state;
+
+  span {
+    display: inline-block;
+  }
+
+  span:first-child {
+    width: 15px;
+    height: 15px;
+    background: $border-secondary-color;
+  }
+}
+
+.ChannelLanesSeparatorButton {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  cursor: ns-resize;
+  transition: background 0.1s ease;
+}
+
+.ChannelSeparatorActive {
+  background: $color-primary;
+  height: 6px;
+  bottom: -3px;
+}

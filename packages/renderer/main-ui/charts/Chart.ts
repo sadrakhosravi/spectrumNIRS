@@ -19,5 +19,10 @@ export class Chart extends ChartBase {
     this.addChartXY();
     this.addChartXY();
     this.addChartXY();
+
+    setTimeout(() => {
+      this.addChartXY();
+      this.addChartXY();
+    }, 2000);
   }
 }
