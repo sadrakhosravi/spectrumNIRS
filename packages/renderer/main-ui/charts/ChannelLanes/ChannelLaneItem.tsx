@@ -7,6 +7,7 @@ import * as styles from './channelLanes.module.scss';
 
 // Components
 import { ChannelSettings } from './ChannelSettings';
+import { ChannelActions } from './ChannelActions';
 
 // Types
 import type { Chart } from '../Chart';
@@ -19,6 +20,8 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
   const [top, setTop] = React.useState(0);
   const [height, setHeight] = React.useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isMaximized, setIsMaximized] = React.useState(false);
+
   const channelInfoRef = React.useRef<HTMLButtonElement>(null);
   let timeoutRef: null | NodeJS.Timeout = null;
 
@@ -29,6 +32,15 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
     const token = chart.onResize(() => {
       setTimeout(() => {
         const size = (ChartModel.chartInstance as Chart).getChartSize(chart);
+
+        if (size.height < 15) {
+          setIsMaximized(true);
+        }
+
+        if (size.height > 15) {
+          setIsMaximized(false);
+        }
+
         setTop(size.y);
         setHeight(size.height);
       }, 50);
@@ -111,29 +123,33 @@ export const ChannelLaneItem = observer(({ chartIndex }: ChannelLaneItemType) =>
 
   return (
     <>
-      <div className={styles.ChannelLaneItem} style={{ top, height }}>
-        <div className={styles.ChannelUI}>
-          <div style={{ position: 'relative' }}>
-            <button
-              className={styles.ChannelInfo}
-              onClick={handleOpenChannelSettings}
-              ref={channelInfoRef}
-            >
-              <span />
-              <span>Name</span>
-            </button>
+      {!isMaximized && (
+        <div className={styles.ChannelLaneItem} style={{ top, height }}>
+          <div className={styles.ChannelUI}>
+            <div className={styles.ChannelUIInnerContainer}>
+              <button
+                className={styles.ChannelInfo}
+                onClick={handleOpenChannelSettings}
+                ref={channelInfoRef}
+              >
+                <span />
+                <span>Name</span>
+              </button>
+              <ChannelActions chartIndex={chartIndex} />
+            </div>
           </div>
+          <div
+            title="Double click to reset all channel heights"
+            id={`channel-separator-${chartIndex}`}
+            className={styles.ChannelLanesSeparatorButton}
+            onMouseDownCapture={handleChannelSeparatorClick}
+            onDoubleClick={handleChannelSeparatorDblClick}
+            onMouseEnter={handleSeparatorOnMouseEnter}
+            onMouseLeave={handleSeparatorOnMouseLeave}
+          />
         </div>
-        <div
-          title="Double click to reset all channel heights"
-          id={`channel-separator-${chartIndex}`}
-          className={styles.ChannelLanesSeparatorButton}
-          onMouseDownCapture={handleChannelSeparatorClick}
-          onDoubleClick={handleChannelSeparatorDblClick}
-          onMouseEnter={handleSeparatorOnMouseEnter}
-          onMouseLeave={handleSeparatorOnMouseLeave}
-        />
-      </div>
+      )}
+
       {isSettingsOpen && (
         <ChannelSettings
           parentRef={channelInfoRef.current as HTMLButtonElement}

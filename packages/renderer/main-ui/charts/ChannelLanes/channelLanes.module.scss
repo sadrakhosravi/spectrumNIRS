@@ -33,7 +33,17 @@ $channel-info-height: 25px;
   width: $channel-ui-width;
   height: 100%;
   border-right: solid $border-primary-width $border-primary-color;
+}
+
+.ChannelUIInnerContainer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: $gap-xs $gap-base;
+  @include slide-left;
 }
 
 .ChannelInfo {
@@ -109,4 +119,26 @@ $channel-info-height: 25px;
   left: 60px;
   position: absolute;
   bottom: -10px;
+}
+
+.ChannelActionContainer {
+  width: 100%;
+  @include flex-center;
+  justify-content: center;
+  gap: $gap-xs;
+}
+
+.ChannelActionButton {
+  padding: $gap-sm;
+  border-radius: $border-primary-radius;
+  @include hover-state;
+
+  &:active {
+    @include ring;
+  }
+}
+
+.ChannelActionButtonActive {
+  background: $color-bg-tertiary;
+  @include ring;
 }
