@@ -5,8 +5,8 @@ import * as styles from './screenView.module.scss';
 
 // Components
 import { WidgetsRouter } from '@widgets/WidgetsRouter';
-import { ToolbarRouter } from '../Toolbar';
-import { ChartView } from '/@/charts';
+import { ToolbarRouter } from '../../components/Toolbar';
+import { ChartView } from '../Chart/ChartView';
 
 type ScreenViewType = {
   enableWidgets?: boolean;

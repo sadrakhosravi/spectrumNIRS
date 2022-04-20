@@ -2,9 +2,9 @@ import AppStatesModel from '@models/AppStatesModel';
 import type { AppNavStates } from '@utils/types/AppStateTypes';
 
 /**
- * Controller for application states
+ * ViewModel for application states
  */
-export class AppStatesController {
+export class AppStatesViewModel {
   /**
    * Sets the current path of the app as a state
    */

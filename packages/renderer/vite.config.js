@@ -26,7 +26,7 @@ const config = {
       '/@/': join(PACKAGE_ROOT, 'main-ui') + '/',
       '@styles/': join(PACKAGE_ROOT, 'main-ui', 'styles') + '/',
       '@models/': join(PACKAGE_ROOT, '../models') + '/',
-      '@controllers/': join(PACKAGE_ROOT, '../controllers') + '/',
+      '@viewmodels/': join(PACKAGE_ROOT, '../viewmodels') + '/',
       '@database/': join(PACKAGE_ROOT, '../database') + '/',
       '@charts/': join(PACKAGE_ROOT, 'main-ui', 'charts') + '/',
       '@widgets/': join(PACKAGE_ROOT, 'main-ui', 'widgets') + '/',

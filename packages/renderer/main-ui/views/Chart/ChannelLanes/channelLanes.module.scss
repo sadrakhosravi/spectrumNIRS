@@ -4,7 +4,7 @@
 $channel-ui-width: 150px;
 $channel-info-height: 25px;
 
-.Channel {
+.ChannelsContainer {
   position: relative;
   width: 100%;
   height: 100%;
@@ -75,7 +75,7 @@ $channel-info-height: 25px;
   left: 0;
   width: 100%;
   height: 6px;
-  cursor: ns-resize;
+  // cursor: ns-resize;
   transition: background 0.1s ease;
   z-index: 5;
 }
@@ -139,6 +139,6 @@ $channel-info-height: 25px;
 }
 
 .ChannelActionButtonActive {
-  background: $color-bg-tertiary;
-  @include ring;
+  background: $color-primary;
+  @include active-focus-state;
 }

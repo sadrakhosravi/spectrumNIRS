@@ -35,13 +35,27 @@
   },
   "ModelComments": {
     "scope": "javascript,typescript,typescriptreact",
-    "prefix": "mdlcmt",
+    "prefix": "model",
     "body": [
       "/*---------------------------------------------------------------------------------------------",
-      "*  Singleton $1 Model.",
-      "*  Uses MobX observable pattern",
+      "*  $1 Model.",
+      "*  $2",
+      "*  @version 0.1.0",
       "*--------------------------------------------------------------------------------------------*/"
     ],
-    "description": "Quick way to load scss styles"
+    "description": "Header comment for model class"
+  },
+  "ViewModelComments": {
+    "scope": "javascript,typescript,typescriptreact",
+    "prefix": "viewmodel",
+    "body": [
+      "/*---------------------------------------------------------------------------------------------",
+      "*  $1 View Model.",
+      "*  Uses Mobx observable pattern.",
+      "*  $2",
+      "*  @version 0.1.0",
+      "*--------------------------------------------------------------------------------------------*/"
+    ],
+    "description": "Header comment for view model class"
   }
 }

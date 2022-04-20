@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import ChartModel from '@models/ChartModel';
 
 // Styles
 import * as styles from './channelLanes.module.scss';
@@ -8,11 +7,14 @@ import * as styles from './channelLanes.module.scss';
 // Components
 import { ChannelLaneItem } from './ChannelLaneItem';
 
+// View model
+import { vm } from '../ChartView';
+
 export const ChannelLanes = observer(() => {
   return (
-    <div className={styles.Channel}>
-      {ChartModel.charts.map((_chart, i) => (
-        <ChannelLaneItem key={i} chartIndex={i} />
+    <div className={styles.ChannelsContainer}>
+      {vm.charts.map((chart, i) => (
+        <ChannelLaneItem key={i} chart={chart} />
       ))}
     </div>
   );

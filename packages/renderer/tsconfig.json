@@ -8,6 +8,7 @@
     "strict": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",
@@ -17,7 +18,7 @@
       "/@/*": ["main-ui/*"],
       "@styles/*": ["main-ui/styles/*"],
       "@models/*": ["../models/*"],
-      "@controllers/*": ["../controllers/*"],
+      "@viewmodels/*": ["../viewmodels/*"],
       "@charts/*": ["./main-ui/charts/*"],
       "@widgets/*": ["./main-ui/widgets/*"],
       "@utils/*": ["../utils/*"]
@@ -27,7 +28,7 @@
 
   "include": [
     "../models/**/*",
-    "../controllers/**/*",
+    "../viewmodels/**/*",
     "../database/**/*",
     "../utils/**/*",
     "main-ui/**/*.scss",

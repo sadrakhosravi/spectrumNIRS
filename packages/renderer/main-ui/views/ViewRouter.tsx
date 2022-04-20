@@ -4,7 +4,7 @@ import AppStatesModel from '@models/AppStatesModel';
 
 // Views
 import { HomeView } from './';
-import { ScreenView } from '../components/ScreenView';
+import { ScreenView } from './ScreenView';
 
 export const ViewRouter = observer(() => {
   return (

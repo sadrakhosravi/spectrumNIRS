@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "sourceMap": false,
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "strict": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "types": ["node"],
+    "baseUrl": "./",
+
+    "lib": ["ESNext", "dom", "dom.iterable"]
+  },
+
+  "include": ["./models/**/*", "./viewmodels/**/*", "./database/**/*", "./utils/**/*"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
+}

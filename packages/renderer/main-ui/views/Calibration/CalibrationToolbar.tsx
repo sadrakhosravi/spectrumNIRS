@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // Components
-import { Toolbar, ToolbarSection, ToolbarButton } from '/@/components/Toolbar';
+import { ToolbarSection, ToolbarButton } from '/@/components/Toolbar';
 
 // Icons
 import { FiMinimize2 } from 'react-icons/fi';
@@ -12,7 +12,7 @@ const iconStrokeWidth = 2;
 
 export const CalibrationToolbar = () => {
   return (
-    <Toolbar>
+    <>
       <ToolbarSection text="Charts">
         <ToolbarButton
           icon={
@@ -53,6 +53,6 @@ export const CalibrationToolbar = () => {
           tooltipText={'Channel Height'}
         />
       </ToolbarSection>
-    </Toolbar>
+    </>
   );
 };

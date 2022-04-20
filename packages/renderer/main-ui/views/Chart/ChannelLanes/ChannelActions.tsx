@@ -1,14 +1,11 @@
 import * as React from 'react';
-import ChartModel from '@models/ChartModel';
+import { observer } from 'mobx-react-lite';
 
 // Styles
 import * as styles from './channelLanes.module.scss';
 
 // Icons
-import { FiMaximize2 } from 'react-icons/fi';
-
-// Types
-import type { Dashboard } from '@arction/lcjs';
+import { FiMaximize2, FiMinimize2 } from 'react-icons/fi';
 
 const iconSettings = {
   size: 16,
@@ -19,19 +16,19 @@ type ChannelActionsType = {
   chartIndex: number;
 };
 
-export const ChannelActions = ({ chartIndex }: ChannelActionsType) => {
+export const ChannelActions = observer(({ chartIndex }: ChannelActionsType) => {
   const [isMaximized, setIsMaximized] = React.useState(false);
-
+  console.log(chartIndex);
   // Handles channel maximize button
   const handleMaximizeClick = React.useCallback(() => {
-    const dashboard = ChartModel.chartInstance?.getDashboard() as Dashboard;
+    // const dashboard = ChartModel.chartInstance?.getDashboard() as Dashboard;
 
-    for (let i = 0; i < ChartModel.charts.length; i++) {
-      if (i === chartIndex) {
-        continue;
-      }
-      dashboard.setRowHeight(i, isMaximized ? 1 : 0);
-    }
+    // for (let i = 0; i < ChartModel.charts.length; i++) {
+    //   if (i === chartIndex) {
+    //     continue;
+    //   }
+    //   dashboard.setRowHeight(i, isMaximized ? 1 : 0.0001);
+    // }
     setIsMaximized(!isMaximized);
   }, [isMaximized]);
 
@@ -43,8 +40,12 @@ export const ChannelActions = ({ chartIndex }: ChannelActionsType) => {
         }`}
         onClick={handleMaximizeClick}
       >
-        <FiMaximize2 {...iconSettings} title={'Maximize Channel'} />
+        {!isMaximized ? (
+          <FiMaximize2 {...iconSettings} title={'Maximize Channel'} />
+        ) : (
+          <FiMinimize2 {...iconSettings} title={'Minimize Channel'} />
+        )}
       </button>
     </div>
   );
-};
+});

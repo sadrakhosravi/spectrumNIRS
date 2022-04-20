@@ -25,7 +25,7 @@ export class XYDataGenerator {
         // set stream to progress every 250 milliseconds
         .setStreamInterval(rate)
         // set stream to output 10 points at a time
-        .setStreamBatchSize(10)
+        .setStreamBatchSize(frequency)
         // make the stream infinite
         .setStreamRepeat(true)
         // create a new stream with previously defined stream settings
