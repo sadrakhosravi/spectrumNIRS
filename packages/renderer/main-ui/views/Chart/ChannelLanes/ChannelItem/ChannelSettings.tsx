@@ -1,9 +1,13 @@
 import * as React from 'react';
 
 // Styles
-import * as styles from './channelLanes.module.scss';
+import * as styles from '../channelLanes.module.scss';
+
+// Types
+import type { ChartChannel } from '@models/Chart';
 
 type ChannelSettingsType = {
+  channelInfo: ChartChannel;
   parentRef: HTMLButtonElement;
   closeSetter: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -17,15 +21,14 @@ export const ChannelSettings = ({ parentRef, closeSetter }: ChannelSettingsType)
   let left = parentRefSize.left - 45;
   let flip = false;
 
-  // Get viewport height
+  // Get viewport height and flip the indicator if needed
   const windowHeight = window.innerHeight;
   if (top + height > windowHeight - 15) {
     top = parentRefSize.y - height - topMargin;
     flip = true;
   }
 
-  console.log(flip);
-
+  // Close the popup on Escape key press
   React.useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
       e.key === 'Escape' && closeSetter(false);
@@ -46,6 +49,7 @@ export const ChannelSettings = ({ parentRef, closeSetter }: ChannelSettingsType)
             flip ? styles.ChannelSettingsIndicatorBottom : styles.ChannelSettingsIndicatorTop
           }
         />
+        <div></div>
         Test
       </div>
       <div className="overlay-transparent" onClick={() => closeSetter(false)}></div>

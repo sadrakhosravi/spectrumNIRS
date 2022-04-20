@@ -5,16 +5,16 @@ import { observer } from 'mobx-react-lite';
 import * as styles from './channelLanes.module.scss';
 
 // Components
-import { ChannelLaneItem } from './ChannelLaneItem';
+import { ChannelLaneItem } from './ChannelItem';
 
 // View model
-import { vm } from '../ChartView';
+import { vm } from '../ChartView'; // Prevents unnecessary re-renders
 
 export const ChannelLanes = observer(() => {
   return (
     <div className={styles.ChannelsContainer}>
       {vm.charts.map((chart, i) => (
-        <ChannelLaneItem key={i} chart={chart} />
+        <ChannelLaneItem key={i + chart.id} chart={chart} chartIndex={i} />
       ))}
     </div>
   );

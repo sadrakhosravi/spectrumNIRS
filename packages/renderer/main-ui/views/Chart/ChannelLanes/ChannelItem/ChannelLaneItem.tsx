@@ -2,20 +2,25 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 // Styles
-import * as styles from './channelLanes.module.scss';
+import * as styles from '../channelLanes.module.scss';
 
 // Components
+import { ChannelSeries } from './ChannelSeries';
 import { ChannelSettings } from './ChannelSettings';
-// import { ChannelActions } from './ChannelActions';
+import { ChannelActions } from './ChannelActions';
 
 // Types
 import type { IChart } from '@viewmodels/Chart/ChartViewModel';
 
+// View model
+import { vm } from '../../ChartView';
+
 type ChannelLaneItemType = {
   chart: IChart;
+  chartIndex: number;
 };
 
-export const ChannelLaneItem = observer(({ chart }: ChannelLaneItemType) => {
+export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemType) => {
   const [top, setTop] = React.useState(0);
   const [height, setHeight] = React.useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
@@ -25,11 +30,14 @@ export const ChannelLaneItem = observer(({ chart }: ChannelLaneItemType) => {
 
   const channelInfoRef = React.useRef<HTMLButtonElement>(null);
 
+  console.log('Channel Item');
+
   React.useEffect(() => {
     const size = chart.dashboardChart.getSize();
 
+    // Resize channels on chart resize
     const token = chart.dashboardChart.chart.onResize(() => {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const size = chart.dashboardChart.getSize();
         if (size.height < 15) {
           setIsMaximized(true);
@@ -45,7 +53,7 @@ export const ChannelLaneItem = observer(({ chart }: ChannelLaneItemType) => {
 
         setTop(size.y);
         setHeight(size.height);
-      }, 10);
+      });
     });
 
     setTop(size.y);
@@ -56,45 +64,9 @@ export const ChannelLaneItem = observer(({ chart }: ChannelLaneItemType) => {
     };
   }, [chart]);
 
-  // // Handles the chart resize separator click
-  // const handleChannelSeparatorClick = React.useCallback(
-  //   (_e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-  //     // TODO: Add chart resize by drag functionality
-
-  //     const separator = document.getElementById(`channel-separator-${chartIndex}`);
-  //     separator?.classList.add(styles.ChannelSeparatorActive);
-  //     document.body.style.cursor = 'ns-resize';
-
-  //     let lastTimeStamp = 0;
-
-  //     // Assign mouse move listeners
-  //     const onMouseMove = (_mouseMoveEvent: MouseEvent) => {
-  //       requestAnimationFrame((timeStamp) => {
-  //         // Only re-render every 10 ms
-  //         if (!(timeStamp - lastTimeStamp > 10)) {
-  //           return;
-  //         }
-
-  //         lastTimeStamp = timeStamp;
-  //       });
-  //     };
-
-  //     const onMouseUp = () => {
-  //       document.removeEventListener('mousemove', onMouseMove);
-  //       document.removeEventListener('mouseup', onMouseUp);
-  //       document.body.style.cursor = 'default';
-  //       separator?.classList.remove(styles.ChannelSeparatorActive);
-  //     };
-
-  //     // document.addEventListener('mousemove', onMouseMove);
-  //     // document.addEventListener('mouseup', onMouseUp);
-  //   },
-  //   [chartIndex],
-  // );
-
   // Handles the on channel name click
   const handleOpenChannelSettings = () => {
-    setIsSettingsOpen(!isSettingsOpen);
+    setIsSettingsOpen(false); // FIXME: Fix the channel open button
   };
 
   return (
@@ -103,19 +75,19 @@ export const ChannelLaneItem = observer(({ chart }: ChannelLaneItemType) => {
         <div className={styles.ChannelLaneItem} style={{ top, height }}>
           <div className={styles.ChannelUI}>
             <div className={styles.ChannelUIInnerContainer}>
-              <button
-                className={styles.ChannelInfo}
-                onClick={handleOpenChannelSettings}
-                ref={channelInfoRef}
-              >
-                <span />
-                <span>Test</span>
-              </button>
-              {/* <ChannelActions chartIndex={chartIndex} /> */}
+              {vm.charts[chartIndex].series.map((series, i) => (
+                <ChannelSeries
+                  key={i + series.series.getName()}
+                  name={series.series.getName()}
+                  channelRef={channelInfoRef}
+                  settingsToggle={handleOpenChannelSettings}
+                />
+              ))}
+              {vm.charts[chartIndex].series.length === 0 && 'No Series'}
+              <ChannelActions chart={chart.dashboardChart} />
             </div>
           </div>
           <div
-            title="Double click to reset all channel heights"
             id={`channel-separator-${chart.id}`}
             className={styles.ChannelLanesSeparatorButton}
           />
@@ -126,6 +98,7 @@ export const ChannelLaneItem = observer(({ chart }: ChannelLaneItemType) => {
         <ChannelSettings
           parentRef={channelInfoRef.current as HTMLButtonElement}
           closeSetter={setIsSettingsOpen}
+          channelInfo={chart.channel}
         />
       )}
     </>

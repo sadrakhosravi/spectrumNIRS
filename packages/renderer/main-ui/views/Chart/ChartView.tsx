@@ -23,14 +23,8 @@ export const ChartView = observer(() => {
     vm.init(id);
 
     setTimeout(() => {
-      vm.addCharts();
-      vm.addCharts();
-      vm.addCharts();
-      vm.addCharts();
-      vm.addCharts();
-      vm.addCharts();
-      vm.addCharts();
-    }, 1000);
+      vm.addSeries(vm.charts[0].id, 'Test');
+    }, 3000);
 
     return () => {
       vm.dispose();

@@ -67,7 +67,7 @@ export class DashboardChart {
    * Adds a line series to the given chart
    * @returns the line series created
    */
-  public addLineSeries(seriesName: string): ChartSeries {
+  public addLineSeries(seriesName: string, seriesColor?: string): ChartSeries {
     const series = this.chart.addLineSeries({
       dataPattern: {
         pattern: 'ProgressiveX',
@@ -78,7 +78,7 @@ export class DashboardChart {
     series.setName(seriesName);
     series.setDataCleaning({ minDataPointCount: 1 });
 
-    const chartSeries = new ChartSeries(series, this.id);
+    const chartSeries = new ChartSeries(series, seriesColor, this.id);
 
     return chartSeries;
   }

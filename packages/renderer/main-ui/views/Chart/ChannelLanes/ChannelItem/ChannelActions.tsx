@@ -2,10 +2,16 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 // Styles
-import * as styles from './channelLanes.module.scss';
+import * as styles from '../channelLanes.module.scss';
 
 // Icons
 import { FiMaximize2, FiMinimize2 } from 'react-icons/fi';
+
+// Types
+import type { DashboardChart } from '@models/Chart';
+
+// View Model
+import { vm } from '../../ChartView';
 
 const iconSettings = {
   size: 16,
@@ -13,22 +19,15 @@ const iconSettings = {
 };
 
 type ChannelActionsType = {
-  chartIndex: number;
+  chart: DashboardChart;
 };
 
-export const ChannelActions = observer(({ chartIndex }: ChannelActionsType) => {
+export const ChannelActions = observer(({ chart }: ChannelActionsType) => {
   const [isMaximized, setIsMaximized] = React.useState(false);
-  console.log(chartIndex);
+
   // Handles channel maximize button
   const handleMaximizeClick = React.useCallback(() => {
-    // const dashboard = ChartModel.chartInstance?.getDashboard() as Dashboard;
-
-    // for (let i = 0; i < ChartModel.charts.length; i++) {
-    //   if (i === chartIndex) {
-    //     continue;
-    //   }
-    //   dashboard.setRowHeight(i, isMaximized ? 1 : 0.0001);
-    // }
+    isMaximized ? vm.resetChannelHeights() : vm.maximizeChannel(chart.id);
     setIsMaximized(!isMaximized);
   }, [isMaximized]);
 
