@@ -4,8 +4,8 @@
 .WidgetsContainer {
   width: 100%;
   margin: $gap-base;
-  padding: $gap-base;
-  background: $color-bg-tertiary;
+  background: $color-bg-secondary;
+  border: solid 1.5px rgba(#fff, 0.12);
+  border-radius: 7px;
   @include flex-center;
-  @include border-primary;
 }

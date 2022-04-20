@@ -9,13 +9,10 @@ type TabItemType = {
   children: JSX.Element | JSX.Element[];
 };
 
-export const TabItem = ({ header }: TabItemType) => {
+export const TabItem = ({ children }: TabItemType) => {
   return (
     <div>
-      <div className={styles.TabItemHeader}>{header}</div>
-      <div className={styles.TabItemBody}>
-        <h1>Test</h1>
-      </div>
+      <div className={styles.TabItem}>{children}</div>
     </div>
   );
 };

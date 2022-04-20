@@ -4,8 +4,13 @@ import * as styles from './widgets.module.scss';
 
 type WidgetsContainerType = {
   children: React.ReactNode;
+  height?: '20%' | '25%' | '50%' | '75%' | '100%';
 };
 
-export const WidgetsContainer = ({ children }: WidgetsContainerType) => {
-  return <div className={styles.WidgetsContainer}>{children}</div>;
+export const WidgetsContainer = ({ children, height = '100%' }: WidgetsContainerType) => {
+  return (
+    <div className={styles.WidgetsContainer} style={{ height }}>
+      {children}
+    </div>
+  );
 };

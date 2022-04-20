@@ -24,8 +24,6 @@
 html,
 body,
 .main-window {
-  width: 100vw;
-  height: 100vh;
   user-select: none;
   -webkit-user-select: none;
   background: $color-bg-primary;
@@ -33,6 +31,11 @@ body,
   overflow: hidden;
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Arial;
   font-weight: 400;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
 }
 
 div,

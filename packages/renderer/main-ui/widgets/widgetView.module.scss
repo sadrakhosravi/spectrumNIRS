@@ -7,4 +7,6 @@
   display: flex;
   flex-direction: column;
   border-left: solid $border-primary-width $color-border-primary;
+  width: 100%;
+  padding-right: 50px;
 }

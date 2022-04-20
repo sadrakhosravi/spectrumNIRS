@@ -6,5 +6,9 @@ import { observer } from 'mobx-react-lite';
 import { CalibrationWidgets } from './CalibrationWidgets';
 
 export const WidgetsRouter = observer(() => {
-  return <>{AppStatesModel.route === 'calibration' && <CalibrationWidgets />}</>;
+  return (
+    <div style={{ paddingRight: '20px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {AppStatesModel.route === 'calibration' && <CalibrationWidgets />}
+    </div>
+  );
 });
