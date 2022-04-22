@@ -33,6 +33,13 @@ export const titleFillStyle = new SolidFill({
   color: ColorHEX('#7f7f7f'),
 });
 
+export const hiddenLabelStyle = new SolidFill({ color: ColorRGBA(0, 0, 0, 0) });
+
+export const gridLineStyle = new SolidLine({
+  thickness: 1,
+  fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255, 35) }),
+});
+
 export const axisStyle = new SolidLine({
   thickness: 1,
   fillStyle: new SolidFill({ color: ColorHEX('#525252') }),

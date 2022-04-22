@@ -10,21 +10,22 @@ import { ChannelLanes } from './ChannelLanes/ChannelLanes';
 // View model
 import { ChartViewModel } from '@viewmodels/index';
 import { toJS } from 'mobx';
+// import { XAxis } from './XAxis/XAxis';
 export let vm = new ChartViewModel();
 
 export const ChartView = observer(() => {
   const id = 'main-chart-container';
-
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (!vm) {
       vm = new ChartViewModel();
     }
     // Initialize the dashboard
     vm.init(id);
 
-    setTimeout(() => {
-      vm.addSeries(vm.charts[0].id, 'Test');
-    }, 3000);
+    vm.charts.forEach((chart, i) => {
+      chart.series.push(chart.dashboardChart.addLineSeries(`Series ${i}`)),
+        chart.series[0].generateDummyData();
+    });
 
     return () => {
       vm.dispose();
@@ -35,9 +36,13 @@ export const ChartView = observer(() => {
   }, []);
 
   return (
-    <div className={styles.ChartContainer} style={toJS(vm.parentContainerStyle)}>
-      <div className={styles.Chart} id={id} style={toJS(vm.chartContainerStyle)}>
-        <ChannelLanes />
+    <div className={styles.ChartContainer}>
+      <div className={styles.ChartAreaContainer}>
+        <div className="h-full w-full" style={toJS(vm.parentContainerStyle)}>
+          <div className={styles.Chart} id={id} style={toJS(vm.chartContainerStyle)}>
+            <ChannelLanes />
+          </div>
+        </div>
       </div>
     </div>
   );

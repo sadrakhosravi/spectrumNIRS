@@ -1,3 +1,5 @@
+import { XYDataGenerator } from './XYDataGenerator';
+
 import type { LineSeries } from '@arction/lcjs';
 
 // Types
@@ -38,8 +40,16 @@ export class ChartSeries {
     this.series.setStrokeStyle(
       new SolidLine({
         thickness: -1,
-        fillStyle: new SolidFill({ color: ColorHEX(this.seriesColor || '#FFF') }),
+        fillStyle: new SolidFill({ color: ColorHEX(this.seriesColor || '#00FFFF') }),
       }),
     );
+  }
+
+  /**
+   * Generates and appends a random data to the series
+   */
+  public generateDummyData() {
+    const dataStream = XYDataGenerator.streamData(10);
+    dataStream.forEach((data) => this.series.add(data));
   }
 }

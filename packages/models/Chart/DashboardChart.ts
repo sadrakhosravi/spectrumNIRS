@@ -5,18 +5,21 @@ import {
   SolidLine,
   SolidFill,
   ColorHEX,
-  AxisScrollStrategies,
-  emptyTick,
   emptyFill,
+  AutoCursorModes,
+  MarkerBuilders,
+  UIBackgrounds,
+  AxisScrollStrategies,
 } from '@arction/lcjs';
 import Hyperid from 'hyperid';
 
 // Modules
 import { ChartSeries } from './ChartSeries';
-import { uiMinorTickFont } from './Theme';
+import { uiMinorTickFont, hiddenLabelStyle, gridLineStyle } from './Theme';
 
 // Types
 import type { ChartType } from './ChartModel';
+import type { VisibleTicks, SeriesMarkerXY, PointMarker, UIBackground } from '@arction/lcjs';
 
 export class DashboardChart {
   /**
@@ -27,10 +30,15 @@ export class DashboardChart {
    * A unique id to track the chart
    */
   public readonly id: string;
+  /**
+   * The series marker for hover on chart
+   */
+  private chartMarker: SeriesMarkerXY<PointMarker, UIBackground> | null;
 
   constructor(chart: ChartType, id?: string) {
     this.chart = chart;
     this.id = id || Hyperid()();
+    this.chartMarker = null;
     this.setChartDefaults(this.chart);
   }
 
@@ -64,6 +72,39 @@ export class DashboardChart {
   }
 
   /**
+   * Gets the closes series point (if any) on a chart from the mouse location.
+   * @returns nearestDataPoint - either `undefined` or an `object`.
+   */
+  public showCursorOnClosesPoint(event: MouseEvent) {
+    // `event` is a native JavaScript event, which packs the active mouse location in `clientX` and `clientY` properties.
+    const mouseLocationClient = { x: event.clientX, y: event.clientY };
+
+    // Before using client coordinates with LCJS, the coordinates have to be translated relative to the LCJS engine.
+    const mouseLocationEngine = this.chart.engine.clientLocation2Engine(
+      mouseLocationClient.x,
+      mouseLocationClient.y,
+    );
+
+    // Now that the coordinates are in the correct coordinate system, they can be used
+    // to solve data points, or further translated to any Axis.
+
+    // (2) Solve nearest data point from a series to the mouse.
+    const nearestDataPoint = this.chart.getSeries()[0].solveNearestFromScreen(mouseLocationEngine);
+    if (!nearestDataPoint) return;
+
+    // Add the chart marker
+    const series = this.chart.getSeries()[0];
+
+    if (!this.chartMarker) {
+      this.chartMarker = series.addMarker(this.buildChartMarker());
+      this.chartMarker.setMouseInteractions(false);
+    }
+
+    // Set the marker's position.
+    this.chartMarker.setPosition(nearestDataPoint.location);
+  }
+
+  /**
    * Adds a line series to the given chart
    * @returns the line series created
    */
@@ -71,6 +112,7 @@ export class DashboardChart {
     const series = this.chart.addLineSeries({
       dataPattern: {
         pattern: 'ProgressiveX',
+        regularProgressiveStep: true,
       },
     });
 
@@ -103,56 +145,88 @@ export class DashboardChart {
       .setMouseInteractions(false);
   }
 
+  /**
+   * Shows the chart's hidden axes.
+   */
   public showAxes() {
-    const yAxis = this.chart.getDefaultAxisY();
-
-    yAxis
-      .setThickness(65)
-      .setTickStrategy(AxisTickStrategies.Numeric)
-      .setStrokeStyle(
-        new SolidLine({
-          thickness: 1,
-          fillStyle: new SolidFill({ color: ColorHEX('#333') }),
-        }),
-      )
-      .setMouseInteractions(true);
+    this.setAxesStyles();
   }
 
   /**
-   * Applies the default styles on current chart
+   * Sets the default axes style.
    */
-  private setChartDefaults(chart: ChartType) {
-    const [axisX, axisY] = chart.getDefaultAxes();
-    axisX.setInterval(0, 10000);
+  private setAxesStyles() {
+    const [axisX, axisY] = this.chart.getDefaultAxes();
 
     // Remove X axis
     axisX
+      .setTickStrategy(AxisTickStrategies.Time, (ticks) =>
+        ticks
+          .setMajorTickStyle((majorTick: VisibleTicks) =>
+            majorTick.setLabelFillStyle(hiddenLabelStyle).setGridStrokeStyle(gridLineStyle),
+          )
+          .setMinorTickStyle((minorTick: VisibleTicks) =>
+            minorTick.setLabelFillStyle(hiddenLabelStyle).setGridStrokeStyle(gridLineStyle),
+          ),
+      )
       .setThickness(0)
-      .setStrokeStyle(emptyLine)
-      .setScrollStrategy(AxisScrollStrategies.progressive)
-      .setAnimationsEnabled(true)
-      .setTickStrategy(AxisTickStrategies.Empty)
       .setStrokeStyle(emptyLine)
       .setMouseInteractions(false);
 
     // Axis Y defaults
     axisY
       .setNibMousePickingAreaSize(0)
-      .disableAnimations()
       .setNibStyle(emptyLine)
       .setThickness(65)
-      .setInterval(-50, 50);
+      .setInterval(-50, 50)
+      .setMouseInteractions(true)
+      .setStrokeStyle(
+        new SolidLine({
+          thickness: 1,
+          fillStyle: new SolidFill({ color: ColorHEX('#333') }),
+        }),
+      );
 
     axisY.setTickStrategy(AxisTickStrategies.Numeric, (ticks) =>
       ticks
         .setMajorTickStyle((majorTickStyle) =>
           majorTickStyle
             .setTickLength(5)
-            .setGridStrokeStyle(emptyLine)
+            .setGridStrokeStyle(gridLineStyle)
             .setLabelFont(uiMinorTickFont),
         )
-        .setMinorTickStyle(emptyTick),
+        .setMinorTickStyle((minorTick: VisibleTicks) =>
+          minorTick.setGridStrokeStyle(gridLineStyle),
+        ),
     );
+  }
+
+  private buildChartMarker() {
+    // Create a builder for SeriesMarker to allow for full modification of its structure.
+    const SeriesMarkerBuilder = MarkerBuilders.XY.setPointMarker(
+      UIBackgrounds.Circle,
+    ).setResultTableBackground(UIBackgrounds.Pointer);
+
+    return SeriesMarkerBuilder;
+  }
+
+  /**
+   * Applies the default styles on current chart
+   */
+  private setChartDefaults(chart: ChartType) {
+    const [axisX] = chart.getDefaultAxes();
+    axisX.setInterval(0, 30000);
+
+    axisX.setScrollStrategy(AxisScrollStrategies.progressive);
+
+    // Style the axes
+    this.setAxesStyles();
+
+    // Disable all charts listeners
+    // this.chart.setMouseInteractions(false);
+
+    // Disable chart default cursors
+    this.chart.setAutoCursorMode(AutoCursorModes.disabled);
 
     // Remove title
     chart.setTitleFillStyle(emptyFill);

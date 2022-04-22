@@ -52,6 +52,10 @@ export class ChartViewModel {
    */
   @observable private isChannelMaximized: boolean;
   /**
+   * The height of the X Axis for all charts
+   */
+  public readonly xAxisHeight: '40px';
+  /**
    * The height of the dashboard
    */
   private dashboardHeight: string;
@@ -62,7 +66,8 @@ export class ChartViewModel {
     this.colors = new ColorPalette();
     this.xAxisSynchronizedHandler = null;
     this.isChannelMaximized = false;
-    this.dashboardHeight = '100%';
+    this.xAxisHeight = '40px';
+    this.dashboardHeight = `calc(100% - ${this.xAxisHeight})`;
     // Make this class observable
     makeObservable(this);
     this.reactions();
@@ -80,11 +85,6 @@ export class ChartViewModel {
    */
   public init(containerId: string) {
     if (!this.model.getDashboard()) this.model.createDashboard(containerId);
-    this.addCharts();
-    this.addCharts();
-    this.addCharts();
-    this.addCharts();
-    this.addCharts();
     this.addCharts();
     this.addCharts();
     this.addCharts();

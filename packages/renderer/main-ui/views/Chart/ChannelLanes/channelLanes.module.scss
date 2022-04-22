@@ -17,12 +17,27 @@ $channel-info-height: 25px;
   z-index: 10;
 }
 
+.ChartCursorContainer {
+  position: absolute;
+  left: $channel-ui-width;
+  top: 0;
+  width: calc(100% - $channel-ui-width);
+  height: 100%;
+  z-index: 30;
+}
+
+.ChartCursorItem {
+  position: absolute;
+  left: 0;
+  z-index: 30;
+}
+
 .ChannelLaneItem {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.075);
+  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
   z-index: 11;
 }
 
@@ -32,7 +47,7 @@ $channel-info-height: 25px;
   left: 0;
   width: $channel-ui-width;
   height: 100%;
-  border-right: solid $border-primary-width $border-primary-color;
+  border-right: solid $border-primary-width rgba(255, 255, 255, 0.2);
 }
 
 .ChannelUIInnerContainer {

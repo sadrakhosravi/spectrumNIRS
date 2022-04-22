@@ -1,21 +1,32 @@
 @import '@styles/variables';
 
+$x-axis-height: 35px;
+
 .ChartContainer {
   position: absolute;
-  top: calc($size-toolbar);
+  top: $size-toolbar;
   left: 0;
-  display: flex;
   width: 100%;
   height: calc(100% - $size-toolbar);
 }
 
+.ChartAreaContainer {
+  position: relative;
+  height: calc(100%);
+  width: 100%;
+}
+
+.ChartXAxis {
+  height: $x-axis-height;
+}
+
 .Chart {
   width: 100%;
-  height: 100%;
+  height: calc(100%);
 }
 
 .ChartChannels {
   width: 150px;
-  height: 100%;
+  height: calc(100%);
   position: relative;
 }
