@@ -40,6 +40,10 @@ export class ChartsXAxisViewModel {
    * The coefficient of converting chart scale to window pixels
    */
   chartToPixelCoef: number;
+  /**
+   * The total number of ticks
+   */
+  totalTicks: number;
 
   constructor() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -50,6 +54,7 @@ export class ChartsXAxisViewModel {
     //@ts-ignore
     this.containerDiv = null;
     this.majorTickGap = 0;
+    this.totalTicks = 11;
     this.ticks = [];
     this.chartToPixelCoef = 0;
     makeObservable(this);
@@ -69,10 +74,10 @@ export class ChartsXAxisViewModel {
    * Initializes the chart x axis and does initial calculations
    */
   private init() {
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       this.calcMajorTickGap();
       this.addTicks();
-    });
+    }, 1000);
   }
 
   /**
@@ -86,15 +91,29 @@ export class ChartsXAxisViewModel {
    * Calculates the gap between each major tick
    */
   private calcMajorTickGap() {
-    this.majorTickGap = this.containerDiv.getBoundingClientRect().width / 10; // 1 is used for pixel offset correction
+    // const yAxisWidth = this.attachedChart.dashboardChart.chart.getDefaultAxisY().getThickness().max;
+    const chartWidth = this.containerDiv.getBoundingClientRect().width; // -65px for the y axis
+    console.log(chartWidth);
+
+    if (chartWidth < 620) {
+      this.totalTicks = 7;
+    }
+
+    const correctionFactor = 0;
+
+    // Set variables
+    this.majorTickGap = chartWidth / this.totalTicks - correctionFactor;
+
+    console.log(this.majorTickGap); // 1 is used for pixel offset correction
   }
 
   @action private addTicks() {
     const interval = this.getInterval();
-    const intervalDiff = interval.end - interval.start + 1;
-    const totalTicks = 10;
+    const intervalDiff = interval.end - interval.start;
 
-    for (let i = 0; i < totalTicks; i++) {
+    this.ticks.length = 0;
+
+    for (let i = 0; i < this.totalTicks; i++) {
       const tick: TicksType = {
         x: i * this.majorTickGap,
         text: msToTime(i * intervalDiff + interval.start),
@@ -103,29 +122,19 @@ export class ChartsXAxisViewModel {
       this.ticks.push(tick);
     }
 
-    // this.updateTicks();
+    this.updateTicks();
   }
 
   @action updateTicks() {
     const axisX = this.attachedChart.dashboardChart.chart.getDefaultAxisX();
 
-    // const pixelCoef = this.majorTickGap / majorTickGapInMs;
-    // let lastTickVal = this.getInterval().end;
+    let lastTickVal = this.getInterval().end;
 
     axisX.onScaleChange((_start, end) => {
-      // const scaleMove = prevScale - end;
+      const pixelsMoved = (lastTickVal + end) * this.chartToPixelCoef;
+      console.log(pixelsMoved);
 
-      // Check and update each tick
-      for (let i = 0; i < this.ticks.length; i++) {
-        const tick = this.ticks[i];
-
-        tick.x += end;
-
-        // If the tick is 30px outside of view delete it
-        // if (tick.x < -40) {
-        //   this.ticks.splice(i, 1);
-        // }
-      }
+      lastTickVal = end;
     });
   }
 }

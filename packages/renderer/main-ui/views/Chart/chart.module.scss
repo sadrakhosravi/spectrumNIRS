@@ -1,6 +1,6 @@
 @import '@styles/variables';
 
-$x-axis-height: 35px;
+$x-axis-height: 40px;
 
 .ChartContainer {
   position: absolute;
@@ -11,9 +11,11 @@ $x-axis-height: 35px;
 }
 
 .ChartAreaContainer {
-  position: relative;
-  height: calc(100%);
+  left: 0;
+  position: absolute;
+  height: calc(100% - $x-axis-height);
   width: 100%;
+  background: #0a0a0a;
 }
 
 .ChartXAxis {
@@ -21,8 +23,11 @@ $x-axis-height: 35px;
 }
 
 .Chart {
-  width: 100%;
-  height: calc(100%);
+  position: absolute;
+  left: 150px;
+  top: 0;
+  width: calc(100% - 150px);
+  height: calc(100% - 35px - $x-axis-height);
 }
 
 .ChartChannels {

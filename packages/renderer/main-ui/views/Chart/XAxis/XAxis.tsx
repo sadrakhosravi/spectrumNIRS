@@ -24,8 +24,12 @@ export const XAxis = React.memo(
         <div className={styles.XAxisLeft}>Test</div>
         <div id={'tick-container'} className={styles.XAxisRight}>
           {xAxisVM.ticks.map((tick, i) => (
-            <div key={'tick-items' + i} className={styles.TickItem} style={{ left: tick.x }}>
-              {tick.text}
+            <div
+              key={'tick-items' + i}
+              className={styles.TickItem}
+              style={{ transform: `translate3d(${tick.x}px, 0, 0)` }}
+            >
+              <div className={styles.TickItemValue}>{tick.text}</div>
             </div>
           ))}
         </div>

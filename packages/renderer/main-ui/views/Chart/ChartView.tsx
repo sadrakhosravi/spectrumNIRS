@@ -6,10 +6,12 @@ import * as styles from './chart.module.scss';
 
 // Components
 import { ChannelLanes } from './ChannelLanes/ChannelLanes';
+import { XAxis } from './XAxis/XAxis';
 
 // View model
 import { ChartViewModel } from '@viewmodels/index';
 import { toJS } from 'mobx';
+
 // import { XAxis } from './XAxis/XAxis';
 export let vm = new ChartViewModel();
 
@@ -23,8 +25,8 @@ export const ChartView = observer(() => {
     vm.init(id);
 
     vm.charts.forEach((chart, i) => {
-      chart.series.push(chart.dashboardChart.addLineSeries(`Series ${i}`)),
-        chart.series[0].generateDummyData();
+      chart.series.push(chart.dashboardChart.addLineSeries(`Series ${i}`));
+      // chart.series[0].generateDummyData();
     });
 
     return () => {
@@ -37,11 +39,11 @@ export const ChartView = observer(() => {
 
   return (
     <div className={styles.ChartContainer}>
+      <XAxis />
       <div className={styles.ChartAreaContainer}>
-        <div className="h-full w-full" style={toJS(vm.parentContainerStyle)}>
-          <div className={styles.Chart} id={id} style={toJS(vm.chartContainerStyle)}>
-            <ChannelLanes />
-          </div>
+        <ChannelLanes />
+        <div className="w-full h-full relative" style={toJS(vm.parentContainerStyle)}>
+          <div className={styles.Chart} id={id} style={toJS(vm.chartContainerStyle)}></div>
         </div>
       </div>
     </div>

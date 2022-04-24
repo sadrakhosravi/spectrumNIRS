@@ -61,7 +61,7 @@ export class DashboardChart {
     const height = Math.abs(posDocument2.y - posDocument.y);
     const width = Math.abs(posDocument2.x - posDocument.x);
 
-    return { x: posDocument.x, y: posDocument2.y - 95, height, width };
+    return { x: posDocument.x, y: posDocument2.y - 135, height, width };
   }
 
   /**
@@ -232,6 +232,6 @@ export class DashboardChart {
     chart.setTitleFillStyle(emptyFill);
 
     // Remove padding
-    chart.setPadding({ top: 3, bottom: 5, left: 150, right: 0 });
+    chart.setPadding({ top: 3, bottom: 5, left: 0, right: 0 });
   }
 }

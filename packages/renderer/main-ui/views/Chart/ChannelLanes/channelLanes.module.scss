@@ -5,7 +5,9 @@ $channel-ui-width: 150px;
 $channel-info-height: 25px;
 
 .ChannelsContainer {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
 }
