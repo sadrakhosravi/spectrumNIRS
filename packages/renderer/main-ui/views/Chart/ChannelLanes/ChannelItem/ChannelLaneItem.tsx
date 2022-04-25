@@ -51,12 +51,12 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
           setIsCompact(true);
         }
 
-        setTop(size.y);
+        setTop(size.y1);
         setHeight(size.height);
       });
     });
 
-    setTop(size.y);
+    setTop(size.y1);
     setHeight(size.height);
 
     return () => {

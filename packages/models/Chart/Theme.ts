@@ -45,21 +45,39 @@ export const axisStyle = new SolidLine({
   fillStyle: new SolidFill({ color: ColorHEX('#525252') }),
 });
 
+/**
+ * The default font style.
+ */
 export const fontStyle = new FontSettings({
-  size: 14,
-  family: 'sans-serif',
+  size: 12,
+  family: 'Inter, arial, sans-serif',
+  style: 'normal',
+  weight: 300,
 });
 
+/**
+ * The default font fill style color.
+ */
+export const fontFillStyle = new SolidFill({ color: ColorHEX('#FFF') });
+
+/**
+ * Axis minor tick font style.
+ */
 export const uiMinorTickFont = new FontSettings({
   size: 12,
-  family: 'sans-serif',
+  family: 'Inter, arial, sans-serif',
   style: 'normal',
+  weight: 300,
 });
 
-const uiMajorTickFont = new FontSettings({
-  size: 10,
-  family: 'Inter, Arial, sans-serif',
+/**
+ * Axis major tick font style
+ */
+export const uiMajorTickFont = new FontSettings({
+  size: 12,
+  family: 'Inter, arial, sans-serif',
   style: 'normal',
+  weight: 300,
 });
 
 export const bandFillStyle = new SolidFill({

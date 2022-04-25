@@ -15,7 +15,7 @@ import Hyperid from 'hyperid';
 
 // Modules
 import { ChartSeries } from './ChartSeries';
-import { uiMinorTickFont, hiddenLabelStyle, gridLineStyle } from './Theme';
+import { hiddenLabelStyle, gridLineStyle, fontStyle, fontFillStyle } from './Theme';
 
 // Types
 import type { ChartType } from './ChartModel';
@@ -61,7 +61,31 @@ export class DashboardChart {
     const height = Math.abs(posDocument2.y - posDocument.y);
     const width = Math.abs(posDocument2.x - posDocument.x);
 
-    return { x: posDocument.x, y: posDocument2.y - 135, height, width };
+    return {
+      x1: posDocument.x,
+      x2: posDocument2.x,
+      y1: posDocument2.y - 135,
+      y2: posDocument2.y - 135,
+      height,
+      width,
+    };
+  }
+
+  public getPointDiffInPixels(x1: number, x2: number) {
+    const posEngine = translatePoint({ x: x1, y: 0 }, this.chart.uiScale, this.chart.engine.scale);
+    const posDocument = this.chart.engine.engineLocation2Client(posEngine.x, posEngine.y);
+
+    const posEngine2 = translatePoint({ x: x2, y: 0 }, this.chart.uiScale, this.chart.engine.scale);
+    const posDocument2 = this.chart.engine.engineLocation2Client(posEngine2.x, posEngine2.y);
+
+    return posDocument2.x - posDocument.x;
+  }
+
+  public getPointLocation(x: number) {
+    const posEngine = translatePoint({ x: x, y: 0 }, this.chart.uiScale, this.chart.engine.scale);
+    const posDocument = this.chart.engine.engineLocation2Client(posEngine.x, posEngine.y);
+
+    return posDocument.x;
   }
 
   /**
@@ -176,10 +200,10 @@ export class DashboardChart {
     // Axis Y defaults
     axisY
       .setNibMousePickingAreaSize(0)
+      .setMouseInteractions(false)
       .setNibStyle(emptyLine)
       .setThickness(65)
       .setInterval(-50, 50)
-      .setMouseInteractions(true)
       .setStrokeStyle(
         new SolidLine({
           thickness: 1,
@@ -193,10 +217,14 @@ export class DashboardChart {
           majorTickStyle
             .setTickLength(5)
             .setGridStrokeStyle(gridLineStyle)
-            .setLabelFont(uiMinorTickFont),
+            .setLabelFont(fontStyle)
+            .setLabelFillStyle(fontFillStyle),
         )
         .setMinorTickStyle((minorTick: VisibleTicks) =>
-          minorTick.setGridStrokeStyle(gridLineStyle),
+          minorTick
+            .setGridStrokeStyle(gridLineStyle)
+            .setLabelFont(fontStyle)
+            .setLabelFillStyle(fontFillStyle),
         ),
     );
   }
@@ -215,7 +243,7 @@ export class DashboardChart {
    */
   private setChartDefaults(chart: ChartType) {
     const [axisX] = chart.getDefaultAxes();
-    axisX.setInterval(0, 30000);
+    axisX.setInterval(0, 5000);
 
     axisX.setScrollStrategy(AxisScrollStrategies.progressive);
 
@@ -223,7 +251,7 @@ export class DashboardChart {
     this.setAxesStyles();
 
     // Disable all charts listeners
-    // this.chart.setMouseInteractions(false);
+    this.chart.setMouseInteractions(false);
 
     // Disable chart default cursors
     this.chart.setAutoCursorMode(AutoCursorModes.disabled);

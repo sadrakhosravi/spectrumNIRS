@@ -4,36 +4,21 @@ import * as React from 'react';
 import * as styles from './xAxis.module.scss';
 
 // View Models
-import { vm } from '../ChartView';
-import { ChartsXAxisViewModel } from '@viewmodels/index';
+import { vm as chartVM } from '../ChartView';
+import { XAxisChartViewModel } from '@viewmodels/index';
 import { observer } from 'mobx-react-lite';
 
-let xAxisVM = new ChartsXAxisViewModel();
+let xAxisVM = new XAxisChartViewModel();
 
-export const XAxis = React.memo(
-  observer(() => {
-    React.useEffect(() => {
-      xAxisVM.attachToChart(
-        vm.charts[0],
-        document.getElementById('tick-container') as HTMLDivElement,
-      );
-    }, []);
+export const XAxis = observer(() => {
+  React.useEffect(() => {
+    xAxisVM.init('tick-container', chartVM.charts[0].dashboardChart.chart);
+  }, []);
 
-    return (
-      <div className={styles.XAxisContainer}>
-        <div className={styles.XAxisLeft}>Test</div>
-        <div id={'tick-container'} className={styles.XAxisRight}>
-          {xAxisVM.ticks.map((tick, i) => (
-            <div
-              key={'tick-items' + i}
-              className={styles.TickItem}
-              style={{ transform: `translate3d(${tick.x}px, 0, 0)` }}
-            >
-              <div className={styles.TickItemValue}>{tick.text}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }),
-);
+  return (
+    <div className={styles.XAxisContainer}>
+      <div className={styles.XAxisLeft}>Test</div>
+      <div id={'tick-container'} className={styles.XAxisRight}></div>
+    </div>
+  );
+});

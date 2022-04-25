@@ -49,7 +49,7 @@ export class ChartSeries {
    * Generates and appends a random data to the series
    */
   public generateDummyData() {
-    const dataStream = XYDataGenerator.streamData(1);
+    const dataStream = XYDataGenerator.streamData(3);
     dataStream.forEach((data) => this.series.add(data));
   }
 }

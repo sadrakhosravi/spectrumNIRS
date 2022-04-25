@@ -22,9 +22,9 @@ export class XYDataGenerator {
         // generate those 1000 points
         .generate()
         // set stream to progress every 250 milliseconds
-        .setStreamInterval(10)
+        .setStreamInterval(5)
         // set stream to output 10 points at a time
-        .setStreamBatchSize(10)
+        .setStreamBatchSize(5)
         // make the stream infinite
         .setStreamRepeat(true)
         // create a new stream with previously defined stream settings

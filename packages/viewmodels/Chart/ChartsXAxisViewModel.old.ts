@@ -54,7 +54,7 @@ export class ChartsXAxisViewModel {
     //@ts-ignore
     this.containerDiv = null;
     this.majorTickGap = 0;
-    this.totalTicks = 11;
+    this.totalTicks = 10;
     this.ticks = [];
     this.chartToPixelCoef = 0;
     makeObservable(this);
@@ -91,22 +91,24 @@ export class ChartsXAxisViewModel {
    * Calculates the gap between each major tick
    */
   private calcMajorTickGap() {
-    // const yAxisWidth = this.attachedChart.dashboardChart.chart.getDefaultAxisY().getThickness().max;
-    const chartWidth = this.containerDiv.getBoundingClientRect().width; // -65px for the y axis
+    const yAxisWidth = this.attachedChart.dashboardChart.chart.getDefaultAxisY().getThickness()
+      .max as number;
+    const chartWidth = this.attachedChart.dashboardChart.getSize().width - yAxisWidth; // -65px for the y axis
     console.log(chartWidth);
 
     if (chartWidth < 620) {
-      this.totalTicks = 7;
+      this.totalTicks = 6;
     }
 
     const correctionFactor = 0;
 
     // Set variables
     this.majorTickGap = chartWidth / this.totalTicks - correctionFactor;
-
-    console.log(this.majorTickGap); // 1 is used for pixel offset correction
   }
 
+  /**
+   * Adds the initial ticks.
+   */
   @action private addTicks() {
     const interval = this.getInterval();
     const intervalDiff = interval.end - interval.start;
@@ -125,16 +127,40 @@ export class ChartsXAxisViewModel {
     this.updateTicks();
   }
 
+  /**
+   * Updates ticks on axis interval change.
+   * Uses the first chart in the dashboard.
+   * Assuming the dashboard will always have at least 1 chart.
+   */
   @action updateTicks() {
     const axisX = this.attachedChart.dashboardChart.chart.getDefaultAxisX();
+    const chart = this.attachedChart.dashboardChart;
 
-    let lastTickVal = this.getInterval().end;
+    let lastIntervalEnd = this.getInterval().end;
+    const totalWidth = chart.getSize().width;
+
+    // const majorTickFactor = (this.getInterval().end - this.getInterval().start) / this.totalTicks;
 
     axisX.onScaleChange((_start, end) => {
-      const pixelsMoved = (lastTickVal + end) * this.chartToPixelCoef;
-      console.log(pixelsMoved);
+      const diff = chart.getPointDiffInPixels(lastIntervalEnd, end) / -53.5; // -53.5 is the correction factor
 
-      lastTickVal = end;
+      // Add ticks depending on which side the chart is scrolling
+      // Progressive scrolling
+
+      // Fix each ticks position
+      for (let i = 0; i < this.ticks.length; i++) {
+        const tick = this.ticks[i];
+
+        // Update position
+        tick.x += diff;
+
+        // Remove ticks outside view
+        if (tick.x < -40 || tick.x > totalWidth + 30) {
+          this.ticks.splice(i, 1);
+        }
+      }
+
+      lastIntervalEnd = end;
     });
   }
 }
