@@ -12,6 +12,7 @@ $container-size: 40px;
 }
 
 .XAxisLeft {
+  padding: $gap-sm;
   width: 150px;
   height: 100%;
   border-right: solid $border-primary-width rgba(255, 255, 255, 0.2);

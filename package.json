@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@arction/lcjs": "^3.4.0",
+    "@headlessui/react": "^1.6.0",
     "@sequelize/core": "^7.0.0-alpha.10",
     "@tippyjs/react": "^4.2.6",
     "antd": "^4.19.5",

@@ -14,6 +14,7 @@ import { ColorPalette } from '../../models/ColorPalette';
 import type { ChartSeries, DashboardChart } from '../../models/Chart';
 import type { Dashboard, SynchronizeAxisIntervalsHandle } from '@arction/lcjs';
 import type { CSSProperties } from 'react';
+import type { IReactionDisposer } from 'mobx';
 
 export type IChart = {
   dashboardChart: DashboardChart;
@@ -59,6 +60,10 @@ export class ChartViewModel {
    * The height of the dashboard
    */
   private dashboardHeight: string;
+  /**
+   * An array of all the reaction functions for later dispose
+   */
+  private reactions: IReactionDisposer[];
 
   constructor() {
     this.model = new ChartModel();
@@ -70,7 +75,8 @@ export class ChartViewModel {
     this.dashboardHeight = `calc(100% - ${this.xAxisHeight})`;
     // Make this class observable
     makeObservable(this);
-    this.reactions();
+    this.reactions = [];
+    this.handleReactions();
   }
 
   /**
@@ -171,6 +177,10 @@ export class ChartViewModel {
    * Cleanups the chart listeners and disposes the dashboard
    */
   public dispose() {
+    this.reactions.forEach((reaction) => reaction());
+    this.reactions.length = 0;
+
+    this.xAxisSynchronizedHandler?.remove();
     this.charts.forEach((chart) => {
       chart.series.forEach((series) => series.series.dispose());
       chart.dashboardChart.chart.dispose();
@@ -179,15 +189,16 @@ export class ChartViewModel {
       //@ts-ignore
       chart = null;
     });
+
     this.model.cleanup();
   }
 
   /**
    * Reacts to changes in certain observables
    */
-  private reactions() {
+  private handleReactions() {
     // On chart addition or deletion
-    reaction(
+    const chartLengthReaction = reaction(
       () => this.charts.length,
       () => {
         const totalCharts = this.charts.length;
@@ -221,7 +232,7 @@ export class ChartViewModel {
     );
 
     // Channel Maximize reaction
-    reaction(
+    const chartMaximizedReaction = reaction(
       () => this.isChannelMaximized,
       () => {
         if (this.isChannelMaximized) {
@@ -233,6 +244,8 @@ export class ChartViewModel {
         }
       },
     );
+
+    this.reactions.push(chartLengthReaction, chartMaximizedReaction);
   }
 }
 

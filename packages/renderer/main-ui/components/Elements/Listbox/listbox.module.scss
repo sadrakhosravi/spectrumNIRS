@@ -1,0 +1,41 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.ListboxButton {
+  width: 100%;
+  padding: $gap-xs $gap-lg;
+  position: relative;
+  justify-content: space-between;
+  background: $color-bg-secondary;
+  @include hover-state;
+  @include flex-center;
+  @include border-primary;
+
+  &:active {
+    @include ring;
+  }
+}
+
+.ListboxOptionsContainer {
+  position: absolute;
+  top: 35px;
+  left: 0;
+  min-width: 150px;
+  z-index: 80;
+  background: $color-bg-secondary;
+  max-height: 350px;
+  padding: $gap-xs $gap-xs;
+  overflow-y: auto;
+  @include border-primary;
+
+  li {
+    font-size: $size-font-base;
+    padding: $gap-sm $gap-base;
+    justify-content: space-between;
+    border-radius: $border-primary-radius;
+
+    @include flex-center;
+    @include hover-state;
+    @include active-focus-state;
+  }
+}

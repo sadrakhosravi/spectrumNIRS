@@ -15,7 +15,7 @@ import {
 import { spectrumTheme, fontStyle, fontFillStyle } from './Theme';
 
 // Types
-import type { AxisInterval, VisibleTicks } from '@arction/lcjs';
+import type { AxisInterval, VisibleTicks, SynchronizeAxisIntervalsHandle } from '@arction/lcjs';
 import type { ChartType } from './ChartModel';
 
 export class XAxisModel {
@@ -27,10 +27,15 @@ export class XAxisModel {
    * The X axis chart
    */
   private xAxisChart: ChartType | null;
+  /**
+   * The handler for X axis synchronization
+   */
+  private synchronizeHandler: SynchronizeAxisIntervalsHandle | null;
 
   constructor() {
     this.attachedChart = null;
     this.xAxisChart = null;
+    this.synchronizeHandler = null;
   }
 
   /**
@@ -40,6 +45,31 @@ export class XAxisModel {
     this.attachedChart = chart;
     this.createXAxisChart(containerId);
     this.setXAxisDefaults();
+  }
+
+  /**
+   * @returns the x axis chart.
+   */
+  public getChart() {
+    return this.xAxisChart;
+  }
+
+  /**
+   * @returns the x axis of the chart or null if empty.
+   */
+  public getXAxis() {
+    return this.xAxisChart?.getDefaultAxisX();
+  }
+
+  /**
+   * Listeners and memory cleanup
+   */
+  public cleanup() {
+    this.synchronizeHandler?.remove();
+    this.synchronizeHandler = null;
+    this.attachedChart = null;
+    this.xAxisChart?.dispose();
+    this.xAxisChart = null;
   }
 
   /**
@@ -55,7 +85,7 @@ export class XAxisModel {
     });
 
     // Synchronize intervals
-    synchronizeAxisIntervals(
+    this.synchronizeHandler = synchronizeAxisIntervals(
       this.xAxisChart.getDefaultAxisX(),
       (this.attachedChart as ChartType).getDefaultAxisX(),
     );

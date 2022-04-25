@@ -243,7 +243,7 @@ export class DashboardChart {
    */
   private setChartDefaults(chart: ChartType) {
     const [axisX] = chart.getDefaultAxes();
-    axisX.setInterval(0, 5000);
+    axisX.setInterval(0, 30000);
 
     axisX.setScrollStrategy(AxisScrollStrategies.progressive);
 

@@ -12,6 +12,10 @@ export class ColorPalette {
   public readonly blue = '#00FFFF';
   public readonly green = '#ABFF4F';
   public readonly white = '#FFFFFF';
+  public readonly yellow = '#f0dd72';
+  public readonly magenta = '#d95dc9';
+  public readonly orange = '#e67b66';
+  public readonly lightPurple = '#c5a6e6';
 
   /**
    * An array containing all the available colors in the color palette.
@@ -23,7 +27,16 @@ export class ColorPalette {
   availableColorsIndex: SortedNumberSet;
 
   constructor() {
-    this.colors = [this.red, this.blue, this.green, this.white];
+    this.colors = [
+      this.red,
+      this.blue,
+      this.green,
+      this.white,
+      this.yellow,
+      this.magenta,
+      this.orange,
+      this.lightPurple,
+    ];
     this.availableColorsIndex = new SortedNumberSet(
       new Array(this.colors.length).fill(0).map((_, i) => i),
     );
