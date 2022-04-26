@@ -26,6 +26,7 @@ export const XAxis = observer(() => {
   return (
     <div className={styles.XAxisContainer}>
       <div className={styles.XAxisLeft}>
+        <span>Time Div</span>
         <Listbox options={xAxisVM.divisions} value={xAxisVM.timeDiv} setter={xAxisVM.setTimeDiv} />
       </div>
       <div id={xAxisContainerId} className={styles.XAxisRight}></div>

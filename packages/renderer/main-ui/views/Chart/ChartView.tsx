@@ -26,7 +26,7 @@ export const ChartView = observer(() => {
 
     vm.charts.forEach((chart, i) => {
       chart.series.push(chart.dashboardChart.addLineSeries(`Series ${i}`));
-      // chart.series[0].generateDummyData();
+      chart.series[0].generateDummyData();
     });
 
     return () => {
