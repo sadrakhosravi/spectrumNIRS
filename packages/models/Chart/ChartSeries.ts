@@ -45,6 +45,15 @@ export class ChartSeries {
     );
   }
 
+  public changeSeriesColor(color: string) {
+    this.series.setStrokeStyle(
+      new SolidLine({
+        thickness: -1,
+        fillStyle: new SolidFill({ color: ColorHEX(color || '#fff') }),
+      }),
+    );
+  }
+
   /**
    * Generates and appends a random data to the series
    */

@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import './security-restrictions';
 import { restoreOrCreateWindow } from '/@/mainWindow';
-
+import { createReaderProcess } from './readerProcess';
 // import { join } from 'path';
 
 /**
@@ -35,6 +35,7 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(restoreOrCreateWindow)
+  .then(createReaderProcess)
   .catch((e) => console.error('Failed create window:', e));
 
 /**
