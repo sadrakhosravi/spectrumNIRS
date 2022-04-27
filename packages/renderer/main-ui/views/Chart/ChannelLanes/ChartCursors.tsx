@@ -8,60 +8,98 @@ import * as styles from './channelLanes.module.scss';
 import { vm } from '../ChartView';
 import { ChartCursorsViewModel } from '@viewmodels/index';
 
+// Types
+
 const cursorsVM = new ChartCursorsViewModel();
 
 export const ChartCursors = observer(() => {
   const cursorContainerId = React.useId();
+  const cursorContainerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const cursorContainer = document.getElementById(cursorContainerId);
-    const example = document.getElementById('example') as HTMLDivElement;
-    const example2 = document.getElementById('example2') as HTMLDivElement;
-
-    vm.charts[0].series[0].changeSeriesColor('#fff');
-
-    //@ts-ignore
-    let time1 = 0;
-    // On cursor mouse move in chart area
-    const onMouseMove = (e: MouseEvent) => {
-      requestAnimationFrame(() => {
-        // Use for loop for faster iterations
-
-        const location = vm.charts[0].dashboardChart.showCursorOnClosesPoint(e) as any;
-
-        if (!location) return;
-        example.style.transform = `translate3d(${location.x}px, ${location.y}px, 0)`;
-        example2.style.transform = `translate3d(${location.x}px, ${location.y + 200}px, 0)`;
-      });
-    };
-
-    // cursorContainer?.addEventListener('mousemove', onMouseMove);
-
     return () => {
-      cursorContainer?.removeEventListener('mousemove', onMouseMove);
+      (cursorContainerRef.current as HTMLDivElement).removeEventListener('mousemove', onMouseMove);
+      (cursorContainerRef.current as HTMLDivElement).removeEventListener(
+        'mousemove',
+        onMouseMoveMaximized,
+      );
     };
-  }, [vm.charts.length]);
-
-  const createCursors = React.useCallback(() => {
-    cursorsVM.createCursors(vm.charts.length);
   }, []);
 
+  // Adds cursors elements in the view model
+  const createCursors = React.useCallback(() => {
+    cursorsVM.createCursors(vm.charts);
+    (cursorContainerRef.current as HTMLDivElement).addEventListener('mousemove', onMouseMove);
+  }, []);
+
+  const createCursorsMaximized = React.useCallback(() => {
+    const chart = vm.charts.find((chart) => chart.id === vm.isChannelMaximized);
+    if (!chart) return;
+    cursorsVM.createCursors([chart]);
+
+    (cursorContainerRef.current as HTMLDivElement).addEventListener(
+      'mousemove',
+      onMouseMoveMaximized,
+    );
+  }, []);
+
+  const onMouseMove = React.useCallback((e: MouseEvent) => {
+    requestAnimationFrame(() => {
+      cursorsVM.updateCursorPos(e, vm.charts);
+    });
+  }, []);
+
+  const onMouseMoveMaximized = React.useCallback((e: MouseEvent) => {
+    const chart = vm.charts.find((chart) => chart.id === vm.isChannelMaximized);
+    if (!chart) return;
+    requestAnimationFrame(() => {
+      cursorsVM.updateCursorPos(e, [chart]);
+    });
+  }, []);
+
+  // Deletes the cursor model from the view model
   const deleteCursors = React.useCallback(() => {
     cursorsVM.deleteCursors();
+    (cursorContainerRef.current as HTMLDivElement).removeEventListener('mousemove', onMouseMove);
+    (cursorContainerRef.current as HTMLDivElement).removeEventListener(
+      'mousemove',
+      onMouseMoveMaximized,
+    );
   }, []);
 
   return (
     <div
       id={cursorContainerId}
+      ref={cursorContainerRef}
       className={styles.ChartCursorContainer}
-      onMouseOver={createCursors}
+      onMouseEnter={vm.isChannelMaximized ? createCursorsMaximized : createCursors}
       onMouseLeave={deleteCursors}
     >
       {cursorsVM.cursors.map((cursor, i) => (
-        <div id={`cursor-${i}`} className={styles.CursorItem}>
-          {cursor.value}
+        <div
+          key={cursor.color + i + 'cursor'}
+          className={`${styles.CursorItem} ${cursor.x > 600 && styles.CursorItemSpanReversed}`}
+          style={{
+            transform: `translate3d(${cursor.x}px, ${cursor.y}px, 0)`,
+            background: cursor.color,
+          }}
+        >
+          <span>{cursor.yVal.toFixed(3)}</span>
         </div>
       ))}
+      {cursorsVM.cursors.length > 0 && (
+        <div
+          key={'cursor-x-axis'}
+          className={`${styles.CursorXAxisItem}`}
+          style={{
+            transform: `translateX(${
+              cursorsVM.cursors[0].x - (vm.isChannelMaximized ? 25 : 32)
+            }px)`,
+          }}
+        >
+          {cursorsVM.cursors[0].xVal.toFixed(3)}
+        </div>
+      )}
     </div>
   );
 });

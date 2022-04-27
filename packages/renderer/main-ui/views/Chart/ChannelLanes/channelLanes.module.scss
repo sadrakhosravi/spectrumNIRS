@@ -19,21 +19,6 @@ $channel-info-height: 25px;
   z-index: 10;
 }
 
-.ChartCursorContainer {
-  position: absolute;
-  left: $channel-ui-width;
-  top: 0;
-  width: calc(100% - $channel-ui-width);
-  height: 100%;
-  z-index: 30;
-}
-
-.ChartCursorItem {
-  position: absolute;
-  left: 0;
-  z-index: 30;
-}
-
 .ChannelLaneItem {
   position: absolute;
   top: 0;
@@ -162,10 +147,45 @@ $channel-info-height: 25px;
   @include active-focus-state;
 }
 
+.ChartCursorContainer {
+  position: absolute;
+  left: calc($channel-ui-width + 65px);
+  top: -40px;
+  width: calc(100% - 65px - $channel-ui-width);
+  height: calc(100% + 40px);
+  z-index: 30;
+}
+
 .CursorItem {
   position: fixed;
-  z-index: 99;
-  width: 5px;
-  height: 5px;
+  z-index: -1;
+  width: 8px;
+  height: 8px;
   background: #fff;
+  border-radius: 50%;
+
+  span {
+    margin-left: 9px;
+    margin-top: 9px;
+    padding: 2px;
+    border-radius: 5px;
+    background: #121212;
+    border: 1px solid rgba(#fff, 0.1);
+  }
+}
+
+.CursorXAxisItem {
+  position: fixed;
+  z-index: -1;
+  padding: $gap-xs $gap-sm;
+  background: #121212;
+  top: 102.5px;
+  border: 1px solid rgba(#fff, 0.1);
+}
+
+.CursorItemSpanReversed {
+  span {
+    position: absolute;
+    transform: translateX(-60px);
+  }
 }

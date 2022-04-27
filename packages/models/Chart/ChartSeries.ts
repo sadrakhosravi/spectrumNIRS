@@ -17,7 +17,7 @@ export class ChartSeries {
   /**
    * The current color of the series line stroke
    */
-  private readonly seriesColor: string | undefined;
+  private seriesColor: string | undefined;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -34,6 +34,13 @@ export class ChartSeries {
   }
 
   /**
+   * @returns the current stroke color of the series.
+   */
+  public getSeriesColor() {
+    return this.seriesColor;
+  }
+
+  /**
    * Sets the line series stroke thickness and color
    */
   private setLineSeriesStrokeStyle() {
@@ -43,8 +50,13 @@ export class ChartSeries {
         fillStyle: new SolidFill({ color: ColorHEX(this.seriesColor || '#00FFFF') }),
       }),
     );
+    this.seriesColor = this.seriesColor || '#00FFFF';
   }
 
+  /**
+   * Changes the current series color.
+   * @param color the new color to set for the series.
+   */
   public changeSeriesColor(color: string) {
     this.series.setStrokeStyle(
       new SolidLine({
@@ -52,6 +64,7 @@ export class ChartSeries {
         fillStyle: new SolidFill({ color: ColorHEX(color || '#fff') }),
       }),
     );
+    this.seriesColor = color;
   }
 
   /**

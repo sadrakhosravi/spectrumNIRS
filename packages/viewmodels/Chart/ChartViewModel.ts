@@ -51,7 +51,7 @@ export class ChartViewModel {
   /**
    * Whether a channels is maximized in the dashboard
    */
-  @observable private isChannelMaximized: boolean;
+  @observable public isChannelMaximized: string | null;
   /**
    * The height of the X Axis for all charts
    */
@@ -70,7 +70,7 @@ export class ChartViewModel {
     this.charts = [];
     this.colors = new ColorPalette();
     this.xAxisSynchronizedHandler = null;
-    this.isChannelMaximized = false;
+    this.isChannelMaximized = null;
     this.xAxisHeight = '40px';
     this.dashboardHeight = `calc(100% - ${this.xAxisHeight})`;
     // Make this class observable
@@ -142,7 +142,7 @@ export class ChartViewModel {
    * @param maximizedChartId the of the chart to maximize
    */
   @action public maximizeChannel(maximizedChartId: string) {
-    this.isChannelMaximized = true;
+    this.isChannelMaximized = maximizedChartId;
     const dashboard = this.model.getDashboard() as Dashboard;
     const maximizedChartIndex = this.charts.findIndex(
       (chart) => chart.id === maximizedChartId,
@@ -162,7 +162,7 @@ export class ChartViewModel {
    * Resets all channel heights back to the default uniform height
    */
   @action public resetChannelHeights() {
-    this.isChannelMaximized = false;
+    this.isChannelMaximized = null;
     const dashboard = this.model.getDashboard() as Dashboard;
 
     for (let i = 0; i < this.charts.length; i++) {
