@@ -33,7 +33,7 @@ export class DashboardChart {
   /**
    * The series marker for hover on chart
    */
-  private chartMarker: SeriesMarkerXY<PointMarker, UIBackground> | null;
+  protected chartMarker: SeriesMarkerXY<PointMarker, UIBackground> | null;
 
   constructor(chart: ChartType, id?: string) {
     this.chart = chart;
@@ -112,20 +112,42 @@ export class DashboardChart {
     // Now that the coordinates are in the correct coordinate system, they can be used
     // to solve data points, or further translated to any Axis.
 
+    // // (1) Translate mouse location an Axis.
+    // const mouseLocationAxis = translatePoint(
+    //   mouseLocationEngine,
+    //   // Source coordinate system.
+    //   this.chart.engine.scale,
+    //   // Target coordinate system.
+    //   series.scale,
+    // );
+
+    // console.log(mouseLocationAxis);
+
     // (2) Solve nearest data point from a series to the mouse.
     const nearestDataPoint = this.chart.getSeries()[0].solveNearestFromScreen(mouseLocationEngine);
     if (!nearestDataPoint) return;
 
-    // Add the chart marker
-    const series = this.chart.getSeries()[0];
+    const pixelLocation = translatePoint(
+      // axis coordinate.
+      nearestDataPoint.location,
+      {
+        x: this.chart.getDefaultAxisX(),
+        y: this.chart.getDefaultAxisY(),
+      },
+      this.chart.engine.scale,
+    );
 
-    if (!this.chartMarker) {
-      this.chartMarker = series.addMarker(this.buildChartMarker());
-      this.chartMarker.setMouseInteractions(false);
-    }
+    const pixelLocationDocument = this.chart.engine.engineLocation2Client(
+      pixelLocation.x,
+      pixelLocation.y,
+    );
 
-    // Set the marker's position.
-    this.chartMarker.setPosition(nearestDataPoint.location);
+    return {
+      x: pixelLocationDocument.x - 215,
+      y: pixelLocationDocument.y - 135,
+      xVal: nearestDataPoint.location.x,
+      yVal: nearestDataPoint.location.y,
+    };
   }
 
   /**
@@ -229,7 +251,7 @@ export class DashboardChart {
     );
   }
 
-  private buildChartMarker() {
+  protected buildChartMarker() {
     // Create a builder for SeriesMarker to allow for full modification of its structure.
     const SeriesMarkerBuilder = MarkerBuilders.XY.setPointMarker(
       UIBackgrounds.Circle,

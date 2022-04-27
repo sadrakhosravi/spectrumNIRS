@@ -57,6 +57,7 @@ const config = {
     rollupOptions: {
       input: {
         main: join(PACKAGE_ROOT, 'index.html'),
+        reader: join(PACKAGE_ROOT, 'reader.html'),
       },
 
       external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
