@@ -99,7 +99,7 @@ export class DashboardChart {
    * Gets the closes series point (if any) on a chart from the mouse location.
    * @returns nearestDataPoint - either `undefined` or an `object`.
    */
-  public showCursorOnClosesPoint(event: MouseEvent) {
+  public getNearestSeriesPointFromScreen(event: MouseEvent) {
     // `event` is a native JavaScript event, which packs the active mouse location in `clientX` and `clientY` properties.
     const mouseLocationClient = { x: event.clientX, y: event.clientY };
 
@@ -143,8 +143,8 @@ export class DashboardChart {
     );
 
     return {
-      x: pixelLocationDocument.x - 215,
-      y: pixelLocationDocument.y - 135,
+      x: pixelLocationDocument.x - 280,
+      y: pixelLocationDocument.y - 98.5,
       xVal: nearestDataPoint.location.x,
       yVal: nearestDataPoint.location.y,
     };
