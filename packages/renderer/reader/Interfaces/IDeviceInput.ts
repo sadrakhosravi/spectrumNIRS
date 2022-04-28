@@ -25,5 +25,3 @@ export interface IDeviceInput {
    */
   closeConnection: () => boolean;
 }
-
-type InputType = 'websocket' | 'stdin';

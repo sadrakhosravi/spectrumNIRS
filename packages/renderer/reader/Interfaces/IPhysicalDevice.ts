@@ -1,5 +1,4 @@
-import { ChildProcess, ChildProcessByStdio, spawn, SpawnOptionsWithoutStdio } from 'child_process';
-import path from 'path';
+import { ChildProcess, ChildProcessByStdio, SpawnOptionsWithoutStdio } from 'child_process';
 import { Readable } from 'stream';
 
 export interface IPhysicalDevice {

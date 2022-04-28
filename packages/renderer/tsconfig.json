@@ -31,6 +31,7 @@
     "../viewmodels/**/*",
     "../database/**/*",
     "../utils/**/*",
+    "reader/**/*.ts",
     "main-ui/**/*.scss",
     "main-ui/**/*.ts",
     "main-ui/**/*.js",

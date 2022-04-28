@@ -1,7 +1,28 @@
-export class BeastParser {
-  private pd_num = 0; // 0 ~ 7 -- this variable is set by user
-  private bytes_count = 8 * 2; // msb lsb
-  private msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
+import { IDeviceParser } from '../api/device-api';
+
+type UnpackedDataType = {
+  ch1: number[];
+  ch2: number[];
+  ch3: number[];
+  ch4: number[];
+  ch5: number[];
+  ch6: number[];
+  ch7: number[];
+  led_nums: any[];
+};
+
+export class BeastParser implements IDeviceParser {
+  private pd_num: number;
+  private bytes_count: number;
+  private msb_indices: number[];
+  private led_num: number;
+
+  constructor() {
+    this.pd_num = 0; // 0 ~ 7 -- this variable is set by user
+    this.bytes_count = 8 * 2; // msb lsb
+    this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
+    this.led_num = 0; // 0 ~ 15 -- this variable is set by user
+  }
 
   /**
    * Processes the incoming data packet and return an object.
@@ -12,7 +33,16 @@ export class BeastParser {
     const data = new Uint8Array(packet);
 
     // fill channels data
-    let res = { ch1: [], ch2: [], ch3: [], ch4: [], ch5: [], ch6: [], ch7: [], led_nums: [] }; // , digital_inputs: []
+    let res: UnpackedDataType = {
+      ch1: [],
+      ch2: [],
+      ch3: [],
+      ch4: [],
+      ch5: [],
+      ch6: [],
+      ch7: [],
+      led_nums: [],
+    }; // , digital_inputs: []
     for (let index = 0; index < this.msb_indices.length; index++) {
       if (index >= this.pd_num && index != 7) continue;
 
@@ -23,12 +53,8 @@ export class BeastParser {
         data.filter((_, i) => i % this.bytes_count === this.msb_indices[index] - 0),
       );
 
-      // if (index == 7) // index for led_nums and digital_inputs
-      // {
-      //     res[Object.keys(res)[index]] = lsb.map(function (e, i) { return e & 15; });// led_nums
-      //     res[Object.keys(res)[index + 1]] = lsb.map(function (e, i) { return e & 112; });// digital_inputs
-      // }
       // else // channels
+      //@ts-ignore
       res[Object.keys(res)[index]] = lsb.map(function (e, i) {
         let d = e + (msb[i] << 8);
         d = (d << 16) >> 16;
@@ -37,8 +63,8 @@ export class BeastParser {
     }
 
     // find indices of arrays with led_num
-    let indexArray = [];
-    indexArray = res.led_nums.reduce(function (b, e, i) {
+    let indexArray: number[] = [];
+    indexArray = res.led_nums.reduce((b, e, i) => {
       if (e === this.led_num) b.push(i);
       return b;
     }, []);

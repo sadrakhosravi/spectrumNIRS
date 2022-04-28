@@ -5,7 +5,8 @@ import {
   IDeviceStream,
   IDeviceInput,
 } from '../Interfaces';
-export {
+
+export type {
   IPhysicalDevice,
   INIRSDevice,
   IDeviceParser,

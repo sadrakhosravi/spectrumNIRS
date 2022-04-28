@@ -10,7 +10,11 @@ export enum BEAST_CMDs {
   // Send events
   start = 'ADC-Start',
   stop = 'ADC-Stop',
+  getVersion = 'Get-Version',
+  setSettings = 'Set-Settings',
 
   // Received events
   data = 'ADC-DATA',
+  connection = 'Connection',
+  setVersion = 'Set-Version',
 }

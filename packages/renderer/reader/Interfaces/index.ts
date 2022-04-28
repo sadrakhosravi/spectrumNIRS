@@ -1,5 +1,5 @@
-export { IPhysicalDevice } from './IPhysicalDevice';
-export { INIRSDevice } from './INIRSDevice';
-export { IDeviceStream } from './IDeviceStream';
-export { IDeviceParser } from './IDeviceParser';
-export { IDeviceInput } from './IDeviceInput';
+export type { IPhysicalDevice } from './IPhysicalDevice';
+export type { INIRSDevice } from './INIRSDevice';
+export type { IDeviceStream } from './IDeviceStream';
+export type { IDeviceParser } from './IDeviceParser';
+export type { IDeviceInput } from './IDeviceInput';

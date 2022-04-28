@@ -16,7 +16,7 @@ export class BeastServer {
   /**
    * The socket io instance.
    */
-  private io: Server;
+  private io!: Server;
   /**
    * The beast client socket connection instance.
    */
