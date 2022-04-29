@@ -1,1 +1,1 @@
-import './Beast/Beast';
+import './Devices/Beast/Beast';

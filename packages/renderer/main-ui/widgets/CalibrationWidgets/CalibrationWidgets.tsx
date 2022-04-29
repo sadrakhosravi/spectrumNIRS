@@ -1,14 +1,12 @@
 import * as React from 'react';
 
 // Widgets
-import { ProbeIntensities } from './ProbeIntensities';
+import { ProbeSettingsWidget } from './ProbeSettingsWidget';
 
 export const CalibrationWidgets = () => {
   return (
     <>
-      <ProbeIntensities />
-      <ProbeIntensities />
-      <ProbeIntensities />
+      <ProbeSettingsWidget />
     </>
   );
 };

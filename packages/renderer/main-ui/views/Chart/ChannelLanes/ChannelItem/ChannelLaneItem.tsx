@@ -8,7 +8,7 @@ import * as styles from '../channelLanes.module.scss';
 import { ChannelSeries } from './ChannelSeries';
 import { ChannelSettings } from './ChannelSettings';
 import { ChannelActions } from './ChannelActions';
-import { GainButton } from './GainButton';
+// import { GainButton } from './GainButton';
 
 // Types
 import type { IChart } from '@viewmodels/Chart/ChartViewModel';
@@ -85,7 +85,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
                 />
               ))}
               {vm.charts[chartIndex].series.length === 0 && 'No Series'}
-              <GainButton />
+              {/* <GainButton /> */}
               <ChannelActions chart={chart.dashboardChart} />
             </div>
           </div>

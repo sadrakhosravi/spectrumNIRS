@@ -62,7 +62,8 @@ h6 {
   font-weight: 600;
 }
 
-input {
+input[type='text'],
+input[type='number'] {
   border: solid $border-primary-width $border-primary-color;
   padding: $input-padding;
   border-radius: 5px;

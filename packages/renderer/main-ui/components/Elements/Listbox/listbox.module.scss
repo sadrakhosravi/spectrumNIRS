@@ -21,12 +21,14 @@
   top: 35px;
   left: 0;
   min-width: 150px;
+  width: 100%;
   z-index: 80;
   background: $color-bg-secondary;
   max-height: 350px;
   padding: $gap-xs $gap-xs;
   overflow-y: auto;
   @include border-primary;
+  @include slide-left;
 
   li {
     font-size: $size-font-base;

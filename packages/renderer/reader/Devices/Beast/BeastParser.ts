@@ -1,4 +1,4 @@
-import { IDeviceParser } from '../api/device-api';
+import { IDeviceParser } from '../../api/device-api';
 
 type UnpackedDataType = {
   ch1: number[];
@@ -42,7 +42,8 @@ export class BeastParser implements IDeviceParser {
       ch6: [],
       ch7: [],
       led_nums: [],
-    }; // , digital_inputs: []
+    };
+
     for (let index = 0; index < this.msb_indices.length; index++) {
       if (index >= this.pd_num && index != 7) continue;
 
@@ -55,7 +56,7 @@ export class BeastParser implements IDeviceParser {
 
       // else // channels
       //@ts-ignore
-      res[Object.keys(res)[index]] = lsb.map(function (e, i) {
+      res[Object.keys(res)[index as number] as any] = lsb.map(function (e, i) {
         let d = e + (msb[i] << 8);
         d = (d << 16) >> 16;
         return d;
