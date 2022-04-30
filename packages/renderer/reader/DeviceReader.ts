@@ -3,6 +3,7 @@ import Beast from './Devices/Beast/Beast';
 // Interfaces
 import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from './api/device-api';
 import { readerIPCService as ipcService } from './ReaderIPCService';
+import { BEAST_CMDs } from './Devices/Beast/enums';
 
 export class DeviceReader {
   /**
@@ -27,8 +28,11 @@ export class DeviceReader {
 
     // Wait for device to connect
     await this.physicalDevice.waitForDevice();
+
+    // When the device connects
     ipcService.sendDeviceConnected(true);
     this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
+    this.listenForDeviceData();
 
     // Listen for device disconnect
     this.listenForDeviceDisconnect();
@@ -45,7 +49,22 @@ export class DeviceReader {
   }
 
   /**
-   * Listens for device disconnection
+   * Listen for device ADC data.
+   */
+  private listenForDeviceData() {
+    const device = this.physicalDevice.getDevice();
+
+    device.on(BEAST_CMDs.data, this.handleDeviceData);
+  }
+
+  // Handle device ADC data.
+  private handleDeviceData(data: Buffer) {
+    const unPackedData = this.deviceParser.processPacket(data);
+    console.log(unPackedData);
+  }
+
+  /**
+   * Listens for device disconnection.
    */
   public listenForDeviceDisconnect() {
     const device = this.physicalDevice.getDevice();
@@ -53,10 +72,17 @@ export class DeviceReader {
     // Handles the device disconnect event
     const handleDisconnect = () => {
       ipcService.sendDeviceConnected(false);
+
+      // Remove listeners
       device.off('disconnect', handleDisconnect);
+      device.off(BEAST_CMDs.data, this.handleDeviceData);
+
+      // Listen for connection again
       this.init();
     };
 
     device.on('disconnect', handleDisconnect);
   }
 }
+
+export default new DeviceReader();

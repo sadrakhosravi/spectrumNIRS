@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { deviceReader } from '.';
+import deviceReader from './DeviceReader';
 
 // Channels
 import { ReaderChannels } from '@utils/channels/ReaderChannels';
@@ -16,7 +16,6 @@ class ReaderIPCService {
    * Sends an IPC message to the main webContents
    */
   public sendDeviceConnected(value: boolean) {
-    console.log(value);
     ipcRenderer.sendTo(1, ReaderChannels.DEVICE_CONNECTED, value);
   }
 

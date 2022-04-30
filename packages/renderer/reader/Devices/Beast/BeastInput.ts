@@ -9,7 +9,7 @@ export type MessageType = string | string[] | boolean | number | number[];
 type SettingsType = {
   numOfLEDs: number;
   numOfPDs: number;
-  LEDCurrents: number[];
+  LEDValues: number[];
 };
 
 export class BeastInput implements IDeviceInput {
@@ -47,6 +47,7 @@ export class BeastInput implements IDeviceInput {
   public updateSettings(settings: SettingsType) {
     // Reset the previous data
     const formattedSettings = this.parseSettings(settings);
+    console.log(formattedSettings);
     this.socket.emit(BEAST_CMDs.setSettings, formattedSettings);
   }
 
@@ -59,45 +60,54 @@ export class BeastInput implements IDeviceInput {
     // Get the num of LEDs and PDs that will be active
     const { numOfLEDs, numOfPDs } = settings;
 
+    // If less than 16 settings are sent, fix the array
+    if (settings.LEDValues.length < 16) {
+      const diff = 16 - settings.LEDValues.length;
+
+      for (let i = 0; i < diff; i++) {
+        settings.LEDValues.push(0);
+      }
+    }
+
     // Parse the intensities to the required hardware byte type
     const virtual_src_addr = new Array(4);
 
     // Format LEDs 1 to 4
     const LED1To4 =
-      this.numTo8BitsBinary(settings.LEDCurrents[3]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[2]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[1]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[0]);
+      this.numTo8BitsBinary(settings.LEDValues[3]) +
+      this.numTo8BitsBinary(settings.LEDValues[2]) +
+      this.numTo8BitsBinary(settings.LEDValues[1]) +
+      this.numTo8BitsBinary(settings.LEDValues[0]);
 
     // Add it to the final array
     virtual_src_addr[3] = parseInt(LED1To4.padEnd(32, '0'), 2);
 
     // Format LEDs 5 to 8
     const LED5To8 =
-      this.numTo8BitsBinary(settings.LEDCurrents[7]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[6]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[5]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[4]);
+      this.numTo8BitsBinary(settings.LEDValues[7]) +
+      this.numTo8BitsBinary(settings.LEDValues[6]) +
+      this.numTo8BitsBinary(settings.LEDValues[5]) +
+      this.numTo8BitsBinary(settings.LEDValues[4]);
 
     // Add it to the final array
     virtual_src_addr[2] = parseInt(LED5To8.padEnd(32, '0'), 2);
 
     // Format LEDs 9 to 12
     const LED9To12 =
-      this.numTo8BitsBinary(settings.LEDCurrents[11]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[10]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[9]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[8]);
+      this.numTo8BitsBinary(settings.LEDValues[11]) +
+      this.numTo8BitsBinary(settings.LEDValues[10]) +
+      this.numTo8BitsBinary(settings.LEDValues[9]) +
+      this.numTo8BitsBinary(settings.LEDValues[8]);
 
     // Add it to the final array
     virtual_src_addr[1] = parseInt(LED9To12.padEnd(32, '0'), 2);
 
     // Format LEDs 12 to 15
     const LED15To12 =
-      this.numTo8BitsBinary(settings.LEDCurrents[15]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[14]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[13]) +
-      this.numTo8BitsBinary(settings.LEDCurrents[12]);
+      this.numTo8BitsBinary(settings.LEDValues[15]) +
+      this.numTo8BitsBinary(settings.LEDValues[14]) +
+      this.numTo8BitsBinary(settings.LEDValues[13]) +
+      this.numTo8BitsBinary(settings.LEDValues[12]);
 
     // Add it to the final array
     virtual_src_addr[0] = parseInt(LED15To12.padEnd(32, '0'), 2);

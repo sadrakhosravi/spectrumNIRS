@@ -45,6 +45,7 @@ export class ProbeSettingsViewModel {
    * The total number of supported PDs from the hardware
    */
   @observable public readonly supportedPDNum: number[];
+
   constructor() {
     this.device = AllDevices[0];
     this.deviceName = this.device.device.getName();
@@ -68,7 +69,7 @@ export class ProbeSettingsViewModel {
   /**
    * Sends the probe settings data to the reader process.
    */
-  public handleDeviceSettingsUpdate() {
+  public handleDeviceSettingsUpdate = () => {
     // The settings object
     const settings: ProbeSettingsType = {
       numOfPDs: this.activePDs,
@@ -82,5 +83,5 @@ export class ProbeSettingsViewModel {
     }
 
     MainWinIPCService.sendToReader(ReaderChannels.DEVICE_SETTING_UPDATE, settings);
-  }
+  };
 }

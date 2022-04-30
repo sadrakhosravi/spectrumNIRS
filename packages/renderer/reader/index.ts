@@ -1,4 +1,5 @@
-import { DeviceReader } from './DeviceReader';
+// Import Reader
+import './DeviceReader';
 
-// Start the device reader
-export const deviceReader = new DeviceReader();
+// Import IPC service
+import './ReaderIPCService';
