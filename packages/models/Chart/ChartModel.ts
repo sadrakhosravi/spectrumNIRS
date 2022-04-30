@@ -40,6 +40,14 @@ export class ChartModel {
   }
 
   /**
+   * Adds the freed row back to the sorted list.
+   * @param rowIndex
+   */
+  public addFreedRowIndex(rowIndex: number) {
+    this.availableRows.addItemToSet(rowIndex);
+  }
+
+  /**
    * Creates an instance of a chart in current dashboard
    */
   public addChartXY(): DashboardChart {
@@ -50,7 +58,7 @@ export class ChartModel {
       defaultAxisX: undefined,
     }) as ChartType;
 
-    return new DashboardChart(chart);
+    return new DashboardChart(chart, firstAvailableRow);
   }
 
   /**

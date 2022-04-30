@@ -61,7 +61,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
     setHeight(size.height);
 
     return () => {
-      chart.dashboardChart.chart.offResize(token);
+      chart?.dashboardChart?.chart?.offResize(token);
     };
   }, [chart]);
 

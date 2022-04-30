@@ -12,9 +12,8 @@ import { Row, Column } from '/@/components/Elements/Grid';
 import { Listbox } from '/@/components/Elements/Listbox';
 import { RangeSliderWithInput } from '/@/components/Form/RnageSliderWithInput';
 
-// ViewModel
+// View Models
 import { ProbeSettingsViewModel } from '@viewmodels/index';
-import { ipcRenderer } from 'electron';
 
 export const probeSettingVM = new ProbeSettingsViewModel();
 
@@ -37,19 +36,6 @@ export const ProbeSettingsWidget = observer(() => {
   // Sets the total number of PDS
   const setPDs = (num: { name: string; value: number }) => {
     probeSettingVM.setActivePDs(num.value);
-  };
-
-  // Handles the on blur event to send the data to the reader process
-  const handleBlur = (_e: any) => {
-    const totalLEDs = probeSettingVM.activeLEDs;
-    const values: number[] = [];
-
-    for (let i = 0; i < totalLEDs; i++) {
-      const ledSlider = document.getElementById(ledIDBase + i) as HTMLInputElement;
-      values.push(~~ledSlider.value);
-    }
-
-    ipcRenderer.sendTo(2, 'test', values);
   };
 
   return (
@@ -92,7 +78,7 @@ export const ProbeSettingsWidget = observer(() => {
                 title={'LED' + ++i}
                 min={0}
                 max={127}
-                onBlur={handleBlur}
+                onBlur={probeSettingVM.handleDeviceSettingsUpdate}
               />
             ))}
           </div>

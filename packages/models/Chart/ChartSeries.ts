@@ -74,4 +74,14 @@ export class ChartSeries {
     const data = XYDataGenerator.staticData(30000);
     data.then((points) => this.series.add(points));
   }
+
+  /**
+   * Disposes the series and all its belongings.
+   */
+  public dispose() {
+    this.series.dispose();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    this.series = null;
+  }
 }

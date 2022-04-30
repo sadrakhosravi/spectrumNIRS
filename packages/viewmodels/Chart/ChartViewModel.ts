@@ -91,11 +91,8 @@ export class ChartViewModel {
    */
   public init(containerId: string) {
     if (!this.model.getDashboard()) this.model.createDashboard(containerId);
-    this.addCharts();
-    this.addCharts();
-    this.addCharts();
-    this.addCharts();
-    this.addCharts();
+    this.addChart();
+    this.addSeries(this.charts[0].id, 'Channel 1');
   }
 
   /**
@@ -107,15 +104,63 @@ export class ChartViewModel {
 
   /**
    * Adds a new chart to the dashboard instance.
+   * @returns the chart id
    */
-  @action public addCharts() {
+  @action public addChart() {
     const chart = this.model.addChartXY();
+    const chartId = chart.getId();
     this.charts.push({
       dashboardChart: chart,
       channel: new ChartChannel(chart.chart),
-      id: chart.getId(),
+      id: chartId,
       series: [],
     });
+    return chart;
+  }
+
+  /**
+   * Removes the chart and all its belongings from the observable list.
+   */
+  @action public removeChart(chartId: string) {
+    const chartIndex = this.charts.findIndex((chart) => chart.id === chartId);
+
+    if (chartIndex === -1) return;
+
+    // Remove the chart and its series
+    this.removeChartAndSeries(chartIndex);
+
+    // Remove the object from observable
+    this.charts.splice(chartIndex, 1);
+  }
+
+  /**
+   * Removes the last chart from the observable if charts are more than 1.
+   */
+  @action public removeLastChart() {
+    if (this.charts.length === 1) return;
+
+    // Remove the chart and series
+    const lastChartIndex = this.charts.length - 1;
+    this.removeChartAndSeries(lastChartIndex);
+
+    // Remove the object from observable
+    this.charts.splice(lastChartIndex, 1);
+  }
+
+  /**
+   * Cleans up the chart and its series and remove the axis synchronization.
+   */
+  @action private removeChartAndSeries(chartIndex: number) {
+    if (chartIndex === -1) return;
+
+    // Remove the synchronization first.
+    this.removeAxisSynchronization();
+
+    this.charts[chartIndex].series.forEach((series) => series.dispose());
+    this.charts[chartIndex].series.length = 0;
+    const rowIndexFreed = this.charts[chartIndex].dashboardChart.dispose();
+
+    this.model.addFreedRowIndex(rowIndexFreed);
   }
 
   /**
@@ -191,6 +236,14 @@ export class ChartViewModel {
     });
 
     this.model.cleanup();
+  }
+
+  /**
+   * Removes the X axis synchronize handler
+   */
+  private removeAxisSynchronization() {
+    this.xAxisSynchronizedHandler?.remove();
+    this.xAxisSynchronizedHandler = null;
   }
 
   /**

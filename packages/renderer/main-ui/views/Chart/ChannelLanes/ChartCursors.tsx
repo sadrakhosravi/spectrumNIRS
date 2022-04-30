@@ -75,19 +75,22 @@ export const ChartCursors = observer(() => {
       onMouseEnter={vm.isChannelMaximized ? createCursorsMaximized : createCursors}
       onMouseLeave={deleteCursors}
     >
-      {cursorsVM.cursors.map((cursor, i) => (
-        <div
-          key={cursor.color + i + 'cursor'}
-          className={`${styles.CursorItem} ${cursor.x > 600 && styles.CursorItemSpanReversed}`}
-          style={{
-            transform: `translate3d(${cursor.x}px, ${cursor.y}px, 0)`,
-            background: cursor.color,
-          }}
-        >
-          <span>{cursor.yVal.toFixed(3)}</span>
-        </div>
-      ))}
-      {cursorsVM.cursors.length > 0 && (
+      {cursorsVM.cursors.map(
+        (cursor, i) =>
+          cursor.y !== 0 && (
+            <div
+              key={cursor.color + i + 'cursor'}
+              className={`${styles.CursorItem} ${cursor.x > 600 && styles.CursorItemSpanReversed}`}
+              style={{
+                transform: `translate3d(${cursor.x}px, ${cursor.y}px, 0)`,
+                background: cursor.color,
+              }}
+            >
+              <span>{cursor.yVal.toFixed(3)}</span>
+            </div>
+          ),
+      )}
+      {cursorsVM.cursors.length > 0 && cursorsVM.cursors[0].y !== 0 && (
         <div
           key={'cursor-x-axis'}
           className={`${styles.CursorXAxisItem}`}

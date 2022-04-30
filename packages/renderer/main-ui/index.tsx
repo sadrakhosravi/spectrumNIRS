@@ -5,8 +5,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 
 // IPC Service
-import { MainWinIPCService } from './MainWinIPCService';
-export const mainWinIPCService = new MainWinIPCService();
+import './MainWinIPCService';
 
 const container = document.getElementById('main') as HTMLElement;
 const root = createRoot(container);

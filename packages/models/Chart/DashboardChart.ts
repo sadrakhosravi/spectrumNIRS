@@ -27,6 +27,10 @@ export class DashboardChart {
    */
   public readonly chart: ChartType;
   /**
+   * The row index of the chart in the dashboard.
+   */
+  public rowIndex: number;
+  /**
    * A unique id to track the chart
    */
   public readonly id: string;
@@ -35,8 +39,9 @@ export class DashboardChart {
    */
   protected chartMarker: SeriesMarkerXY<PointMarker, UIBackground> | null;
 
-  constructor(chart: ChartType, id?: string) {
+  constructor(chart: ChartType, rowIndex: number, id?: string) {
     this.chart = chart;
+    this.rowIndex = rowIndex;
     this.id = id || Hyperid()();
     this.chartMarker = null;
     this.setChartDefaults(this.chart);
@@ -71,6 +76,13 @@ export class DashboardChart {
     };
   }
 
+  /**
+   * @returns the chart row
+   */
+  public getChartRowIndex() {
+    return this.rowIndex;
+  }
+
   public getPointDiffInPixels(x1: number, x2: number) {
     const posEngine = translatePoint({ x: x1, y: 0 }, this.chart.uiScale, this.chart.engine.scale);
     const posDocument = this.chart.engine.engineLocation2Client(posEngine.x, posEngine.y);
@@ -96,6 +108,19 @@ export class DashboardChart {
   }
 
   /**
+   * Disposes the chart instance.
+   * @returns the row index of the chart to be freed in the dashboard.
+   */
+  public dispose() {
+    this.chartMarker?.dispose();
+    this.chart.dispose();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    this.chart = null;
+    return this.rowIndex;
+  }
+
+  /**
    * Gets the closes series point (if any) on a chart from the mouse location.
    * @returns nearestDataPoint - either `undefined` or an `object`.
    */
@@ -111,17 +136,6 @@ export class DashboardChart {
 
     // Now that the coordinates are in the correct coordinate system, they can be used
     // to solve data points, or further translated to any Axis.
-
-    // // (1) Translate mouse location an Axis.
-    // const mouseLocationAxis = translatePoint(
-    //   mouseLocationEngine,
-    //   // Source coordinate system.
-    //   this.chart.engine.scale,
-    //   // Target coordinate system.
-    //   series.scale,
-    // );
-
-    // console.log(mouseLocationAxis);
 
     // (2) Solve nearest data point from a series to the mouse.
     const nearestDataPoint = this.chart.getSeries()[0].solveNearestFromScreen(mouseLocationEngine);

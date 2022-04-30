@@ -10,6 +10,16 @@ import { action, makeObservable, observable } from 'mobx';
 
 import AllDevices from '../renderer/reader/Devices/AllDevices';
 
+// IPC Service
+import MainWinIPCService from '../renderer/main-ui/MainWinIPCService';
+import { ReaderChannels } from '../utils/channels/ReaderChannels';
+
+export type ProbeSettingsType = {
+  numOfPDs: number;
+  numOfLEDs: number;
+  LEDValues: number[];
+};
+
 export class ProbeSettingsViewModel {
   /**
    * The current device information
@@ -53,5 +63,24 @@ export class ProbeSettingsViewModel {
 
   @action public setActivePDs(num: number) {
     this.activePDs = num;
+  }
+
+  /**
+   * Sends the probe settings data to the reader process.
+   */
+  public handleDeviceSettingsUpdate() {
+    // The settings object
+    const settings: ProbeSettingsType = {
+      numOfPDs: this.activePDs,
+      numOfLEDs: this.activeLEDs,
+      LEDValues: [],
+    };
+
+    for (let i = 0; i < this.activeLEDs; i++) {
+      const ledSlider = document.getElementById('led-intensities-' + i) as HTMLInputElement;
+      settings.LEDValues.push(~~ledSlider.value);
+    }
+
+    MainWinIPCService.sendToReader(ReaderChannels.DEVICE_SETTING_UPDATE, settings);
   }
 }

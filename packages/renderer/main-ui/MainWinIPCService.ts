@@ -12,6 +12,13 @@ export class MainWinIPCService {
   }
 
   /**
+   * Sends an IPC message on a specified channel to Reader process
+   */
+  public sendToReader(channel: string, args: any) {
+    ipcRenderer.sendTo(2, channel, args);
+  }
+
+  /**
    * Attaches the IPC listeners for the main window.
    */
   private init() {
@@ -28,3 +35,5 @@ export class MainWinIPCService {
     );
   }
 }
+
+export default new MainWinIPCService();
