@@ -1,12 +1,14 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
-// Types
+// Interfaces
+import { INIRSDevice } from 'reader/Interfaces';
+import type { Socket } from 'socket.io';
 
 // Enums / Interfaces
 import { IO_SERVER } from './enums';
 
-export class BeastPhysicalDevice {
+export class BeastPhysicalDevice implements INIRSDevice {
   /**
    * The socket io server instance
    */
@@ -14,7 +16,7 @@ export class BeastPhysicalDevice {
   /**
    * The beast connection socket instance.
    */
-  private beast: null;
+  private beast: Socket | null;
   constructor() {
     this.io = this.createServer();
     this.beast = null;
@@ -30,22 +32,22 @@ export class BeastPhysicalDevice {
   /**
    * @returns the maximum number of supported LEDs
    */
-  public static getSupportedLEDNum() {
+  public getSupportedLEDNum() {
     return 15;
   }
 
   /**
    * @returns the maximum supported number of PDs
    */
-  public static getSupportedPDNum() {
+  public getSupportedPDNum() {
     return 7;
   }
 
   /**
-   * @returns the current socket.io server instance.
+   * @returns the current beast socket communication instance.
    */
   public getIO() {
-    return this.io;
+    return this.beast as Socket;
   }
 
   /**
@@ -60,6 +62,63 @@ export class BeastPhysicalDevice {
    */
   public getIsConnected() {
     return this.beast ? true : false;
+  }
+
+  /**
+   * @returns the current device communication plugin version.
+   */
+  public getVersion() {
+    return '0.1.0';
+  }
+
+  /**
+   * @returns the default sampling rate of the device.
+   */
+  public getDefaultSamplingRate() {
+    return 1000;
+  }
+
+  /**
+   * @returns the device serial number.
+   */
+  public getDeviceSerialNumber() {
+    return 'beast-ibl-zx1';
+  }
+
+  /**
+   * @returns an array of all the supported sampling rates.
+   */
+  public getSupportedSamplingRates() {
+    return [1000, 500, 250, 100, 50, 30, 20, 10];
+  }
+
+  /**
+   * @returns the current device communication instance.
+   */
+  public getDevice() {
+    return this.beast as Socket;
+  }
+
+  /**
+   * Waits for device connection.
+   */
+  public waitForDevice(): Promise<boolean> {
+    return new Promise((resolve) => {
+      // On device join, resolve the promise
+      this.io.on('connection', (socket) => {
+        this.beast = socket;
+
+        return resolve(true);
+      });
+    });
+  }
+
+  /**
+   * Cleans up the listeners
+   */
+  public cleanup() {
+    this.io.disconnectSockets();
+    this.io.close((err) => new Error(err?.message));
   }
 
   /**

@@ -33,6 +33,12 @@
     "body": ["import * as styles from './$1.module.scss';"],
     "description": "Quick way to load scss styles"
   },
+  "SCSS import variables and mixins": {
+    "scope": "scss",
+    "prefix": "variables",
+    "body": ["@import '@styles/variables';", "@import '@styles/mixins';"],
+    "description": "Quick way to load scss variables and mixins"
+  },
   "ModelComments": {
     "scope": "javascript,typescript,typescriptreact",
     "prefix": "model",

@@ -2,17 +2,23 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
+// Styles
+import * as styles from './probeSettingsWidget.module.scss';
+
 // Components
 import { Tabs, TabItem } from '/@/components/Tabs';
 import { WidgetsContainer } from '/@/components/Widgets';
 import { Row, Column } from '/@/components/Elements/Grid';
 import { Listbox } from '/@/components/Elements/Listbox';
-import { RangeSlider } from '/@/components/Elements/RangeSlider';
+import { RangeSliderWithInput } from '/@/components/Form/RnageSliderWithInput';
 
 // ViewModel
 import { ProbeSettingsViewModel } from '@viewmodels/index';
+import { ipcRenderer } from 'electron';
 
 export const probeSettingVM = new ProbeSettingsViewModel();
+
+const ledIDBase = 'led-intensities-';
 
 export const ProbeSettingsWidget = observer(() => {
   const LEDOptions = toJS(probeSettingVM.supportedLEDNum).map((num) => {
@@ -28,8 +34,22 @@ export const ProbeSettingsWidget = observer(() => {
     probeSettingVM.setActiveLEDs(num.value);
   };
 
+  // Sets the total number of PDS
   const setPDs = (num: { name: string; value: number }) => {
     probeSettingVM.setActivePDs(num.value);
+  };
+
+  // Handles the on blur event to send the data to the reader process
+  const handleBlur = (_e: any) => {
+    const totalLEDs = probeSettingVM.activeLEDs;
+    const values: number[] = [];
+
+    for (let i = 0; i < totalLEDs; i++) {
+      const ledSlider = document.getElementById(ledIDBase + i) as HTMLInputElement;
+      values.push(~~ledSlider.value);
+    }
+
+    ipcRenderer.sendTo(2, 'test', values);
   };
 
   return (
@@ -64,10 +84,21 @@ export const ProbeSettingsWidget = observer(() => {
 
             {/* Adjust LED intensity */}
           </Row>
-          <div>
-            {new Array(probeSettingVM.activeLEDs).fill(0).map(() => (
-              <RangeSlider min={0} max={127} />
+          <div className={styles.LEDIntensitiesContainer}>
+            {new Array(probeSettingVM.activeLEDs).fill(0).map((_, i) => (
+              <RangeSliderWithInput
+                id={ledIDBase + i}
+                key={i + 'range-slider'}
+                title={'LED' + ++i}
+                min={0}
+                max={127}
+                onBlur={handleBlur}
+              />
             ))}
+          </div>
+          <div>
+            <span>Status: </span>
+            <span>Sent to Controller</span>
           </div>
         </TabItem>
       </Tabs>

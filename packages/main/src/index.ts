@@ -1,8 +1,18 @@
 import { app } from 'electron';
 import './security-restrictions';
-import { restoreOrCreateWindow } from '/@/mainWindow';
+import { restoreOrCreateWindow } from './mainWindow';
 import { createReaderProcess } from './readerProcess';
-// import { join } from 'path';
+import { IPCService } from './ipcService';
+
+export type RendererWindows = {
+  mainWindow: Electron.BrowserWindow | null;
+  reader: Electron.BrowserWindow | null;
+};
+
+const renderers: RendererWindows = {
+  mainWindow: null,
+  reader: null,
+};
 
 /**
  * Prevent multiple instances
@@ -35,7 +45,10 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(restoreOrCreateWindow)
+  .then((mainWindow) => (renderers.mainWindow = mainWindow))
   .then(createReaderProcess)
+  .then((reader) => (renderers.reader = reader))
+  .then(() => new IPCService(renderers))
   .catch((e) => console.error('Failed create window:', e));
 
 /**

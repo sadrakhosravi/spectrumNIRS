@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react-lite';
 
 // Styles
 import * as styles from './statusBar.module.scss';
@@ -7,20 +8,27 @@ import * as styles from './statusBar.module.scss';
 import { StatusBarItem } from './';
 
 // Icon
-import { FiAirplay } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
-export const StatusBar = () => {
+// View Model
+import { deviceInfoVM } from '@viewmodels/Singletons/DeviceInfoViewModel';
+
+export const StatusBar = observer(() => {
   return (
     <footer className={styles.StatusBar}>
-      <div className={styles.LeftItems}>
-        <StatusBarItem icon={<FiAirplay size={16} strokeWidth={2.5} />} text="Test" />
-      </div>
+      <div className={styles.LeftItems}></div>
       <div className={styles.RightItems}>
-        <StatusBarItem icon={<FiAirplay size={16} strokeWidth={2.5} />} text="Test" />
-        <StatusBarItem icon={<FiAirplay size={16} strokeWidth={2.5} />} text="Test" />
-
-        <StatusBarItem icon={<FiAirplay size={16} strokeWidth={2.5} />} text="Test" />
+        <StatusBarItem
+          icon={
+            deviceInfoVM.isDeviceConnected ? (
+              <FiCheckCircle size={18} strokeWidth={2.5} color="green" />
+            ) : (
+              <FiXCircle size={18} strokeWidth={2.5} color="red" />
+            )
+          }
+          text={`Beast Status: ${deviceInfoVM.isDeviceConnected ? 'Connected' : 'Disconnected'}`}
+        />
       </div>
     </footer>
   );
-};
+});

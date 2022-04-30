@@ -4,8 +4,9 @@ import { createRoot } from 'react-dom/client';
 // Components
 import App from './App';
 
-// Chart Engine
-// import './charts/Chart';
+// IPC Service
+import { MainWinIPCService } from './MainWinIPCService';
+export const mainWinIPCService = new MainWinIPCService();
 
 const container = document.getElementById('main') as HTMLElement;
 const root = createRoot(container);

@@ -1,27 +1,23 @@
+import { MessageType } from 'reader/Devices/Beast/BeastInput';
+import { BEAST_CMDs } from 'reader/Devices/Beast/enums';
+
 export interface IDeviceInput {
   /**
-   * Creates the connection interface with the physical device
+   * Checks whether the connection is established with the hardware.
    */
-  createConnectionInterface: () => any;
+  getIsConnected(): boolean;
 
   /**
-   * Connects to the controller of the device
+   * Sends a command to the Beast firmware.
+   * @param command the channel/command name to send.
+   * @param message the containing message.
+   * @returns boolean if the message was sent of undefined if the socket
+   *          is not connected.
    */
-  connect: () => any; //TODO: Change the any to work with the supported interfaces
+  sendCommand(command: BEAST_CMDs, message: MessageType): boolean | undefined;
 
   /**
-   * Sends commands/messages to the device
-   * @returns true if successful and false if failed.
+   * Sends the new settings to the Beast controller
    */
-  sendToDevice: (message: string) => boolean;
-
-  /**
-   * Whether the connection with the device input in open
-   */
-  isConnected: () => boolean;
-
-  /**
-   * Closes the connection with device's input stream/interface
-   */
-  closeConnection: () => boolean;
+  updateSettings(settings: any): void;
 }

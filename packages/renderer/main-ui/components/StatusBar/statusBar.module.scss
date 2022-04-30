@@ -11,21 +11,25 @@
 .LeftItems {
   width: 35%;
   height: 100%;
+  padding-left: $gap-base;
+
   @include flex-center;
 }
 
 .RightItems {
   width: 65%;
   height: 100%;
+  padding-right: $gap-base;
   @include flex-center;
   justify-content: flex-end;
 }
 
 .StatusBarItem {
   height: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  gap: $gap-xs;
+  padding-left: 1.2rem;
+  padding-right: 1.5rem;
+  gap: $gap-sm;
+  margin-bottom: 2px;
   @include flex-center;
   @include hover-state;
   span {

@@ -2,7 +2,7 @@
  * Socket.io Server settings
  */
 export enum IO_SERVER {
-  port = 5000,
+  port = 3000,
   ip = 'localhost',
 }
 

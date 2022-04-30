@@ -12,7 +12,7 @@ type RowType = {
 
 export const Row = ({ children, gap, marginTop, marginBottom }: RowType) => {
   return (
-    <div className={styles.Grid} style={{ gap: gap || '0.5rem', marginTop, marginBottom }}>
+    <div className={styles.Row} style={{ gap: gap || '0.5rem', marginTop, marginBottom }}>
       {children}
     </div>
   );

@@ -1,0 +1,8 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.LEDIntensitiesContainer {
+  padding: $gap-sm;
+  max-height: 450px;
+  overflow-y: auto;
+}

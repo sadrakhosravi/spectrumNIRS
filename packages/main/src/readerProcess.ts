@@ -37,5 +37,6 @@ async function createWindow() {
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
 export const createReaderProcess = async () => {
-  await createWindow();
+  const renderer = await createWindow();
+  return renderer;
 };

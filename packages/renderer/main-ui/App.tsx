@@ -6,6 +6,7 @@ import { LeftPanel } from '/@/components/LeftPanel';
 import { StatusBar } from '/@/components/StatusBar';
 
 // Global styles
+import './styles/tailwind.css';
 import './styles/main.scss';
 import 'tippy.js/dist/tippy.css'; // optional
 

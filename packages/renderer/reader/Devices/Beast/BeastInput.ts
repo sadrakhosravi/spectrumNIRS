@@ -2,8 +2,9 @@ import { BEAST_CMDs } from './enums';
 
 // Types
 import type { Socket } from 'socket.io';
+import { IDeviceInput } from 'reader/Interfaces';
 
-type MessageType = string | string[] | boolean | number | number[];
+export type MessageType = string | string[] | boolean | number | number[];
 
 type SettingsType = {
   numOfLEDs: number;
@@ -11,7 +12,7 @@ type SettingsType = {
   LEDCurrents: number[];
 };
 
-export class BeastInput {
+export class BeastInput implements IDeviceInput {
   /**
    * The Beast socket.io connection instance.
    */

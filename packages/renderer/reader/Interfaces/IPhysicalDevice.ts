@@ -1,38 +1,15 @@
-import { ChildProcess, ChildProcessByStdio, SpawnOptionsWithoutStdio } from 'child_process';
-import { Readable } from 'stream';
+import type { Socket } from 'socket.io';
 
 export interface IPhysicalDevice {
   /**
-   * Starts the physical device by spawning a device reader as a child process
+   * @returns the current socket.io server instance.
    */
-  startDevice: (
-    options?: SpawnOptionsWithoutStdio,
-  ) => ChildProcessByStdio<null, Readable, Readable> | ChildProcess;
+  getIO(): Socket;
 
   /**
-   * Stops the device and removes its process from the memory
+   * @return the device communication instance.
    */
-  stopDevice: () => boolean | boolean[];
-
-  /**
-   * @returns the current spawned process of the device
-   */
-  getDevice: () => ChildProcess;
-
-  /**
-   * @returns the name of the device
-   */
-  getDeviceName: () => string;
-
-  /**
-   * @returns the number of ADC channels
-   */
-  getADCNumOfChannels: () => number;
-
-  /**
-   * @returns the number of ADCs on the device
-   */
-  getNumOfADCs?: () => number;
+  getDevice(): Socket;
 
   /**
    * @returns the serial number of the device
@@ -55,7 +32,7 @@ export interface IPhysicalDevice {
   getVersion: () => string;
 
   /**
-   * @returns - the startup delay of the controller of the device after initialization
+   * Waits for device connection.
    */
-  getStartupDelay: () => number;
+  waitForDevice(): Promise<boolean>;
 }

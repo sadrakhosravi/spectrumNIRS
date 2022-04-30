@@ -41,12 +41,8 @@ export class ProbeSettingsViewModel {
     this.activePDs = 1;
     this.activeLEDs = 1;
 
-    this.supportedLEDNum = new Array(this.device.device.getSupportedLEDNum())
-      .fill(0)
-      .map((_, i) => (_ = i + 1));
-    this.supportedPDNum = new Array(this.device.device.getSupportedPDNum())
-      .fill(0)
-      .map((_, i) => (_ = i + 1));
+    this.supportedLEDNum = new Array(15).fill(0).map((_, i) => (_ = i + 1));
+    this.supportedPDNum = new Array(7).fill(0).map((_, i) => (_ = i + 1));
 
     makeObservable(this);
   }
