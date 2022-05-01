@@ -9,7 +9,7 @@ type WidgetsContainerType = {
 
 export const WidgetsContainer = ({ children, height = '100%' }: WidgetsContainerType) => {
   return (
-    <div className={styles.WidgetsContainer} style={{ height }}>
+    <div className={styles.WidgetsContainer} style={{ height: `calc(${height} - 0px)` }}>
       {children}
     </div>
   );

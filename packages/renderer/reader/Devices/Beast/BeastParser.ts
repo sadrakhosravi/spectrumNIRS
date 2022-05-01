@@ -1,6 +1,6 @@
 import { IDeviceParser } from '../../api/device-api';
 
-type UnpackedDataType = {
+export type UnpackedDataType = {
   ch1: number[];
   ch2: number[];
   ch3: number[];

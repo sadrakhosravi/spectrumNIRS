@@ -1,4 +1,5 @@
 export { AppStatesViewModel } from './AppStatesViewModel';
+export { AppMenuViewModel } from './AppMenuViewModel';
 
 // Chart VMs
 export { ChartViewModel } from './Chart/ChartViewModel';

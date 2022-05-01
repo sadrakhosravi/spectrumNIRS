@@ -7,5 +7,6 @@
   background: $color-bg-secondary;
   border: solid 1.5px rgba(#fff, 0.12);
   border-radius: 7px;
+  position: relative;
   @include flex-center;
 }

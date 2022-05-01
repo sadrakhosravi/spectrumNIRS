@@ -61,6 +61,7 @@
     "antd": "^4.19.5",
     "better-sqlite3": "^7.5.1",
     "electron-updater": "4.6.5",
+    "fili": "^2.0.3",
     "hyperid": "^3.0.1",
     "mobx": "^6.5.0",
     "mobx-react-lite": "^3.3.0",

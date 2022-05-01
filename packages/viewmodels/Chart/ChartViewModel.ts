@@ -8,6 +8,7 @@ import { action, makeObservable, observable, reaction, computed } from 'mobx';
 
 // Models
 import { ChartModel, ChartChannel } from '../../models/Chart';
+import { Lowpass } from '../../models/Filters';
 import { ColorPalette } from '../../models/ColorPalette';
 
 // Types
@@ -19,6 +20,7 @@ import type { IReactionDisposer } from 'mobx';
 export type IChart = {
   dashboardChart: DashboardChart;
   series: ChartSeries[];
+  filters: any;
   channel: ChartChannel;
   id: string;
 };
@@ -28,6 +30,10 @@ export class ChartViewModel {
    * The chart model instance
    */
   private model: ChartModel;
+  /**
+   * The filter creator model instance.
+   */
+  private filterModel: Lowpass;
   /**
    * The charts of the dashboard
    */
@@ -67,6 +73,7 @@ export class ChartViewModel {
 
   constructor() {
     this.model = new ChartModel();
+    this.filterModel = new Lowpass();
     this.charts = [];
     this.colors = new ColorPalette();
     this.xAxisSynchronizedHandler = null;
@@ -114,6 +121,7 @@ export class ChartViewModel {
       channel: new ChartChannel(chart.chart),
       id: chartId,
       series: [],
+      filters: null,
     });
     return chart;
   }
@@ -180,6 +188,17 @@ export class ChartViewModel {
 
     const series = chart.dashboardChart.addLineSeries(seriesName || 'No Name', color || '#fff');
     chart.series.push(series);
+
+    // Create filter for series
+    this.createLowpassFilterForSeries(chart);
+  }
+
+  /**
+   * Creates a lowpass filter for the chart series and adds it to the chart object.
+   */
+  @action public createLowpassFilterForSeries(chart: IChart) {
+    const lowpassFilter = this.filterModel.createLowpassFilter();
+    chart.filters = lowpassFilter;
   }
 
   /**

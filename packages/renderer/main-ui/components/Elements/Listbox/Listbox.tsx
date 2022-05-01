@@ -21,10 +21,12 @@ type ListboxType = {
 const iconSize = 16;
 
 export const Listbox = ({ options, value, setter }: ListboxType) => {
+  const listBoxRef = React.useRef<HTMLButtonElement>(null);
+
   return (
     <div className="w-full relative">
       <ListboxUI value={value.name} onChange={setter}>
-        <ListboxUI.Button className={styles.ListboxButton}>
+        <ListboxUI.Button ref={listBoxRef} className={styles.ListboxButton}>
           {value.name} <FiChevronDown />
         </ListboxUI.Button>
 

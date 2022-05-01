@@ -111,12 +111,11 @@ export class DeviceReader {
   private listenForDeviceData() {
     const device = this.physicalDevice.getDevice();
 
-    device.on(BEAST_CMDs.data, this.handleDeviceData);
+    device.on(BEAST_CMDs.data, this.handleDeviceData.bind(this));
   }
 
   // Handle device ADC data.
   private handleDeviceData(data: Buffer) {
-    console.log(this.deviceParser);
     const unPackedData = this.deviceParser.processPacket(data);
     ipcService.sendDeviceData(unPackedData);
     console.log(unPackedData);

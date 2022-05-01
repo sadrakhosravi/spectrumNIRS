@@ -37,9 +37,9 @@ export const RangeSliderWithInput = ({ title, min, max, id, onBlur }: RangeSlide
 
   return (
     <>
-      {title && <span className={styles.TitleSpan}>{title}</span>}
       <div className={styles.RangeSliderWithInput}>
         <span className={styles.RangeSliderSpan}>
+          {title && <span className={styles.TitleSpan}>{title}</span>}
           <RangeSlider
             id={id}
             value={value}

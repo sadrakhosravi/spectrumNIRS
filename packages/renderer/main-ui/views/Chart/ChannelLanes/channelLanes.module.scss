@@ -24,9 +24,12 @@ $channel-info-height: 25px;
   top: 0;
   left: 0;
   width: 100%;
-  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
   z-index: 11;
   pointer-events: none;
+
+  &:not(:last-child) {
+    border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
+  }
 }
 
 .ChannelUI {

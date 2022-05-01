@@ -31,8 +31,6 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
 
   const channelInfoRef = React.useRef<HTMLButtonElement>(null);
 
-  console.log('Channel Item');
-
   React.useEffect(() => {
     const size = chart.dashboardChart.getSize();
 

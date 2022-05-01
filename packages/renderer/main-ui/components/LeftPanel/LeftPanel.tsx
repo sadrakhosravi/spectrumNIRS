@@ -20,16 +20,17 @@ type NavigationItems = {
 };
 
 // Main navigation routes
+//TODO: Fix paths
 const navigationItems: NavigationItems[] = [
   {
     text: 'Record',
     icon: FiActivity,
-    path: 'record',
+    path: '',
   },
   {
     text: 'Review',
     icon: FiSearch,
-    path: 'review',
+    path: '',
   },
   {
     text: 'Calibration',

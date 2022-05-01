@@ -10,9 +10,5 @@ type TabItemType = {
 };
 
 export const TabItem = ({ children }: TabItemType) => {
-  return (
-    <div>
-      <div className={styles.TabItem}>{children}</div>
-    </div>
-  );
+  return <div className={styles.TabItem}>{children}</div>;
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import AppMenuModel from '@models/AppMenuModel';
+import { AppMenuViewModel } from '@viewmodels/index';
 
 // Styles
 import * as styles from './menu.module.scss';
@@ -8,12 +8,14 @@ import * as styles from './menu.module.scss';
 // Modules
 import { MenuItem, SubMenu, SubMenuItem } from './';
 
+const appMenuVM = new AppMenuViewModel();
+
 export const Menu = observer(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className={styles.MenuContainer}>
-      {AppMenuModel.menu.map((menuItem) => (
+      {appMenuVM.menu.map((menuItem) => (
         <MenuItem
           text={menuItem.label}
           isMenuOpen={isMenuOpen}

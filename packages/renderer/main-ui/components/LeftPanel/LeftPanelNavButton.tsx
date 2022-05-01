@@ -22,7 +22,7 @@ export const LeftPanelNavButton = observer(({ text, icon, path }: LeftPanelNavBu
       className={`${styles.LeftPanelNavButton} ${
         AppStatesModel.route === path && styles.LeftPanelNavButton_Active
       }`}
-      onClick={() => AppStatesViewModel.navigateTo(path)}
+      onClick={() => path && AppStatesViewModel.navigateTo(path)}
     >
       {icon}
       <span>{text}</span>

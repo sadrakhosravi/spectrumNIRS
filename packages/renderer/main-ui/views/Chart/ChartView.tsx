@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
+import { ipcRenderer } from 'electron';
 
 // Styles
 import * as styles from './chart.module.scss';
@@ -9,10 +10,12 @@ import * as styles from './chart.module.scss';
 import { ChannelLanes } from './ChannelLanes/ChannelLanes';
 import { XAxis } from './XAxis/XAxis';
 
+// Types
+import type { UnpackedDataType } from '../../../reader/Devices/Beast/BeastParser';
+
 // View model
 import { ChartViewModel } from '@viewmodels/index';
 import { probeSettingVM } from '/@/widgets/CalibrationWidgets/ProbeSettingsWidget/';
-import { ipcRenderer } from 'electron/renderer';
 import { ReaderChannels } from '@utils/channels/ReaderChannels';
 
 // import { XAxis } from './XAxis/XAxis';
@@ -33,7 +36,19 @@ export const ChartView = observer(() => {
   }, []);
 
   React.useEffect(() => {
-    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_data) => {});
+    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: UnpackedDataType) => {
+      vm.charts.forEach((chart, i) => {
+        // If the chart has a filter, filter the data first
+        if (chart.filters) {
+          for (let i = 0; i < data[`ch${i + 1}` as keyof UnpackedDataType].length; i++) {
+            data[`ch${i + 1}` as keyof UnpackedDataType][i] = chart.filters.singleStep(
+              data[`ch${i + 1}` as keyof UnpackedDataType][i],
+            );
+          }
+        }
+        chart.series[0].series.addArrayY(data[`ch${i + 1}` as keyof UnpackedDataType], 1);
+      });
+    });
 
     return () => {
       ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_DATA);

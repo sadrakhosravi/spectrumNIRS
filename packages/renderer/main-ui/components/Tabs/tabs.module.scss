@@ -40,11 +40,13 @@ $tab-button-height: 40px;
 }
 
 .TabItemContainer {
+  height: 100%;
   width: 100%;
   padding: $gap-xl;
 }
 
 .TabItem {
-  min-height: 100px;
+  height: calc(100% - 43px);
+  position: relative;
   @include slide-left;
 }

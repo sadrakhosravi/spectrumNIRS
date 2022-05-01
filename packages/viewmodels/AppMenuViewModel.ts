@@ -1,8 +1,9 @@
 /*---------------------------------------------------------------------------------------------
- *  Singleton AppMenu Model.
- *  Uses MobX observable pattern
+ *  App Menu View Model.
+ *  Uses Mobx observable pattern.
+ *  Handles the application main menu logic.
+ *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
-
 import { makeAutoObservable } from 'mobx';
 export interface ISubMenu {
   label: string;
@@ -32,7 +33,7 @@ const defaultMenuTemplate: IMenu[] = [
 /**
  * Handles the main application menu templates and updates
  */
-class AppMenuModel {
+export class AppMenuViewModel {
   public menu: IMenu[];
 
   constructor() {
@@ -52,5 +53,3 @@ class AppMenuModel {
     });
   }
 }
-
-export default new AppMenuModel();

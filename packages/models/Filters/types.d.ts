@@ -1,0 +1,2 @@
+// Modules
+declare module 'fili';
