@@ -3,7 +3,7 @@ import Beast from './Devices/Beast/Beast';
 // Interfaces
 import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from './api/device-api';
 import { readerIPCService as ipcService } from './ReaderIPCService';
-import { BEAST_CMDs } from './Devices/Beast/enums';
+import { BEAST_CMDs } from './Devices/Beast/BeastCommandsEnum,';
 
 export class DeviceReader {
   /**
@@ -35,6 +35,7 @@ export class DeviceReader {
     this.isDeviceConnected = true;
     ipcService.sendDeviceConnected(true);
     this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
+    this.listenForInitialWalkthrough();
     this.listenForDeviceData();
 
     // Listen for device disconnect
@@ -43,12 +44,27 @@ export class DeviceReader {
     console.log('Device Connected');
   }
 
+  private listenForInitialWalkthrough() {
+    const device = this.physicalDevice.getDevice();
+
+    // On 'Connection', ask for version - this is a must
+    device.on(BEAST_CMDs.connection, () =>
+      this.deviceInput?.sendCommand(BEAST_CMDs.getVersion, true),
+    );
+
+    // On version received
+    device.on(BEAST_CMDs.setSettings, (version: string) =>
+      console.log('Beast Version Received: ' + version),
+    );
+  }
+
   /**
    * Sends the updated settings to the device.
    * @param settings
    */
   public handleDeviceSettingsUpdate(settings: any) {
     this.deviceInput?.updateSettings(settings);
+    this.deviceParser.setPDNum(settings.numOfPDs);
   }
 
   /**
@@ -100,6 +116,7 @@ export class DeviceReader {
 
   // Handle device ADC data.
   private handleDeviceData(data: Buffer) {
+    console.log(this.deviceParser);
     const unPackedData = this.deviceParser.processPacket(data);
     ipcService.sendDeviceData(unPackedData);
     console.log(unPackedData);

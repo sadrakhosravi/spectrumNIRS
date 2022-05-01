@@ -1,5 +1,5 @@
 import { MessageType } from 'reader/Devices/Beast/BeastInput';
-import { BEAST_CMDs } from 'reader/Devices/Beast/enums';
+import { BEAST_CMDs } from 'reader/Devices/Beast/BeastCommandsEnum,';
 
 export interface IDeviceInput {
   /**

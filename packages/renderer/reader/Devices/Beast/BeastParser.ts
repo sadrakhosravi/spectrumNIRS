@@ -25,11 +25,18 @@ export class BeastParser implements IDeviceParser {
   }
 
   /**
+   * Sets the total active PD number.
+   */
+  public setPDNum = (num: number) => {
+    this.pd_num = num;
+  };
+
+  /**
    * Processes the incoming data packet and return an object.
    * @param packet the packet received from the hardware.
    * @returns an object containing the processed data of all the channels of beast hardware.
    */
-  public processPacket(packet: Buffer) {
+  public processPacket = (packet: Buffer) => {
     const data = new Uint8Array(packet);
 
     // fill channels data
@@ -56,7 +63,7 @@ export class BeastParser implements IDeviceParser {
 
       // else // channels
       //@ts-ignore
-      res[Object.keys(res)[index as number] as any] = lsb.map(function (e, i) {
+      res[Object.keys(res)[index as number] as any] = lsb.map((e, i) => {
         let d = e + (msb[i] << 8);
         d = (d << 16) >> 16;
         return d;
@@ -80,5 +87,5 @@ export class BeastParser implements IDeviceParser {
     res.led_nums = indexArray.map((i) => res.led_nums[i]);
 
     return res;
-  }
+  };
 }

@@ -12,6 +12,8 @@ import { XAxis } from './XAxis/XAxis';
 // View model
 import { ChartViewModel } from '@viewmodels/index';
 import { probeSettingVM } from '/@/widgets/CalibrationWidgets/ProbeSettingsWidget/';
+import { ipcRenderer } from 'electron/renderer';
+import { ReaderChannels } from '@utils/channels/ReaderChannels';
 
 // import { XAxis } from './XAxis/XAxis';
 export let vm = new ChartViewModel();
@@ -29,6 +31,14 @@ export const ChartView = observer(() => {
       vm = null;
     };
   }, []);
+
+  React.useEffect(() => {
+    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_data) => {});
+
+    return () => {
+      ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_DATA);
+    };
+  }, [vm.charts.length]);
 
   // Update charts based on the number of active channels
   React.useEffect(() => {

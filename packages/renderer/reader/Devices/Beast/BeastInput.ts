@@ -1,4 +1,4 @@
-import { BEAST_CMDs } from './enums';
+import { BEAST_CMDs } from './BeastCommandsEnum,';
 
 // Types
 import type { Socket } from 'socket.io';

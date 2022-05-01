@@ -6,7 +6,7 @@ import { INIRSDevice } from 'reader/Interfaces';
 import type { Socket } from 'socket.io';
 
 // Enums / Interfaces
-import { IO_SERVER } from './enums';
+import { IO_SERVER } from './BeastCommandsEnum,';
 
 export class BeastPhysicalDevice implements INIRSDevice {
   /**

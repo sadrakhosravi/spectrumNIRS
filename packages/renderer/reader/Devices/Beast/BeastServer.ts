@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
 
 // Enums
-import { IO_SERVER } from './enums';
+import { IO_SERVER } from './BeastCommandsEnum,';
 
 /**
  * The Beast communication server class
