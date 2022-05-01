@@ -7,12 +7,13 @@ type ChannelSeriesType = {
   settingsToggle?: React.MouseEventHandler<HTMLButtonElement>;
   channelRef: React.LegacyRef<HTMLButtonElement>;
   name: string;
+  color?: string;
 };
 
-export const ChannelSeries = ({ settingsToggle, channelRef, name }: ChannelSeriesType) => {
+export const ChannelSeries = ({ settingsToggle, channelRef, name, color }: ChannelSeriesType) => {
   return (
     <button className={styles.ChannelInfo} onClick={settingsToggle} ref={channelRef}>
-      <span />
+      <span style={{ backgroundColor: color }} />
       <span>{name || 'No Series Name'}</span>
     </button>
   );

@@ -1,22 +1,11 @@
 @import '@styles/variables';
+@import '@styles/mixins';
 
-.ChartViewContainer {
-  height: calc(100% - $size-toolbar);
-}
-
-.ChartView {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  overflow: auto;
-}
-
-.ChartContainer {
-  height: 100%;
-  width: calc(100% - 150px);
-}
-
-.ChartChannels {
-  height: 100%;
-  width: 150px;
+.ActionButtonContainer {
+  position: absolute;
+  right: $gap-xl;
+  top: 50%;
+  transform: translateY(-50%);
+  @include flex-center;
+  gap: $gap-lg;
 }

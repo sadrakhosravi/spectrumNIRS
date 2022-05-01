@@ -4,6 +4,7 @@
 .Toolbar {
   height: $size-toolbar;
   border-bottom: solid $border-primary-width $color-border-primary;
+  position: relative;
   @include flex-center;
 }
 

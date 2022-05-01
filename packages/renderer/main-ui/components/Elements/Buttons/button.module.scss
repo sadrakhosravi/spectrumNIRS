@@ -1,0 +1,25 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.Button {
+  padding: $gap-xs $gap-lg;
+  background-color: $color-bg-secondary;
+  @include border-primary;
+  @include hover-state;
+}
+
+.ButtonGreen {
+  background-color: #1bbc9b;
+
+  &:hover {
+    background-color: #0d836b;
+  }
+}
+
+.ButtonRed {
+  background-color: #fa5044;
+}
+
+.ButtonPrimary {
+  background-color: $color-primary;
+}

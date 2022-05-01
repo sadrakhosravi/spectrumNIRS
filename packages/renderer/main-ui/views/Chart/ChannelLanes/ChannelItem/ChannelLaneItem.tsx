@@ -80,6 +80,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
                 <ChannelSeries
                   key={i + series.series.getName()}
                   name={series.series.getName()}
+                  color={series.getSeriesColor()}
                   channelRef={channelInfoRef}
                   settingsToggle={handleOpenChannelSettings}
                 />

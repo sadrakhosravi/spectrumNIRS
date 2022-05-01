@@ -20,11 +20,23 @@ class ReaderIPCService {
   }
 
   /**
+   * Sends the data received from the device to the main ui.
+   * @param data
+   */
+  public sendDeviceData(data: any) {
+    ipcRenderer.sendTo(1, ReaderChannels.DEVICE_DATA, data);
+  }
+
+  /**
    * Attaches all initial listeners
    */
   private init() {
     // Attach device settings update listener
     this.listenForDeviceSettingsUpdate();
+
+    // Listen for STOP and START from the UI.
+    this.listenForDeviceStart();
+    this.listenForDeviceStop();
   }
 
   /**
@@ -34,6 +46,20 @@ class ReaderIPCService {
     ipcRenderer.on(ReaderChannels.DEVICE_SETTING_UPDATE, (_, settings) =>
       deviceReader.handleDeviceSettingsUpdate(settings),
     );
+  }
+
+  /**
+   * Listens for start signal from the main ui.
+   */
+  private listenForDeviceStart() {
+    ipcRenderer.on(ReaderChannels.DEVICE_START, () => deviceReader.handleDeviceStart());
+  }
+
+  /**
+   * Listens for stop signal from the main ui.
+   */
+  private listenForDeviceStop() {
+    ipcRenderer.on(ReaderChannels.DEVICE_STOP, () => deviceReader.handleDeviceStop());
   }
 }
 

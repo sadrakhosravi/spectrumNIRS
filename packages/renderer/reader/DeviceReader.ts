@@ -13,12 +13,14 @@ export class DeviceReader {
   private physicalDevice: IPhysicalDevice;
   private deviceInput: IDeviceInput | null;
   protected deviceParser: IDeviceParser;
+  private isDeviceConnected: boolean;
 
   constructor() {
     this.device = Beast;
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
     this.deviceInput = null;
+    this.isDeviceConnected = false;
 
     this.init();
   }
@@ -30,6 +32,7 @@ export class DeviceReader {
     await this.physicalDevice.waitForDevice();
 
     // When the device connects
+    this.isDeviceConnected = true;
     ipcService.sendDeviceConnected(true);
     this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
     this.listenForDeviceData();
@@ -49,18 +52,19 @@ export class DeviceReader {
   }
 
   /**
-   * Listen for device ADC data.
+   * Sends a signal to the device to start sending/recording data.
    */
-  private listenForDeviceData() {
-    const device = this.physicalDevice.getDevice();
-
-    device.on(BEAST_CMDs.data, this.handleDeviceData);
+  public handleDeviceStart() {
+    console.log('Starting Device...');
+    this.isDeviceConnected && this.deviceInput?.sendCommand(BEAST_CMDs.start, true);
   }
 
-  // Handle device ADC data.
-  private handleDeviceData(data: Buffer) {
-    const unPackedData = this.deviceParser.processPacket(data);
-    console.log(unPackedData);
+  /**
+   * Sends a signal to device to stop sending/recording data.
+   */
+  public handleDeviceStop() {
+    console.log('Stopping Device...');
+    this.isDeviceConnected && this.deviceInput?.sendCommand(BEAST_CMDs.stop, true);
   }
 
   /**
@@ -71,6 +75,7 @@ export class DeviceReader {
 
     // Handles the device disconnect event
     const handleDisconnect = () => {
+      this.isDeviceConnected = false;
       ipcService.sendDeviceConnected(false);
 
       // Remove listeners
@@ -82,6 +87,22 @@ export class DeviceReader {
     };
 
     device.on('disconnect', handleDisconnect);
+  }
+
+  /**
+   * Listen for device ADC data.
+   */
+  private listenForDeviceData() {
+    const device = this.physicalDevice.getDevice();
+
+    device.on(BEAST_CMDs.data, this.handleDeviceData);
+  }
+
+  // Handle device ADC data.
+  private handleDeviceData(data: Buffer) {
+    const unPackedData = this.deviceParser.processPacket(data);
+    ipcService.sendDeviceData(unPackedData);
+    console.log(unPackedData);
   }
 }
 
