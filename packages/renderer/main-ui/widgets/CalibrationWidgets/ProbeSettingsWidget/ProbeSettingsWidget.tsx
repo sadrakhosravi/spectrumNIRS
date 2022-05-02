@@ -1,9 +1,13 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
+import { ipcRenderer } from 'electron';
 
 // Styles
 import * as styles from './probeSettingsWidget.module.scss';
+
+// Channels
+import { ReaderChannels } from '@utils/channels/ReaderChannels';
 
 // Components
 import { Tabs, TabItem } from '/@/components/Tabs';
@@ -20,6 +24,41 @@ export const probeSettingVM = new ProbeSettingsViewModel();
 const ledIDBase = 'led-intensities-';
 
 export const ProbeSettingsWidget = observer(() => {
+  const statusRef = React.useRef<HTMLSpanElement>(null);
+
+  React.useEffect(() => {
+    const statusSpan = statusRef.current as HTMLSpanElement;
+
+    const clearSpan = () => setTimeout(() => (statusSpan.innerText = ''), 3500);
+
+    ipcRenderer.on(ReaderChannels.DEVICE_INPUT_RESPONSE, (_event, status: boolean | undefined) => {
+      switch (status) {
+        case undefined:
+          statusSpan.innerText = 'Device is not connected!';
+          statusSpan.style.color = 'red';
+          clearSpan();
+          break;
+
+        case false:
+          statusSpan.innerText = 'Failed to update settings on device! Please try again.';
+          statusSpan.style.color = 'red';
+          clearSpan();
+          break;
+
+        case true:
+          statusSpan.innerText = 'Sent to device successfully.';
+          statusSpan.style.color = 'green';
+
+          clearSpan();
+          break;
+      }
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_INPUT_RESPONSE);
+    };
+  }, []);
+
   const LEDOptions = toJS(probeSettingVM.supportedLEDNum).map((num) => {
     return { name: num.toString(), value: num };
   });
@@ -53,6 +92,7 @@ export const ProbeSettingsWidget = observer(() => {
                   name: probeSettingVM.activeLEDs.toString(),
                   value: probeSettingVM.activeLEDs,
                 }}
+                onChange={probeSettingVM.handleDeviceSettingsUpdate}
                 setter={setLEDs}
               />
             </Column>
@@ -64,6 +104,7 @@ export const ProbeSettingsWidget = observer(() => {
                   name: probeSettingVM.activePDs.toString(),
                   value: probeSettingVM.activePDs,
                 }}
+                onChange={probeSettingVM.handleDeviceSettingsUpdate}
                 setter={setPDs}
               />
             </Column>
@@ -84,7 +125,7 @@ export const ProbeSettingsWidget = observer(() => {
           </div>
           <div>
             <span>Status: </span>
-            <span>Sent to Controller</span>
+            <span className={styles.StatusSpan} ref={statusRef}></span>
           </div>
         </TabItem>
       </Tabs>

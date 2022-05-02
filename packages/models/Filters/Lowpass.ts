@@ -15,12 +15,12 @@ export class Lowpass extends IIRFilter {
    * Creates and return the lowpass filter instance.
    * @returns the lowpass filter instance.
    */
-  public createLowpassFilter() {
+  public createLowpassFilter(fs: number, fc: number, order: number) {
     const lowpassCoef = this.IIRFilters.lowpass({
-      order: 6,
+      order: order,
       characteristic: 'butterworth',
-      Fs: 1000,
-      Fc: 5,
+      Fs: fs,
+      Fc: fc,
       preGain: false,
     });
     const lowpassFilter = new Fili.IirFilter(lowpassCoef);
@@ -28,3 +28,6 @@ export class Lowpass extends IIRFilter {
     return lowpassFilter;
   }
 }
+
+export const cutoffFrequencies = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 40, 50, 100, 200, 400, 500];
+export const orders = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];

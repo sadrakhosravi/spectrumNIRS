@@ -28,6 +28,14 @@ class ReaderIPCService {
   }
 
   /**
+   * Sends the device input response to the main UI.
+   * @param status the status of the device input.
+   */
+  public sendDeviceInputStatus(status: boolean | undefined) {
+    ipcRenderer.sendTo(1, ReaderChannels.DEVICE_INPUT_RESPONSE, status);
+  }
+
+  /**
    * Attaches all initial listeners
    */
   private init() {

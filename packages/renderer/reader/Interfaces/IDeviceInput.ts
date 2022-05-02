@@ -1,5 +1,5 @@
 import { MessageType } from 'reader/Devices/Beast/BeastInput';
-import { BEAST_CMDs } from 'reader/Devices/Beast/BeastCommandsEnum,';
+import { BeastCmd } from 'reader/Devices/Beast/BeastCommandsEnum,';
 
 export interface IDeviceInput {
   /**
@@ -14,10 +14,10 @@ export interface IDeviceInput {
    * @returns boolean if the message was sent of undefined if the socket
    *          is not connected.
    */
-  sendCommand(command: BEAST_CMDs, message: MessageType): boolean | undefined;
+  sendCommand(command: BeastCmd, message: MessageType): boolean | undefined;
 
   /**
    * Sends the new settings to the Beast controller
    */
-  updateSettings(settings: any): void;
+  updateSettings(settings: any): boolean;
 }

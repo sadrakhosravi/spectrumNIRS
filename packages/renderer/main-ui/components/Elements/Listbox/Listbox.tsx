@@ -14,23 +14,35 @@ type OptionsType = {
 
 type ListboxType = {
   options: OptionsType[];
-  setter: (value: any) => void;
   value: OptionsType;
+  /**
+   * Height of the list box option container in pixels.
+   */
+  height?: number;
+  setter: (value: any) => void;
+  onChange?: (value: string) => void;
 };
 
 const iconSize = 16;
 
-export const Listbox = ({ options, value, setter }: ListboxType) => {
-  const listBoxRef = React.useRef<HTMLButtonElement>(null);
-
+export const Listbox = ({ options, value, height, setter, onChange }: ListboxType) => {
   return (
     <div className="w-full relative">
-      <ListboxUI value={value.name} onChange={setter}>
-        <ListboxUI.Button ref={listBoxRef} className={styles.ListboxButton}>
+      <ListboxUI
+        value={value.name}
+        onChange={(value: string) => {
+          setter(value);
+          onChange && setTimeout(() => onChange(value), 1);
+        }}
+      >
+        <ListboxUI.Button className={styles.ListboxButton}>
           {value.name} <FiChevronDown />
         </ListboxUI.Button>
 
-        <ListboxUI.Options className={styles.ListboxOptionsContainer}>
+        <ListboxUI.Options
+          className={styles.ListboxOptionsContainer}
+          style={{ height: height ? `${height}px` : undefined }}
+        >
           {options.map((option, i) => (
             <ListboxUI.Option key={option.name + i} value={option}>
               {option.name}

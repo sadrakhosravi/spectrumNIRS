@@ -3,7 +3,7 @@ import Beast from './Devices/Beast/Beast';
 // Interfaces
 import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from './api/device-api';
 import { readerIPCService as ipcService } from './ReaderIPCService';
-import { BEAST_CMDs } from './Devices/Beast/BeastCommandsEnum,';
+import { BeastCmd } from './Devices/Beast/BeastCommandsEnum,';
 
 export class DeviceReader {
   /**
@@ -24,36 +24,33 @@ export class DeviceReader {
 
     this.init();
   }
-
   public async init() {
     console.log('Waiting for device');
 
     // Wait for device to connect
-    await this.physicalDevice.waitForDevice();
+    this.physicalDevice.waitForDevice().then(() => {
+      // When the device connects
+      this.isDeviceConnected = true;
+      ipcService.sendDeviceConnected(true);
+      this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
+      this.listenForInitialWalkthrough();
+      this.listenForDeviceData();
 
-    // When the device connects
-    this.isDeviceConnected = true;
-    ipcService.sendDeviceConnected(true);
-    this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
-    this.listenForInitialWalkthrough();
-    this.listenForDeviceData();
+      // Listen for device disconnect
+      this.listenForDeviceDisconnect();
 
-    // Listen for device disconnect
-    this.listenForDeviceDisconnect();
-
-    console.log('Device Connected');
+      console.log('Device Connected');
+    });
   }
 
   private listenForInitialWalkthrough() {
     const device = this.physicalDevice.getDevice();
 
     // On 'Connection', ask for version - this is a must
-    device.on(BEAST_CMDs.connection, () =>
-      this.deviceInput?.sendCommand(BEAST_CMDs.getVersion, true),
-    );
+    device.on(BeastCmd.CONNECTION, () => this.deviceInput?.sendCommand(BeastCmd.GET_VERSION, true));
 
     // On version received
-    device.on(BEAST_CMDs.setSettings, (version: string) =>
+    device.on(BeastCmd.SET_VERSION, (version: string) =>
       console.log('Beast Version Received: ' + version),
     );
   }
@@ -63,8 +60,10 @@ export class DeviceReader {
    * @param settings
    */
   public handleDeviceSettingsUpdate(settings: any) {
-    this.deviceInput?.updateSettings(settings);
+    console.log(settings);
+    const status = this.deviceInput?.updateSettings(settings);
     this.deviceParser.setPDNum(settings.numOfPDs);
+    ipcService.sendDeviceInputStatus(status);
   }
 
   /**
@@ -72,7 +71,7 @@ export class DeviceReader {
    */
   public handleDeviceStart() {
     console.log('Starting Device...');
-    this.isDeviceConnected && this.deviceInput?.sendCommand(BEAST_CMDs.start, true);
+    this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.START, true);
   }
 
   /**
@@ -80,7 +79,7 @@ export class DeviceReader {
    */
   public handleDeviceStop() {
     console.log('Stopping Device...');
-    this.isDeviceConnected && this.deviceInput?.sendCommand(BEAST_CMDs.stop, true);
+    this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.STOP, true);
   }
 
   /**
@@ -91,12 +90,13 @@ export class DeviceReader {
 
     // Handles the device disconnect event
     const handleDisconnect = () => {
+      console.log('Device disconnected ...');
       this.isDeviceConnected = false;
       ipcService.sendDeviceConnected(false);
 
       // Remove listeners
       device.off('disconnect', handleDisconnect);
-      device.off(BEAST_CMDs.data, this.handleDeviceData);
+      device.off(BeastCmd.ADC_DATA, this.handleDeviceData);
 
       // Listen for connection again
       this.init();
@@ -111,7 +111,7 @@ export class DeviceReader {
   private listenForDeviceData() {
     const device = this.physicalDevice.getDevice();
 
-    device.on(BEAST_CMDs.data, this.handleDeviceData.bind(this));
+    device.on(BeastCmd.ADC_DATA, this.handleDeviceData.bind(this));
   }
 
   // Handle device ADC data.

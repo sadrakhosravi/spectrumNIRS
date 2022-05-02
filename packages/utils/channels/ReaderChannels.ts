@@ -7,4 +7,5 @@ export enum ReaderChannels {
   DEVICE_START = 'device:start',
   DEVICE_STOP = 'device:stop',
   DEVICE_DATA = 'device:data',
+  DEVICE_INPUT_RESPONSE = 'device:input-response',
 }

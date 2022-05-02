@@ -70,12 +70,14 @@ export class ProbeSettingsViewModel {
    * Sends the probe settings data to the reader process.
    */
   public handleDeviceSettingsUpdate = () => {
+    console.log('Update');
     // The settings object
     const settings: ProbeSettingsType = {
       numOfPDs: this.activePDs,
       numOfLEDs: this.activeLEDs,
       LEDValues: [],
     };
+    console.log(this.activeLEDs);
 
     for (let i = 0; i < this.activeLEDs; i++) {
       const ledSlider = document.getElementById('led-intensities-' + i) as HTMLInputElement;

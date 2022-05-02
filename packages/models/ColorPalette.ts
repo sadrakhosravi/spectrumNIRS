@@ -45,8 +45,11 @@ export class ColorPalette {
   /**
    * @returns the next available color from the list
    */
-  public getNextColor() {
-    const index = this.availableColorsIndex.getFirstAvailableItem();
-    return this.colors[index];
+  public getNextColor(index?: number) {
+    let colorIndex = index;
+    if (!colorIndex) {
+      colorIndex = this.availableColorsIndex.getFirstAvailableItem();
+    }
+    return this.colors[colorIndex];
   }
 }

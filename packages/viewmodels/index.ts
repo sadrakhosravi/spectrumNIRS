@@ -10,3 +10,6 @@ export { ChartCursorsViewModel } from './Chart/ChartCursorsViewModel';
 // Probe Settings
 export { ProbeSettingsViewModel } from './ProbeSettingsViewModel';
 export { CalibrationToolbarViewModel } from './CalibrationToolbarViewModel';
+
+// Filters
+export { FilterSettingsViewModel } from './FilterSettingsViewModel';

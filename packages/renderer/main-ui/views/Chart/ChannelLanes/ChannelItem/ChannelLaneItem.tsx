@@ -61,7 +61,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
     return () => {
       chart?.dashboardChart?.chart?.offResize(token);
     };
-  }, [chart]);
+  }, []);
 
   // Handles the on channel name click
   const handleOpenChannelSettings = () => {
@@ -85,7 +85,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
               ))}
               {vm.charts[chartIndex].series.length === 0 && 'No Series'}
               {/* <GainButton /> */}
-              <ChannelActions chart={chart.dashboardChart} />
+              <ChannelActions chart={chart.dashboardChart} chartIndex={chartIndex} />
             </div>
           </div>
           <div

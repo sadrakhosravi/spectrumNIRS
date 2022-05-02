@@ -1,4 +1,4 @@
-import { BEAST_CMDs } from './BeastCommandsEnum,';
+import { BeastCmd } from './BeastCommandsEnum,';
 
 // Types
 import type { Socket } from 'socket.io';
@@ -36,7 +36,7 @@ export class BeastInput implements IDeviceInput {
    * @returns boolean if the message was sent of undefined if the socket
    *          is not connected.
    */
-  public sendCommand(command: BEAST_CMDs, message: MessageType) {
+  public sendCommand(command: BeastCmd, message: MessageType) {
     if (!this.getIsConnected()) return;
     return this.socket.emit(command, message);
   }
@@ -48,7 +48,8 @@ export class BeastInput implements IDeviceInput {
     // Reset the previous data
     const formattedSettings = this.parseSettings(settings);
     console.log(formattedSettings);
-    this.socket.emit(BEAST_CMDs.setSettings, formattedSettings);
+    const status = this.socket.emit(BeastCmd.SET_SETTINGS, formattedSettings);
+    return status;
   }
 
   /**

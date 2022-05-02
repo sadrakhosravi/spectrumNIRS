@@ -29,6 +29,7 @@ export class BeastParser implements IDeviceParser {
    */
   public setPDNum = (num: number) => {
     this.pd_num = num;
+    console.log('Parser PD Number updated: ' + num);
   };
 
   /**

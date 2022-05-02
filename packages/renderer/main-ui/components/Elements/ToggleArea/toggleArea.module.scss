@@ -1,0 +1,26 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.ToggleArea {
+}
+
+.ToggleButton {
+  margin-bottom: $gap-base;
+  gap: $gap-base;
+  @include flex-center;
+
+  label {
+    font-size: $size-font-lg;
+  }
+
+  input {
+    width: $gap-xl;
+    height: $gap-xl;
+    accent-color: $color-primary;
+    color: #fff;
+  }
+}
+
+.ToggleAreaDisabled {
+  opacity: 0.8;
+}

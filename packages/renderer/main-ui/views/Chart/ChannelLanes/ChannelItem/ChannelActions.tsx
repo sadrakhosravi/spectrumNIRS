@@ -5,13 +5,14 @@ import { observer } from 'mobx-react-lite';
 import * as styles from '../channelLanes.module.scss';
 
 // Icons
-import { FiMaximize2, FiMinimize2 } from 'react-icons/fi';
+import { FiMaximize2, FiMinimize2, FiFilter } from 'react-icons/fi';
 
 // Types
 import type { DashboardChart } from '@models/Chart';
 
 // View Model
 import { vm } from '../../ChartView';
+import Tippy from '@tippyjs/react';
 
 const iconSettings = {
   size: 16,
@@ -20,9 +21,10 @@ const iconSettings = {
 
 type ChannelActionsType = {
   chart: DashboardChart;
+  chartIndex: number;
 };
 
-export const ChannelActions = observer(({ chart }: ChannelActionsType) => {
+export const ChannelActions = observer(({ chart, chartIndex }: ChannelActionsType) => {
   const [isMaximized, setIsMaximized] = React.useState(false);
 
   // Handles channel maximize button
@@ -45,6 +47,15 @@ export const ChannelActions = observer(({ chart }: ChannelActionsType) => {
           <FiMinimize2 {...iconSettings} title={'Minimize Channel'} />
         )}
       </button>
+      {vm.charts[chartIndex].filters && (
+        <Tippy content="Lowpass Filter Active">
+          <button
+            className={`${styles.ChannelActionButton} ${styles.ChannelActionButtonDisabled} `}
+          >
+            <FiFilter {...iconSettings} />
+          </button>
+        </Tippy>
+      )}
     </div>
   );
 });

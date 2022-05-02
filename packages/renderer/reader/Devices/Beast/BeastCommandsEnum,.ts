@@ -6,15 +6,15 @@ export enum IO_SERVER {
   ip = 'localhost',
 }
 
-export enum BEAST_CMDs {
+export enum BeastCmd {
   // Send events
-  start = 'ADC-Start',
-  stop = 'ADC-Stop',
-  getVersion = 'Get-Version',
-  setSettings = 'Set-Settings',
+  START = 'ADC-Start',
+  STOP = 'ADC-Stop',
+  GET_VERSION = 'Get-Version',
+  SET_SETTINGS = 'Set-Settings',
 
   // Received events
-  data = 'ADC-DATA',
-  connection = 'Connection',
-  setVersion = 'Set-Version',
+  ADC_DATA = 'ADC-DATA',
+  CONNECTION = 'Connection',
+  SET_VERSION = 'Set-Version',
 }
