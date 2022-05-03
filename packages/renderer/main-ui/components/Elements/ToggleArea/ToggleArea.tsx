@@ -29,7 +29,7 @@ export const ToggleArea = ({ defaultState = false, setter, children }: ToggleAre
         />
       </div>
       {isActive && children}
-      {!isActive && <p>Enable this area to see the options.</p>}
+      {!isActive && <p className={styles.DisabledText}>Enable this area to see the options.</p>}
     </div>
   );
 };

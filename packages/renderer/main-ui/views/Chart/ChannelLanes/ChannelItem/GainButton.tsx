@@ -15,9 +15,7 @@ export const GainButton = () => {
   const test = () => {
     setCurrValue(currValue + 2);
     const yAxis = vm.charts[0].dashboardChart.chart.getDefaultAxisY();
-    const interval = yAxis.getInterval();
-
-    yAxis.setInterval(interval.start + 2, interval.end - 2);
+    yAxis.getInterval();
 
     yAxis.setTickStrategy('Numeric', (strategy) => {
       return strategy.setFormattingOffset(currValue - 2);

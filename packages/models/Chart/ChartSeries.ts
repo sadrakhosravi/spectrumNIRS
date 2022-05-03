@@ -18,11 +18,16 @@ export class ChartSeries {
    * The current color of the series line stroke
    */
   private seriesColor: string | undefined;
+  /**
+   * Series gain value
+   */
+  private seriesGainVal: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
     this.chartId = chartId;
     this.seriesColor = seriesColor;
+    this.seriesGainVal = 1;
     this.setLineSeriesStrokeStyle();
   }
 
@@ -41,16 +46,23 @@ export class ChartSeries {
   }
 
   /**
-   * Sets the line series stroke thickness and color
+   * Sets the series gain value.
    */
-  private setLineSeriesStrokeStyle() {
-    this.series.setStrokeStyle(
-      new SolidLine({
-        thickness: -1,
-        fillStyle: new SolidFill({ color: ColorHEX(this.seriesColor || '#00FFFF') }),
-      }),
-    );
-    this.seriesColor = this.seriesColor || '#00FFFF';
+  public setSeriesGain(value: number) {
+    if (value < 0) new Error('Value cannot be less than 0');
+    this.seriesGainVal = value;
+  }
+
+  /**
+   * Applied the gain value and adds the data to the series.
+   */
+  public addArrayY(data: Float32Array | number[]) {
+    console.time('gain');
+    // For each is faster here
+    data.forEach((point) => (point *= this.seriesGainVal));
+    console.timeEnd('gain');
+
+    this.series.addArrayY(data);
   }
 
   /**
@@ -83,5 +95,18 @@ export class ChartSeries {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     this.series = null;
+  }
+
+  /**
+   * Sets the line series stroke thickness and color
+   */
+  private setLineSeriesStrokeStyle() {
+    this.series.setStrokeStyle(
+      new SolidLine({
+        thickness: -1,
+        fillStyle: new SolidFill({ color: ColorHEX(this.seriesColor || '#00FFFF') }),
+      }),
+    );
+    this.seriesColor = this.seriesColor || '#00FFFF';
   }
 }

@@ -7,8 +7,6 @@ import {
   ColorHEX,
   emptyFill,
   AutoCursorModes,
-  MarkerBuilders,
-  UIBackgrounds,
   AxisScrollStrategies,
 } from '@arction/lcjs';
 import Hyperid from 'hyperid';
@@ -233,20 +231,6 @@ export class DashboardChart {
       .setStrokeStyle(emptyLine)
       .setMouseInteractions(false);
 
-    // Axis Y defaults
-    axisY
-      .setNibMousePickingAreaSize(0)
-      .setMouseInteractions(false)
-      .setNibStyle(emptyLine)
-      .setThickness(65)
-      .setInterval(-50, 50)
-      .setStrokeStyle(
-        new SolidLine({
-          thickness: 1,
-          fillStyle: new SolidFill({ color: ColorHEX('#333') }),
-        }),
-      );
-
     axisY.setTickStrategy(AxisTickStrategies.Numeric, (ticks) =>
       ticks
         .setMajorTickStyle((majorTickStyle) =>
@@ -263,15 +247,23 @@ export class DashboardChart {
             .setLabelFillStyle(fontFillStyle),
         ),
     );
-  }
 
-  protected buildChartMarker() {
-    // Create a builder for SeriesMarker to allow for full modification of its structure.
-    const SeriesMarkerBuilder = MarkerBuilders.XY.setPointMarker(
-      UIBackgrounds.Circle,
-    ).setResultTableBackground(UIBackgrounds.Pointer);
+    // Axis Y defaults
+    axisY
+      .setNibMousePickingAreaSize(0)
+      .setMouseInteractions(false)
+      .setChartInteractions(false)
+      .setScrollStrategy(undefined)
+      .setNibStyle(emptyLine)
+      .setThickness(65)
+      .setStrokeStyle(
+        new SolidLine({
+          thickness: 1,
+          fillStyle: new SolidFill({ color: ColorHEX('#333') }),
+        }),
+      );
 
-    return SeriesMarkerBuilder;
+    requestAnimationFrame(() => axisY.setInterval(-50, 50, false, true));
   }
 
   /**
@@ -282,9 +274,7 @@ export class DashboardChart {
     axisX.setInterval(0, 30000);
 
     axisX.setScrollStrategy(AxisScrollStrategies.progressive);
-
-    // Style the axes
-    this.setAxesStyles();
+    axisX.setChartInteractions(false);
 
     // Disable all charts listeners
     this.chart.setMouseInteractions(false);
@@ -297,5 +287,8 @@ export class DashboardChart {
 
     // Remove padding
     chart.setPadding({ top: 3, bottom: 5, left: 0, right: 0 });
+
+    // Style the axes
+    this.setAxesStyles();
   }
 }

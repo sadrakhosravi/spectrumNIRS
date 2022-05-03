@@ -7,7 +7,12 @@
 .ToggleButton {
   margin-bottom: $gap-base;
   gap: $gap-base;
+  transition: all 0.2s ease-in-out;
   @include flex-center;
+
+  &:hover {
+    opacity: 0.8;
+  }
 
   label {
     font-size: $size-font-lg;
@@ -21,6 +26,6 @@
   }
 }
 
-.ToggleAreaDisabled {
-  opacity: 0.8;
+.DisabledText {
+  opacity: 0.7;
 }

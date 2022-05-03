@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 // Widgets
-import { ProbeSettingsWidget } from './ProbeSettingsWidget';
+import { CalibrationSettingsWidget } from './CalibrationSettingsWidget';
 import { GlobalFiltersWidget } from './GlobalFiltersWidget';
 
 export const CalibrationWidgets = () => {
   return (
     <>
-      <ProbeSettingsWidget />
+      <CalibrationSettingsWidget />
       <GlobalFiltersWidget />
     </>
   );

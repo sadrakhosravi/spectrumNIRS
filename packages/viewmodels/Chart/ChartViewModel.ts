@@ -5,6 +5,8 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 import { action, makeObservable, observable, reaction, computed } from 'mobx';
+import { ipcRenderer } from 'electron';
+import { ReaderChannels } from '../../utils/channels/ReaderChannels';
 
 // Models
 import { ChartModel, ChartChannel } from '../../models/Chart';
@@ -15,6 +17,7 @@ import type { ChartSeries, DashboardChart } from '../../models/Chart';
 import type { Dashboard, SynchronizeAxisIntervalsHandle } from '@arction/lcjs';
 import type { CSSProperties } from 'react';
 import type { IReactionDisposer } from 'mobx';
+import type { UnpackedDataType } from '../../renderer/reader/Devices/Beast/BeastParser';
 
 export type IChart = {
   dashboardChart: DashboardChart;
@@ -79,6 +82,7 @@ export class ChartViewModel {
     makeObservable(this);
     this.reactions = [];
     this.handleReactions();
+    this.listenForData();
   }
 
   /**
@@ -225,6 +229,8 @@ export class ChartViewModel {
    * Cleanups the chart listeners and disposes the dashboard
    */
   public dispose() {
+    ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_DATA);
+
     this.reactions.forEach((reaction) => reaction());
     this.reactions.length = 0;
 
@@ -239,6 +245,25 @@ export class ChartViewModel {
     });
 
     this.model.cleanup();
+  }
+
+  /**
+   * Listens for data from the reader process and adds it to the series.
+   */
+  private listenForData() {
+    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: UnpackedDataType) => {
+      this.charts.forEach((chart, i) => {
+        // If the chart has a filter, filter the data first
+        if (chart.filters) {
+          for (let j = 0; j < data[`ch${i + 1}` as keyof UnpackedDataType].length; j++) {
+            data[`ch${i + 1}` as keyof UnpackedDataType][j] = chart.filters.singleStep(
+              data[`ch${i + 1}` as keyof UnpackedDataType][j],
+            );
+          }
+        }
+        chart.series[0].series.addArrayY(data[`ch${i + 1}` as keyof UnpackedDataType], 1);
+      });
+    });
   }
 
   /**

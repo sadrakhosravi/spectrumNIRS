@@ -6,10 +6,10 @@
   padding: $gap-xs $gap-lg;
   position: relative;
   justify-content: space-between;
-  background: $color-bg-secondary;
-  @include hover-state;
+  background: $color-bg-tertiary;
+  @include hover-state-secondary;
   @include flex-center;
-  @include border-primary;
+  @include border-primary-light;
 
   &:active {
     @include ring;
@@ -23,11 +23,11 @@
   min-width: 150px;
   width: 100%;
   z-index: 80;
-  background: $color-bg-secondary;
+  background: $color-bg-tertiary;
   max-height: 200px;
   padding: $gap-xs $gap-xs;
   overflow-y: auto;
-  @include border-primary;
+  @include border-primary-light;
   @include slide-left;
 
   li {
@@ -37,7 +37,7 @@
     border-radius: $border-primary-radius;
 
     @include flex-center;
-    @include hover-state;
+    @include hover-state-secondary;
     @include active-focus-state;
   }
 }

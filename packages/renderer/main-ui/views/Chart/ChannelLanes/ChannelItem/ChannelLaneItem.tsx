@@ -8,6 +8,7 @@ import * as styles from '../channelLanes.module.scss';
 import { ChannelSeries } from './ChannelSeries';
 import { ChannelSettings } from './ChannelSettings';
 import { ChannelActions } from './ChannelActions';
+// import { ChannelAxisScaleIndicator } from './ChannelAxisScaleIndicator';
 // import { GainButton } from './GainButton';
 
 // Types
@@ -26,8 +27,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
   const [height, setHeight] = React.useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const [isMaximized, setIsMaximized] = React.useState(false);
-  //@ts-ignore
-  const [isCompact, setIsCompact] = React.useState(false);
+  // const [isCompact, setIsCompact] = React.useState(false);
 
   const channelInfoRef = React.useRef<HTMLButtonElement>(null);
 
@@ -47,7 +47,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
         }
 
         if (size.height < 55) {
-          setIsCompact(true);
+          // setIsCompact(true);
         }
 
         setTop(size.y1);
@@ -92,6 +92,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
             id={`channel-separator-${chart.id}`}
             className={styles.ChannelLanesSeparatorButton}
           />
+          {/* <ChannelAxisScaleIndicator /> */}
         </div>
       )}
 

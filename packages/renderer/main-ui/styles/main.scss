@@ -64,6 +64,17 @@ h6 {
 
 input[type='text'],
 input[type='number'] {
+  width: 100%;
+  padding: $gap-sm $gap-lg;
+  background-color: $color-bg-tertiary;
+  border-radius: $border-primary-radius;
+  @include border-primary-light;
+  @include hover-state-secondary;
+
+  &:invalid {
+    border-color: red;
+  }
+
   transition: all 0.2s ease-in-out;
 
   &::placeholder {

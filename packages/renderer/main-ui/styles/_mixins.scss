@@ -20,6 +20,17 @@
   }
 }
 
+@mixin hover-state-secondary {
+  @include default-transition;
+  &:hover {
+    background: rgba(#fff, 0.175);
+  }
+
+  &:active {
+    background: $color-bg-tertiary;
+  }
+}
+
 @mixin active-state {
   background: $color-bg-tertiary;
 }
@@ -38,6 +49,11 @@
 
 @mixin border-primary {
   border: $border-primary-width solid $border-primary-color;
+  border-radius: 5px;
+}
+
+@mixin border-primary-light {
+  border: $border-primary-width solid rgba(#fff, 0.1);
   border-radius: 5px;
 }
 

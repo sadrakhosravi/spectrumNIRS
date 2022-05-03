@@ -118,7 +118,6 @@ export class DeviceReader {
   private handleDeviceData(data: Buffer) {
     const unPackedData = this.deviceParser.processPacket(data);
     ipcService.sendDeviceData(unPackedData);
-    console.log(unPackedData);
   }
 }
 
