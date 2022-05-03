@@ -1,3 +1,10 @@
+/*---------------------------------------------------------------------------------------------
+ *  Chart Series Model.
+ *  Logic for chart series.
+ *  @version 0.1.0
+ *--------------------------------------------------------------------------------------------*/
+
+import { action, makeObservable, observable } from 'mobx';
 import { XYDataGenerator } from './XYDataGenerator';
 
 import type { LineSeries } from '@arction/lcjs';
@@ -21,7 +28,7 @@ export class ChartSeries {
   /**
    * Series gain value
    */
-  private seriesGainVal: number;
+  @observable public seriesGainVal: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -29,6 +36,8 @@ export class ChartSeries {
     this.seriesColor = seriesColor;
     this.seriesGainVal = 1;
     this.setLineSeriesStrokeStyle();
+
+    makeObservable(this);
   }
 
   /**
@@ -46,10 +55,17 @@ export class ChartSeries {
   }
 
   /**
+   * @returns the gail value of the series.
+   */
+  public getSeriesGainVal() {
+    return this.seriesGainVal;
+  }
+
+  /**
    * Sets the series gain value.
    */
-  public setSeriesGain(value: number) {
-    if (value < 0) new Error('Value cannot be less than 0');
+  @action public setSeriesGain(value: number) {
+    if (value < 0) return;
     this.seriesGainVal = value;
   }
 

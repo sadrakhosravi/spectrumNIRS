@@ -1,0 +1,72 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.Popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 400px;
+  height: 250px;
+  background: $color-bg-secondary;
+  z-index: 51;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.8);
+  @include slide-left;
+  border-radius: $border-primary-radius;
+}
+
+.PopoverTriangleIndicatorTop {
+  border-bottom: 15px solid $color-bg-secondary;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  content: '';
+  display: inline-block;
+  left: 60px;
+  position: absolute;
+  top: -10px;
+}
+
+.PopoverTriangleIndicatorBottom {
+  border-top: 13px solid $color-bg-secondary;
+  border-left: 13px solid transparent;
+  border-right: 15px solid transparent;
+  content: '';
+  display: inline-block;
+  left: 60px;
+  position: absolute;
+  bottom: -10px;
+}
+
+.PopoverCloseBtn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0.55;
+  padding: $gap-sm;
+  z-index: 90;
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.PopoverContentArea {
+  position: absolute;
+  top: 27.5px;
+  padding: $gap-base $gap-lg;
+  background-color: $color-bg-primary;
+  width: 100%;
+  height: calc(100% - 27.5px);
+  @include border-primary-light;
+}
+
+.Title {
+  position: absolute;
+  padding: 0 $gap-xl;
+  z-index: 50;
+  left: 15px;
+  top: 5px;
+  height: 25px;
+  background-color: $color-bg-primary;
+  @include border-primary-light;
+  border-radius: 3px 3px 1.5px 1.5px;
+  border-bottom: none;
+}

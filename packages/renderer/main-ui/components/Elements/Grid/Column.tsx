@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 type ColumnType = {
-  width: '25%' | '33.3%' | '50%' | '66.66%' | '75%' | '100%';
+  width: '20%' | '25%' | '33.3%' | '50%' | '66.66%' | '75%' | '80%' | '100%';
   children: React.ReactNode;
 };
 

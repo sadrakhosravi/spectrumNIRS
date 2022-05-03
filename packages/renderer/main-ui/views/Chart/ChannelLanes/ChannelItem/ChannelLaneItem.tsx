@@ -65,7 +65,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
 
   // Handles the on channel name click
   const handleOpenChannelSettings = () => {
-    setIsSettingsOpen(false); // FIXME: Fix the channel open button
+    setIsSettingsOpen(!isSettingsOpen); // FIXME: Fix the channel open button
   };
 
   return (
@@ -100,7 +100,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
         <ChannelSettings
           parentRef={channelInfoRef.current as HTMLButtonElement}
           closeSetter={setIsSettingsOpen}
-          channelInfo={chart.channel}
+          chart={chart}
         />
       )}
     </>

@@ -62,17 +62,27 @@ h6 {
   font-weight: 600;
 }
 
+label {
+  font-size: $size-font-base;
+}
+
 input[type='text'],
 input[type='number'] {
   width: 100%;
-  padding: $gap-sm $gap-lg;
+  padding: $gap-2xs $gap-base;
   background-color: $color-bg-tertiary;
   border-radius: $border-primary-radius;
   @include border-primary-light;
-  @include hover-state-secondary;
+  &:not(:disabled) {
+    @include hover-state-secondary;
+  }
 
   &:invalid {
     border-color: red;
+  }
+
+  &:disabled {
+    background-color: transparent;
   }
 
   transition: all 0.2s ease-in-out;
