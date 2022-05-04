@@ -10,12 +10,13 @@ import { ChannelSettings } from './ChannelSettings';
 import { ChannelActions } from './ChannelActions';
 // import { ChannelAxisScaleIndicator } from './ChannelAxisScaleIndicator';
 // import { GainButton } from './GainButton';
+import { SeriesUnit } from './SeriesUnit';
 
 // Types
 import type { IChart } from '@viewmodels/Chart/ChartViewModel';
 
 // View model
-import { vm } from '../../ChartView';
+import { chartVM } from '@store';
 
 type ChannelLaneItemType = {
   chart: IChart;
@@ -65,7 +66,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
 
   // Handles the on channel name click
   const handleOpenChannelSettings = () => {
-    setIsSettingsOpen(!isSettingsOpen); // FIXME: Fix the channel open button
+    setIsSettingsOpen(!isSettingsOpen);
   };
 
   return (
@@ -74,28 +75,37 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
         <div className={styles.ChannelLaneItem} style={{ top, height }}>
           <div className={styles.ChannelUI}>
             <div className={styles.ChannelUIInnerContainer}>
-              {vm.charts[chartIndex].series.map((series, i) => (
+              {/* Series Button Info */}
+              {chartVM.charts[chartIndex].series.map((series, i) => (
                 <ChannelSeries
                   key={i + series.series.getName()}
                   name={series.series.getName()}
-                  color={series.getSeriesColor()}
+                  color={series.color}
                   channelRef={channelInfoRef}
                   settingsToggle={handleOpenChannelSettings}
                 />
               ))}
-              {vm.charts[chartIndex].series.length === 0 && 'No Series'}
+              {chartVM.charts[chartIndex].series.length === 0 && 'No Series'}
+
               {/* <GainButton /> */}
+              {/* Channel Action Buttons */}
               <ChannelActions chart={chart.dashboardChart} chartIndex={chartIndex} />
             </div>
+
+            {/* Series Unit */}
+            <SeriesUnit />
           </div>
+
           <div
             id={`channel-separator-${chart.id}`}
             className={styles.ChannelLanesSeparatorButton}
           />
+
           {/* <ChannelAxisScaleIndicator /> */}
         </div>
       )}
 
+      {/* Channel Settings */}
       {isSettingsOpen && (
         <ChannelSettings
           parentRef={channelInfoRef.current as HTMLButtonElement}

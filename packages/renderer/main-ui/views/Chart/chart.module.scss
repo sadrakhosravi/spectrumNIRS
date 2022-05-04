@@ -1,6 +1,7 @@
 @import '@styles/variables';
 
 $x-axis-height: 40px;
+$sensor-info-width: 30px;
 
 .ChartContainer {
   position: absolute;
@@ -11,10 +12,10 @@ $x-axis-height: 40px;
 }
 
 .ChartAreaContainer {
-  left: 0;
   position: absolute;
+  left: $sensor-info-width;
   height: calc(100% - $x-axis-height);
-  width: 100%;
+  width: calc(100% - $sensor-info-width);
   background: #0a0a0a;
 }
 

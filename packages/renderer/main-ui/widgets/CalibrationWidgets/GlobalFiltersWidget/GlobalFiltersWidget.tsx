@@ -9,9 +9,9 @@ import { Listbox } from '/@/components/Elements/Listbox';
 import { ToggleArea } from '/@/components/Elements/ToggleArea';
 
 // View Models
-import { vm } from '/@/views/Chart/ChartView';
+import { chartVM } from '@store';
 import { FilterSettingsViewModel } from '@viewmodels/index';
-const filterSettingsVM = new FilterSettingsViewModel(vm);
+const filterSettingsVM = new FilterSettingsViewModel(chartVM);
 
 // Filter
 import { cutoffFrequencies, orders } from '@models/Filters/Lowpass';

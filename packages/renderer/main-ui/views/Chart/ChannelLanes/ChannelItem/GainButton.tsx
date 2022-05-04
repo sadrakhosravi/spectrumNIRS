@@ -7,14 +7,14 @@ import * as styles from './gain.module.scss';
 import { FiPlus, FiMinus } from 'react-icons/fi';
 
 // View Model
-import { vm } from '../../ChartView';
+import { chartVM } from '@store';
 
 export const GainButton = () => {
   const [currValue, setCurrValue] = React.useState(1);
 
   const test = () => {
     setCurrValue(currValue + 2);
-    const yAxis = vm.charts[0].dashboardChart.chart.getDefaultAxisY();
+    const yAxis = chartVM.charts[0].dashboardChart.chart.getDefaultAxisY();
     yAxis.getInterval();
 
     yAxis.setTickStrategy('Numeric', (strategy) => {

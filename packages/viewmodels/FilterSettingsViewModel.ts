@@ -11,7 +11,7 @@ import { action, makeObservable, observable, reaction } from 'mobx';
 import { Lowpass } from '../models/Filters';
 
 // View Models
-import type ChartViewModel from './Chart/ChartViewModel';
+import type { ChartViewModel } from './Chart/ChartViewModel';
 
 export class FilterSettingsViewModel {
   private chartVM: ChartViewModel;

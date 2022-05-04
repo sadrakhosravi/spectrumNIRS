@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import * as styles from './channelLanes.module.scss';
 
 // View Models
-import { vm } from '../ChartView';
+import { chartVM } from '@store';
 import { ChartCursorsViewModel } from '@viewmodels/index';
 
 // Types
@@ -28,12 +28,12 @@ export const ChartCursors = observer(() => {
 
   // Adds cursors elements in the view model
   const createCursors = React.useCallback(() => {
-    cursorsVM.createCursors(vm.charts);
+    cursorsVM.createCursors(chartVM.charts);
     (cursorContainerRef.current as HTMLDivElement).addEventListener('mousemove', onMouseMove);
   }, []);
 
   const createCursorsMaximized = React.useCallback(() => {
-    const chart = vm.charts.find((chart) => chart.id === vm.isChannelMaximized);
+    const chart = chartVM.charts.find((chart) => chart.id === chartVM.isChannelMaximized);
     if (!chart) return;
     cursorsVM.createCursors([chart]);
 
@@ -45,12 +45,12 @@ export const ChartCursors = observer(() => {
 
   const onMouseMove = React.useCallback((e: MouseEvent) => {
     requestAnimationFrame(() => {
-      cursorsVM.updateCursorPos(e, vm.charts);
+      cursorsVM.updateCursorPos(e, chartVM.charts);
     });
   }, []);
 
   const onMouseMoveMaximized = React.useCallback((e: MouseEvent) => {
-    const chart = vm.charts.find((chart) => chart.id === vm.isChannelMaximized);
+    const chart = chartVM.charts.find((chart) => chart.id === chartVM.isChannelMaximized);
     if (!chart) return;
     requestAnimationFrame(() => {
       cursorsVM.updateCursorPos(e, [chart]);
@@ -72,7 +72,7 @@ export const ChartCursors = observer(() => {
       id={cursorContainerId}
       ref={cursorContainerRef}
       className={styles.ChartCursorContainer}
-      onMouseEnter={vm.isChannelMaximized ? createCursorsMaximized : createCursors}
+      onMouseEnter={chartVM.isChannelMaximized ? createCursorsMaximized : createCursors}
       onMouseLeave={deleteCursors}
     >
       {cursorsVM.cursors.map(
@@ -96,7 +96,7 @@ export const ChartCursors = observer(() => {
           className={`${styles.CursorXAxisItem}`}
           style={{
             transform: `translateX(${
-              cursorsVM.cursors[0].x - (vm.isChannelMaximized ? 25 : 32)
+              cursorsVM.cursors[0].x - (chartVM.isChannelMaximized ? 25 : 32)
             }px)`,
           }}
         >

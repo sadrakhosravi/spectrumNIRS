@@ -7,7 +7,7 @@ import * as styles from './xAxis.module.scss';
 import { Listbox } from '/@/components/Elements/Listbox';
 
 // View Models
-import { vm as chartVM } from '../ChartView';
+import { chartVM } from '@store';
 import { XAxisChartViewModel } from '@viewmodels/index';
 import { observer } from 'mobx-react-lite';
 

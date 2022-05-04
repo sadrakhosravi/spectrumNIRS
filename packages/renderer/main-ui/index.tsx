@@ -4,6 +4,9 @@ import { createRoot } from 'react-dom/client';
 // Components
 import App from './App';
 
+// View Model Store
+import '../../viewmodels/Store';
+
 // IPC Service
 import './MainWinIPCService';
 

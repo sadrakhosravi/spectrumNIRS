@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Dialog } from '@headlessui/react';
 
 // Styles
 import * as styles from './popover.module.scss';
@@ -29,20 +30,8 @@ export const Popover = ({ buttonRef, title, children, closeSetter }: PopoverType
     flip = true;
   }
 
-  // Close the popup on Escape key press
-  React.useEffect(() => {
-    const onKeyPress = (e: KeyboardEvent) => {
-      e.key === 'Escape' && closeSetter(false);
-    };
-    document.addEventListener('keydown', onKeyPress);
-
-    return () => {
-      document.removeEventListener('keydown', onKeyPress);
-    };
-  }, []);
-
   return (
-    <>
+    <Dialog open={true} onClose={() => closeSetter(false)}>
       <div className={styles.Popover} style={{ top, left, height }}>
         {/* The triangle indicator */}
         <span
@@ -58,6 +47,6 @@ export const Popover = ({ buttonRef, title, children, closeSetter }: PopoverType
         <div className={styles.PopoverContentArea}>{children}</div>
       </div>
       <div className="overlay-transparent" onClick={() => closeSetter(false)}></div>
-    </>
+    </Dialog>
   );
 };

@@ -1,0 +1,26 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.SensorInfo {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  height: calc(100% - 40px);
+  background-color: #0a0a0a;
+  border: 2px solid $border-primary-color;
+  border-top: none;
+  width: 30px;
+
+  span {
+    position: absolute;
+    width: 100px;
+    line-height: 25px;
+    top: 50%;
+    left: 0;
+    text-align: center;
+    transform-origin: 0 0;
+    font-size: $size-font-sm;
+    color: rgba(#fff, 0.6);
+    transform: rotate(-90deg) translateX(-50%);
+  }
+}

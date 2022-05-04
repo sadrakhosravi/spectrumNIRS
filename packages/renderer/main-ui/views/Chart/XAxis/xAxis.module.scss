@@ -13,7 +13,7 @@ $container-size: 40px;
 
 .XAxisLeft {
   padding: $gap-sm;
-  width: 150px;
+  width: 180px;
   height: 100%;
   border-right: solid $border-primary-width rgba(255, 255, 255, 0.2);
   @include flex-center;
@@ -28,7 +28,7 @@ $container-size: 40px;
   overflow: hidden;
   height: 100%;
   margin-left: 65px; // The y-axis thickness
-  width: calc(100% - 150px - 65px);
+  width: calc(100% - 180px - 65px);
 
   &::before {
     left: -65px;

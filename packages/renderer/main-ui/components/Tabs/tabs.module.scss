@@ -1,7 +1,7 @@
 @import '@styles/variables.scss';
 @import '@styles/mixins.scss';
 
-$tab-button-width: 100px;
+$tab-button-width: 100%;
 $tab-button-height: 40px;
 
 .Tabs {
@@ -10,10 +10,11 @@ $tab-button-height: 40px;
 }
 
 .TabButtonsContainer {
-  width: 100%;
+  min-width: 100%;
   height: $tab-button-height;
   position: relative;
   border-bottom: 2px solid rgba(#fff, 0.15);
+  @include flex-center;
 }
 
 .TabButton {
@@ -31,12 +32,11 @@ $tab-button-height: 40px;
 
 .TabIndicator {
   position: absolute;
-  bottom: -2px;
+  bottom: -1.5px;
   left: 0px;
-  height: 4px;
-  width: calc($tab-button-width);
+  height: 3px;
   background: $color-primary;
-  transition: left 0.25s cubic-bezier(0.69, 0.07, 0.62, 1.31);
+  transition: left 0.25s ease-in-out;
 }
 
 .TabItemContainer {

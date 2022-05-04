@@ -19,6 +19,7 @@
       "@styles/*": ["main-ui/styles/*"],
       "@models/*": ["../models/*"],
       "@viewmodels/*": ["../viewmodels/*"],
+      "@store": ["../viewmodels/Store.ts"],
       "@charts/*": ["./main-ui/charts/*"],
       "@widgets/*": ["./main-ui/widgets/*"],
       "@utils/*": ["../utils/*"]

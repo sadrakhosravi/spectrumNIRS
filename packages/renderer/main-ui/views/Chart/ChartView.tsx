@@ -11,24 +11,23 @@ import { XAxis } from './XAxis/XAxis';
 
 // Types
 
-// View model
-import { ChartViewModel } from '@viewmodels/index';
-import { probeSettingVM } from '../../widgets/CalibrationWidgets/CalibrationSettingsWidget';
+// View models
+import { chartVM, initChartVM, disposeChartVM } from '@store';
 
-// import { XAxis } from './XAxis/XAxis';
-export let vm = new ChartViewModel();
+import { probeSettingVM } from '../../widgets/CalibrationWidgets/CalibrationSettingsWidget';
+import { SensorInfo } from './SensorInfo/SensorInfo';
 
 export const ChartView = observer(() => {
   const id = 'main-chart-container';
+  React.useMemo(() => initChartVM(), []);
+
   React.useLayoutEffect(() => {
-    // Initialize the dashboard
-    vm.init(id);
+    if (!chartVM) initChartVM();
+    chartVM.init(id);
 
     return () => {
-      vm.dispose();
-
-      //@ts-ignore
-      vm = null;
+      console.log('Chart Cleanup');
+      disposeChartVM();
     };
   }, []);
 
@@ -36,20 +35,20 @@ export const ChartView = observer(() => {
   React.useEffect(() => {
     // The dashboard will always have 1 chart, create 1 less than the total channels
     // Adjust charts
-    const lengthDiff = probeSettingVM.activePDs - vm.charts.length;
+    const lengthDiff = probeSettingVM.activePDs - chartVM.charts.length;
 
     // Remove charts
     if (lengthDiff < 0) {
       for (let i = 0; i < Math.abs(lengthDiff); i++) {
-        vm.removeLastChart();
+        chartVM.removeLastChart();
       }
     }
 
     if (lengthDiff > 0) {
       for (let i = 0; i < lengthDiff; i++) {
-        const chart = vm.addChart();
+        const chart = chartVM.addChart();
 
-        vm.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
+        chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
       }
     }
   }, [probeSettingVM.activePDs]);
@@ -57,10 +56,18 @@ export const ChartView = observer(() => {
   return (
     <div className={styles.ChartContainer}>
       <XAxis />
+      <SensorInfo />
       <div className={styles.ChartAreaContainer}>
         <ChannelLanes />
-        <div className="w-full h-full relative" style={toJS(vm.parentContainerStyle)}>
-          <div className={styles.Chart} id={id} style={toJS(vm.chartContainerStyle)}></div>
+        <div
+          className="w-full h-full relative"
+          style={toJS(chartVM?.parentContainerStyle) || undefined}
+        >
+          <div
+            className={styles.Chart}
+            id={id}
+            style={toJS(chartVM?.chartContainerStyle) || undefined}
+          />
         </div>
       </div>
     </div>

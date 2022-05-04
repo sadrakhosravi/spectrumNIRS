@@ -11,7 +11,7 @@ import { FiMaximize2, FiMinimize2, FiFilter } from 'react-icons/fi';
 import type { DashboardChart } from '@models/Chart';
 
 // View Model
-import { vm } from '../../ChartView';
+import { chartVM } from '@store';
 import Tippy from '@tippyjs/react';
 
 const iconSettings = {
@@ -29,7 +29,7 @@ export const ChannelActions = observer(({ chart, chartIndex }: ChannelActionsTyp
 
   // Handles channel maximize button
   const handleMaximizeClick = React.useCallback(() => {
-    isMaximized ? vm.resetChannelHeights() : vm.maximizeChannel(chart.id);
+    isMaximized ? chartVM.resetChannelHeights() : chartVM.maximizeChannel(chart.id);
     setIsMaximized(!isMaximized);
   }, [isMaximized]);
 
@@ -47,7 +47,7 @@ export const ChannelActions = observer(({ chart, chartIndex }: ChannelActionsTyp
           <FiMinimize2 {...iconSettings} title={'Minimize Channel'} />
         )}
       </button>
-      {vm.charts[chartIndex].filters && (
+      {chartVM.charts[chartIndex].filters && (
         <Tippy content="Lowpass Filter Active">
           <button
             className={`${styles.ChannelActionButton} ${styles.ChannelActionButtonDisabled} `}

@@ -3,6 +3,7 @@
 
 $channel-ui-width: 150px;
 $channel-info-height: 25px;
+$sensor-info-width: 30px;
 
 .ChannelsContainer {
   position: absolute;
@@ -55,10 +56,10 @@ $channel-info-height: 25px;
 
 .ChannelInfo {
   padding-left: $gap-sm;
+  width: 110px;
   gap: $gap-xs;
   margin-top: 3px;
   border-radius: $border-primary-radius;
-  width: 100%;
   height: $channel-info-height;
   @include flex-center;
   @include hover-state;

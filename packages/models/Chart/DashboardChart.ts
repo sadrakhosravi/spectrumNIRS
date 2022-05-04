@@ -17,7 +17,7 @@ import { hiddenLabelStyle, gridLineStyle, fontStyle, fontFillStyle } from './The
 
 // Types
 import type { ChartType } from './ChartModel';
-import type { VisibleTicks, SeriesMarkerXY, PointMarker, UIBackground } from '@arction/lcjs';
+import type { VisibleTicks } from '@arction/lcjs';
 
 export class DashboardChart {
   /**
@@ -32,16 +32,11 @@ export class DashboardChart {
    * A unique id to track the chart
    */
   public readonly id: string;
-  /**
-   * The series marker for hover on chart
-   */
-  protected chartMarker: SeriesMarkerXY<PointMarker, UIBackground> | null;
 
   constructor(chart: ChartType, rowIndex: number, id?: string) {
     this.chart = chart;
     this.rowIndex = rowIndex;
     this.id = id || nanoid();
-    this.chartMarker = null;
     this.setChartDefaults(this.chart);
   }
 
@@ -110,7 +105,6 @@ export class DashboardChart {
    * @returns the row index of the chart to be freed in the dashboard.
    */
   public dispose() {
-    this.chartMarker?.dispose();
     this.chart.dispose();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore

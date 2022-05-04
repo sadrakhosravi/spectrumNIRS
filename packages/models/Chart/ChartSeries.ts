@@ -24,11 +24,11 @@ export class ChartSeries {
   /**
    * The current color of the series line stroke
    */
-  private seriesColor: string | undefined;
+  @observable private seriesColor: string | undefined;
   /**
    * Series gain value
    */
-  @observable public seriesGainVal: number;
+  @observable private seriesGainVal: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -40,24 +40,24 @@ export class ChartSeries {
   }
 
   /**
-   * @returns the parent chart's unique id
+   * @returns the series color.
    */
-  public getChartId() {
-    return this.chartId;
-  }
-
-  /**
-   * @returns the current stroke color of the series.
-   */
-  public getSeriesColor() {
+  public get color() {
     return this.seriesColor;
   }
 
   /**
-   * @returns the gail value of the series.
+   * @returns the series gain value.
    */
-  public getSeriesGainVal() {
+  public get gainVal() {
     return this.seriesGainVal;
+  }
+
+  /**
+   * @returns the parent chart's unique id
+   */
+  public getChartId() {
+    return this.chartId;
   }
 
   /**
@@ -105,7 +105,7 @@ export class ChartSeries {
    * Changes the current series color.
    * @param color the new color to set for the series.
    */
-  public changeSeriesColor(color: string) {
+  @action public changeSeriesColor(color: string) {
     this.series.setStrokeStyle(
       new SolidLine({
         thickness: -1,

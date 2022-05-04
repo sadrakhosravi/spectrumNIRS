@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { makeAutoObservable } from 'mobx';
-import type { AppNavStates } from '@utils/types/AppStateTypes';
+import type { AppNavStates } from '../utils/types/AppStateTypes';
 
 export class AppStatesModel {
   public route: AppNavStates;
@@ -15,10 +15,10 @@ export class AppStatesModel {
   }
 
   /**
-   * Sets the app route variable
+   * Setter for application route.
    */
-  public setAppRoute(newRoute: AppNavStates) {
-    this.route = newRoute;
+  public set appRoute(route: AppNavStates) {
+    this.route = route;
   }
 }
 

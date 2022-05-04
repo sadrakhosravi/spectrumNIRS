@@ -6,14 +6,14 @@ import { Row, Column } from '/@/components/Elements/Grid';
 import { Separator } from '/@/components/Elements/Separator';
 
 // View Models
-import { vm } from '/@/views/Chart/ChartView';
+import { chartVM } from '@store';
 
 export const ChartSettingsTab = observer(() => {
   const changeChartsYScale = (e: React.ChangeEvent<HTMLInputElement>, minOrMax: 'max' | 'min') => {
     const value = ~~e.target.value;
     if (isNaN(value)) return;
 
-    vm.charts.forEach((chart) => {
+    chartVM.charts.forEach((chart) => {
       const axisY = chart.dashboardChart.chart.getDefaultAxisY();
 
       if (minOrMax === 'max') {

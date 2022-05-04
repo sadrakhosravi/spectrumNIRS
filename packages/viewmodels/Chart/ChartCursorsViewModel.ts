@@ -39,7 +39,7 @@ export class ChartCursorsViewModel {
     this.cursors.length = 0;
     for (let i = 0; i < charts.length; i++) {
       const series = charts[i].series[0];
-      const seriesColor = series.getSeriesColor();
+      const seriesColor = series.color;
 
       const cursor: CursorType = {
         x: 0,

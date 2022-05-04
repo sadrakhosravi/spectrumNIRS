@@ -13,6 +13,7 @@ type TabsType = {
 
 export const Tabs = ({ children }: TabsType) => {
   const [activeTab, setActiveTab] = React.useState(0);
+  const width = Array.isArray(children) ? 100 / children.length : 33.3;
 
   if (!Array.isArray(children)) {
     const { header } = children.props;
@@ -20,8 +21,14 @@ export const Tabs = ({ children }: TabsType) => {
     return (
       <div className={styles.Tabs}>
         <div className={styles.TabButtonsContainer}>
-          <TabButton text={header} isActive={true} onClick={() => {}} key={header} />
-          <TabIndicator />
+          <TabButton
+            text={header}
+            isActive={true}
+            onClick={() => {}}
+            key={header}
+            style={{ width: width + '%' }}
+          />
+          <TabIndicator style={{ width: width + '%' }} />
         </div>
         <div className={styles.TabItemContainer}>{children}</div>
       </div>
@@ -43,7 +50,7 @@ export const Tabs = ({ children }: TabsType) => {
               />
             );
           })}
-        <TabIndicator style={{ left: activeTab * 100 + 'px' }} />
+        <TabIndicator style={{ left: activeTab * width + '%', width: width + '%' }} />
       </div>
       <div className={styles.TabItemContainer}>
         {Array.isArray(children) && children.map((child, i) => activeTab === i && child)}

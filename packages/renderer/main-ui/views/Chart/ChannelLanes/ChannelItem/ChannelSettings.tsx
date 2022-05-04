@@ -31,13 +31,13 @@ export const ChannelSettings = observer(
     // Series useEffect
     React.useEffect(() => {
       if (chart && chart.series.length !== 0) {
-        const color = chart.series[0].getSeriesColor() as string;
+        const color = chart.series[0].color as string;
         const name = chart.series[0].series.getName() as string;
-        const gainVal = chart.series[0].getSeriesGainVal() as number;
+        const gainVal = chart.series[0].gainVal as number;
 
         setSeriesInfo({ name, color, gainVal });
       }
-    }, [chart.series[0].seriesGainVal]);
+    }, [chart.series[0].gainVal, chart.series[0].color]);
 
     // Chart useEffect
     React.useEffect(() => {
@@ -105,6 +105,7 @@ export const ChannelSettings = observer(
                 <Column width="75%">
                   <input
                     id={yMinId}
+                    tabIndex={1}
                     type={'number'}
                     value={chartInfo.yMin}
                     onChange={handleYMinIntervalChange}
@@ -121,6 +122,7 @@ export const ChannelSettings = observer(
                 <Column width="75%">
                   <input
                     id={yMaxId}
+                    tabIndex={2}
                     type={'number'}
                     value={chartInfo.yMax}
                     onChange={handleYMaxIntervalChange}
@@ -143,6 +145,7 @@ export const ChannelSettings = observer(
                 id={gainId}
                 type={'number'}
                 min={0}
+                tabIndex={3}
                 value={seriesInfo.gainVal}
                 onChange={handleGainValueChange}
               />

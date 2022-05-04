@@ -32,7 +32,6 @@ export class ChartViewModel {
    * The chart model instance
    */
   private model: ChartModel;
-
   /**
    * The charts of the dashboard
    */
@@ -52,7 +51,7 @@ export class ChartViewModel {
   /**
    * The handler function for synchronized X axis of all charts
    */
-  xAxisSynchronizedHandler: SynchronizeAxisIntervalsHandle | null;
+  private xAxisSynchronizedHandler: SynchronizeAxisIntervalsHandle | null;
   /**
    * Whether a channels is maximized in the dashboard
    */
@@ -228,23 +227,32 @@ export class ChartViewModel {
   /**
    * Cleanups the chart listeners and disposes the dashboard
    */
-  public dispose() {
+  @action public dispose() {
     ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_DATA);
 
     this.reactions.forEach((reaction) => reaction());
     this.reactions.length = 0;
 
     this.xAxisSynchronizedHandler?.remove();
-    this.charts.forEach((chart) => {
-      chart.series.forEach((series) => series.series.dispose());
-      chart.dashboardChart.chart.dispose();
+    this.xAxisSynchronizedHandler = null;
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      chart = null;
+    this.charts.forEach((chart) => {
+      chart.series.forEach((series) => series.dispose());
+      chart.series.length = 0;
+      chart.dashboardChart.dispose();
+      chart.filters = null;
     });
 
+    this.charts.length = 0;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    this.charts = null;
     this.model.cleanup();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    this.model = null;
   }
 
   /**
@@ -329,5 +337,3 @@ export class ChartViewModel {
     this.reactions.push(chartLengthReaction, chartMaximizedReaction);
   }
 }
-
-export default ChartViewModel;
