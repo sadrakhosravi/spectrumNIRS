@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 
 // View Model Store
-import '../../viewmodels/Store';
+import '@store';
 
 // IPC Service
 import './MainWinIPCService';

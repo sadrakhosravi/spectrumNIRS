@@ -11,10 +11,11 @@ import { chartVM } from '@store';
 import { XAxisChartViewModel } from '@viewmodels/index';
 import { observer } from 'mobx-react-lite';
 
-let xAxisVM = new XAxisChartViewModel();
 const xAxisContainerId = 'x-axis-chart-container';
 
 export const XAxis = observer(() => {
+  let xAxisVM: XAxisChartViewModel = React.useMemo(() => new XAxisChartViewModel(), []);
+
   React.useEffect(() => {
     xAxisVM.init(xAxisContainerId, chartVM.charts[0].dashboardChart.chart);
 

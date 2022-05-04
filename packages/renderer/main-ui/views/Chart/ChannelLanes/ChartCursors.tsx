@@ -8,11 +8,9 @@ import * as styles from './channelLanes.module.scss';
 import { chartVM } from '@store';
 import { ChartCursorsViewModel } from '@viewmodels/index';
 
-// Types
-
-const cursorsVM = new ChartCursorsViewModel();
-
 export const ChartCursors = observer(() => {
+  const cursorsVM = React.useMemo(() => new ChartCursorsViewModel(), []);
+
   const cursorContainerId = React.useId();
   const cursorContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -23,6 +21,8 @@ export const ChartCursors = observer(() => {
         'mousemove',
         onMouseMoveMaximized,
       );
+
+      cursorsVM.dispose();
     };
   }, []);
 

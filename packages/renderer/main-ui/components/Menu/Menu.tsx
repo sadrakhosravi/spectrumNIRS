@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { AppMenuViewModel } from '@viewmodels/index';
+import { appMenuVM } from '@store';
 
 // Styles
 import * as styles from './menu.module.scss';
 
 // Modules
 import { MenuItem, SubMenu, SubMenuItem } from './';
-
-const appMenuVM = new AppMenuViewModel();
 
 export const Menu = observer(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

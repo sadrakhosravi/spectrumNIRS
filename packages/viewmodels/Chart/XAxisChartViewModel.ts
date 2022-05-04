@@ -125,6 +125,6 @@ export class XAxisChartViewModel {
    * Performs memory and listener cleanups
    */
   public cleanup() {
-    this.model.cleanup();
+    this.model.dispose();
   }
 }

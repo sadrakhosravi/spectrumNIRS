@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import AppStatesModel from '../../../../models/AppStatesModel';
-import { AppStatesViewModel } from '@viewmodels/index';
+import { appRouterVM } from '@store';
 
 // Styles
 import * as styles from './leftPanel.module.scss';
@@ -20,9 +19,9 @@ export const LeftPanelNavButton = observer(({ text, icon, path }: LeftPanelNavBu
     <button
       tabIndex={1}
       className={`${styles.LeftPanelNavButton} ${
-        AppStatesModel.route === path && styles.LeftPanelNavButton_Active
+        appRouterVM.route === path && styles.LeftPanelNavButton_Active
       }`}
-      onClick={() => path && AppStatesViewModel.navigateTo(path)}
+      onClick={() => path && appRouterVM.navigateTo(path)}
     >
       {icon}
       <span>{text}</span>

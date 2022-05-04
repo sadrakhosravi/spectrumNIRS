@@ -15,30 +15,29 @@ import { Listbox } from '/@/components/Elements/Listbox';
 import { RangeSliderWithInput } from '/@/components/Form/RnageSliderWithInput';
 
 // View Models
-import { ProbeSettingsViewModel } from '@viewmodels/index';
-export const probeSettingVM = new ProbeSettingsViewModel();
+import { deviceVM } from '@store';
 
 const ledIDBase = 'led-intensities-';
 
 export const ProbeSettingsTab = observer(() => {
   const statusRef = React.useRef<HTMLSpanElement>(null);
 
-  const LEDOptions = toJS(probeSettingVM.supportedLEDNum).map((num) => {
+  const LEDOptions = toJS(deviceVM.supportedLEDNum).map((num) => {
     return { name: num.toString(), value: num };
   });
 
-  const PDOptions = toJS(probeSettingVM.supportedPDNum).map((num) => {
+  const PDOptions = toJS(deviceVM.supportedPDNum).map((num) => {
     return { name: num.toString(), value: num };
   });
 
   // Should be used because of the observable error in listbox setter
   const setLEDs = (num: { name: string; value: number }) => {
-    probeSettingVM.setActiveLEDs(num.value);
+    deviceVM.setActiveLEDs(num.value);
   };
 
   // Sets the total number of PDS
   const setPDs = (num: { name: string; value: number }) => {
-    probeSettingVM.setActivePDs(num.value);
+    deviceVM.setActivePDs(num.value);
   };
 
   React.useEffect(() => {
@@ -82,10 +81,10 @@ export const ProbeSettingsTab = observer(() => {
           <Listbox
             options={LEDOptions}
             value={{
-              name: probeSettingVM.activeLEDs.toString(),
-              value: probeSettingVM.activeLEDs,
+              name: deviceVM.activeLEDs.toString(),
+              value: deviceVM.activeLEDs,
             }}
-            onChange={probeSettingVM.handleDeviceSettingsUpdate}
+            onChange={deviceVM.handleDeviceSettingsUpdate}
             setter={setLEDs}
           />
         </Column>
@@ -94,10 +93,10 @@ export const ProbeSettingsTab = observer(() => {
           <Listbox
             options={PDOptions}
             value={{
-              name: probeSettingVM.activePDs.toString(),
-              value: probeSettingVM.activePDs,
+              name: deviceVM.activePDs.toString(),
+              value: deviceVM.activePDs,
             }}
-            onChange={probeSettingVM.handleDeviceSettingsUpdate}
+            onChange={deviceVM.handleDeviceSettingsUpdate}
             setter={setPDs}
           />
         </Column>
@@ -105,14 +104,14 @@ export const ProbeSettingsTab = observer(() => {
         {/* Adjust LED intensity */}
       </Row>
       <div className={styles.LEDIntensitiesContainer}>
-        {new Array(probeSettingVM.activeLEDs).fill(0).map((_, i) => (
+        {new Array(deviceVM.activeLEDs).fill(0).map((_, i) => (
           <RangeSliderWithInput
             id={ledIDBase + i}
             key={i + 'range-slider'}
             title={'LED' + ++i}
             min={0}
             max={127}
-            onBlur={probeSettingVM.handleDeviceSettingsUpdate}
+            onBlur={deviceVM.handleDeviceSettingsUpdate}
           />
         ))}
       </div>

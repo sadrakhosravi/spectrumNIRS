@@ -11,7 +11,6 @@ import { ToggleArea } from '/@/components/Elements/ToggleArea';
 // View Models
 import { chartVM } from '@store';
 import { FilterSettingsViewModel } from '@viewmodels/index';
-const filterSettingsVM = new FilterSettingsViewModel(chartVM);
 
 // Filter
 import { cutoffFrequencies, orders } from '@models/Filters/Lowpass';
@@ -25,6 +24,8 @@ const ordersOptions = orders.map((order) => {
 });
 
 export const GlobalFiltersWidget = observer(() => {
+  const filterSettingsVM = React.useMemo(() => new FilterSettingsViewModel(chartVM), []);
+
   return (
     <WidgetsContainer>
       <Tabs>

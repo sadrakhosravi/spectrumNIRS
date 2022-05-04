@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import AppStatesModel from '@models/AppStatesModel';
+import { appRouterVM } from '@store';
 
 // Components
 import { Toolbar } from './Toolbar';
@@ -9,5 +9,5 @@ import { Toolbar } from './Toolbar';
 import { CalibrationToolbar } from '/@/views/Calibration';
 
 export const ToolbarRouter = observer(() => {
-  return <Toolbar>{AppStatesModel.route === 'calibration' && <CalibrationToolbar />}</Toolbar>;
+  return <Toolbar>{appRouterVM.route === 'calibration' && <CalibrationToolbar />}</Toolbar>;
 });

@@ -14,7 +14,7 @@ import { XAxis } from './XAxis/XAxis';
 // View models
 import { chartVM, initChartVM, disposeChartVM } from '@store';
 
-import { probeSettingVM } from '../../widgets/CalibrationWidgets/CalibrationSettingsWidget';
+import { deviceVM } from '@store';
 import { SensorInfo } from './SensorInfo/SensorInfo';
 
 export const ChartView = observer(() => {
@@ -35,7 +35,7 @@ export const ChartView = observer(() => {
   React.useEffect(() => {
     // The dashboard will always have 1 chart, create 1 less than the total channels
     // Adjust charts
-    const lengthDiff = probeSettingVM.activePDs - chartVM.charts.length;
+    const lengthDiff = deviceVM.activePDs - chartVM.charts.length;
 
     // Remove charts
     if (lengthDiff < 0) {
@@ -51,7 +51,7 @@ export const ChartView = observer(() => {
         chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
       }
     }
-  }, [probeSettingVM.activePDs]);
+  }, [deviceVM.activePDs]);
 
   return (
     <div className={styles.ChartContainer}>

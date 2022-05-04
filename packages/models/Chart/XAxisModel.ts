@@ -64,9 +64,10 @@ export class XAxisModel {
   /**
    * Listeners and memory cleanup
    */
-  public cleanup() {
+  public dispose() {
     this.synchronizeHandler?.remove();
     this.synchronizeHandler = null;
+
     this.attachedChart = null;
     this.xAxisChart?.dispose();
     this.xAxisChart = null;

@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import ReaderChannels from '@utils/channels/ReaderChannels';
 
 // View Models
-import { deviceInfoVM } from '@viewmodels/Singletons/DeviceInfoViewModel';
+import { deviceVM } from '@store';
 
 export class MainWinIPCService {
   constructor() {
@@ -31,7 +31,7 @@ export class MainWinIPCService {
    */
   private listenToDeviceConnection() {
     ipcRenderer.on(ReaderChannels.DEVICE_CONNECTED, (_, isConnected) =>
-      deviceInfoVM.setIsDeviceConnected(isConnected),
+      deviceVM.setIsDeviceConnected(isConnected),
     );
   }
 }

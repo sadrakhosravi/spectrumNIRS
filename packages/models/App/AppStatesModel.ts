@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { makeAutoObservable } from 'mobx';
-import type { AppNavStates } from '../utils/types/AppStateTypes';
+import type { AppNavStates } from '../../utils/types/AppStateTypes';
 
 export class AppStatesModel {
   public route: AppNavStates;
@@ -22,4 +22,4 @@ export class AppStatesModel {
   }
 }
 
-export default new AppStatesModel();
+export default AppStatesModel;

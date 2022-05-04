@@ -76,4 +76,11 @@ export class ChartCursorsViewModel {
   @action public deleteCursors() {
     this.cursors.length = 0;
   }
+
+  /**
+   * Removes all elements in the observable list.
+   */
+  @action dispose() {
+    this.cursors.length = 0;
+  }
 }

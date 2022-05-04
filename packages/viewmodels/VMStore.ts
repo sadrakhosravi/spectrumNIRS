@@ -5,9 +5,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 // View Model imports
-import { AppMenuViewModel } from './AppMenuViewModel';
-import { AppStatesViewModel } from './AppStatesViewModel';
+import { AppMenuViewModel } from './App/AppMenuViewModel';
+import { AppStatesViewModel } from './App/AppStatesViewModel';
 import { ChartViewModel } from './Chart/ChartViewModel';
+import { DeviceSettingsViewModel } from './Device/DeviceSettingsViewModel';
 
 /// ------------------------- App Global ------------------------- ///
 /**
@@ -41,3 +42,10 @@ export const disposeChartVM = () => {
   //@ts-ignore
   chartVM = null;
 };
+
+/// ------------------------- Device -------------------------///
+
+/**
+ * Device settings view model instance.
+ */
+export const deviceVM = new DeviceSettingsViewModel();

@@ -24,7 +24,7 @@ const config = {
       '@styles/': join(PACKAGE_ROOT, 'main-ui', 'styles') + '/',
       '@models/': join(PACKAGE_ROOT, '../models') + '/',
       '@viewmodels/': join(PACKAGE_ROOT, '../viewmodels') + '/',
-      '@store': join(PACKAGE_ROOT, '../viewmodels/Store.ts'),
+      '@store': join(PACKAGE_ROOT, '../viewmodels/VMStore.ts'),
       '@database/': join(PACKAGE_ROOT, '../database') + '/',
       '@charts/': join(PACKAGE_ROOT, 'main-ui', 'charts') + '/',
       '@widgets/': join(PACKAGE_ROOT, 'main-ui', 'widgets') + '/',

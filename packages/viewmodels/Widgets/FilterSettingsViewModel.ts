@@ -8,10 +8,11 @@
 import { action, makeObservable, observable, reaction } from 'mobx';
 
 // Models
-import { Lowpass } from '../models/Filters';
+import { Lowpass } from '../../models/Filters';
 
-// View Models
-import type { ChartViewModel } from './Chart/ChartViewModel';
+// Types
+import type { ChartViewModel } from '../Chart/ChartViewModel';
+import type { IReactionDisposer } from 'mobx';
 
 export class FilterSettingsViewModel {
   private chartVM: ChartViewModel;
@@ -20,6 +21,7 @@ export class FilterSettingsViewModel {
   @observable public isActive: boolean;
   @observable public cutoffFrequency: number;
   @observable public order: number;
+  private reactions: IReactionDisposer[];
 
   constructor(chartVM: ChartViewModel) {
     this.chartVM = chartVM;
@@ -28,6 +30,7 @@ export class FilterSettingsViewModel {
     this.isActive = false;
     this.cutoffFrequency = 5;
     this.order = 6;
+    this.reactions = [];
 
     makeObservable(this);
     this.handleReactions();
@@ -55,6 +58,14 @@ export class FilterSettingsViewModel {
     this.order = order;
   }
 
+  @action public dispose() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    this.chartVM = null;
+    this.reactions.forEach((reaction) => reaction());
+    this.reactions.length = 0;
+  }
+
   /**
    * Handles the observable changes.
    */
@@ -76,8 +87,10 @@ export class FilterSettingsViewModel {
       });
     };
 
-    reaction(() => this.isActive, handleFilterChange);
-    reaction(() => this.cutoffFrequency, handleFilterChange);
-    reaction(() => this.order, handleFilterChange);
+    this.reactions.push(
+      reaction(() => this.isActive, handleFilterChange),
+      reaction(() => this.cutoffFrequency, handleFilterChange),
+      reaction(() => this.order, handleFilterChange),
+    );
   }
 }

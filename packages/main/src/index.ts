@@ -3,6 +3,7 @@ import './security-restrictions';
 import { createMainWindow } from './mainWindow';
 import { createReaderProcess } from './readerProcess';
 import { IPCService } from './ipcService';
+import { GlobalStore } from './GlobalStore';
 
 export type RendererWindows = {
   mainWindow: Electron.BrowserWindow | null;
@@ -41,6 +42,9 @@ app
   .then(createReaderProcess)
   .then((reader) => (renderers.reader = reader))
   .then(() => new IPCService(renderers))
+  .then(() => {
+    new GlobalStore();
+  })
   .catch((e) => console.error('Failed create window:', e));
 
 /**

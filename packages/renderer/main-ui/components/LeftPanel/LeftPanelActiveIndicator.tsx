@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
-import AppStatesModel from '@models/AppStatesModel';
+import { appRouterVM } from '@store';
 
 // Styles
 import * as styles from './leftPanel.module.scss';
@@ -12,7 +12,7 @@ export const LeftPanelActiveIndicator = observer(() => {
   const [topPos, setTopPos] = React.useState(0);
 
   React.useEffect(() => {
-    switch (AppStatesModel.route) {
+    switch (appRouterVM.route) {
       case 'record':
         setTopPos(0);
         break;
@@ -28,7 +28,7 @@ export const LeftPanelActiveIndicator = observer(() => {
       default:
         break;
     }
-  }, [AppStatesModel.route]);
+  }, [appRouterVM.route]);
 
   return <div className={`${styles.LeftPanelActiveIndicator}`} style={{ top: topPos }}></div>;
 });

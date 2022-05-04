@@ -11,7 +11,7 @@ import { StatusBarItem } from './';
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 // View Model
-import { deviceInfoVM } from '@viewmodels/Singletons/DeviceInfoViewModel';
+import { deviceVM } from '@store';
 
 export const StatusBar = observer(() => {
   return (
@@ -20,13 +20,13 @@ export const StatusBar = observer(() => {
       <div className={styles.RightItems}>
         <StatusBarItem
           icon={
-            deviceInfoVM.isDeviceConnected ? (
+            deviceVM.isDeviceConnected ? (
               <FiCheckCircle size={18} strokeWidth={2.5} color="green" />
             ) : (
               <FiXCircle size={18} strokeWidth={2.5} color="red" />
             )
           }
-          text={`Beast Status: ${deviceInfoVM.isDeviceConnected ? 'Connected' : 'Disconnected'}`}
+          text={`Beast Status: ${deviceVM.isDeviceConnected ? 'Connected' : 'Disconnected'}`}
         />
       </div>
     </footer>
