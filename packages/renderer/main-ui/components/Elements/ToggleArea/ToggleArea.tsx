@@ -14,7 +14,7 @@ export const ToggleArea = ({ defaultState = false, setter, children }: ToggleAre
   const id = React.useId();
 
   return (
-    <div className={styles.ToggleArea}>
+    <div>
       <div className={styles.ToggleButton}>
         <label htmlFor={id}>Lowpass Filter</label>
 

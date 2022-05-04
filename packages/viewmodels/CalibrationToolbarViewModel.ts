@@ -7,7 +7,7 @@
 
 // IPC
 import MainWinIPCService from '../renderer/main-ui/MainWinIPCService';
-import { ReaderChannels } from '../utils/channels/ReaderChannels';
+import ReaderChannels from '../utils/channels/ReaderChannels';
 
 export class CalibrationToolbarViewModel {
   /**

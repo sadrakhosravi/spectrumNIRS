@@ -107,3 +107,5 @@ export const ScreenView = ({ enableWidgets }: ScreenViewType) => {
     </div>
   );
 };
+
+export default ScreenView;

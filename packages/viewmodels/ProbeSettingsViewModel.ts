@@ -8,11 +8,9 @@
 // Types
 import { action, makeObservable, observable } from 'mobx';
 
-import AllDevices from '../renderer/reader/Devices/AllDevices';
-
 // IPC Service
 import MainWinIPCService from '../renderer/main-ui/MainWinIPCService';
-import { ReaderChannels } from '../utils/channels/ReaderChannels';
+import ReaderChannels from '../utils/channels/ReaderChannels';
 
 export type ProbeSettingsType = {
   numOfPDs: number;
@@ -21,10 +19,6 @@ export type ProbeSettingsType = {
 };
 
 export class ProbeSettingsViewModel {
-  /**
-   * The current device information
-   */
-  public device: typeof AllDevices[0];
   /**
    * The name of the current device
    */
@@ -47,8 +41,7 @@ export class ProbeSettingsViewModel {
   @observable public readonly supportedPDNum: number[];
 
   constructor() {
-    this.device = AllDevices[0];
-    this.deviceName = this.device.device.getName();
+    this.deviceName = 'Beast';
     this.activePDs = 1;
     this.activeLEDs = 1;
 

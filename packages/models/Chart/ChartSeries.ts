@@ -36,7 +36,6 @@ export class ChartSeries {
     this.seriesColor = seriesColor;
     this.seriesGainVal = 1;
     this.setLineSeriesStrokeStyle();
-
     makeObservable(this);
   }
 
@@ -70,7 +69,7 @@ export class ChartSeries {
   }
 
   /**
-   * Applied the gain value and adds the data to the series.
+   * Applies the gain value and adds Array of the data to the series.
    */
   public addArrayY(data: Float32Array | number[]) {
     console.time('gain');
@@ -79,6 +78,27 @@ export class ChartSeries {
     console.timeEnd('gain');
 
     this.series.addArrayY(data);
+  }
+
+  /**
+   * Applies the gain value and adds obj array to the series.
+   */
+  public addArrayXY(data: { x: number; y: number }[]) {
+    console.time('gain');
+    // For each is faster here
+    data.forEach((point) => (point.y *= this.seriesGainVal));
+    console.timeEnd('gain');
+
+    this.series.add(data);
+  }
+
+  /**
+   * Applies the gain value and adds single data point to the series.
+   */
+  public addPoint(data: { x: number; y: number }) {
+    data.y *= this.seriesGainVal;
+
+    this.series.add(data);
   }
 
   /**
@@ -99,8 +119,8 @@ export class ChartSeries {
    * Generates and appends a random data to the series
    */
   public generateDummyData() {
-    const data = XYDataGenerator.staticData(30000);
-    data.then((points) => this.series.add(points));
+    const data = XYDataGenerator.streamData(100);
+    data.forEach((point) => this.addPoint(point));
   }
 
   /**

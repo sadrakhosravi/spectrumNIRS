@@ -1,6 +1,6 @@
 import { app } from 'electron';
 import './security-restrictions';
-import { restoreOrCreateWindow } from './mainWindow';
+import { createMainWindow } from './mainWindow';
 import { createReaderProcess } from './readerProcess';
 import { IPCService } from './ipcService';
 
@@ -23,28 +23,20 @@ if (!isSingleInstance) {
   app.quit();
   process.exit(0);
 }
-app.on('second-instance', restoreOrCreateWindow);
 
 /**
  * Shout down background process if all windows was closed
  */
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
-
-/**
- * @see https://www.electronjs.org/docs/v14-x-y/api/app#event-activate-macos Event: 'activate'
- */
-app.on('activate', restoreOrCreateWindow);
 
 /**
  * Create app window when background process will be ready
  */
 app
   .whenReady()
-  .then(restoreOrCreateWindow)
+  .then(createMainWindow)
   .then((mainWindow) => (renderers.mainWindow = mainWindow))
   .then(createReaderProcess)
   .then((reader) => (renderers.reader = reader))

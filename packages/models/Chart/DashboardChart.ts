@@ -9,7 +9,7 @@ import {
   AutoCursorModes,
   AxisScrollStrategies,
 } from '@arction/lcjs';
-import Hyperid from 'hyperid';
+import { nanoid } from 'nanoid';
 
 // Modules
 import { ChartSeries } from './ChartSeries';
@@ -40,7 +40,7 @@ export class DashboardChart {
   constructor(chart: ChartType, rowIndex: number, id?: string) {
     this.chart = chart;
     this.rowIndex = rowIndex;
-    this.id = id || Hyperid()();
+    this.id = id || nanoid();
     this.chartMarker = null;
     this.setChartDefaults(this.chart);
   }
@@ -263,7 +263,10 @@ export class DashboardChart {
         }),
       );
 
-    requestAnimationFrame(() => axisY.setInterval(-50, 50, false, true));
+    requestAnimationFrame(() => {
+      axisY.setInterval(-50, 50, false, true);
+      axisX.release();
+    });
   }
 
   /**

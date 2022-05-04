@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron';
 import deviceReader from './DeviceReader';
 
 // Channels
-import { ReaderChannels } from '@utils/channels/ReaderChannels';
+import ReaderChannels from '../../utils/channels/ReaderChannels';
 
 /**
  * Handles the necessary IPC communications

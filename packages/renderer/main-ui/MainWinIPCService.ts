@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 
 // Channels
-import { ReaderChannels } from '@utils/channels/ReaderChannels';
+import ReaderChannels from '@utils/channels/ReaderChannels';
 
 // View Models
 import { deviceInfoVM } from '@viewmodels/Singletons/DeviceInfoViewModel';

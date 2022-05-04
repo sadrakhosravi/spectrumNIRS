@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react-lite';
 
 // Channels
-import { ReaderChannels } from '@utils/channels/ReaderChannels';
+import ReaderChannels from '@utils/channels/ReaderChannels';
 
 // Styles
 import * as styles from './probeSettingsWidget.module.scss';

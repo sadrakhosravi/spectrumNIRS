@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { URL } from 'url';
 
 async function createWindow() {
@@ -58,17 +58,8 @@ async function createWindow() {
 /**
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
-export async function restoreOrCreateWindow() {
-  let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
-
-  if (window === undefined) {
-    window = await createWindow();
-  }
-
-  if (window.isMinimized()) {
-    window.restore();
-  }
-
-  window.focus();
+export async function createMainWindow() {
+  const window = await createWindow();
+  window.on('close', () => app.quit());
   return window;
 }

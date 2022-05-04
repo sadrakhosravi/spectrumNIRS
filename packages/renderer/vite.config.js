@@ -1,16 +1,13 @@
 /* eslint-env node */
 
 import { node } from '../../.electron-vendors.cache.json';
-import { join, resolve } from 'path';
+import { join } from 'path';
 import { builtinModules } from 'module';
 
 // Plugins
 import reactVite from '@vitejs/plugin-react';
 import electronRenderer from 'vite-plugin-electron/renderer';
 import checker from 'vite-plugin-checker';
-
-// SCSS configs
-const scssVariables = resolve(__dirname, './main-ui/styles/variables.scss');
 
 const PACKAGE_ROOT = __dirname;
 
@@ -61,8 +58,17 @@ const config = {
         reader: join(PACKAGE_ROOT, 'reader.html'),
       },
 
+      output: {
+        format: 'es',
+        exports: 'auto',
+        esModule: true,
+      },
+
       external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
+    minify: 'esbuild',
+
+    chunkSizeWarningLimit: 1024,
     emptyOutDir: true,
     brotliSize: false,
   },

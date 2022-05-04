@@ -6,7 +6,7 @@
  *--------------------------------------------------------------------------------------------*/
 import { action, makeObservable, observable, reaction, computed } from 'mobx';
 import { ipcRenderer } from 'electron';
-import { ReaderChannels } from '../../utils/channels/ReaderChannels';
+import ReaderChannels from '../../utils/channels/ReaderChannels';
 
 // Models
 import { ChartModel, ChartChannel } from '../../models/Chart';
