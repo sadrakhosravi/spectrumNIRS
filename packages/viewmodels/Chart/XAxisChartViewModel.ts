@@ -72,23 +72,35 @@ const divisions: DivisionsType[] = [
 
 export class XAxisChartViewModel {
   /**
-   * The X Axis chart model
+   * The X Axis chart model.
    */
   private model: XAxisModel;
   /**
-   * Possible time divisions
+   * Condition whether the X axis has been stopped manually.
+   */
+  @observable private isAxisLocked: boolean;
+  /**
+   * Possible time divisions.
    */
   public divisions: DivisionsType[];
   /**
-   * The interval of the X axis
+   * The interval of the X axis.
    */
   @observable public timeDiv: DivisionsType;
   constructor() {
     this.model = new XAxisModel();
     this.divisions = divisions;
+    this.isAxisLocked = false;
     this.timeDiv = this.divisions[7];
 
     makeObservable(this);
+  }
+
+  /**
+   * @returns whether the X axis is locked/stopped manually.
+   */
+  public get isLocked() {
+    return this.isAxisLocked;
   }
 
   /**
@@ -99,6 +111,26 @@ export class XAxisChartViewModel {
     this.setTimeDiv();
   }
 
+  /**
+   * Toggles the X axis lock. Locks / Unlocks it
+   */
+  @action public toggleAxisLock = () => {
+    this.isAxisLocked = !this.isAxisLocked;
+
+    // Apply it to the Axis
+    if (this.isAxisLocked) {
+      this.model.getXAxis()?.stop();
+      this.model.getAttachedChart()?.getDefaultAxisX().stop();
+      return;
+    }
+
+    this.model.getXAxis()?.release();
+    this.model.getAttachedChart()?.getDefaultAxisX().release();
+  };
+
+  /**
+   * Sets the X axis time division and releases it.
+   */
   @action public setTimeDiv = (timeDiv?: DivisionsType) => {
     const xAxis = this.model.getXAxis() as Axis;
 
@@ -117,8 +149,22 @@ export class XAxisChartViewModel {
       };
     }
 
-    xAxis?.setInterval(xAxis.getInterval().start, xAxis.getInterval().start + this.timeDiv.value);
-    xAxis.release();
+    const attachedChart = this.model.getAttachedChart();
+    const interval = xAxis.getInterval();
+    const seriesXMax = attachedChart?.getSeries()[0].getXMax();
+
+    let end = interval.end;
+
+    if (seriesXMax && interval.end > seriesXMax) {
+      end = seriesXMax;
+    }
+
+    xAxis?.setInterval(end - this.timeDiv.value, end, 0, this.isAxisLocked ? true : false);
+
+    if (!this.isAxisLocked) {
+      xAxis.release();
+      attachedChart?.getDefaultAxisX().release();
+    }
   };
 
   /**

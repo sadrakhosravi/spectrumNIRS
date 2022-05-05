@@ -3,18 +3,15 @@
  * @param ms the total duration in milliseconds.
  */
 export const msToTime = (duration: number) => {
-  // Pad to 2 or 3 digits, default is 2
-  function pad(n: number, z?: number) {
-    z = z || 2;
-    return ('00' + n).slice(-z);
-  }
+  let seconds: string | number = Math.floor((duration / 1000) % 60),
+    minutes: string | number = Math.floor((duration / (1000 * 60)) % 60),
+    hours: string | number = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
   const ms = duration % 1000;
-  duration = (duration - ms) / 1000;
-  const secs = duration % 60;
-  duration = (duration - secs) / 60;
-  const mins = duration % 60;
-  const hrs = (duration - mins) / 60;
 
-  return pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + '.' + pad(ms, 3);
+  hours = hours < 10 ? '0' + hours : hours;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  seconds = seconds < 10 ? '0' + seconds : seconds;
+
+  return hours + ':' + minutes + ':' + seconds + ':' + ms.toFixed(0);
 };

@@ -5,7 +5,7 @@
   padding: $gap-xs $gap-lg;
   background-color: $color-bg-secondary;
   @include border-primary;
-  @include hover-state;
+  @include hover-state-secondary;
   @include active-focus-state;
 }
 
@@ -22,5 +22,18 @@
 }
 
 .ButtonPrimary {
+  background-color: $color-primary;
+}
+
+.IconOnlyButton {
+  min-height: 24px;
+  padding: $gap-2xs $gap-xs;
+  background-color: $color-bg-tertiary;
+  @include border-primary-light;
+  @include hover-state-secondary;
+  @include active-focus-state;
+}
+
+.IconOnlyButtonActive {
   background-color: $color-primary;
 }

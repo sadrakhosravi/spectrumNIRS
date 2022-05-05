@@ -55,6 +55,13 @@ export class XAxisModel {
   }
 
   /**
+   * @returns the attached chart instance.
+   */
+  public getAttachedChart() {
+    return this.attachedChart;
+  }
+
+  /**
    * @returns the x axis of the chart or null if empty.
    */
   public getXAxis() {

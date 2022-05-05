@@ -149,7 +149,7 @@ export class DashboardChart {
     );
 
     return {
-      x: pixelLocationDocument.x - 280,
+      x: pixelLocationDocument.x - 310,
       y: pixelLocationDocument.y - 98.5,
       xVal: nearestDataPoint.location.x,
       yVal: nearestDataPoint.location.y,

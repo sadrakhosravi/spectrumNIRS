@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
+import { msToTime } from '@utils/helpers';
 
 // Styles
 import * as styles from './channelLanes.module.scss';
@@ -100,7 +101,7 @@ export const ChartCursors = observer(() => {
             }px)`,
           }}
         >
-          {cursorsVM.cursors[0].xVal.toFixed(3)}
+          {msToTime(cursorsVM.cursors[0].xVal)}
         </div>
       )}
     </div>
