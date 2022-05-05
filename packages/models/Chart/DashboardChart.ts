@@ -267,7 +267,7 @@ export class DashboardChart {
    * Applies the default styles on current chart
    */
   private setChartDefaults(chart: ChartType) {
-    const [axisX] = chart.getDefaultAxes();
+    const axisX = chart.getDefaultAxisX();
     axisX.setInterval(0, 30000);
 
     axisX.setScrollStrategy(AxisScrollStrategies.progressive);

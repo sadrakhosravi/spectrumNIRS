@@ -118,7 +118,9 @@ export class BeastPhysicalDevice implements INIRSDevice {
    */
   public cleanup() {
     this.io.disconnectSockets();
-    this.io.close((err) => new Error(err?.message));
+    this.io.close((err) => {
+      throw new Error(err?.message);
+    });
   }
 
   /**

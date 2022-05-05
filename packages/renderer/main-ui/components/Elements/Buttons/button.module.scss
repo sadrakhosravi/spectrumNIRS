@@ -6,6 +6,7 @@
   background-color: $color-bg-secondary;
   @include border-primary;
   @include hover-state;
+  @include active-focus-state;
 }
 
 .ButtonGreen {

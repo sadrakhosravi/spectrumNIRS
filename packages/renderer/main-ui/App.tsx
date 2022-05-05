@@ -4,6 +4,7 @@ import React from 'react';
 import { TitleBar } from '/@/components/TitleBar';
 import { LeftPanel } from '/@/components/LeftPanel';
 import { StatusBar } from '/@/components/StatusBar';
+import { ErrorDialogs } from './components/ErrorDialogs/ErrorDialogs';
 
 // Global styles
 import './styles/tailwind.css';
@@ -27,6 +28,9 @@ const App = () => {
           </div>
         </div>
       </div>
+
+      {/* Error Popups */}
+      <ErrorDialogs />
     </div>
   );
 };

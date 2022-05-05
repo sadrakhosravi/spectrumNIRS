@@ -234,7 +234,6 @@ export class ChartViewModel {
     this.reactions.length = 0;
 
     this.xAxisSynchronizedHandler?.remove();
-    this.xAxisSynchronizedHandler = null;
 
     this.charts.forEach((chart) => {
       chart.series.forEach((series) => series.dispose());
@@ -301,9 +300,15 @@ export class ChartViewModel {
           this.xAxisSynchronizedHandler.remove();
           this.xAxisSynchronizedHandler = null;
         }
-        this.xAxisSynchronizedHandler = this.model.synchronizeChartXAxes(
-          this.charts.map((chart) => chart.dashboardChart.chart),
-        );
+
+        // Set new charts interval first
+        const interval = this.charts[0].dashboardChart.chart.getDefaultAxisX().getInterval();
+        const allCharts = this.charts.map((chart) => {
+          chart.dashboardChart.chart.getDefaultAxisX().setInterval(interval.start, interval.end);
+          return chart.dashboardChart.chart;
+        });
+
+        this.xAxisSynchronizedHandler = this.model.synchronizeChartXAxes(allCharts);
 
         // Set the style of the chart and parent div containers
         if (totalCharts > 12) {
