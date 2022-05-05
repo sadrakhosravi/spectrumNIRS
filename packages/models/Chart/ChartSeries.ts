@@ -12,6 +12,9 @@ import type { LineSeries } from '@arction/lcjs';
 // Types
 import { ColorHEX, SolidFill, SolidLine } from '@arction/lcjs';
 
+// View Models
+import { deviceVM } from '../../viewmodels/VMStore';
+
 export class ChartSeries {
   /**
    * The current series instance
@@ -74,7 +77,7 @@ export class ChartSeries {
   public addArrayY(data: Float32Array | number[]) {
     console.time('gain');
     // For each is faster here
-    data.forEach((point) => (point *= this.seriesGainVal));
+    data.forEach((point) => (point *= this.seriesGainVal * deviceVM.calibrationFactor));
     console.timeEnd('gain');
 
     this.series.addArrayY(data);
@@ -86,7 +89,7 @@ export class ChartSeries {
   public addArrayXY(data: { x: number; y: number }[]) {
     console.time('gain');
     // For each is faster here
-    data.forEach((point) => (point.y *= this.seriesGainVal));
+    data.forEach((point) => (point.y *= this.seriesGainVal * deviceVM.calibrationFactor));
     console.timeEnd('gain');
 
     this.series.add(data);
@@ -96,7 +99,7 @@ export class ChartSeries {
    * Applies the gain value and adds single data point to the series.
    */
   public addPoint(data: { x: number; y: number }) {
-    data.y *= this.seriesGainVal;
+    data.y *= this.seriesGainVal * deviceVM.calibrationFactor;
 
     this.series.add(data);
   }

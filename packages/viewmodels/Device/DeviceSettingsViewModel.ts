@@ -43,12 +43,17 @@ export class DeviceSettingsViewModel {
    * The total number of supported PDs from the hardware
    */
   @observable public readonly supportedPDNum: number[];
+  /**
+   * The device calibration factor.
+   */
+  @observable private calibFactor: number;
 
   constructor() {
     this.isConnected = false;
     this.deviceName = 'Beast';
     this.activePDs = 1;
     this.activeLEDs = 1;
+    this.calibFactor = 1;
 
     this.supportedLEDNum = new Array(15).fill(0).map((_, i) => (_ = i + 1));
     this.supportedPDNum = new Array(7).fill(0).map((_, i) => (_ = i + 1));
@@ -64,18 +69,38 @@ export class DeviceSettingsViewModel {
   }
 
   /**
+   * @returns the device calibration factor.
+   */
+  public get calibrationFactor() {
+    return this.calibFactor;
+  }
+
+  /**
    * Sets whether the device is connected or not.
    */
   @action public setIsDeviceConnected(value: boolean) {
     this.isConnected = value;
   }
 
+  /**
+   * Sets the total active LEDs number.
+   */
   @action public setActiveLEDs(num: number) {
     this.activeLEDs = num;
   }
 
+  /**
+   * Sets the total active PDs number.
+   */
   @action public setActivePDs(num: number) {
     this.activePDs = num;
+  }
+
+  /**
+   * Sets the device calibration factor.
+   */
+  @action public setCalibrationFactor(num: number) {
+    this.calibFactor = num;
   }
 
   /**

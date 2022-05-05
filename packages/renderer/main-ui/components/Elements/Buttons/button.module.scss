@@ -2,9 +2,9 @@
 @import '@styles/mixins';
 
 .Button {
-  padding: $gap-xs $gap-lg;
-  background-color: $color-bg-secondary;
-  @include border-primary;
+  padding: $gap-2xs $gap-lg;
+  background-color: $color-bg-tertiary;
+  @include border-primary-light;
   @include hover-state-secondary;
   @include active-focus-state;
 }

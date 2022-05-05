@@ -1,19 +1,22 @@
 import * as React from 'react';
+import { observer } from 'mobx-react-lite';
 
 // Components
 import { Row, Column } from '/@/components/Elements/Grid';
 
-const defaultCoef = 0.1;
+// View Models
+import { deviceVM } from '@viewmodels/VMStore';
+
 const coefKey = 'hardwareCoef';
 
-export const DataSettingsTab = () => {
-  const [coefVal, setCoefVal] = React.useState(defaultCoef);
+export const DataSettingsTab = observer(() => {
+  const inputId = React.useId();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
     if (value < 0) return;
     if (value > 100000) return;
-    setCoefVal(value);
+    deviceVM.setCalibrationFactor(value);
     window.localStorage.setItem(coefKey, value.toString());
   };
 
@@ -21,7 +24,7 @@ export const DataSettingsTab = () => {
   React.useEffect(() => {
     const coef = window.localStorage.getItem(coefKey);
     if (!coef) return;
-    setCoefVal(parseFloat(coef));
+    deviceVM.setCalibrationFactor(parseFloat(coef));
   }, []);
 
   return (
@@ -30,12 +33,13 @@ export const DataSettingsTab = () => {
 
       <Row marginTop="1rem" marginBottom="1rem">
         <Column width="50%">
-          <span>Calibration Factor</span>
+          <label htmlFor={inputId}>Calibration Factor</label>
         </Column>
         <Column width="50%">
           <input
+            id={inputId}
             type={'number'}
-            value={coefVal}
+            value={deviceVM.calibrationFactor}
             onChange={handleInputChange}
             min={0}
             max={10000}
@@ -45,4 +49,4 @@ export const DataSettingsTab = () => {
       </Row>
     </>
   );
-};
+});
