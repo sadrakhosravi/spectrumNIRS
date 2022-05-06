@@ -104,6 +104,14 @@ export class XAxisChartViewModel {
   }
 
   /**
+   * Sets the chart's right padding in pixels.
+   * @param padInPixels
+   */
+  public setChartPaddingRight(padInPixels: number) {
+    this.model.getChart()?.setPadding({ right: padInPixels });
+  }
+
+  /**
    * Initializes the VM and the model
    */
   public init(containerId: string, attachedChart: ChartType) {

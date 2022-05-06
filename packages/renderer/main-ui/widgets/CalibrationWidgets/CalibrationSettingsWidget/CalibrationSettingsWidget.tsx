@@ -15,7 +15,7 @@ export const CalibrationSettingsWidget = observer(() => {
     <WidgetsContainer>
       <Tabs>
         {/* Probe Settings Tab */}
-        <TabItem header="Probe">
+        <TabItem header="Device Settings">
           <ProbeSettingsTab />
         </TabItem>
 

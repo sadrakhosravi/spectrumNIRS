@@ -1,0 +1,11 @@
+@import '@styles/variables';
+
+.LEDIntensitiesContainer {
+  padding: $gap-sm;
+  height: 250px;
+  overflow-y: auto;
+}
+
+.StatusSpan {
+  transition: all 0.2s ease-in-out;
+}

@@ -32,9 +32,10 @@
 
   li {
     font-size: $size-font-base;
-    padding: $gap-sm $gap-base;
+    padding: $gap-2xs $gap-base;
     justify-content: space-between;
     border-radius: $border-primary-radius;
+    margin: 2px 0;
 
     @include flex-center;
     @include hover-state-secondary;

@@ -1,6 +1,10 @@
 @import '@styles/variables';
 @import '@styles/mixins';
 
+.DeviceListButtonContainer {
+  padding: 0 $gap-xl;
+}
+
 .ActionButtonContainer {
   position: absolute;
   right: $gap-xl;

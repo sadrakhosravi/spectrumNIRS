@@ -6,6 +6,7 @@ import * as styles from './calibration.module.scss';
 // Components
 // import { ToolbarSection, ToolbarButton } from '/@/components/Toolbar';
 import { Button } from '/@/components/Elements/Buttons/Button';
+import { DeviceList } from '../../components/Device';
 
 // Icons
 // import { FiMinimize2 } from 'react-icons/fi';
@@ -63,6 +64,10 @@ export const CalibrationToolbar = () => {
         />
       </ToolbarSection> */}
       <div className={styles.ActionButtonContainer}>
+        <span className={styles.DeviceListButtonContainer}>
+          <DeviceList />
+        </span>
+
         <Button text="Start" color="green" onClick={calibrationToolbarVM.handleDeviceStart} />
         <Button text="Stop" onClick={calibrationToolbarVM.handleDeviceStop} />
       </div>

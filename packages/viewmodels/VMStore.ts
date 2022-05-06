@@ -8,6 +8,7 @@
 import { AppMenuViewModel } from './App/AppMenuViewModel';
 import { AppStatesViewModel } from './App/AppStatesViewModel';
 import { ChartViewModel } from './Chart/ChartViewModel';
+import { DeviceManagerViewModel } from './Device/DeviceManagerViewModel';
 import { DeviceSettingsViewModel } from './Device/DeviceSettingsViewModel';
 
 /// ------------------------- App Global ------------------------- ///
@@ -49,3 +50,8 @@ export const disposeChartVM = () => {
  * Device settings view model instance.
  */
 export const deviceVM = new DeviceSettingsViewModel();
+
+/**
+ * Device Manager view model
+ */
+export const deviceManagerVM = new DeviceManagerViewModel();

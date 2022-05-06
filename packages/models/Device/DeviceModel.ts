@@ -5,20 +5,29 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { action, makeObservable, observable, reaction } from 'mobx';
+import { ipcRenderer } from 'electron';
+import { ReaderChannels } from '../../utils/channels';
+
+// Services
+import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 
 // Types
 import type { IReactionDisposer } from 'mobx';
+import type { DeviceSettingsType } from '../../viewmodels/Device/DeviceSettingsViewModel';
 
 export type DeviceInfoType = {
+  id: string;
   name: string;
   numOfPDs: number;
   numOfLEDs: number;
+  samplingRate: number;
   defaultCalibrationFactor: number;
   activeLEDs?: number;
   activePDs?: number;
 };
 
 export class DeviceModel {
+  public readonly id: string;
   /**
    * Device name.
    */
@@ -44,6 +53,10 @@ export class DeviceModel {
    */
   @observable private _activePDs: number;
   /**
+   * The current sampling rate of the device.
+   */
+  @observable private _samplingRate: number;
+  /**
    * Device connection status.
    */
   @observable private isConnected: boolean;
@@ -61,6 +74,7 @@ export class DeviceModel {
   private reactions: IReactionDisposer[];
 
   constructor(deviceInfo: DeviceInfoType) {
+    this.id = deviceInfo.id;
     this.name = deviceInfo.name;
     this.LEDs = new Array(deviceInfo.numOfLEDs).fill(0).map((_, i) => (_ = i + 1));
     this.PDs = new Array(deviceInfo.numOfPDs).fill(0).map((_, i) => (_ = i + 1));
@@ -68,6 +82,7 @@ export class DeviceModel {
 
     this._activeLEDs = deviceInfo.activeLEDs || 1;
     this._activePDs = deviceInfo.activePDs || 1;
+    this._samplingRate = deviceInfo.samplingRate;
 
     this.isConnected = false;
     this.isStarted = false;
@@ -77,6 +92,7 @@ export class DeviceModel {
 
     makeObservable(this);
     this.handleReactions();
+    this.initListeners();
   }
 
   /**
@@ -98,6 +114,13 @@ export class DeviceModel {
    */
   public get activePDs() {
     return this._activePDs;
+  }
+
+  /**
+   * The current sampling rate of the device.
+   */
+  public get samplingRate() {
+    return this._samplingRate;
   }
 
   /**
@@ -167,21 +190,67 @@ export class DeviceModel {
   }
 
   /**
+   * Initializes all event listeners.
+   */
+  private initListeners() {
+    this.listenForDeviceConnection();
+  }
+
+  /**
+   * Listens for device connection.
+   */
+  @action private listenForDeviceConnection() {
+    ipcRenderer.on(ReaderChannels.DEVICE_CONNECTED, () => {
+      this.isConnected = true;
+    });
+  }
+
+  /**
+   * Sends the new device settings to the reader process.
+   */
+  public sendDeviceSettingsToReader = () => {
+    // Should wait for react to re-render first.
+    requestAnimationFrame(() => {
+      MainWinIPCService.sendToReader(
+        ReaderChannels.DEVICE_SETTING_UPDATE,
+        this.getDeviceSettings(),
+      );
+    });
+  };
+
+  /**
+   * @returns the device settings read from the UI.
+   * TODO: Update the LED intensities to use observable instead of getElementById.
+   */
+  private getDeviceSettings = () => {
+    console.log('Update');
+    // The settings object
+    const settings: DeviceSettingsType = {
+      numOfPDs: this.activePDs,
+      numOfLEDs: this.activeLEDs,
+      LEDValues: [],
+    };
+
+    for (let i = 0; i < this.activeLEDs; i++) {
+      const ledSlider = document.getElementById('led-intensities-' + i) as HTMLInputElement;
+      settings.LEDValues.push(~~ledSlider.value);
+    }
+
+    return settings;
+  };
+
+  /**
    * Handles observable changes.
    */
   private handleReactions() {
     const LEDChangeReactionDisposer = reaction(
-      () => this._activePDs,
-      () => {
-        console.log('Reaction');
-      },
+      () => this._activeLEDs,
+      () => this.sendDeviceSettingsToReader(),
     );
 
     const PDChangeReactionDisposer = reaction(
       () => this._activePDs,
-      () => {
-        console.log('Reaction');
-      },
+      () => this.sendDeviceSettingsToReader(),
     );
 
     const intensityChange = reaction(
@@ -198,7 +267,10 @@ export class DeviceModel {
    * Cleans up the reactions.
    */
   public cleanup() {
-    this.reactions.forEach((diposer) => diposer());
+    this.reactions.forEach((disposer) => disposer());
     this.reactions.length = 0;
+
+    // Remove listeners
+    ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_CONNECTED);
   }
 }

@@ -15,7 +15,7 @@ type DeviceListItemType = {
 export const DeviceListItem = ({ name, isConnected, onClick }: DeviceListItemType) => {
   return (
     <button className={styles.DeviceListItem} onClick={onClick}>
-      <FiServer size="24px" />
+      <FiServer size="20px" />
       {name}
       <div>
         <span>Status:</span>

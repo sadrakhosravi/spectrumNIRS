@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { toJS } from 'mobx';
 
 // Styles
 import * as styles from './xAxis.module.scss';
@@ -27,6 +28,17 @@ export const XAxis = observer(() => {
       xAxisVM.cleanup();
     };
   }, []);
+
+  React.useEffect(() => {
+    if (
+      toJS(chartVM.parentContainerStyle?.overflowY) ||
+      toJS(chartVM.parentContainerStyle?.overflow) === 'auto'
+    ) {
+      xAxisVM.setChartPaddingRight(15);
+    } else {
+      xAxisVM.setChartPaddingRight(0);
+    }
+  }, [chartVM.parentContainerStyle]);
 
   return (
     <div className={styles.XAxisContainer}>

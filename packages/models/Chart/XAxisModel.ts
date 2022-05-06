@@ -113,6 +113,7 @@ export class XAxisModel {
     // Remove the title and paddings
     chart.setTitleFillStyle(emptyFill);
     chart.setPadding(0);
+    chart.setMouseInteractions(false);
 
     // Dispose the yAxis
     yAxis.dispose();
@@ -130,7 +131,11 @@ export class XAxisModel {
             minorTick.setLabelFont(fontStyle).setLabelFillStyle(fontFillStyle),
           ),
       );
-    xAxis.setStrokeStyle(emptyLine).setNibLength(0).setMouseInteractions(false);
+    xAxis
+      .setStrokeStyle(emptyLine)
+      .setNibLength(0)
+      .setMouseInteractions(false)
+      .setChartInteractions(false);
 
     xAxis.restore();
     this.attachedChart?.getDefaultAxisX().release();

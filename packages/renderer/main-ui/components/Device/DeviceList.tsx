@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react-lite';
 
 // Styles
 import * as styles from './deviceList.module.scss';
@@ -11,7 +12,10 @@ import { DeviceListItem } from './DeviceListItem';
 // Icons
 import { FiServer, FiRefreshCcw } from 'react-icons/fi';
 
-export const DeviceList = () => {
+// View Model
+import { deviceManagerVM } from '@store';
+
+export const DeviceList = observer(() => {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -30,7 +34,15 @@ export const DeviceList = () => {
           closeSetter={setIsOpen}
           title="Devices"
         >
-          <DeviceListItem name="Beast" isConnected={true} />
+          {/* List all active devices */}
+          {deviceManagerVM.activeDevices.map((device) => (
+            <DeviceListItem
+              key={device.id}
+              name={device.name}
+              isConnected={device.isDeviceConnected}
+            />
+          ))}
+
           <ButtonIconText
             className={styles.DeviceListRefreshButton}
             text="Refresh"
@@ -40,4 +52,4 @@ export const DeviceList = () => {
       )}
     </>
   );
-};
+});

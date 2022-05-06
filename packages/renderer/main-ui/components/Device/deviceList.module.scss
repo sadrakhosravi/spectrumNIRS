@@ -8,7 +8,7 @@
 }
 
 .DeviceListItem {
-  padding: $gap-base $gap-lg;
+  padding: $gap-xs $gap-lg;
   background-color: $color-bg-tertiary;
   width: 100%;
   gap: $gap-lg;
@@ -16,6 +16,7 @@
   @include flex-center;
   @include border-primary-light;
   @include hover-state-secondary;
+  @include active-focus-state;
 
   div {
     margin-left: auto;

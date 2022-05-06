@@ -1,124 +1,40 @@
 import * as React from 'react';
-import { toJS } from 'mobx';
-import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react-lite';
-
-// Channels
-import ReaderChannels from '@utils/channels/ReaderChannels';
-
-// Styles
-import * as styles from './probeSettingsWidget.module.scss';
 
 // Components
 import { Row, Column } from '/@/components/Elements/Grid';
 import { Listbox } from '/@/components/Elements/Listbox';
-import { RangeSliderWithInput } from '/@/components/Form/RnageSliderWithInput';
+import { DeviceSettings } from '/@/components/Device';
 
-// View Models
-import { deviceVM } from '@store';
-
-const ledIDBase = 'led-intensities-';
+// View Model
+import { deviceManagerVM } from '@viewmodels/VMStore';
+import { Separator } from '/@/components/Elements/Separator';
 
 export const ProbeSettingsTab = observer(() => {
-  const statusRef = React.useRef<HTMLSpanElement>(null);
-
-  const LEDOptions = toJS(deviceVM.supportedLEDNum).map((num) => {
-    return { name: num.toString(), value: num };
-  });
-
-  const PDOptions = toJS(deviceVM.supportedPDNum).map((num) => {
-    return { name: num.toString(), value: num };
-  });
-
-  // Should be used because of the observable error in listbox setter
-  const setLEDs = (num: { name: string; value: number }) => {
-    deviceVM.setActiveLEDs(num.value);
-  };
-
-  // Sets the total number of PDS
-  const setPDs = (num: { name: string; value: number }) => {
-    deviceVM.setActivePDs(num.value);
-  };
-
-  React.useEffect(() => {
-    const statusSpan = statusRef.current as HTMLSpanElement;
-
-    const clearSpan = () => setTimeout(() => (statusSpan.innerText = ''), 3500);
-
-    ipcRenderer.on(ReaderChannels.DEVICE_INPUT_RESPONSE, (_event, status: boolean | undefined) => {
-      switch (status) {
-        case undefined:
-          statusSpan.innerText = 'Device is not connected!';
-          statusSpan.style.color = 'red';
-          clearSpan();
-          break;
-
-        case false:
-          statusSpan.innerText = 'Failed to update settings on device! Please try again.';
-          statusSpan.style.color = 'red';
-          clearSpan();
-          break;
-
-        case true:
-          statusSpan.innerText = 'Sent to device successfully.';
-          statusSpan.style.color = 'green';
-
-          clearSpan();
-          break;
-      }
-    });
-
-    return () => {
-      ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_INPUT_RESPONSE);
+  const deviceOptions = deviceManagerVM.activeDevices.map((device) => {
+    return {
+      name: device.name,
+      value: device.id,
     };
-  }, []);
+  });
+
+  const [currDeviceId, setCurrDeviceId] = React.useState(deviceManagerVM.activeDevices[0].id);
+
+  const currDevice = deviceManagerVM.activeDevices.find((device) => device.id === currDeviceId);
+  const currVal = { name: currDevice?.name || '', value: currDevice?.name || '' };
+
   return (
     <>
-      <Row gap="1rem" marginBottom="2rem">
-        {/* Select total number of LEDs and PDs */}
-        <Column width="50%">
-          <span>Total LEDs:</span>
-          <Listbox
-            options={LEDOptions}
-            value={{
-              name: deviceVM.activeLEDs.toString(),
-              value: deviceVM.activeLEDs,
-            }}
-            onChange={deviceVM.handleDeviceSettingsUpdate}
-            setter={setLEDs}
-          />
+      <Row>
+        <Column width="33.3%">
+          <span>Device:</span>
         </Column>
-        <Column width="50%">
-          <span>Total PDs:</span>
-          <Listbox
-            options={PDOptions}
-            value={{
-              name: deviceVM.activePDs.toString(),
-              value: deviceVM.activePDs,
-            }}
-            onChange={deviceVM.handleDeviceSettingsUpdate}
-            setter={setPDs}
-          />
+        <Column width="66.66%">
+          <Listbox value={currVal} options={deviceOptions} setter={setCurrDeviceId} />
         </Column>
-
-        {/* Adjust LED intensity */}
       </Row>
-      <div className={styles.LEDIntensitiesContainer}>
-        {new Array(deviceVM.activeLEDs).fill(0).map((_, i) => (
-          <RangeSliderWithInput
-            id={ledIDBase + i}
-            key={i + 'range-slider'}
-            title={'LED' + ++i}
-            min={0}
-            max={127}
-            onBlur={deviceVM.handleDeviceSettingsUpdate}
-          />
-        ))}
-      </div>
-      <div>
-        <span>Status: </span>
-        <span className={styles.StatusSpan} ref={statusRef}></span>
-      </div>
+      <Separator />
+      {currDevice && <DeviceSettings device={currDevice} />}
     </>
   );
 });
