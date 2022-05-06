@@ -5,7 +5,7 @@ import * as styles from './rangeSliderWithInput.module.scss';
 
 // Components
 import { RangeSlider } from '../../Elements/RangeSlider';
-import { InputUnderlined } from '../InputUnderlined';
+import { InputNumber } from '../InputNumber';
 
 type RangeSliderWithInputType = {
   title?: string;
@@ -51,7 +51,7 @@ export const RangeSliderWithInput = ({ title, min, max, id, onBlur }: RangeSlide
           />
         </span>
         <span className={styles.InputSpan}>
-          <InputUnderlined
+          <InputNumber
             value={value}
             min={min}
             max={max}

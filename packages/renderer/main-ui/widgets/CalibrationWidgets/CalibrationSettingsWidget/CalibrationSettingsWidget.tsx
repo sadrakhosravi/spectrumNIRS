@@ -6,7 +6,7 @@ import { Tabs, TabItem } from '/@/components/Tabs';
 import { WidgetsContainer } from '/@/components/Widgets';
 
 // Tabs
-import { ProbeSettingsTab } from './ProbeSettingsTab';
+import { DeviceSettingsTab } from './DeviceSettingsTab';
 import { ChartSettingsTab } from './ChartSettingsTab';
 import { DataSettingsTab } from './DataSettingsTab';
 
@@ -14,9 +14,9 @@ export const CalibrationSettingsWidget = observer(() => {
   return (
     <WidgetsContainer>
       <Tabs>
-        {/* Probe Settings Tab */}
+        {/* Device Settings Tab */}
         <TabItem header="Device Settings">
-          <ProbeSettingsTab />
+          <DeviceSettingsTab />
         </TabItem>
 
         {/* Chart Settings Tab */}

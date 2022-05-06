@@ -10,7 +10,7 @@ import { DeviceSettings } from '/@/components/Device';
 import { deviceManagerVM } from '@viewmodels/VMStore';
 import { Separator } from '/@/components/Elements/Separator';
 
-export const ProbeSettingsTab = observer(() => {
+export const DeviceSettingsTab = observer(() => {
   const deviceOptions = deviceManagerVM.activeDevices.map((device) => {
     return {
       name: device.name,
@@ -18,7 +18,7 @@ export const ProbeSettingsTab = observer(() => {
     };
   });
 
-  const [currDeviceId, setCurrDeviceId] = React.useState(deviceManagerVM.activeDevices[0].id);
+  const [currDeviceId] = React.useState(deviceManagerVM.activeDevices[0].id);
 
   const currDevice = deviceManagerVM.activeDevices.find((device) => device.id === currDeviceId);
   const currVal = { name: currDevice?.name || '', value: currDevice?.name || '' };
@@ -30,7 +30,7 @@ export const ProbeSettingsTab = observer(() => {
           <span>Device:</span>
         </Column>
         <Column width="66.66%">
-          <Listbox value={currVal} options={deviceOptions} setter={setCurrDeviceId} />
+          <Listbox value={currVal} options={deviceOptions} setter={() => {}} />
         </Column>
       </Row>
       <Separator />

@@ -7,16 +7,12 @@
 
 import { action, makeObservable, observable, reaction } from 'mobx';
 
-// Models
-import { Lowpass } from '../../models/Filters';
-
 // Types
 import type { ChartViewModel } from '../Chart/ChartViewModel';
 import type { IReactionDisposer } from 'mobx';
 
 export class FilterSettingsViewModel {
   private chartVM: ChartViewModel;
-  private lowpassModel: Lowpass;
   private samplingRate: number;
   @observable public isActive: boolean;
   @observable public cutoffFrequency: number;
@@ -25,7 +21,6 @@ export class FilterSettingsViewModel {
 
   constructor(chartVM: ChartViewModel) {
     this.chartVM = chartVM;
-    this.lowpassModel = new Lowpass();
     this.samplingRate = 1000;
     this.isActive = false;
     this.cutoffFrequency = 5;
@@ -74,16 +69,12 @@ export class FilterSettingsViewModel {
       console.log('Filter Changed');
       if (!this.isActive) {
         this.chartVM.charts.forEach((chart) => {
-          chart.filters = null;
+          chart.series[0].removeSeriesLowpassFilter();
         });
         return;
       }
       this.chartVM.charts.forEach((chart) => {
-        chart.filters = this.lowpassModel.createLowpassFilter(
-          this.samplingRate,
-          this.cutoffFrequency,
-          this.order,
-        );
+        chart.series[0].addSeriesLowpassFilter(this.samplingRate, this.cutoffFrequency, this.order);
       });
     };
 

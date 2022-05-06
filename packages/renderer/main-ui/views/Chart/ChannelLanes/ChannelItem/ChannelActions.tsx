@@ -47,7 +47,7 @@ export const ChannelActions = observer(({ chart, chartIndex }: ChannelActionsTyp
           <FiMinimize2 {...iconSettings} title={'Minimize Channel'} />
         )}
       </button>
-      {chartVM.charts[chartIndex].filters && (
+      {chartVM.charts[chartIndex].series[0].lpFilter && (
         <Tippy content="Lowpass Filter Active">
           <button
             className={`${styles.ChannelActionButton} ${styles.ChannelActionButtonDisabled} `}

@@ -9,7 +9,7 @@ import { ipcRenderer } from 'electron';
 import ReaderChannels from '../../utils/channels/ReaderChannels';
 
 // Models
-import { ChartModel, ChartChannel } from '../../models/Chart';
+import { ChartModel } from '../../models/Chart';
 import { ColorPalette } from '../../models/ColorPalette';
 
 // Types
@@ -22,8 +22,6 @@ import type { UnpackedDataType } from '../../renderer/reader/Devices/Beast/Beast
 export type IChart = {
   dashboardChart: DashboardChart;
   series: ChartSeries[];
-  filters: any;
-  channel: ChartChannel;
   id: string;
 };
 
@@ -116,10 +114,8 @@ export class ChartViewModel {
     const chartId = chart.getId();
     this.charts.push({
       dashboardChart: chart,
-      channel: new ChartChannel(chart.chart),
       id: chartId,
       series: [],
-      filters: null,
     });
     return chart;
   }
@@ -239,7 +235,6 @@ export class ChartViewModel {
       chart.series.forEach((series) => series.dispose());
       chart.series.length = 0;
       chart.dashboardChart.dispose();
-      chart.filters = null;
     });
 
     this.charts.length = 0;
@@ -259,17 +254,10 @@ export class ChartViewModel {
    */
   private listenForData() {
     ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: UnpackedDataType) => {
-      this.charts.forEach((chart, i) => {
-        // If the chart has a filter, filter the data first
-        if (chart.filters) {
-          for (let j = 0; j < data[`ch${i + 1}` as keyof UnpackedDataType].length; j++) {
-            data[`ch${i + 1}` as keyof UnpackedDataType][j] = chart.filters.singleStep(
-              data[`ch${i + 1}` as keyof UnpackedDataType][j],
-            );
-          }
-        }
-        chart.series[0].series.addArrayY(data[`ch${i + 1}` as keyof UnpackedDataType], 1);
-      });
+      const numOfChannels = Object.keys(data).length - 1;
+      for (let i = 0; i < numOfChannels; i++) {
+        this.charts[i].series[0].series.addArrayY(data[`ch${i + 1}` as keyof UnpackedDataType], 1);
+      }
     });
   }
 

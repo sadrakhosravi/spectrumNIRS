@@ -6,6 +6,11 @@
 import Fili from 'fili';
 import { IIRFilter } from './IIRFilter';
 
+export interface Filter {
+  multiStep(data: number[] | Float32Array, overwrite?: boolean): number[];
+  singleStep(num: number, overwrite?: boolean): number;
+}
+
 export class Lowpass extends IIRFilter {
   constructor() {
     super();
@@ -15,7 +20,7 @@ export class Lowpass extends IIRFilter {
    * Creates and return the lowpass filter instance.
    * @returns the lowpass filter instance.
    */
-  public createLowpassFilter(fs: number, fc: number, order: number) {
+  public createLowpassFilter(fs: number, fc: number, order: number): Filter {
     const lowpassCoef = this.IIRFilters.lowpass({
       order: order,
       characteristic: 'butterworth',

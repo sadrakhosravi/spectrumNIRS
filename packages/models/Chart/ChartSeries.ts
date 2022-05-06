@@ -11,9 +11,11 @@ import type { LineSeries } from '@arction/lcjs';
 
 // Types
 import { ColorHEX, SolidFill, SolidLine } from '@arction/lcjs';
+import type { Filter } from '../Filters/Lowpass';
 
 // View Models
 import { deviceVM } from '../../viewmodels/VMStore';
+import { Lowpass } from '../Filters';
 
 export class ChartSeries {
   /**
@@ -32,15 +34,25 @@ export class ChartSeries {
    * Series gain value
    */
   @observable private seriesGainVal: number;
+  /**
+   * Lowpass filter instance or none.
+   */
+  @observable private lowpassFilter: Filter | null;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
     this.chartId = chartId;
+
     this.seriesColor = seriesColor;
     this.seriesGainVal = 1;
+    this.lowpassFilter = new Lowpass().createLowpassFilter(1000, 3, 3);
+
     this.setLineSeriesStrokeStyle();
     this.setSeriesCleaning(30 * 1000);
     makeObservable(this);
+
+    // this.generateDummyStreamData();
+    this.generateDummyStaticData();
   }
 
   /**
@@ -55,6 +67,13 @@ export class ChartSeries {
    */
   public get gainVal() {
     return this.seriesGainVal;
+  }
+
+  /**
+   * @returns the current lowpass filter instance.
+   */
+  public get lpFilter() {
+    return this.lowpassFilter;
   }
 
   /**
@@ -73,13 +92,32 @@ export class ChartSeries {
   }
 
   /**
+   * Creates or replaces the lowpass filter for the series.
+   * @param samplingRate the sampling rate of the device.
+   * @param cutoff the cutoff frequency of the lowpass filter.
+   * @param order the order of the lowpass filter.
+   */
+  @action public addSeriesLowpassFilter(samplingRate: number, cutoff: number, order: number) {
+    this.lowpassFilter = new Lowpass().createLowpassFilter(samplingRate, cutoff, order);
+  }
+
+  /**
+   * Removes the lowpass filter instance.
+   */
+  @action public removeSeriesLowpassFilter() {
+    this.lowpassFilter = null;
+  }
+
+  /**
    * Applies the gain value and adds Array of the data to the series.
    */
   public addArrayY(data: Float32Array | number[]) {
-    console.time('gain');
+    if (this.lowpassFilter) {
+      data = this.lowpassFilter.multiStep(data, true);
+    }
+
     // For each is faster here
     data.forEach((point) => (point *= this.seriesGainVal * deviceVM.calibrationFactor));
-    console.timeEnd('gain');
 
     this.series.addArrayY(data);
   }
@@ -100,6 +138,9 @@ export class ChartSeries {
    * Applies the gain value and adds single data point to the series.
    */
   public addPoint(data: { x: number; y: number }) {
+    if (this.lowpassFilter) {
+      this.lowpassFilter.singleStep(data.y, true);
+    }
     data.y *= this.seriesGainVal * deviceVM.calibrationFactor;
 
     this.series.add(data);
@@ -122,9 +163,17 @@ export class ChartSeries {
   /**
    * Generates and appends a random data to the series
    */
-  public generateDummyData() {
-    const data = XYDataGenerator.streamData(100);
+  public generateDummyStreamData() {
+    const data = XYDataGenerator.streamData(10);
     data.forEach((point) => this.addPoint(point));
+  }
+
+  public generateDummyStaticData() {
+    const data = XYDataGenerator.staticData(30 * 1000);
+    data.then((dp) => {
+      const arrY = dp.map((point) => point.y);
+      this.addArrayY(arrY);
+    });
   }
 
   /**

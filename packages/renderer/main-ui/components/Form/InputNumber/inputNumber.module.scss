@@ -1,19 +1,9 @@
 @import '@styles/variables.scss';
 
-.InputUnderlined {
+.InputNumber {
   background: transparent;
   border-bottom: solid 3px $color-bg-tertiary;
   padding: $gap-sm $gap-base;
   width: 100%;
   text-align: center;
-
-  &:focus-visible {
-    outline: none;
-    border-radius: 0;
-    border-color: $color-primary;
-  }
-
-  &:invalid {
-    border-color: $color-red;
-  }
 }

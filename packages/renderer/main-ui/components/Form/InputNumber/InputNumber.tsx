@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 // Styles
-import * as styles from './inputUnderlined.module.scss';
+import * as styles from './inputNumber.module.scss';
 
-type InputUnderlinedType = {
+type InputNumberType = {
   type?: React.HTMLInputTypeAttribute;
   value?: string | number;
   min?: number;
@@ -13,7 +13,7 @@ type InputUnderlinedType = {
   onFocus?: React.FocusEventHandler<HTMLInputElement>;
 };
 
-export const InputUnderlined = ({
+export const InputNumber = ({
   type,
   value,
   min,
@@ -21,10 +21,10 @@ export const InputUnderlined = ({
   onChange,
   onFocus,
   onBlur,
-}: InputUnderlinedType) => {
+}: InputNumberType) => {
   return (
     <input
-      className={`${styles.InputUnderlined}`}
+      className={`${styles.InputNumber}`}
       value={value}
       min={min}
       max={max}
