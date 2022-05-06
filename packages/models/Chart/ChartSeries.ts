@@ -39,6 +39,7 @@ export class ChartSeries {
     this.seriesColor = seriesColor;
     this.seriesGainVal = 1;
     this.setLineSeriesStrokeStyle();
+    this.setSeriesCleaning(30 * 1000);
     makeObservable(this);
   }
 
@@ -134,6 +135,13 @@ export class ChartSeries {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     this.series = null;
+  }
+
+  /**
+   * Sets the series data cleaning threshold.
+   */
+  public setSeriesCleaning(numOfPointsToKeep: number) {
+    this.series.setDataCleaning({ minDataPointCount: numOfPointsToKeep });
   }
 
   /**

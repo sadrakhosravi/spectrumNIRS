@@ -37,3 +37,8 @@
 .IconOnlyButtonActive {
   background-color: $color-primary;
 }
+
+.IconTextButton {
+  @include flex-center;
+  gap: $gap-xs;
+}

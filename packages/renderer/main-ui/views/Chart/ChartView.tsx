@@ -35,7 +35,7 @@ export const ChartView = observer(() => {
   React.useEffect(() => {
     // The dashboard will always have 1 chart, create 1 less than the total channels
     // Adjust charts
-    const lengthDiff = deviceVM.activePDs - chartVM.charts.length;
+    const lengthDiff = deviceVM.activeLEDs - chartVM.charts.length;
 
     // Remove charts
     if (lengthDiff < 0) {
@@ -51,18 +51,18 @@ export const ChartView = observer(() => {
         chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
       }
     }
-  }, [deviceVM.activePDs]);
+  }, [deviceVM.activeLEDs]);
 
   return (
     <div className={styles.ChartContainer}>
       <XAxis />
       <SensorInfo />
-      <div className={styles.ChartAreaContainer}>
+      <div
+        className={styles.ChartAreaContainer}
+        style={toJS(chartVM?.parentContainerStyle) || undefined}
+      >
         <ChannelLanes />
-        <div
-          className="w-full h-full relative"
-          style={toJS(chartVM?.parentContainerStyle) || undefined}
-        >
+        <div className="w-full h-full relative">
           <div
             className={styles.Chart}
             id={id}

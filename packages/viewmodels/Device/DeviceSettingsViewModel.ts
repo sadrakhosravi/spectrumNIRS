@@ -52,7 +52,7 @@ export class DeviceSettingsViewModel {
     this.isConnected = false;
     this.deviceName = 'Beast';
     this.activePDs = 1;
-    this.activeLEDs = 1;
+    this.activeLEDs = 15;
     this.calibFactor = 1;
 
     this.supportedLEDNum = new Array(15).fill(0).map((_, i) => (_ = i + 1));

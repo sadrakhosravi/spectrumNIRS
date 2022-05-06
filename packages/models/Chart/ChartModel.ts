@@ -28,7 +28,7 @@ export class ChartModel {
   protected dashboard: Dashboard | undefined;
 
   constructor() {
-    this.availableRows = new SortedNumberSet(new Array(20).fill(0).map((_, i) => i));
+    this.availableRows = new SortedNumberSet(new Array(30).fill(0).map((_, i) => i));
     this.dashboard = undefined;
   }
 
@@ -72,6 +72,8 @@ export class ChartModel {
       maxFps: 30,
       container: chartContainerId,
       theme: spectrumTheme,
+      lineAntiAlias: true,
+      antialias: true,
     });
     this.applyDashboardDefaults();
     return this.dashboard;

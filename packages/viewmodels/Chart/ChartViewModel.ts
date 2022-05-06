@@ -315,7 +315,7 @@ export class ChartViewModel {
           const diff = (totalCharts - 12) * 100; // 150px for each chart;
           this.chartContainerStyle = { height: `calc(100% + ${diff}px)` };
           this.dashboardHeight = `calc(100% + ${diff}px)`;
-          this.parentContainerStyle = { overflow: 'auto' };
+          this.parentContainerStyle = { overflowY: 'auto', overflowX: 'hidden' };
         }
         if (totalCharts < 12) {
           this.chartContainerStyle = { height: '100%' };

@@ -1,0 +1,25 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.DeviceListRefreshButton {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+}
+
+.DeviceListItem {
+  padding: $gap-base $gap-lg;
+  background-color: $color-bg-tertiary;
+  width: 100%;
+  gap: $gap-lg;
+
+  @include flex-center;
+  @include border-primary-light;
+  @include hover-state-secondary;
+
+  div {
+    margin-left: auto;
+    @include flex-center;
+    gap: $gap-sm;
+  }
+}

@@ -6,6 +6,7 @@ import * as styles from './statusBar.module.scss';
 
 // Components
 import { StatusBarItem } from './';
+import { DeviceList } from '../DeviceList';
 
 // Icon
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
@@ -16,7 +17,9 @@ import { deviceVM } from '@store';
 export const StatusBar = observer(() => {
   return (
     <footer className={styles.StatusBar}>
-      <div className={styles.LeftItems}></div>
+      <div className={styles.LeftItems}>
+        <DeviceList />
+      </div>
       <div className={styles.RightItems}>
         <StatusBarItem
           icon={
