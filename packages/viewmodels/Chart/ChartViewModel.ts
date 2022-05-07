@@ -17,7 +17,6 @@ import type { ChartSeries, DashboardChart } from '../../models/Chart';
 import type { Dashboard, SynchronizeAxisIntervalsHandle } from '@arction/lcjs';
 import type { CSSProperties } from 'react';
 import type { IReactionDisposer } from 'mobx';
-import type { UnpackedDataType } from '../../renderer/reader/Devices/Beast/BeastParser';
 
 export type IChart = {
   dashboardChart: DashboardChart;
@@ -79,7 +78,6 @@ export class ChartViewModel {
     makeObservable(this);
     this.reactions = [];
     this.handleReactions();
-    this.listenForData();
   }
 
   /**
@@ -247,18 +245,6 @@ export class ChartViewModel {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     this.model = null;
-  }
-
-  /**
-   * Listens for data from the reader process and adds it to the series.
-   */
-  private listenForData() {
-    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: UnpackedDataType) => {
-      const numOfChannels = Object.keys(data).length - 1;
-      for (let i = 0; i < numOfChannels; i++) {
-        this.charts[i].series[0].series.addArrayY(data[`ch${i + 1}` as keyof UnpackedDataType], 1);
-      }
-    });
   }
 
   /**

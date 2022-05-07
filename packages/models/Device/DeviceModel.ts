@@ -14,6 +14,10 @@ import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 // Types
 import type { IReactionDisposer } from 'mobx';
 import type { DeviceSettingsType } from '../../viewmodels/Device/DeviceSettingsViewModel';
+import type { UnpackedDataType } from '../../renderer/reader/Devices/Beast/BeastParser';
+
+// View Model
+import { chartVM } from '../../viewmodels/VMStore';
 
 export type DeviceInfoType = {
   id: string;
@@ -93,6 +97,7 @@ export class DeviceModel {
     makeObservable(this);
     this.handleReactions();
     this.initListeners();
+    this.listenForData();
   }
 
   /**
@@ -238,6 +243,47 @@ export class DeviceModel {
 
     return settings;
   };
+
+  /**
+   * Listens for data from the reader process and adds it to the series.
+   */
+  private listenForData() {
+    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: UnpackedDataType) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      const channelData = data[`ch${this._activePDs}`] as number[];
+      const ledNums = data['led_nums'];
+
+      const deviceData: any = {
+        led0: [],
+        led1: [],
+        led2: [],
+        led3: [],
+        led4: [],
+        led5: [],
+        led6: [],
+        led7: [],
+        led8: [],
+        led9: [],
+        led10: [],
+        led11: [],
+        led12: [],
+        led13: [],
+        led14: [],
+        led15: [],
+      };
+
+      for (let i = 0; i < 512 + 1; i++) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        deviceData[`led${ledNums[i]}`].push(channelData[i]);
+      }
+
+      for (let j = 0; j < 16; j++) {
+        chartVM.charts[j].series[0].addArrayY(deviceData[`led${j}`]);
+      }
+    });
+  }
 
   /**
    * Handles observable changes.

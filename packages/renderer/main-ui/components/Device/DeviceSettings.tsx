@@ -94,7 +94,7 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
           />
         </Column>
         <Column width="50%">
-          <span>Total PDs:</span>
+          <span>Selected PDs:</span>
           <Listbox
             options={PDOptions}
             value={{

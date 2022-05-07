@@ -8,20 +8,20 @@ export type UnpackedDataType = {
   ch5: number[];
   ch6: number[];
   ch7: number[];
-  led_nums: any[];
+  led_nums: number[];
 };
 
 export class BeastParser implements IDeviceParser {
   private pd_num: number;
   private bytes_count: number;
   private msb_indices: number[];
-  private led_num: number;
+  // private led_num: number;
 
   constructor() {
     this.pd_num = 0; // 0 ~ 7 -- this variable is set by user
     this.bytes_count = 8 * 2; // msb lsb
     this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
-    this.led_num = 0; // 0 ~ 15 -- this variable is set by user
+    // this.led_num = 0; // 0 ~ 15 -- this variable is set by user
   }
 
   /**
@@ -53,7 +53,7 @@ export class BeastParser implements IDeviceParser {
     };
 
     for (let index = 0; index < this.msb_indices.length; index++) {
-      if (index >= this.pd_num && index != 7) continue;
+      if (index >= this.pd_num && index !== 7) continue;
 
       let lsb = Int32Array.from(
         data.filter((_, i) => i % this.bytes_count === this.msb_indices[index] - 1),
@@ -73,8 +73,9 @@ export class BeastParser implements IDeviceParser {
 
     // find indices of arrays with led_num
     let indexArray: number[] = [];
-    indexArray = res.led_nums.reduce((b, e, i) => {
-      if (e === this.led_num) b.push(i);
+    indexArray = res.led_nums.reduce((b, _e, i) => {
+      //@ts-ignore
+      b.push(i);
       return b;
     }, []);
 
