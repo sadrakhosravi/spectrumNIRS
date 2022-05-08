@@ -45,14 +45,14 @@ export class ChartSeries {
 
     this.seriesColor = seriesColor;
     this.seriesGainVal = 1;
-    this.lowpassFilter = new Lowpass().createLowpassFilter(1000, 3, 3);
+    this.lowpassFilter = null;
 
     this.setLineSeriesStrokeStyle();
     this.setSeriesCleaning(30 * 1000);
     makeObservable(this);
 
     // this.generateDummyStreamData();
-    this.generateDummyStaticData();
+    // this.generateDummyStaticData();
   }
 
   /**
@@ -119,7 +119,7 @@ export class ChartSeries {
     // For each is faster here
     data.forEach((point) => (point *= this.seriesGainVal * deviceVM.calibrationFactor));
 
-    this.series.addArrayY(data);
+    this.series.addArrayY(data, 1);
   }
 
   /**

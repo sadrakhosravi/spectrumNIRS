@@ -14,7 +14,6 @@ import { XAxis } from './XAxis/XAxis';
 // View models
 import { chartVM, initChartVM, disposeChartVM } from '@store';
 
-import { deviceManagerVM } from '@store';
 import { SensorInfo } from './SensorInfo/SensorInfo';
 
 export const ChartView = observer(() => {
@@ -33,25 +32,30 @@ export const ChartView = observer(() => {
 
   // Update charts based on the number of active channels
   React.useEffect(() => {
-    // The dashboard will always have 1 chart, create 1 less than the total channels
-    // Adjust charts
-    const lengthDiff = deviceManagerVM.activeDevices[0].activeLEDs - chartVM.charts.length;
-
-    // Remove charts
-    if (lengthDiff < 0) {
-      for (let i = 0; i < Math.abs(lengthDiff); i++) {
-        chartVM.removeLastChart();
-      }
+    for (let i = 0; i < 15; i++) {
+      const chart = chartVM.addChart();
+      chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
     }
 
-    if (lengthDiff > 0) {
-      for (let i = 0; i < lengthDiff; i++) {
-        const chart = chartVM.addChart();
+    // // The dashboard will always have 1 chart, create 1 less than the total channels
+    // // Adjust charts
+    // const lengthDiff = deviceManagerVM.activeDevices[0].activeLEDs - chartVM.charts.length;
 
-        chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
-      }
-    }
-  }, [deviceManagerVM.activeDevices[0].activeLEDs]);
+    // // Remove charts
+    // if (lengthDiff < 0) {
+    //   for (let i = 0; i < Math.abs(lengthDiff); i++) {
+    //     chartVM.removeLastChart();
+    //   }
+    // }
+
+    // if (lengthDiff > 0) {
+    //   for (let i = 0; i < lengthDiff; i++) {
+    //     const chart = chartVM.addChart();
+
+    //     chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
+    //   }
+    // }
+  }, []);
 
   return (
     <div className={styles.ChartContainer}>

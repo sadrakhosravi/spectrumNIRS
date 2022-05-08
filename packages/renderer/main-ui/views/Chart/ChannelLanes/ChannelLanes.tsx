@@ -6,7 +6,7 @@ import * as styles from './channelLanes.module.scss';
 
 // Components
 import { ChannelLaneItem } from './ChannelItem';
-import { ChartCursors } from './ChartCursors';
+// import { ChartCursors } from './ChartCursors';
 
 // View model
 import { chartVM } from '@store'; // Prevents unnecessary re-renders
@@ -18,7 +18,7 @@ export const ChannelLanes = observer(() => {
         <ChannelLaneItem key={i + chart.id} chart={chart} chartIndex={i} />
       ))}
       {/* When mouse is over this area, charts will show cursors at that point */}
-      <ChartCursors />
+      {/* <ChartCursors /> */}
     </div>
   );
 });

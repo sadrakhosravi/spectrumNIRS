@@ -59,7 +59,7 @@ export class BeastInput implements IDeviceInput {
    */
   private parseSettings(settings: SettingsType) {
     // Get the num of LEDs and PDs that will be active
-    const { numOfLEDs } = settings;
+    // const { numOfLEDs } = settings;
 
     // If less than 16 settings are sent, fix the array
     if (settings.LEDValues.length < 16) {
@@ -116,7 +116,7 @@ export class BeastInput implements IDeviceInput {
     // Create the final object for to be sent to the controller
     const dataToSend = {
       pd_num: 7, // TODO: Make it so that the user can select it.
-      led_num: numOfLEDs + 1,
+      led_num: 15 + 1,
       virtual_src_addr_4: virtual_src_addr[0],
       virtual_src_addr_5: virtual_src_addr[1],
       virtual_src_addr_6: virtual_src_addr[2],
