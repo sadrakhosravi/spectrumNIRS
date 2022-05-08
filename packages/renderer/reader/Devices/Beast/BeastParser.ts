@@ -84,7 +84,7 @@ export class BeastParser implements IDeviceParser {
    * @returns an object containing the processed data of all the channels of beast hardware.
    */
   public processPacket = (packet: Buffer) => {
-    console.time('1');
+    // console.time('1');
 
     const data = new Uint8Array(packet);
 
@@ -207,7 +207,7 @@ export class BeastParser implements IDeviceParser {
     // res.ch6 = indexArray.map((i) => res.ch6[i]);
     // res.ch7 = indexArray.map((i) => res.ch7[i]);
     // res.led_nums = indexArray.map((i) => res.led_nums[i]);
-    console.timeEnd('1');
+    // console.timeEnd('1');
 
     return example;
   };

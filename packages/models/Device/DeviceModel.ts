@@ -252,7 +252,7 @@ export class DeviceModel {
       // Just plot the selected PD channel
       const chartData = data[`ch${this._activePDs}`];
       chartVM.charts.forEach((chart, i) => {
-        chart.series[0].addArrayY(chartData[`led${i + 1}`]);
+        chart.series[0].addArrayY(chartData[`led${i}`]);
       });
     });
   }

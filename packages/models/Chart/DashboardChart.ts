@@ -17,7 +17,7 @@ import { hiddenLabelStyle, gridLineStyle, fontStyle, fontFillStyle } from './The
 
 // Types
 import type { ChartType } from './ChartModel';
-import type { VisibleTicks } from '@arction/lcjs';
+import type { VisibleTicks, AxisInterval } from '@arction/lcjs';
 
 export class DashboardChart {
   /**
@@ -32,11 +32,16 @@ export class DashboardChart {
    * A unique id to track the chart
    */
   public readonly id: string;
+  /**
+   * Y Axis interval before dispose
+   */
+  private interval: AxisInterval | null;
 
   constructor(chart: ChartType, rowIndex: number, id?: string) {
     this.chart = chart;
     this.rowIndex = rowIndex;
     this.id = id || nanoid();
+    this.interval = null;
     this.setChartDefaults(this.chart);
   }
 
@@ -184,6 +189,9 @@ export class DashboardChart {
   public hideAxes() {
     const [xAxis, yAxis] = this.chart.getAxes();
 
+    // Save the interval
+    this.interval = yAxis.getInterval();
+
     xAxis
       .setThickness(0)
       .setTickStrategy(AxisTickStrategies.Empty)
@@ -201,7 +209,15 @@ export class DashboardChart {
    * Shows the chart's hidden axes.
    */
   public showAxes() {
+    const [axisX, axisY] = this.chart.getDefaultAxes();
+
     this.setAxesStyles();
+
+    requestAnimationFrame(() => {
+      this.interval &&
+        axisY.setInterval(this.interval.start || -50, this.interval.end || 50, false, true);
+      axisX.release();
+    });
   }
 
   /**
@@ -245,9 +261,11 @@ export class DashboardChart {
     // Axis Y defaults
     axisY
       .setNibMousePickingAreaSize(0)
-      .setMouseInteractions(false)
-      .setChartInteractions(false)
-      .setScrollStrategy(undefined)
+      .setMouseInteractions(true)
+      // .setMouseInteractions(false)
+      // .setChartInteractions(false)
+      // .setScrollStrategy(undefined)
+      .setScrollStrategy(AxisScrollStrategies.fitting)
       .setNibStyle(emptyLine)
       .setThickness(65)
       .setStrokeStyle(
@@ -256,11 +274,6 @@ export class DashboardChart {
           fillStyle: new SolidFill({ color: ColorHEX('#333') }),
         }),
       );
-
-    requestAnimationFrame(() => {
-      axisY.setInterval(-50, 50, false, true);
-      axisX.release();
-    });
   }
 
   /**
