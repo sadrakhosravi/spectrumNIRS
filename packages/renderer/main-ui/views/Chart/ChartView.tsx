@@ -23,6 +23,8 @@ export const ChartView = observer(() => {
   React.useLayoutEffect(() => {
     if (!chartVM) initChartVM();
     chartVM.init(id);
+    chartVM.addChart();
+    chartVM.addSeries(chartVM.charts[0].id, 'Ambient');
 
     return () => {
       console.log('Chart Cleanup');
@@ -34,7 +36,7 @@ export const ChartView = observer(() => {
   React.useEffect(() => {
     for (let i = 0; i < 15; i++) {
       const chart = chartVM.addChart();
-      chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
+      chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex()}`);
     }
 
     // // The dashboard will always have 1 chart, create 1 less than the total channels

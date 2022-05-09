@@ -8,7 +8,7 @@
 // import { makeObservable } from 'mobx';
 
 // Types
-import { EventEmitter } from 'node:events';
+// import { EventEmitter } from 'node:events';
 import type { DeviceModel } from '../Device/DeviceModel';
 
 type DataType = {
@@ -24,11 +24,11 @@ export class DataModel {
   /**
    * The data event emitter.
    */
-  public readonly emitter: EventEmitter;
+  // public readonly emitter: EventEmitter;
 
   constructor() {
     this.data = {};
-    this.emitter = new EventEmitter();
+    // this.emitter = new EventEmitter();
     this.maxDataInSec = 360; // Store up to 360 seconds in memory;
 
     // makeObservable(this);

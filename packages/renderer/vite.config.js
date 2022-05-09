@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { node } from '../../.electron-vendors.cache.json';
+import { chrome } from '../../.electron-vendors.cache.json';
 import { join } from 'path';
 import { builtinModules } from 'module';
 
@@ -49,18 +49,20 @@ const config = {
     port: 7777,
   },
   build: {
-    sourcemap: true,
-    target: `node${node}`,
+    sourcemap: false,
+    target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',
+    lib: {
+      entry: join(PACKAGE_ROOT, 'index.html'),
+      formats: ['cjs'],
+    },
+
     rollupOptions: {
-      input: {
-        main: join(PACKAGE_ROOT, 'index.html'),
-        reader: join(PACKAGE_ROOT, 'reader.html'),
-      },
+      input: [join(PACKAGE_ROOT, 'index.html'), join(PACKAGE_ROOT, 'reader.html')],
 
       output: {
-        format: 'es',
+        format: 'esm',
         exports: 'auto',
         esModule: true,
       },

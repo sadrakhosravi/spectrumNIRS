@@ -88,7 +88,7 @@ export class BeastParser implements IDeviceParser {
 
     const data = new Uint8Array(packet);
 
-    // // fill channels data
+    // // // fill channels data
     // let res: UnpackedDataType = {
     //   ch1: [],
     //   ch2: [],
@@ -164,10 +164,10 @@ export class BeastParser implements IDeviceParser {
 
     // console.timeEnd('1');
 
-    // console.log('New Method');
-    // console.log(example);
+    // // console.log('New Method');
+    // // console.log(example);
 
-    // console.time('2');
+    // // console.time('2');
     // for (let index = 0; index < this.msb_indices.length; index++) {
     //   // if (index >= this.pd_num && index !== 7) continue;
 
@@ -207,8 +207,11 @@ export class BeastParser implements IDeviceParser {
     // res.ch6 = indexArray.map((i) => res.ch6[i]);
     // res.ch7 = indexArray.map((i) => res.ch7[i]);
     // res.led_nums = indexArray.map((i) => res.led_nums[i]);
-    // console.timeEnd('1');
-
+    // // console.timeEnd('1');
+    // console.log('New Method');
+    // console.log(example);
+    // console.log('Old Method');
+    // console.log(res);
     return example;
   };
 }

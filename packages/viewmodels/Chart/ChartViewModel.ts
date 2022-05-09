@@ -92,8 +92,6 @@ export class ChartViewModel {
    */
   public init(containerId: string) {
     if (!this.model.getDashboard()) this.model.createDashboard(containerId);
-    this.addChart();
-    this.addSeries(this.charts[0].id, 'Channel 1');
   }
 
   /**

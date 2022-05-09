@@ -12,11 +12,9 @@ async function createWindow() {
   });
 
   // Open dev tools in dev mode
-  if (import.meta.env.DEV) {
-    setTimeout(() => {
-      browserWindow.webContents.openDevTools();
-    }, 1000);
-  }
+  setTimeout(() => {
+    browserWindow.webContents.openDevTools();
+  }, 1000);
 
   /**
    * URL for reader process.
