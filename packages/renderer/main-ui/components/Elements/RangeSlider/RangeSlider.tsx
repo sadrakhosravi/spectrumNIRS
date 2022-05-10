@@ -33,6 +33,7 @@ export const RangeSlider = ({
       step={step || 1}
       onChange={onChange}
       onMouseUp={onMouseUp}
+      tabIndex={-1}
     ></input>
   );
 };

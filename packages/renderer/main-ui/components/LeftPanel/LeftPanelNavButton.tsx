@@ -11,20 +11,23 @@ import { AppNavStates } from '@utils/types/AppStateTypes';
 type LeftPanelNavButtonProps = {
   text: string;
   icon: JSX.Element;
-  path: AppNavStates;
+  path?: AppNavStates;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-export const LeftPanelNavButton = observer(({ text, icon, path }: LeftPanelNavButtonProps) => {
-  return (
-    <button
-      tabIndex={1}
-      className={`${styles.LeftPanelNavButton} ${
-        appRouterVM.route === path && styles.LeftPanelNavButton_Active
-      }`}
-      onClick={() => path && appRouterVM.navigateTo(path)}
-    >
-      {icon}
-      <span>{text}</span>
-    </button>
-  );
-});
+export const LeftPanelNavButton = observer(
+  ({ text, icon, path, onClick }: LeftPanelNavButtonProps) => {
+    return (
+      <button
+        tabIndex={1}
+        className={`${styles.LeftPanelNavButton} ${
+          appRouterVM.route === path && styles.LeftPanelNavButton_Active
+        }`}
+        onClick={() => (path ? appRouterVM.navigateTo(path) : onClick)}
+      >
+        {icon}
+        <span>{text}</span>
+      </button>
+    );
+  },
+);

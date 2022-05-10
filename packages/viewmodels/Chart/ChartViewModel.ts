@@ -65,6 +65,10 @@ export class ChartViewModel {
    * An array of all the reaction functions for later dispose
    */
   private reactions: IReactionDisposer[];
+  /**
+   * The current chart view.
+   */
+  @observable private currView: 'line' | 'bar';
 
   constructor() {
     this.model = new ChartModel();
@@ -74,6 +78,7 @@ export class ChartViewModel {
     this.isChannelMaximized = null;
     this.xAxisHeight = '40px';
     this.dashboardHeight = `calc(100% - ${this.xAxisHeight})`;
+    this.currView = 'line';
     // Make this class observable
     makeObservable(this);
     this.reactions = [];
@@ -88,6 +93,13 @@ export class ChartViewModel {
   }
 
   /**
+   * The current chart view/
+   */
+  public get currentView() {
+    return this.currView;
+  }
+
+  /**
    * Creates the dashboard instance.
    */
   public init(containerId: string) {
@@ -99,6 +111,13 @@ export class ChartViewModel {
    */
   public getDashboard() {
     return this.model.getDashboard();
+  }
+
+  /**
+   * Sets the current chart view
+   */
+  @action public setCurrentView(value: 'line' | 'bar') {
+    this.currView = value;
   }
 
   /**
@@ -284,7 +303,7 @@ export class ChartViewModel {
 
         // Set the style of the chart and parent div containers
         if (totalCharts > 12) {
-          const diff = (totalCharts - 12) * 100; // 150px for each chart;
+          const diff = (totalCharts - 12) * 150; // 150px for each chart;
           this.chartContainerStyle = { height: `calc(100% + ${diff}px)` };
           this.dashboardHeight = `calc(100% + ${diff}px)`;
           this.parentContainerStyle = { overflowY: 'auto', overflowX: 'hidden' };

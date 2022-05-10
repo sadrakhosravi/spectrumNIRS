@@ -1,0 +1,25 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.SelectButton {
+  padding: $gap-xs $gap-lg;
+  background-color: $color-bg-tertiary;
+  width: 100%;
+  justify-content: space-between;
+  @include flex-center;
+  @include hover-state-secondary;
+  @include border-primary-light;
+
+  span {
+    @include flex-center;
+    gap: $gap-sm;
+  }
+}
+
+.SelectButtonActive {
+  background-color: $color-primary;
+
+  &:hover {
+    background-color: $color-primary;
+  }
+}

@@ -49,10 +49,8 @@ export class ChartSeries {
 
     this.setLineSeriesStrokeStyle();
     this.setSeriesCleaning(30 * 1000);
-    makeObservable(this);
 
-    // this.generateDummyStreamData();
-    // this.generateDummyStaticData();
+    makeObservable(this);
   }
 
   /**
@@ -161,13 +159,16 @@ export class ChartSeries {
   }
 
   /**
-   * Generates and appends a random data to the series
+   * Generates and appends a random data to the series.
    */
   public generateDummyStreamData() {
     const data = XYDataGenerator.streamData(10);
     data.forEach((point) => this.addPoint(point));
   }
 
+  /**
+   * Generates a static data and appends it to the series.
+   */
   public generateDummyStaticData() {
     const data = XYDataGenerator.staticData(30 * 1000);
     data.then((dp) => {
@@ -194,15 +195,15 @@ export class ChartSeries {
   }
 
   /**
-   * Sets the line series stroke thickness and color
+   * Sets the line series stroke thickness and color.
    */
   private setLineSeriesStrokeStyle() {
-    this.series.setStrokeStyle(
-      new SolidLine({
-        thickness: -1,
-        fillStyle: new SolidFill({ color: ColorHEX(this.seriesColor || '#00FFFF') }),
-      }),
-    );
-    this.seriesColor = this.seriesColor || '#00FFFF';
+    // Set the ambient color to white.
+    if (this.series.getName().toLocaleLowerCase() === 'ambient') {
+      this.changeSeriesColor('#fff');
+      return;
+    }
+
+    this.changeSeriesColor(this.seriesColor || '#fff');
   }
 }

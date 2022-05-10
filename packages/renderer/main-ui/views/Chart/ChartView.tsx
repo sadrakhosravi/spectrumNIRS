@@ -8,16 +8,15 @@ import * as styles from './chart.module.scss';
 // Components
 import { ChannelLanes } from './ChannelLanes/ChannelLanes';
 import { XAxis } from './XAxis/XAxis';
-
-// Types
+import { SensorInfo } from './SensorInfo/SensorInfo';
 
 // View models
-import { chartVM, initChartVM, disposeChartVM } from '@store';
-
-import { SensorInfo } from './SensorInfo/SensorInfo';
+import { chartVM, initChartVM, disposeChartVM, deviceManagerVM } from '@store';
+import { BarChartViewModel } from '@viewmodels/index';
 
 export const ChartView = observer(() => {
   const id = 'main-chart-container';
+  const barChartId = 'bar-chart-container';
   React.useMemo(() => initChartVM(), []);
 
   React.useLayoutEffect(() => {
@@ -34,48 +33,49 @@ export const ChartView = observer(() => {
 
   // Update charts based on the number of active channels
   React.useEffect(() => {
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < deviceManagerVM.activeDevices[0].activeLEDs; i++) {
       const chart = chartVM.addChart();
       chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex()}`);
     }
-
-    // // The dashboard will always have 1 chart, create 1 less than the total channels
-    // // Adjust charts
-    // const lengthDiff = deviceManagerVM.activeDevices[0].activeLEDs - chartVM.charts.length;
-
-    // // Remove charts
-    // if (lengthDiff < 0) {
-    //   for (let i = 0; i < Math.abs(lengthDiff); i++) {
-    //     chartVM.removeLastChart();
-    //   }
-    // }
-
-    // if (lengthDiff > 0) {
-    //   for (let i = 0; i < lengthDiff; i++) {
-    //     const chart = chartVM.addChart();
-
-    //     chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex() + 1}`);
-    //   }
-    // }
   }, []);
 
+  // On chart bart view, load the bar view chart
+  React.useEffect(() => {
+    let barChartVM: BarChartViewModel | null;
+
+    if (chartVM.currentView === 'bar') {
+      barChartVM = new BarChartViewModel();
+      barChartVM?.init(barChartId);
+    }
+
+    return () => {
+      barChartVM?.dispose();
+      barChartVM = null;
+    };
+  }, [chartVM.currentView]);
+
   return (
-    <div className={styles.ChartContainer}>
-      <XAxis />
-      <SensorInfo />
-      <div
-        className={styles.ChartAreaContainer}
-        style={toJS(chartVM?.parentContainerStyle) || undefined}
-      >
-        <ChannelLanes />
-        <div className="w-full h-full relative">
-          <div
-            className={styles.Chart}
-            id={id}
-            style={toJS(chartVM?.chartContainerStyle) || undefined}
-          />
+    <>
+      <div className={styles.ChartContainer}>
+        {chartVM.currentView === 'bar' && <div className={styles.ChartBarView} id={barChartId} />}
+        <span style={{ visibility: chartVM.currentView === 'line' ? 'visible' : 'hidden' }}>
+          <XAxis />
+          <SensorInfo />
+        </span>
+        <div
+          className={styles.ChartAreaContainer}
+          style={toJS(chartVM?.parentContainerStyle) || undefined}
+        >
+          <ChannelLanes />
+          <div className="w-full h-full relative">
+            <div
+              className={styles.Chart}
+              id={id}
+              style={toJS(chartVM?.chartContainerStyle) || undefined}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 });

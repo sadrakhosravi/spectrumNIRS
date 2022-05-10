@@ -26,31 +26,28 @@ type DeviceSettingsType = {
 
 export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
   const statusRef = React.useRef<HTMLSpanElement>(null);
-
-  const LEDOptions = toJS(device.LEDs).map((num) => {
-    return { name: num.toString(), value: num };
-  });
+  let timeoutRef: null | NodeJS.Timeout = null;
 
   const PDOptions = toJS(device.PDs).map((num) => {
     return { name: num.toString(), value: num };
   });
 
-  // Should be used because of the observable error in listbox setter
-  const setLEDs = (num: { name: string; value: number }) => {
-    device.setActiveLEDs(num.value);
-  };
-
   // Sets the total number of PDS
   const setPDs = (num: { name: string; value: number }) => {
-    device.setActivePDs(num.value);
+    device.setSelectedPD(num.value);
   };
 
   React.useEffect(() => {
     const statusSpan = statusRef.current as HTMLSpanElement;
 
-    const clearSpan = () => setTimeout(() => (statusSpan.innerText = ''), 3500);
+    const clearSpan = () => (timeoutRef = setTimeout(() => (statusSpan.innerText = ''), 3500));
 
     ipcRenderer.on(ReaderChannels.DEVICE_INPUT_RESPONSE, (_event, status: boolean | undefined) => {
+      // Clear the timeout first
+      if (timeoutRef) {
+        window.clearTimeout(timeoutRef);
+      }
+
       switch (status) {
         case undefined:
           statusSpan.innerText = 'Device is not connected!';
@@ -81,27 +78,15 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
     <>
       <Row gap="1rem" marginBottom="2rem">
         {/* Select total number of LEDs and PDs */}
-        <Column width="50%">
-          <span>Total LEDs:</span>
-          <Listbox
-            options={LEDOptions}
-            value={{
-              name: device.activeLEDs.toString(),
-              value: device.activeLEDs,
-            }}
-            // onChange={device.sendDeviceSettingsToReader}
-            setter={setLEDs}
-          />
-        </Column>
-        <Column width="50%">
-          <span>Selected PDs:</span>
+
+        <Column width="100%">
+          <span>Selected PD:</span>
           <Listbox
             options={PDOptions}
             value={{
-              name: device.activePDs.toString(),
-              value: device.activePDs,
+              name: device.selectedPD.toString(),
+              value: device.selectedPD,
             }}
-            // onChange={device.sendDeviceSettingsToReader}
             setter={setPDs}
           />
         </Column>

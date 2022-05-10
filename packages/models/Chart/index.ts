@@ -8,3 +8,6 @@ export { XAxisModel } from './XAxisModel';
 
 // Types
 export type { ChartType } from './ChartModel';
+
+// Bar Chart
+export { BarChartModel } from './BarChartModel';

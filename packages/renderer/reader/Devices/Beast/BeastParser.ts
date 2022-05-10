@@ -1,13 +1,10 @@
 import { IDeviceParser } from '../../api/device-api';
 
+// Type
+import type { DeviceADCDataType } from 'reader/types/DeviceDataType';
+
 export type UnpackedDataType = {
   [key: string]: number[];
-};
-
-export type UnpackedDataType2 = {
-  [key: string]: {
-    [key: string]: number[];
-  };
 };
 
 type ChannelsLsbMsbType = {
@@ -100,7 +97,7 @@ export class BeastParser implements IDeviceParser {
     //   led_nums: [],
     // };
 
-    let example: UnpackedDataType2 = {
+    let example: DeviceADCDataType = {
       ch1: {},
       ch2: {},
       ch3: {},

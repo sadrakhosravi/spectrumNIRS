@@ -74,6 +74,9 @@ export class ChartModel {
       theme: spectrumTheme,
       lineAntiAlias: true,
       antialias: true,
+      webgl: {
+        version: 'webgl2',
+      },
     });
     this.applyDashboardDefaults();
     return this.dashboard;

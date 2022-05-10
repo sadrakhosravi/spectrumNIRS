@@ -36,3 +36,13 @@ $sensor-info-width: 30px;
   height: calc(100%);
   position: relative;
 }
+
+.ChartBarView {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100%);
+  z-index: 100;
+  background-color: #fff;
+}

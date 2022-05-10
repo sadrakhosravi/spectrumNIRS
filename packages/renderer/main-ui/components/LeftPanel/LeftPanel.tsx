@@ -7,7 +7,7 @@ import * as styles from './leftPanel.module.scss';
 import { LeftPanelNavButton, LeftPanelActiveIndicator } from './';
 
 // Icons
-import { FiActivity, FiSearch, FiTool } from 'react-icons/fi';
+import { FiActivity, FiSearch, FiTool, FiSettings } from 'react-icons/fi';
 
 // Types
 import type { IconType } from 'react-icons/lib';
@@ -59,7 +59,12 @@ export const LeftPanel = () => {
         ))}
       </div>
 
-      <div className={styles.LeftPanelSettingsContainer}></div>
+      <div className={styles.LeftPanelSettingsContainer}>
+        <LeftPanelNavButton
+          text={'Settings'}
+          icon={<FiSettings size={iconSize} strokeWidth={iconStrokeWidth} color={iconColor} />}
+        />
+      </div>
       <LeftPanelActiveIndicator />
     </div>
   );

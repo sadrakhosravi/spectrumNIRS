@@ -14,10 +14,10 @@ import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 // Types
 import type { IReactionDisposer } from 'mobx';
 import type { DeviceSettingsType } from '../../viewmodels/Device/DeviceSettingsViewModel';
-import type { UnpackedDataType2 } from '../../renderer/reader/Devices/Beast/BeastParser';
+// import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
 
-// View Model
-import { chartVM } from '../../viewmodels/VMStore';
+// // View Model
+// import { chartVM } from '../../viewmodels/VMStore';
 
 export type DeviceInfoType = {
   id: string;
@@ -57,6 +57,10 @@ export class DeviceModel {
    */
   @observable private _activePDs: number;
   /**
+   * The selected PD data to show.
+   */
+  @observable private _selectedPD: number;
+  /**
    * The current sampling rate of the device.
    */
   @observable private _samplingRate: number;
@@ -86,6 +90,7 @@ export class DeviceModel {
 
     this._activeLEDs = deviceInfo.activeLEDs || 1;
     this._activePDs = deviceInfo.activePDs || 1;
+    this._selectedPD = 2;
     this._samplingRate = deviceInfo.samplingRate;
 
     this.isConnected = false;
@@ -119,6 +124,13 @@ export class DeviceModel {
    */
   public get activePDs() {
     return this._activePDs;
+  }
+
+  /**
+   * The selected PD to show the data from.
+   */
+  public get selectedPD() {
+    return this._selectedPD;
   }
 
   /**
@@ -176,6 +188,13 @@ export class DeviceModel {
    */
   @action public setActivePDs(num: number) {
     this._activePDs = num;
+  }
+
+  /**
+   * Sets the currently selected PD.
+   */
+  @action public setSelectedPD(num: number) {
+    this._selectedPD = num;
   }
 
   /**
@@ -248,13 +267,13 @@ export class DeviceModel {
    * Listens for data from the reader process and adds it to the series.
    */
   private listenForData() {
-    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: UnpackedDataType2) => {
-      // Just plot the selected PD channel
-      const chartData = data[`ch${this._activePDs}`];
-      chartVM.charts.forEach((chart, i) => {
-        chart.series[0].addArrayY(chartData[`led${i}`]);
-      });
-    });
+    // ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: DeviceADCDataType) => {
+    //   // Just plot the selected PD channel
+    //   const chartData = data[`ch${this._activePDs}`];
+    //   chartVM.charts.forEach((chart, i) => {
+    //     chart.series[0].addArrayY(chartData[`led${i}`]);
+    //   });
+    // });
   }
 
   /**

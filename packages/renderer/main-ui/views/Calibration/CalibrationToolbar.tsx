@@ -4,12 +4,12 @@ import * as React from 'react';
 import * as styles from './calibration.module.scss';
 
 // Components
-// import { ToolbarSection, ToolbarButton } from '/@/components/Toolbar';
 import { Button } from '/@/components/Elements/Buttons/Button';
 import { DeviceList } from '../../components/Device';
+import { ChartViewSwitcher } from '/@/components/Chart';
 
 // Icons
-// import { FiMinimize2 } from 'react-icons/fi';
+// import { FiGrid } from 'react-icons/fi';
 
 // View Models
 import { CalibrationToolbarViewModel } from '@viewmodels/index';
@@ -64,6 +64,7 @@ export const CalibrationToolbar = () => {
         />
       </ToolbarSection> */}
       <div className={styles.ActionButtonContainer}>
+        <ChartViewSwitcher />
         <span className={styles.DeviceListButtonContainer}>
           <DeviceList />
         </span>

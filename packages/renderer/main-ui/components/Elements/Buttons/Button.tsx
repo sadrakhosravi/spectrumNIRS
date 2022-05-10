@@ -7,12 +7,14 @@ type ButtonType = {
   text: string;
   color?: 'primary' | 'green' | 'red';
   className?: string;
+  type?: 'button' | 'submit' | 'reset';
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-export const Button = ({ text, onClick, className, color }: ButtonType) => {
+export const Button = ({ text, type, className, color, onClick }: ButtonType) => {
   return (
     <button
+      type={type || 'button'}
       className={`${styles.Button} ${className || ''} ${
         color === 'primary'
           ? styles.ButtonPrimary

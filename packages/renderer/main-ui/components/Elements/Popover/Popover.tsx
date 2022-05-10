@@ -11,11 +11,12 @@ type PopoverType = {
   buttonRef: HTMLButtonElement;
   title?: string;
   children: React.ReactNode;
+  height?: number;
   closeSetter: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const Popover = ({ buttonRef, title, children, closeSetter }: PopoverType) => {
-  const height = 250;
+export const Popover = ({ buttonRef, title, height, children, closeSetter }: PopoverType) => {
+  const popoverHeight = height || 250;
 
   const buttonSize = buttonRef.getBoundingClientRect();
   const topMargin = 15;
@@ -23,16 +24,16 @@ export const Popover = ({ buttonRef, title, children, closeSetter }: PopoverType
   let left = buttonSize.left - 45;
   let flip = false;
 
-  // Get viewport height and flip the indicator if needed
+  // Get viewport popoverHeight and flip the indicator if needed
   const windowHeight = window.innerHeight;
-  if (top + height > windowHeight - 15) {
-    top = buttonSize.y - height - topMargin;
+  if (top + popoverHeight > windowHeight - 15) {
+    top = buttonSize.y - popoverHeight - topMargin;
     flip = true;
   }
 
   return (
     <Dialog open={true} onClose={() => closeSetter(false)}>
-      <div className={styles.Popover} style={{ top, left, height }}>
+      <div className={styles.Popover} style={{ top, left, height: popoverHeight }}>
         {/* The triangle indicator */}
         <span
           className={

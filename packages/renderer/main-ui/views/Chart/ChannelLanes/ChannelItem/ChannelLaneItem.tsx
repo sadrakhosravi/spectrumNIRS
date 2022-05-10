@@ -37,23 +37,21 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
 
     // Resize channels on chart resize
     const token = chart.dashboardChart.chart.onResize(() => {
-      requestAnimationFrame(() => {
-        const size = chart.dashboardChart.getSize();
-        if (size.height < 15) {
-          setIsMaximized(true);
-        }
+      const size = chart.dashboardChart.getSize();
+      if (size.height < 15) {
+        setIsMaximized(true);
+      }
 
-        if (size.height > 15) {
-          setIsMaximized(false);
-        }
+      if (size.height > 15) {
+        setIsMaximized(false);
+      }
 
-        if (size.height < 55) {
-          // setIsCompact(true);
-        }
+      if (size.height < 55) {
+        // setIsCompact(true);
+      }
 
-        setTop(size.y1);
-        setHeight(size.height);
-      });
+      setTop(size.y1);
+      setHeight(size.height);
     });
 
     setTop(size.y1);

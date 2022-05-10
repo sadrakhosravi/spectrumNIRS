@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import http from 'http';
-console.log(http);
+
 // Components
 import App from './App';
 

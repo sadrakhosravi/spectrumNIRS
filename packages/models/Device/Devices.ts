@@ -11,7 +11,7 @@ export const devices: DeviceInfoType[] = [
     numOfLEDs: 15,
     defaultCalibrationFactor: 1,
     samplingRate: 1000,
-    activeLEDs: 1,
-    activePDs: 1,
+    activeLEDs: 15,
+    activePDs: 7,
   },
 ];

@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { chrome } from '../../.electron-vendors.cache.json';
+import { node } from '../../.electron-vendors.cache.json';
 import { join } from 'path';
 import { builtinModules } from 'module';
 
@@ -50,7 +50,7 @@ const config = {
   },
   build: {
     sourcemap: false,
-    target: `chrome${chrome}`,
+    target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
     lib: {

@@ -12,6 +12,8 @@ export const ErrorDialogs = () => {
       setError(error);
       setIsDialogOpen(true);
     };
+
+    process.on('uncaughtException', () => console.log('Exception'));
   }, []);
 
   return (
