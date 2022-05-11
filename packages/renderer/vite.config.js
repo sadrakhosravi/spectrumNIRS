@@ -1,12 +1,14 @@
 /* eslint-env node */
 
-import { node } from '../../.electron-vendors.cache.json';
+import { chrome } from '../../.electron-vendors.cache.json';
 import { join } from 'path';
 import { builtinModules } from 'module';
 
 // Plugins
 import reactVite from '@vitejs/plugin-react';
 import electronRenderer from 'vite-plugin-electron/renderer';
+import polyfillExports from 'vite-plugin-electron/polyfill-exports';
+
 import checker from 'vite-plugin-checker';
 
 const PACKAGE_ROOT = __dirname;
@@ -35,6 +37,8 @@ const config = {
   plugins: [
     reactVite(),
     electronRenderer(),
+    polyfillExports(),
+
     checker({
       typescript: {
         tsconfigPath: './tsconfig.json',
@@ -47,33 +51,37 @@ const config = {
       strict: true,
     },
     port: 7777,
+    rollupOptions: {
+      output: {
+        format: 'cjs',
+        exports: 'auto',
+      },
+    },
   },
   build: {
-    sourcemap: false,
-    target: `node${node}`,
+    sourcemap: true,
+    target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',
-    lib: {
-      entry: join(PACKAGE_ROOT, 'index.html'),
-      formats: ['cjs'],
-    },
 
     rollupOptions: {
-      input: [join(PACKAGE_ROOT, 'index.html'), join(PACKAGE_ROOT, 'reader.html')],
-
-      output: {
-        format: 'esm',
-        exports: 'auto',
-        esModule: true,
+      input: {
+        main: join(PACKAGE_ROOT, 'index.html'),
+        reader: join(PACKAGE_ROOT, 'reader.html'),
       },
+      output: {
+        format: 'cjs',
+        exports: 'auto',
+      },
+
+      treeshake: true,
 
       external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
-    minify: 'esbuild',
 
-    chunkSizeWarningLimit: 1024,
     emptyOutDir: true,
     brotliSize: false,
+    minify: false,
   },
   test: {
     environment: 'happy-dom',

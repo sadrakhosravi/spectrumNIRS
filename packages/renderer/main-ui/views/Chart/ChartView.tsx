@@ -11,8 +11,15 @@ import { XAxis } from './XAxis/XAxis';
 import { SensorInfo } from './SensorInfo/SensorInfo';
 
 // View models
-import { chartVM, initChartVM, disposeChartVM, deviceManagerVM } from '@store';
-import { BarChartViewModel } from '@viewmodels/index';
+import {
+  chartVM,
+  initChartVM,
+  disposeChartVM,
+  deviceManagerVM,
+  barChartVM,
+  initBarChartVM,
+  disposeBarChartVM,
+} from '@store';
 
 export const ChartView = observer(() => {
   const id = 'main-chart-container';
@@ -41,16 +48,13 @@ export const ChartView = observer(() => {
 
   // On chart bart view, load the bar view chart
   React.useEffect(() => {
-    let barChartVM: BarChartViewModel | null;
-
     if (chartVM.currentView === 'bar') {
-      barChartVM = new BarChartViewModel();
+      initBarChartVM();
       barChartVM?.init(barChartId);
     }
 
     return () => {
-      barChartVM?.dispose();
-      barChartVM = null;
+      disposeBarChartVM();
     };
   }, [chartVM.currentView]);
 

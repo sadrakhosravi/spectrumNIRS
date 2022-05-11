@@ -14,6 +14,7 @@ import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 // Types
 import type { IReactionDisposer } from 'mobx';
 import type { DeviceSettingsType } from '../../viewmodels/Device/DeviceSettingsViewModel';
+import DataManagerModel from '../Data/DataManagerModel';
 // import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
 
 // // View Model
@@ -195,6 +196,7 @@ export class DeviceModel {
    */
   @action public setSelectedPD(num: number) {
     this._selectedPD = num;
+    DataManagerModel.setChannelSource(num);
   }
 
   /**

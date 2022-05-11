@@ -30,7 +30,7 @@ export const textFillStyle = new SolidFill({
 });
 
 export const titleFillStyle = new SolidFill({
-  color: ColorHEX('#7f7f7f'),
+  color: ColorHEX('#fff'),
 });
 
 export const hiddenLabelStyle = new SolidFill({ color: ColorRGBA(0, 0, 0, 0) });

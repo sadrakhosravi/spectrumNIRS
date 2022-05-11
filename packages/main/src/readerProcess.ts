@@ -5,6 +5,7 @@ async function createWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
     webPreferences: {
+      webgl: false,
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,

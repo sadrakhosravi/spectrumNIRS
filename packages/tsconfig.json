@@ -16,6 +16,12 @@
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
 
-  "include": ["./models/**/*", "./viewmodels/**/*", "./database/**/*", "./utils/**/*"],
+  "include": [
+    "./models/**/*",
+    "./viewmodels/**/*",
+    "./database/**/*",
+    "./utils/**/*",
+    "./preload/contracts.d.ts"
+  ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

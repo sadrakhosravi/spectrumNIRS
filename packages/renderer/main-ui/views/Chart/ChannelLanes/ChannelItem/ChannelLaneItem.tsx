@@ -14,6 +14,7 @@ import { SeriesUnit } from './SeriesUnit';
 
 // Types
 import type { IChart } from '@viewmodels/Chart/ChartViewModel';
+import type { Token } from '@arction/eventer';
 
 // View model
 import { chartVM } from '@store';
@@ -33,29 +34,34 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
   const channelInfoRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
-    const size = chart.dashboardChart.getSize();
-
-    // Resize channels on chart resize
-    const token = chart.dashboardChart.chart.onResize(() => {
+    let token: Token;
+    requestAnimationFrame(() => {
       const size = chart.dashboardChart.getSize();
-      if (size.height < 15) {
-        setIsMaximized(true);
-      }
 
-      if (size.height > 15) {
-        setIsMaximized(false);
-      }
+      // Resize channels on chart resize
+      token = chart.dashboardChart.chart.onResize(() => {
+        requestAnimationFrame(() => {
+          const size = chart.dashboardChart.getSize();
+          if (size.height < 15) {
+            setIsMaximized(true);
+          }
 
-      if (size.height < 55) {
-        // setIsCompact(true);
-      }
+          if (size.height > 15) {
+            setIsMaximized(false);
+          }
+
+          if (size.height < 55) {
+            // setIsCompact(true);
+          }
+
+          setTop(size.y1);
+          setHeight(size.height);
+        });
+      });
 
       setTop(size.y1);
       setHeight(size.height);
     });
-
-    setTop(size.y1);
-    setHeight(size.height);
 
     return () => {
       chart?.dashboardChart?.chart?.offResize(token);
@@ -63,9 +69,9 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
   }, []);
 
   // Handles the on channel name click
-  const handleOpenChannelSettings = () => {
+  const handleOpenChannelSettings = React.useCallback(() => {
     setIsSettingsOpen(!isSettingsOpen);
-  };
+  }, []);
 
   return (
     <>

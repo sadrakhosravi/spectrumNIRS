@@ -8,6 +8,8 @@
 import { AppMenuViewModel } from './App/AppMenuViewModel';
 import { AppStatesViewModel } from './App/AppStatesViewModel';
 import { ChartViewModel } from './Chart/ChartViewModel';
+import { BarChartViewModel } from './Chart/BarChartViewModel';
+
 import { DeviceManagerViewModel } from './Device/DeviceManagerViewModel';
 import { DeviceSettingsViewModel } from './Device/DeviceSettingsViewModel';
 
@@ -42,6 +44,26 @@ export const disposeChartVM = () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   chartVM = null;
+};
+
+/**
+ * The bar chart view model instance
+ */
+export let barChartVM: BarChartViewModel | null;
+
+/**
+ * Initializes the barChartVM instance
+ */
+export const initBarChartVM = () => {
+  if (!barChartVM) barChartVM = new BarChartViewModel();
+};
+
+/**
+ * Disposes the bar chart view model instance.
+ */
+export const disposeBarChartVM = () => {
+  barChartVM?.dispose();
+  barChartVM = null;
 };
 
 /// ------------------------- Device -------------------------///

@@ -7,7 +7,6 @@ import { StatusBar } from '/@/components/StatusBar';
 import { ErrorDialogs } from './components/ErrorDialogs/ErrorDialogs';
 
 // Global styles
-import './styles/tailwind.css';
 import './styles/main.scss';
 import 'tippy.js/dist/tippy.css'; // optional
 

@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 
 // Data
-import '@models/Data/DataModel';
+import '@models/Data/DataManagerModel';
 
 // View Model Store
 import '@store';

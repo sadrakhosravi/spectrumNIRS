@@ -3,8 +3,8 @@ import { observer } from 'mobx-react-lite';
 import { appRouterVM } from '@store';
 
 // Views
-const HomeView = React.lazy(() => import('./Home/HomeView'));
-const ScreenView = React.lazy(() => import('./ScreenView/ScreenView'));
+import { HomeView } from './Home';
+import { ScreenView } from './ScreenView';
 
 export const ViewRouter = observer(() => {
   return (

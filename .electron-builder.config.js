@@ -15,13 +15,17 @@ const config = {
     buildResources: 'buildResources',
   },
   appId: 'com.spectrumnirs.app',
+  productName: 'Spectrum',
+
   files: ['packages/**/dist/**'],
-  nsis: {
-    oneClick: true,
-  },
+
   extraMetadata: {
     version: process.env.VITE_APP_VERSION,
   },
+  asar: false,
+  // win: {
+  //   target: ['nsis'],
+  // },
 };
 
 module.exports = config;

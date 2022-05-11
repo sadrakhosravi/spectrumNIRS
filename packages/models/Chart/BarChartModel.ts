@@ -8,11 +8,9 @@ import {
   AutoCursorModes,
   AxisScrollStrategies,
   AxisTickStrategies,
-  ColorHEX,
   ColorRGBA,
   lightningChart,
   SolidFill,
-  SolidLine,
   UIElementBuilders,
 } from '@arction/lcjs';
 
@@ -28,7 +26,13 @@ import type {
 import type { ChannelDataType } from '../../renderer/reader/types/DeviceDataType';
 
 // Theme
-import { spectrumTheme, textFillStyle, uiMajorTickFont, uiMinorTickFont } from './Theme';
+import {
+  gridLineStyle,
+  spectrumTheme,
+  textFillStyle,
+  uiMajorTickFont,
+  uiMinorTickFont,
+} from './Theme';
 
 export class BarChartModel {
   /**
@@ -174,6 +178,7 @@ export class BarChartModel {
     for (let i = 0; i < totalLEDs; i++) {
       const tick = xAxis
         .addCustomTick(UIElementBuilders.AxisTick)
+        .setGridStrokeStyle(gridLineStyle)
         .setValue(this.seriesGap * i + this.rectWidth / 2)
         .setTextFormatter(() => 'LED' + (i + 1));
 
@@ -183,6 +188,7 @@ export class BarChartModel {
     // Create the ambient
     const ambientTick = xAxis
       .addCustomTick(UIElementBuilders.AxisTick)
+      .setGridStrokeStyle(gridLineStyle)
       .setValue(this.seriesGap * totalLEDs + 1 + this.rectWidth / 2)
       .setTextFormatter(() => 'Ambient');
 
@@ -200,9 +206,11 @@ export class BarChartModel {
         antialias: true,
         theme: spectrumTheme,
       })
+      .setTitle('Intensity Calibration')
       .setTitleMarginBottom(10)
       .setAutoCursorMode(AutoCursorModes.disabled)
-      .setMouseInteractions(false);
+      .setMouseInteractions(false)
+      .setPadding({ bottom: 10 });
   }
 
   /**
@@ -242,23 +250,13 @@ export class BarChartModel {
           majorTick
             .setLabelFont(uiMajorTickFont)
             .setLabelFillStyle(textFillStyle)
-            .setGridStrokeStyle(
-              new SolidLine({
-                thickness: 0.5,
-                fillStyle: new SolidFill({ color: ColorHEX('#222') }),
-              }),
-            ),
+            .setGridStrokeStyle(gridLineStyle),
         )
         .setMinorTickStyle((minorTick: VisibleTicks) =>
           minorTick
             .setLabelFont(uiMinorTickFont)
             .setLabelFillStyle(textFillStyle)
-            .setGridStrokeStyle(
-              new SolidLine({
-                thickness: 0.5,
-                fillStyle: new SolidFill({ color: ColorHEX('#222') }),
-              }),
-            ),
+            .setGridStrokeStyle(gridLineStyle),
         ),
     );
   }
