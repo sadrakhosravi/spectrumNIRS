@@ -109,7 +109,7 @@ export class ChartSeries {
   /**
    * Applies the gain value and adds Array of the data to the series.
    */
-  public addArrayY(data: Float32Array | number[]) {
+  public addArrayY(data: Float32Array | Int32Array | number[]) {
     if (this.lowpassFilter) {
       data = this.lowpassFilter.multiStep(data, true);
     }

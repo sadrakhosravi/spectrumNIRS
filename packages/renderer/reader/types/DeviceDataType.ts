@@ -6,7 +6,7 @@
  */
 export type DeviceADCDataType = {
   [key: string]: {
-    [key: string]: number[];
+    [key: string]: Int32Array;
   };
 };
 
@@ -16,5 +16,5 @@ export type DeviceADCDataType = {
  * @example LED name: 'led0'. LED 0 is the ambient.
  */
 export type ChannelDataType = {
-  [key: string]: number[];
+  [key: string]: Int32Array;
 };

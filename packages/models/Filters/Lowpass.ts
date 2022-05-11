@@ -7,7 +7,7 @@ import Fili from 'fili';
 import { IIRFilter } from './IIRFilter';
 
 export interface Filter {
-  multiStep(data: number[] | Float32Array, overwrite?: boolean): number[];
+  multiStep(data: number[] | Float32Array | Int32Array, overwrite?: boolean): number[];
   singleStep(num: number, overwrite?: boolean): number;
 }
 

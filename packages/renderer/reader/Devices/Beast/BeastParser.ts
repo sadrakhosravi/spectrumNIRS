@@ -2,6 +2,7 @@ import { IDeviceParser } from '../../api/device-api';
 
 // Type
 import type { DeviceADCDataType } from 'reader/types/DeviceDataType';
+import EventEmitter from 'node:events';
 
 export type UnpackedDataType = {
   [key: string]: number[];
@@ -18,8 +19,11 @@ export class BeastParser implements IDeviceParser {
   // private pd_num: number;
   private bytes_count: number;
   private msb_indices: number[];
-  private bufferSize: 512;
-  channelsLsbMsb: ChannelsLsbMsbType;
+  private bufferFactor: number;
+  private bufferSize: number;
+  private channelsLsbMsb: ChannelsLsbMsbType;
+  private emitter: EventEmitter;
+  private res: DeviceADCDataType;
 
   // private led_num: number;
 
@@ -27,8 +31,9 @@ export class BeastParser implements IDeviceParser {
     // this.pd_num = 0; // 0 ~ 7 -- this variable is set by user
     this.bytes_count = 8 * 2; // msb lsb
     this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
-    this.bufferSize = 512;
-    // this.led_num = 0; // 0 ~ 15 -- this variable is set by user
+    this.bufferFactor = 1;
+    this.bufferSize = 512 * this.bufferFactor;
+    this.emitter = new EventEmitter();
 
     // Channels MSB LSB
     this.channelsLsbMsb = {
@@ -65,6 +70,35 @@ export class BeastParser implements IDeviceParser {
         msb: new Int32Array(this.bufferSize),
       },
     };
+
+    this.res = {
+      ch1: {},
+      ch2: {},
+      ch3: {},
+      ch4: {},
+      ch5: {},
+      ch6: {},
+      ch7: {},
+      ch8: {},
+    };
+
+    // Create each LED for each channel.
+    for (let i = 0; i < 16; i++) {
+      for (let j = 0; j < 8; j++) {
+        this.res[`ch${j + 1}`][`led${i}`] = new Int32Array(this.bufferSize);
+      }
+    }
+  }
+
+  /**
+   * The parser data emitter, use `data` event to listen for data.
+   */
+  public get dataEmitter() {
+    return this.emitter;
+  }
+
+  public emitData() {
+    this.emitter.emit('data', this.res);
   }
 
   /**
@@ -84,37 +118,6 @@ export class BeastParser implements IDeviceParser {
     // console.time('1');
 
     const data = new Uint8Array(packet);
-
-    // // // fill channels data
-    // let res: UnpackedDataType = {
-    //   ch1: [],
-    //   ch2: [],
-    //   ch3: [],
-    //   ch4: [],
-    //   ch5: [],
-    //   ch6: [],
-    //   ch7: [],
-    //   led_nums: [],
-    // };
-
-    let example: DeviceADCDataType = {
-      ch1: {},
-      ch2: {},
-      ch3: {},
-      ch4: {},
-      ch5: {},
-      ch6: {},
-      ch7: {},
-      ch8: {},
-    };
-
-    // Create each LED for each channel.
-    for (let i = 0; i < 16; i++) {
-      for (let j = 0; j < 8; j++) {
-        example[`ch${j + 1}`][`led${i}`] = [];
-      }
-    }
-
     const dataLength = data.length;
     const msbIndicesLength = this.msb_indices.length;
 
@@ -155,60 +158,10 @@ export class BeastParser implements IDeviceParser {
           (this.channelsLsbMsb[channelIndex].msb[i] << 8);
         d = (d << 16) >> 16;
 
-        example[channelIndex][`led${ledNum}`].push(d);
+        this.res[channelIndex][`led${ledNum}`][i] = d;
       }
     }
 
-    // console.timeEnd('1');
-
-    // // console.log('New Method');
-    // // console.log(example);
-
-    // // console.time('2');
-    // for (let index = 0; index < this.msb_indices.length; index++) {
-    //   // if (index >= this.pd_num && index !== 7) continue;
-
-    //   const lsbArr = Int32Array.from(
-    //     data.filter((_, i) => i % this.bytes_count === this.msb_indices[index] - 1),
-    //   );
-    //   const msbArr = Int32Array.from(
-    //     data.filter((_, i) => i % this.bytes_count === this.msb_indices[index] - 0),
-    //   );
-
-    //   // else // channels
-    //   //@ts-ignore
-    //   res[Object.keys(res)[index as number] as any] = lsbArr.map((lsb, i) => {
-    //     let d = lsb + (msbArr[i] << 8);
-    //     d = (d << 16) >> 16;
-    //     return d;
-    //   });
-    // }
-    // console.timeEnd('2');
-
-    // console.log('Old Method');
-    // console.log(res);
-
-    // // find indices of arrays with led_num
-    // let indexArray: number[] = [];
-    // indexArray = res.led_nums.reduce((b, _e, i) => {
-    //   //@ts-ignore
-    //   b.push(i);
-    //   return b;
-    // }, []);
-
-    // res.ch1 = indexArray.map((i) => res.ch1[i]);
-    // res.ch2 = indexArray.map((i) => res.ch2[i]);
-    // res.ch3 = indexArray.map((i) => res.ch3[i]);
-    // res.ch4 = indexArray.map((i) => res.ch4[i]);
-    // res.ch5 = indexArray.map((i) => res.ch5[i]);
-    // res.ch6 = indexArray.map((i) => res.ch6[i]);
-    // res.ch7 = indexArray.map((i) => res.ch7[i]);
-    // res.led_nums = indexArray.map((i) => res.led_nums[i]);
-    // // console.timeEnd('1');
-    // console.log('New Method');
-    // console.log(example);
-    // console.log('Old Method');
-    // console.log(res);
-    return example;
+    return this.res;
   };
 }

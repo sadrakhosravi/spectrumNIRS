@@ -100,16 +100,27 @@ export class BarChartModel {
    * @param data Channel Data Type
    */
   public addData(data: ChannelDataType) {
-    for (let i = 1; i < this.rectangles.length; i++) {
-      // Only plot the last value in the array.
-      const dataPointY = data[`led${i}`][-1];
+    const lastPointIndex = data['led1'].length - 1;
+    const ambient = data['led0'][lastPointIndex];
 
-      // Update rectangle dimensions.
-      this.rectangles[i].setDimensions({
-        ...this.rectangles[i].getDimensionsPositionAndSize(),
-        height: dataPointY,
+    requestAnimationFrame(() => {
+      for (let i = 0; i < this.rectangles.length - 1; i++) {
+        // Only plot the last value in the array.
+        const dataPointY = data[`led${i + 1}`][lastPointIndex];
+
+        // Update rectangle dimensions.
+        this.rectangles[i].setDimensions({
+          ...this.rectangles[i].getDimensionsPositionAndSize(),
+          height: dataPointY - ambient, // Subtract the ambient from the reading
+        });
+      }
+
+      // Plot the ambient
+      this.rectangles[this.rectangles.length - 1].setDimensions({
+        ...this.rectangles[this.rectangles.length - 1].getDimensionsPositionAndSize(),
+        height: ambient, // Subtract the ambient from the reading
       });
-    }
+    });
   }
 
   /**
