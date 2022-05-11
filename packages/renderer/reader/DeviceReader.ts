@@ -98,6 +98,8 @@ export class DeviceReader {
       device.off('disconnect', handleDisconnect);
       device.off(BeastCmd.ADC_DATA, this.handleDeviceData);
 
+      this.deviceParser.dataEmitter.removeAllListeners('data');
+
       // Listen for connection again
       this.init();
     };
@@ -111,13 +113,23 @@ export class DeviceReader {
   private listenForDeviceData() {
     const device = this.physicalDevice.getDevice();
 
+    this.listenForParserData();
     device.on(BeastCmd.ADC_DATA, this.handleDeviceData.bind(this));
   }
 
   // Handle device ADC data.
   private handleDeviceData(data: Buffer) {
-    const unPackedData = this.deviceParser.processPacket(data);
-    ipcService.sendDeviceData(unPackedData);
+    this.deviceParser.processPacket(data);
+  }
+
+  /**
+   * Listens for device parser `data` event to signal when data is ready.
+   */
+  private listenForParserData() {
+    this.deviceParser.dataEmitter.on('data', () => {
+      const unPackedData = this.deviceParser.getData();
+      ipcService.sendDeviceData(unPackedData);
+    });
   }
 }
 

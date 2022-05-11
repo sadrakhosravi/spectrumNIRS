@@ -67,12 +67,16 @@ export class DataManagerModel {
    * Listens for parsed data from the reader channel.
    */
   private streamDeviceDataToMainChart() {
-    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_e, data: DeviceADCDataType) => {
-      const channelData = data[this.channelName];
+    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_e, dataArr: DeviceADCDataType[]) => {
+      requestAnimationFrame(() => {
+        dataArr.forEach((data) => {
+          const channelData = data[this.channelName];
 
-      for (let i = 0; i < chartVM.charts.length; i++) {
-        chartVM.charts[i].series[0].addArrayY(channelData['led' + i]);
-      }
+          for (let i = 0; i < chartVM.charts.length; i++) {
+            chartVM.charts[i].series[0].addArrayY(channelData['led' + i]);
+          }
+        });
+      });
     });
   }
 
@@ -80,8 +84,12 @@ export class DataManagerModel {
    * Listens for parsed data from the reader channel.
    */
   private streamDeviceDataToCalibration() {
-    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_e, data: DeviceADCDataType) => {
-      barChartVM?.addData(data);
+    ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_e, dataArr: DeviceADCDataType[]) => {
+      requestAnimationFrame(() => {
+        dataArr.forEach((data) => {
+          barChartVM?.addData(data);
+        });
+      });
     });
   }
 }

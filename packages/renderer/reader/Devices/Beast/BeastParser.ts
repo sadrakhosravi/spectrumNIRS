@@ -2,7 +2,7 @@ import { IDeviceParser } from '../../api/device-api';
 
 // Type
 import type { DeviceADCDataType } from 'reader/types/DeviceDataType';
-import EventEmitter from 'node:events';
+import EventEmitter from 'events';
 
 export type UnpackedDataType = {
   [key: string]: number[];
@@ -21,9 +21,9 @@ export class BeastParser implements IDeviceParser {
   private msb_indices: number[];
   private bufferFactor: number;
   private bufferSize: number;
+  private dataBuff: DeviceADCDataType[];
   private channelsLsbMsb: ChannelsLsbMsbType;
   private emitter: EventEmitter;
-  private res: DeviceADCDataType;
 
   // private led_num: number;
 
@@ -31,7 +31,8 @@ export class BeastParser implements IDeviceParser {
     // this.pd_num = 0; // 0 ~ 7 -- this variable is set by user
     this.bytes_count = 8 * 2; // msb lsb
     this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
-    this.bufferFactor = 1;
+    this.bufferFactor = 2;
+    this.dataBuff = [];
     this.bufferSize = 512 * this.bufferFactor;
     this.emitter = new EventEmitter();
 
@@ -70,24 +71,6 @@ export class BeastParser implements IDeviceParser {
         msb: new Int32Array(this.bufferSize),
       },
     };
-
-    this.res = {
-      ch1: {},
-      ch2: {},
-      ch3: {},
-      ch4: {},
-      ch5: {},
-      ch6: {},
-      ch7: {},
-      ch8: {},
-    };
-
-    // Create each LED for each channel.
-    for (let i = 0; i < 16; i++) {
-      for (let j = 0; j < 8; j++) {
-        this.res[`ch${j + 1}`][`led${i}`] = new Int32Array(this.bufferSize);
-      }
-    }
   }
 
   /**
@@ -97,8 +80,18 @@ export class BeastParser implements IDeviceParser {
     return this.emitter;
   }
 
-  public emitData() {
-    this.emitter.emit('data', this.res);
+  /**
+   * @returns the data buffer and frees the data from the parser memory.
+   */
+  public getData() {
+    return this.dataBuff.splice(0);
+  }
+
+  /**
+   * Emits the `data` event when data is ready.
+   */
+  private emitData() {
+    this.emitter.emit('data');
   }
 
   /**
@@ -115,14 +108,30 @@ export class BeastParser implements IDeviceParser {
    * @returns an object containing the processed data of all the channels of beast hardware.
    */
   public processPacket = (packet: Buffer) => {
-    // console.time('1');
-
     const data = new Uint8Array(packet);
     const dataLength = data.length;
     const msbIndicesLength = this.msb_indices.length;
 
     let msbArrIndex = new Array(this.msb_indices.length).fill(0);
     let lsbArrIndex = new Array(this.msb_indices.length).fill(0);
+
+    const res: DeviceADCDataType = {
+      ch1: {},
+      ch2: {},
+      ch3: {},
+      ch4: {},
+      ch5: {},
+      ch6: {},
+      ch7: {},
+      ch8: {},
+    };
+
+    // Create each LED for each channel.
+    for (let i = 0; i < 16; i++) {
+      for (let j = 0; j < 8; j++) {
+        res[`ch${j + 1}`][`led${i}`] = [];
+      }
+    }
 
     // Loops over the entire array buffer
     for (let i = 0; i < dataLength; i++) {
@@ -158,10 +167,15 @@ export class BeastParser implements IDeviceParser {
           (this.channelsLsbMsb[channelIndex].msb[i] << 8);
         d = (d << 16) >> 16;
 
-        this.res[channelIndex][`led${ledNum}`][i] = d;
+        res[channelIndex][`led${ledNum}`].push(d);
       }
     }
 
-    return this.res;
+    this.dataBuff.push(res);
+
+    // When 2 frames are stored, emit data ready.
+    if (this.dataBuff.length === 2) {
+      this.emitData();
+    }
   };
 }
