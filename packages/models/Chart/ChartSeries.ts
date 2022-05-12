@@ -14,7 +14,7 @@ import { ColorHEX, SolidFill, SolidLine } from '@arction/lcjs';
 import type { Filter } from '../Filters/Lowpass';
 
 // View Models
-import { deviceVM } from '../../viewmodels/VMStore';
+import { deviceManagerVM } from '../../viewmodels/VMStore';
 import { Lowpass } from '../Filters';
 
 export class ChartSeries {
@@ -110,12 +110,15 @@ export class ChartSeries {
    * Applies the gain value and adds Array of the data to the series.
    */
   public addArrayY(data: Float32Array | Int32Array | number[]) {
+    const deviceCalibFactor = deviceManagerVM.activeDevices[0].deviceCalibrationFactor;
+    const gainVal = this.seriesGainVal;
+
     if (this.lowpassFilter) {
-      data = this.lowpassFilter.multiStep(data, true);
+      this.lowpassFilter.multiStep(data, true);
     }
 
     // For each is faster here
-    data.forEach((point) => (point *= this.seriesGainVal * deviceVM.calibrationFactor));
+    data.forEach((point) => (point *= gainVal * deviceCalibFactor));
 
     this.series.addArrayY(data, 1);
   }
@@ -124,9 +127,12 @@ export class ChartSeries {
    * Applies the gain value and adds obj array to the series.
    */
   public addArrayXY(data: { x: number; y: number }[]) {
+    const deviceCalibFactor = deviceManagerVM.activeDevices[0].deviceCalibrationFactor;
+    const gainVal = this.seriesGainVal;
+
     console.time('gain');
     // For each is faster here
-    data.forEach((point) => (point.y *= this.seriesGainVal * deviceVM.calibrationFactor));
+    data.forEach((point) => (point.y *= gainVal * deviceCalibFactor));
     console.timeEnd('gain');
 
     this.series.add(data);
@@ -136,10 +142,13 @@ export class ChartSeries {
    * Applies the gain value and adds single data point to the series.
    */
   public addPoint(data: { x: number; y: number }) {
+    const deviceCalibFactor = deviceManagerVM.activeDevices[0].deviceCalibrationFactor;
+    const gainVal = this.seriesGainVal;
+
     if (this.lowpassFilter) {
       this.lowpassFilter.singleStep(data.y, true);
     }
-    data.y *= this.seriesGainVal * deviceVM.calibrationFactor;
+    data.y *= gainVal * deviceCalibFactor;
 
     this.series.add(data);
   }

@@ -11,7 +11,6 @@ import ReaderChannels from '../../utils/channels/ReaderChannels';
 // Models
 import { ChartModel } from '../../models/Chart';
 import { ColorPalette } from '../../models/ColorPalette';
-import DataManagerModel from '../../models/Data/DataManagerModel';
 
 // Types
 import type { ChartSeries, DashboardChart } from '../../models/Chart';
@@ -336,7 +335,6 @@ export class ChartViewModel {
       () => this.currView,
       () => {
         console.log('View Changed');
-        DataManagerModel.setSource(this.currView === 'line' ? 'main' : 'calibration');
       },
     );
 

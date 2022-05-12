@@ -51,15 +51,9 @@ const config = {
       strict: true,
     },
     port: 7777,
-    rollupOptions: {
-      output: {
-        format: 'cjs',
-        exports: 'auto',
-      },
-    },
   },
   build: {
-    sourcemap: true,
+    sourcemap: 'inline',
     target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',
@@ -71,10 +65,7 @@ const config = {
       },
       output: {
         format: 'cjs',
-        exports: 'auto',
       },
-
-      treeshake: true,
 
       external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },

@@ -99,7 +99,7 @@ export class BarChartModel {
    * Adds the data to the series and plots the data on the graph.
    * @param data Channel Data Type
    */
-  public addData(data: ChannelDataType) {
+  public appendData(data: ChannelDataType) {
     const lastPointIndex = data['led1'].length - 1;
     const ambient = data['led0'][lastPointIndex];
 

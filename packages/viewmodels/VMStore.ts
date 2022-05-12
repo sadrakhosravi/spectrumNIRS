@@ -4,14 +4,14 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-// View Model imports
+// View Model imports - ORDER MATTERS
 import { AppMenuViewModel } from './App/AppMenuViewModel';
 import { AppStatesViewModel } from './App/AppStatesViewModel';
-import { ChartViewModel } from './Chart/ChartViewModel';
-import { BarChartViewModel } from './Chart/BarChartViewModel';
 
 import { DeviceManagerViewModel } from './Device/DeviceManagerViewModel';
-import { DeviceSettingsViewModel } from './Device/DeviceSettingsViewModel';
+
+import { ChartViewModel } from './Chart/ChartViewModel';
+import { BarChartViewModel } from './Chart/BarChartViewModel';
 
 /// ------------------------- App Global ------------------------- ///
 /**
@@ -23,11 +23,18 @@ export const appMenuVM = new AppMenuViewModel();
  */
 export const appRouterVM = new AppStatesViewModel();
 
+/// ------------------------- Device -------------------------///
+
+/**
+ * Device Manager view model
+ */
+export const deviceManagerVM = new DeviceManagerViewModel();
+
 /// ------------------------- Chart -------------------------///
 /**
  * The chart view model singleton.
  */
-export let chartVM: ChartViewModel;
+export let chartVM: ChartViewModel = new ChartViewModel();
 
 /**
  * Creates the chart view model instance.
@@ -65,15 +72,3 @@ export const disposeBarChartVM = () => {
   barChartVM?.dispose();
   barChartVM = null;
 };
-
-/// ------------------------- Device -------------------------///
-
-/**
- * Device settings view model instance.
- */
-export const deviceVM = new DeviceSettingsViewModel();
-
-/**
- * Device Manager view model
- */
-export const deviceManagerVM = new DeviceManagerViewModel();

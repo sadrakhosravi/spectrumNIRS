@@ -14,7 +14,6 @@ import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 // Types
 import type { IReactionDisposer } from 'mobx';
 import type { DeviceSettingsType } from '../../viewmodels/Device/DeviceSettingsViewModel';
-import DataManagerModel from '../Data/DataManagerModel';
 // import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
 
 // // View Model
@@ -103,7 +102,6 @@ export class DeviceModel {
     makeObservable(this);
     this.handleReactions();
     this.initListeners();
-    this.listenForData();
   }
 
   /**
@@ -196,7 +194,6 @@ export class DeviceModel {
    */
   @action public setSelectedPD(num: number) {
     this._selectedPD = num;
-    DataManagerModel.setChannelSource(num);
   }
 
   /**
@@ -264,19 +261,6 @@ export class DeviceModel {
 
     return settings;
   };
-
-  /**
-   * Listens for data from the reader process and adds it to the series.
-   */
-  private listenForData() {
-    // ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_event, data: DeviceADCDataType) => {
-    //   // Just plot the selected PD channel
-    //   const chartData = data[`ch${this._activePDs}`];
-    //   chartVM.charts.forEach((chart, i) => {
-    //     chart.series[0].addArrayY(chartData[`led${i}`]);
-    //   });
-    // });
-  }
 
   /**
    * Handles observable changes.

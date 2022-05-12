@@ -4,7 +4,7 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, makeObservable, observable } from 'mobx';
+import { reaction } from 'mobx';
 import { ipcRenderer } from 'electron';
 import { ReaderChannels } from '../../utils/channels';
 
@@ -13,28 +13,16 @@ import type { IReactionDisposer } from 'mobx';
 import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
 
 // View Models
-import { chartVM, barChartVM } from '../../viewmodels/VMStore';
+import { chartVM, barChartVM, deviceManagerVM } from '../../viewmodels/VMStore';
 
 export class DataManagerModel {
-  @observable private streamTo: 'main' | 'calibration';
-
-  reactions: IReactionDisposer[];
-  channelName: string;
+  private reactions: IReactionDisposer[];
+  private channelName: string;
   constructor() {
-    this.streamTo = 'main';
     this.reactions = [];
     this.channelName = 'ch1';
+
     this.init();
-
-    makeObservable(this);
-  }
-
-  /**
-   * Sets the source that the data stream should be sent to.
-   */
-  @action public setSource(value: 'main' | 'calibration') {
-    this.streamTo = value;
-    this.handleStreamChange();
   }
 
   /**
@@ -42,25 +30,37 @@ export class DataManagerModel {
    */
   public setChannelSource(channelNum: number) {
     this.channelName = 'ch' + channelNum;
-    this.handleStreamChange();
   }
 
   /**
    * Initializes the class
    */
   private init() {
+    this.channelName = 'ch' + deviceManagerVM.activeDevices[0].selectedPD;
+    this.handleReactions();
     this.streamDeviceDataToMainChart();
   }
 
   /**
-   * Handles the streamTo change.
+   * Listens to value changes from other observables
    */
-  private handleStreamChange() {
-    // Remove all listeners first
-    ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_DATA);
+  private handleReactions() {
+    const chartViewReactionDisposer = reaction(
+      () => chartVM.currentView,
+      () => {
+        ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_DATA);
+        chartVM.currentView === 'line'
+          ? this.streamDeviceDataToMainChart()
+          : this.streamDeviceDataToCalibration();
+      },
+    );
 
-    if (this.streamTo === 'main') this.streamDeviceDataToMainChart();
-    if (this.streamTo === 'calibration') this.streamDeviceDataToCalibration();
+    const selectedPDReactionDisposer = reaction(
+      () => deviceManagerVM.activeDevices[0].selectedPD,
+      () => (this.channelName = 'ch' + deviceManagerVM.activeDevices[0].selectedPD),
+    );
+
+    this.reactions.push(chartViewReactionDisposer, selectedPDReactionDisposer);
   }
 
   /**
