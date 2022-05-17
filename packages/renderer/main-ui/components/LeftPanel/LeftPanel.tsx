@@ -11,12 +11,12 @@ import { FiActivity, FiSearch, FiTool, FiSettings } from 'react-icons/fi';
 
 // Types
 import type { IconType } from 'react-icons/lib';
-import type { AppNavStates } from '@utils/types/AppStateTypes';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 type NavigationItems = {
   text: string;
   icon: IconType;
-  path: AppNavStates;
+  path: AppNavStatesEnum;
 };
 
 // Main navigation routes
@@ -25,17 +25,17 @@ const navigationItems: NavigationItems[] = [
   {
     text: 'Record',
     icon: FiActivity,
-    path: '',
+    path: AppNavStatesEnum.NONE,
   },
   {
     text: 'Review',
     icon: FiSearch,
-    path: '',
+    path: AppNavStatesEnum.NONE,
   },
   {
     text: 'Calibration',
     icon: FiTool,
-    path: 'calibration',
+    path: AppNavStatesEnum.CALIBRATION,
   },
 ];
 

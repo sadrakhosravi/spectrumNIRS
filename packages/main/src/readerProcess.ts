@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron';
 import { URL } from 'url';
 
-async function createWindow() {
+function createWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
     webPreferences: {
@@ -27,7 +27,7 @@ async function createWindow() {
       ? import.meta.env.VITE_DEV_SERVER_URL + 'reader.html'
       : new URL('../renderer/dist/reader.html', 'file://' + __dirname).toString();
 
-  await browserWindow.loadURL(pageUrl);
+  browserWindow.loadURL(pageUrl);
 
   return browserWindow;
 }
@@ -35,7 +35,7 @@ async function createWindow() {
 /**
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
-export const createReaderProcess = async () => {
-  const renderer = await createWindow();
+export const createReaderProcess = () => {
+  const renderer = createWindow();
   return renderer;
 };

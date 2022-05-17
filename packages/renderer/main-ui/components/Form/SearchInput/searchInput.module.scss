@@ -2,6 +2,8 @@
 
 .SearchInput {
   background: $color-bg-secondary;
+  padding: $gap-xs $gap-base;
+  border-radius: $border-primary-radius;
   padding-left: 4rem;
   width: 100%;
 }

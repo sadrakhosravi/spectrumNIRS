@@ -69,7 +69,7 @@ export const CalibrationToolbar = () => {
           <DeviceList />
         </span>
 
-        <Button text="Start" color="green" onClick={calibrationToolbarVM.handleDeviceStart} />
+        <Button text="Start" onClick={calibrationToolbarVM.handleDeviceStart} />
         <Button text="Stop" onClick={calibrationToolbarVM.handleDeviceStop} />
       </div>
     </>

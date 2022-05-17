@@ -13,15 +13,23 @@ import { DeviceManagerViewModel } from './Device/DeviceManagerViewModel';
 import { ChartViewModel } from './Chart/ChartViewModel';
 import { BarChartViewModel } from './Chart/BarChartViewModel';
 
+import { RecordingViewModel } from './Recording/RecordingViewModel';
+
 /// ------------------------- App Global ------------------------- ///
-/**
- * Application menu view model singleton.
- */
-export const appMenuVM = new AppMenuViewModel();
 /**
  * Application router view model singleton.
  */
 export const appRouterVM = new AppStatesViewModel();
+/**
+ * Application menu view model singleton.
+ */
+export const appMenuVM = new AppMenuViewModel();
+
+/// ------------------------- Recording -------------------------///
+/**
+ * Recording view model singleton.
+ */
+export const recordingVM = new RecordingViewModel();
 
 /// ------------------------- Device -------------------------///
 

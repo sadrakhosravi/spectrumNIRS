@@ -1,29 +1,41 @@
-import AppStatesModel from '../../models/App/AppStatesModel';
-import type { AppNavStates } from '../../utils/types/AppStateTypes';
+import { action, makeObservable, observable } from 'mobx';
+import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 
 /**
  * ViewModel for application states
  */
 export class AppStatesViewModel {
   /**
-   * The app state model instance.
+   * The current application route
    */
-  private model: AppStatesModel;
+  @observable public route: AppNavStatesEnum;
+  /**
+   * Application loading state
+   */
+  @observable private _isLoading: boolean;
   constructor() {
-    this.model = new AppStatesModel();
+    this.route = AppNavStatesEnum.CALIBRATION; //FIXME: Revert back to '' as the default route. Only for debugging
+    this._isLoading = false;
+    makeObservable(this);
   }
 
   /**
-   * The current application route.
+   * Whether the application is loading or not.
    */
-  public get route() {
-    return this.model.route;
+  public get isLoading() {
+    return this._isLoading;
   }
 
   /**
    * Sets the current path of the app as a state
    */
-  public navigateTo(path: AppNavStates) {
-    this.model.appRoute = path;
+  @action public navigateTo(path: AppNavStatesEnum) {
+    this._isLoading = true;
+
+    this.route = path;
+
+    setTimeout(() => {
+      this._isLoading = false;
+    }, 1500);
   }
 }

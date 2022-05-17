@@ -4,13 +4,14 @@ import { createMainWindow } from './mainWindow';
 import { createReaderProcess } from './readerProcess';
 import { IPCService } from './ipcService';
 import { GlobalStore } from './GlobalStore';
+import { RegisterGlobalShortcuts } from './Menu/RegisterGlobalShortcuts';
 
 export type RendererWindows = {
   mainWindow: Electron.BrowserWindow | null;
   reader: Electron.BrowserWindow | null;
 };
 
-const renderers: RendererWindows = {
+export const renderers: RendererWindows = {
   mainWindow: null,
   reader: null,
 };
@@ -35,17 +36,22 @@ app.on('window-all-closed', () => {
 /**
  * Create app window when background process will be ready
  */
-app
-  .whenReady()
-  .then(createMainWindow)
-  .then((mainWindow) => (renderers.mainWindow = mainWindow))
-  .then(createReaderProcess)
-  .then((reader) => (renderers.reader = reader))
-  .then(() => new IPCService(renderers))
-  .then(() => {
-    new GlobalStore();
-  })
-  .catch((e) => console.error('Failed create window:', e));
+
+(async () => {
+  await app.whenReady();
+
+  new RegisterGlobalShortcuts();
+
+  const mainWindow = createMainWindow();
+  renderers.mainWindow = mainWindow;
+
+  const readerProcess = createReaderProcess();
+  renderers.reader = readerProcess;
+
+  // Start the IPC service
+  new IPCService(renderers);
+  new GlobalStore();
+})();
 
 /**
  * Install dev extensions on dev mode only

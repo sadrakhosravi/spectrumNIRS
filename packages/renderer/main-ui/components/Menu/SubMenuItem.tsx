@@ -5,22 +5,22 @@ import * as styles from './menu.module.scss';
 
 type SubMenuItemProps = {
   text: string;
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
-  shortcut?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  accelerator?: string;
 };
 
-export const SubMenuItem = ({ text, shortcut, onClick }: SubMenuItemProps) => {
+export const SubMenuItem = ({ text, accelerator, onClick }: SubMenuItemProps) => {
   return (
-    <div
+    <button
       className={styles.SubMenuItem}
       aria-label={text}
       role="menuitem"
-      aria-keyshortcuts={shortcut}
+      aria-keyshortcuts={accelerator}
       onClick={onClick}
     >
       <span>{text}</span>
-      <span>{shortcut || null}</span>
-    </div>
+      <span>{accelerator || null}</span>
+    </button>
   );
 };
 

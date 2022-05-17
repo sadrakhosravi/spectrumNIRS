@@ -24,7 +24,7 @@
       "@widgets/*": ["./main-ui/widgets/*"],
       "@utils/*": ["../utils/*"]
     },
-    "lib": ["ESNext", "dom", "dom.iterable"]
+    "lib": ["ESNext", "ES6", "dom", "dom.iterable"]
   },
 
   "include": [

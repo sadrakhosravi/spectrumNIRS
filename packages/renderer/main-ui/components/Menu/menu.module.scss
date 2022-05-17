@@ -24,7 +24,7 @@
   position: absolute;
   top: 100%;
   left: 0;
-  min-width: 250px;
+  min-width: 280px;
   z-index: 1000;
   background: $color-bg-secondary;
   padding: $gap-lg 0;
@@ -34,7 +34,9 @@
 .SubMenuItem {
   display: flex;
   justify-content: space-between;
-  padding: 2px $gap-2xl;
+  padding: 3px $gap-2xl;
+  width: 100%;
+  margin: 2px 0;
 
   &:hover {
     background: $color-primary;

@@ -8,7 +8,8 @@
 }
 
 .DeviceListItem {
-  padding: $gap-xs $gap-lg;
+  position: relative;
+  padding: 0.875rem $gap-lg;
   background-color: $color-bg-tertiary;
   width: 100%;
   gap: $gap-lg;
@@ -16,11 +17,19 @@
   @include flex-center;
   @include border-primary-light;
   @include hover-state-secondary;
-  @include active-focus-state;
 
   div {
     margin-left: auto;
     @include flex-center;
     gap: $gap-sm;
   }
+}
+
+.DeviceSettingsButton {
+  position: absolute;
+  right: 25%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  border: 1px solid rgba($color: #fff, $alpha: 0.4);
 }

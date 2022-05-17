@@ -4,17 +4,18 @@ import * as React from 'react';
 import * as styles from './deviceList.module.scss';
 
 // Icons
-import { FiServer, FiXCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiServer, FiXCircle, FiCheckCircle, FiSettings } from 'react-icons/fi';
+import { ButtonIconText } from '../Elements/Buttons';
 
 type DeviceListItemType = {
   name: string;
   isConnected: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 export const DeviceListItem = ({ name, isConnected, onClick }: DeviceListItemType) => {
   return (
-    <button className={styles.DeviceListItem} onClick={onClick}>
+    <div className={styles.DeviceListItem} onClick={onClick}>
       <FiServer size="20px" />
       {name}
       <div>
@@ -27,6 +28,11 @@ export const DeviceListItem = ({ name, isConnected, onClick }: DeviceListItemTyp
           )}
         </span>
       </div>
-    </button>
+      <ButtonIconText
+        className={styles.DeviceSettingsButton}
+        icon={<FiSettings size="16px" />}
+        text="Settings"
+      />
+    </div>
   );
 };

@@ -1,38 +1,38 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import * as React from 'react';
 
 // Styles
 import * as styles from './menu.module.scss';
 
-// Hooks
+// View Model
+import { appMenuVM } from '@store';
 
 type MenuItemProps = {
   text: string;
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  id: string;
   children: JSX.Element;
 };
 
-export const MenuItem = ({ text, isMenuOpen, setIsMenuOpen, children }: MenuItemProps) => {
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+export const MenuItem = observer(({ text, id, children }: MenuItemProps) => {
+  const menuRef = React.useRef<HTMLDivElement>(null);
 
-  const handleMenuItemClick = () => {
-    if(isMenuOpen && isSubMenuOpen) {
-      setIsSubMenuOpen(false);
-      setIsMenuOpen(false);
+  const handleMenuItemClick = React.useCallback(() => {
+    if (appMenuVM.currSubMenu === id) {
+      appMenuVM.setCurrSubMenuOpen('');
       return;
-    } 
+    }
+    appMenuVM.setCurrSubMenuOpen(id);
+  }, [appMenuVM.currSubMenu]);
 
-    setIsSubMenuOpen(true);
-    setIsMenuOpen(true);
-  };
-
-  useEffect(() => {
+  // Detect click outside
+  React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent | KeyboardEvent) => {
-      menuRef.current && !menuRef.current.contains(event.target as any) && setIsSubMenuOpen(false);
+      menuRef.current &&
+        !menuRef.current.contains(event.target as any) &&
+        appMenuVM.setCurrSubMenuOpen('');
     };
 
-    if (isSubMenuOpen) {
+    if (appMenuVM.currSubMenu === id) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleClickOutside);
     }
@@ -41,21 +41,20 @@ export const MenuItem = ({ text, isMenuOpen, setIsMenuOpen, children }: MenuItem
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleClickOutside);
     };
-  }, [isSubMenuOpen]);
+  }, [appMenuVM.currSubMenu]);
 
   return (
     <div
-      className={`${styles.MenuItem} ${isSubMenuOpen && styles.MenuItemActive}`}
+      className={`${styles.MenuItem} ${appMenuVM.currSubMenu === id && styles.MenuItemActive}`}
       aria-label={text}
       role="menuitem"
       aria-haspopup
       ref={menuRef}
-      onMouseEnter={() => isMenuOpen && handleMenuItemClick()}
-      onMouseLeave={() => isMenuOpen && setIsSubMenuOpen(false)}
-      onClick={handleMenuItemClick}
+      onClick={() => handleMenuItemClick()}
+      onMouseEnter={() => appMenuVM.currSubMenu && appMenuVM.setCurrSubMenuOpen(id)}
     >
       {text}
-      {isSubMenuOpen && <div>{children}</div>}
+      {appMenuVM.currSubMenu === id && <div>{children}</div>}
     </div>
   );
-};
+});

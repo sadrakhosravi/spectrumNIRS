@@ -40,14 +40,16 @@ export const TableColumns = ({ dataSource }: TableColumnsType) => {
 
 type TableItemType = {
   text: string;
+  icon?: JSX.Element;
   description?: string;
 };
-export const TableItem = ({ text, description }: TableItemType) => {
+export const TableItem = ({ text, icon, description }: TableItemType) => {
   return (
     <div className={styles.TableItem} tabIndex={2}>
+      <span className={styles.TableItemIcon}>{icon}</span>
       <div>
-        <span className="text-larger">{text}</span>
-        <span>{description}</span>
+        <span className={styles.TableItemText}>{text}</span>
+        <span className={styles.TableItemDescription}>{description}</span>
       </div>
     </div>
   );

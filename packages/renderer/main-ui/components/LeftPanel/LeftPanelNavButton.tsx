@@ -6,12 +6,12 @@ import { appRouterVM } from '@store';
 import * as styles from './leftPanel.module.scss';
 
 // Types
-import { AppNavStates } from '@utils/types/AppStateTypes';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 type LeftPanelNavButtonProps = {
   text: string;
   icon: JSX.Element;
-  path?: AppNavStates;
+  path?: AppNavStatesEnum;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 

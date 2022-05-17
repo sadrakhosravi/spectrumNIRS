@@ -5,6 +5,13 @@
   align-items: center;
 }
 
+@mixin absolute-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 @mixin default-transition {
   transition: background 0.15s ease-in-out;
 }
@@ -63,7 +70,7 @@
 }
 
 @mixin slide-left {
-  animation: slideLeft 0.3s forwards;
+  animation: slideLeft 0.15s forwards;
 }
 
 @keyframes slideLeft {

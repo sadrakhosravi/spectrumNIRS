@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import { URL } from 'url';
 
-async function createWindow() {
+function createWindow() {
   const browserWindow = new BrowserWindow({
     show: true, // Use 'ready-to-show' event to show window
     titleBarStyle: 'hidden',
@@ -50,7 +50,7 @@ async function createWindow() {
       ? import.meta.env.VITE_DEV_SERVER_URL + 'index.html'
       : new URL('../renderer/dist/index.html', 'file://' + __dirname).toString();
 
-  await browserWindow.loadURL(pageUrl);
+  browserWindow.loadURL(pageUrl);
 
   return browserWindow;
 }
@@ -58,8 +58,8 @@ async function createWindow() {
 /**
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
-export async function createMainWindow() {
-  const window = await createWindow();
+export function createMainWindow() {
+  const window = createWindow();
   window.on('close', () => app.quit());
   return window;
 }

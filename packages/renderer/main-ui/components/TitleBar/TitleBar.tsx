@@ -7,7 +7,7 @@ import * as styles from './titleBar.module.scss';
 import Logo from '../../../assets/Logo.png';
 
 // Icons
-// import { Menu } from '../Menu';
+import { Menu } from '../Menu';
 
 export const TitleBar = () => {
   return (
@@ -16,7 +16,9 @@ export const TitleBar = () => {
         <div className={styles.Logo}>
           <img src={Logo} width="28px" />
         </div>
-        <div className={styles.TopMenu}>{/* <Menu /> */}</div>
+        <div className={styles.TopMenu}>
+          <Menu />
+        </div>
         <div className={styles.Filename}>
           <p>Spectrum - Beast</p>
         </div>

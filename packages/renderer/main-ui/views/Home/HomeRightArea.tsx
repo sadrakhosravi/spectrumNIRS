@@ -4,7 +4,7 @@ import * as React from 'react';
 import { LargeActionButton } from '/@/components/Elements/Buttons';
 
 // Icons
-import { FiFilePlus, FiUser, FiActivity } from 'react-icons/fi';
+import { FiFilePlus, FiFileText } from 'react-icons/fi';
 
 // Types
 import type { IconType } from 'react-icons';
@@ -18,19 +18,14 @@ type ActionButtonsType = {
 
 const actionButtons: ActionButtonsType[] = [
   {
-    text: 'New Experiment',
-    icon: FiFilePlus,
-    description: 'Create a new experiment',
-  },
-  {
-    text: 'New Patient',
-    icon: FiUser,
-    description: 'Create a new patient',
-  },
-  {
     text: 'New Recording',
-    icon: FiActivity,
+    icon: FiFilePlus,
     description: 'Create a new recording',
+  },
+  {
+    text: 'Open Recording',
+    icon: FiFileText,
+    description: 'Open a recording',
   },
 ];
 

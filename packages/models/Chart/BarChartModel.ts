@@ -71,6 +71,14 @@ export class BarChartModel {
    * White color for rectangles
    */
   private whiteColor: SolidFill;
+  /**
+   * Previous time stamp used to limit chart updates in milliseconds.
+   */
+  private prevTS: number;
+  /**
+   * The update interval in milliseconds.
+   */
+  private readonly updateIntervalInMS: number;
 
   constructor() {
     this.chart = null;
@@ -84,6 +92,8 @@ export class BarChartModel {
     this.redColor = new SolidFill().setColor(ColorRGBA(242, 67, 79));
     this.blueColor = new SolidFill().setColor(ColorRGBA(42, 171, 240));
     this.whiteColor = new SolidFill().setColor(ColorRGBA(255, 255, 255));
+    this.prevTS = Date.now();
+    this.updateIntervalInMS = 100;
   }
 
   /**
@@ -100,6 +110,9 @@ export class BarChartModel {
    * @param data Channel Data Type
    */
   public appendData(data: ChannelDataType) {
+    const currTS = Date.now();
+    if (currTS - this.prevTS < this.updateIntervalInMS) return;
+
     const lastPointIndex = data['led1'].length - 1;
     const ambient = data['led0'][lastPointIndex];
 
@@ -120,6 +133,8 @@ export class BarChartModel {
         ...this.rectangles[this.rectangles.length - 1].getDimensionsPositionAndSize(),
         height: ambient, // Subtract the ambient from the reading
       });
+
+      this.prevTS = currTS;
     });
   }
 
@@ -252,8 +267,8 @@ export class BarChartModel {
     yAxis
       .setMouseInteractions(false)
       .setChartInteractions(false)
-      .setScrollStrategy(AxisScrollStrategies.fitting)
-      .setInterval(0, 15_000);
+      .setScrollStrategy(AxisScrollStrategies.progressive)
+      .setInterval(0, 5_000);
 
     yAxis.setTickStrategy(AxisTickStrategies.Numeric, (tick) =>
       tick

@@ -20,6 +20,7 @@
     "./models/**/*",
     "./viewmodels/**/*",
     "./database/**/*",
+    "./services/**/*",
     "./utils/**/*",
     "./preload/contracts.d.ts"
   ],

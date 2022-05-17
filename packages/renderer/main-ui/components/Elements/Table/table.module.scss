@@ -20,8 +20,11 @@
 }
 
 .TableItem {
-  padding: $gap-base $gap-xl;
+  position: relative;
+  padding: $gap-lg $gap-xl;
+  gap: $gap-lg;
   @include hover-state;
+  @include flex-center;
 
   &:not(:last-child) {
     border-bottom: solid $border-primary-width $border-primary-color;
@@ -36,13 +39,17 @@
     span {
       display: block;
     }
-
-    span:first-child {
-      font-weight: 500;
-    }
-
-    span:last-child {
-      color: $color-text-tertiary;
-    }
   }
+}
+
+.TableItemIcon {
+  width: 40px;
+}
+
+.TableItemText {
+  font-size: $size-font-lg;
+}
+
+.TableItemDescription {
+  color: $color-text-tertiary;
 }

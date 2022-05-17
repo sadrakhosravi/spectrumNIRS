@@ -1,0 +1,43 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.LoaderContainer {
+  background-color: $color-bg-dark1;
+  width: 100%;
+  height: calc(100% - $size-title-bar);
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1000;
+  text-align: center;
+  gap: $gap-xl;
+  @include flex-center;
+  position: absolute;
+  top: $size-title-bar;
+  left: 0;
+}
+
+.Loader {
+  display: block;
+  width: 109.5px;
+  height: 109.5px;
+}
+
+.Loader:after {
+  content: ' ';
+  display: block;
+  width: 102px;
+  height: 102px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 10px solid #fff;
+  border-color: $color-primary transparent #ccc transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

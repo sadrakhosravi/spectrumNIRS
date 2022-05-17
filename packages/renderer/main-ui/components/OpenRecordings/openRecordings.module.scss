@@ -1,0 +1,104 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+@import '@styles/screen';
+
+$action-bar-height: 4.5rem;
+$bottom-bar-height: 4rem;
+
+// Parent container
+.OpenRecordings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  height: 80%;
+  overflow-x: hidden;
+  background-color: $color-bg-secondary;
+  border: 1.75px solid rgba($color: #fff, $alpha: 0.2);
+  border-radius: 5px;
+
+  @include screen-lg {
+    width: 80vw;
+  }
+}
+
+// The top action bar
+.ActionBar {
+  position: relative;
+  height: $action-bar-height;
+  width: 100%;
+  background-color: $color-bg-secondary;
+  border-bottom: 1px solid $border-secondary-color;
+  padding: $gap-xs $gap-lg;
+  @include flex-center;
+}
+
+.SearchContainer {
+  position: absolute;
+  min-width: 50%;
+  @include absolute-center;
+
+  input {
+    background-color: $color-bg-primary;
+  }
+}
+
+.ActionButtons {
+  position: absolute;
+  right: 20%;
+  top: 50%;
+  transform: translateY(-50%);
+
+  button {
+    background-color: $color-text-tertiary;
+  }
+}
+
+.CloseButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+// Content Area
+.ContentArea {
+  width: 100%;
+  height: calc(100% - $action-bar-height - $bottom-bar-height);
+  background-color: $color-bg-dark1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.NoRecordsContainer {
+  flex-direction: column;
+  gap: $gap-lg;
+  @include absolute-center;
+  @include flex-center;
+
+  span {
+    opacity: 0.6;
+    text-align: center;
+  }
+}
+
+// Bottom bar
+.BottomBar {
+  height: $bottom-bar-height;
+  width: 100%;
+  background-color: $color-bg-secondary;
+  border-top: 1px solid $border-secondary-color;
+  padding: $gap-xs $gap-lg;
+  justify-content: flex-end;
+  gap: $gap-base;
+  @include flex-center;
+
+  button {
+    background-color: $color-text-tertiary;
+  }
+
+  button:last-child {
+    background-color: $color-primary;
+  }
+}

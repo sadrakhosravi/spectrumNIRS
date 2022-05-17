@@ -8,12 +8,17 @@ import { action, makeObservable, observable, reaction } from 'mobx';
 import { ipcRenderer } from 'electron';
 import { ReaderChannels } from '../../utils/channels';
 
+export type DeviceSettingsType = {
+  numOfPDs: number;
+  numOfLEDs: number;
+  LEDValues: number[];
+};
+
 // Services
 import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 
 // Types
 import type { IReactionDisposer } from 'mobx';
-import type { DeviceSettingsType } from '../../viewmodels/Device/DeviceSettingsViewModel';
 // import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
 
 // // View Model

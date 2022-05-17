@@ -8,6 +8,7 @@ import { builtinModules } from 'module';
 import reactVite from '@vitejs/plugin-react';
 import electronRenderer from 'vite-plugin-electron/renderer';
 import polyfillExports from 'vite-plugin-electron/polyfill-exports';
+import resolve from 'vite-plugin-resolve';
 
 import checker from 'vite-plugin-checker';
 
@@ -38,7 +39,9 @@ const config = {
     reactVite(),
     electronRenderer(),
     polyfillExports(),
-
+    resolve({
+      sqlite3: 'export default require("sqlite3");',
+    }),
     checker({
       typescript: {
         tsconfigPath: './tsconfig.json',
@@ -51,6 +54,9 @@ const config = {
       strict: true,
     },
     port: 7777,
+    rollupOptions: {
+      external: ['sqlite3', ...builtinModules.flatMap((p) => [p, `node:${p}`])],
+    },
   },
   build: {
     sourcemap: 'inline',
@@ -66,13 +72,12 @@ const config = {
       output: {
         format: 'cjs',
       },
-
-      external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
+      external: ['sqlite3', ...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
 
     emptyOutDir: true,
     brotliSize: false,
-    minify: false,
+    minify: 'terser',
   },
   test: {
     environment: 'happy-dom',
