@@ -28,13 +28,15 @@
 }
 
 @mixin hover-state-secondary {
-  @include default-transition;
-  &:hover {
-    background: rgba(#fff, 0.175);
-  }
+  &:not(:disabled) {
+    @include default-transition;
+    &:hover {
+      background: rgba(#fff, 0.175);
+    }
 
-  &:active {
-    background: $color-bg-tertiary;
+    &:active {
+      background: $color-bg-tertiary;
+    }
   }
 }
 
@@ -43,9 +45,11 @@
 }
 
 @mixin active-focus-state {
-  &:focus,
-  &:active {
-    @include ring;
+  &:not(:disabled) {
+    &:focus,
+    &:active {
+      @include ring;
+    }
   }
 }
 

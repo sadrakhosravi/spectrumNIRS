@@ -4,11 +4,11 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { ipcRenderer } from 'electron';
+// import { ipcRenderer } from 'electron';
 import { nanoid } from 'nanoid';
 
 // Channels
-import { MenuChannels } from '../../../utils/channels';
+// import { MenuChannels } from '../../../utils/channels';
 
 type ClickType = () => void;
 
@@ -27,10 +27,10 @@ export class SubMenuItemModel {
     this.onClick = onClick;
 
     // Register the accelerator globally.
-    this.accelerator &&
-      ipcRenderer.invoke(MenuChannels.REGISTER_SHORTCUT, {
-        accelerator: this.accelerator,
-        id: this.id,
-      });
+    // this.accelerator &&
+    //   ipcRenderer.invoke(MenuChannels.REGISTER_SHORTCUT, {
+    //     accelerator: this.accelerator,
+    //     id: this.id,
+    //   });
   }
 }

@@ -12,6 +12,10 @@
   position: relative;
 }
 
+.block {
+  display: block;
+}
+
 .mb {
   margin-bottom: $gap-lg;
 }
@@ -26,8 +30,4 @@
 
 .w-full {
   width: 100%;
-}
-
-.relative {
-  position: relative;
 }

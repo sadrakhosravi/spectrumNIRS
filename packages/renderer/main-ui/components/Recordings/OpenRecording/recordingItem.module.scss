@@ -2,14 +2,19 @@
 @import '@styles/mixins';
 
 .RecordingItem {
+  position: relative;
   width: 100%;
   height: 7rem;
   padding: 0 $gap-2xl;
   gap: $gap-xl;
   border-bottom: 1px solid rgba($color: #fff, $alpha: 0.2);
-
+  z-index: 5;
   @include flex-center;
   @include hover-state-secondary;
+}
+
+.RecordingItemActive {
+  @include ring;
 }
 
 .Icon {

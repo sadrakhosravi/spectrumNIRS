@@ -1,9 +1,15 @@
 import { app } from 'electron';
 import './security-restrictions';
+import { startup } from './Startup/startup';
+
+// Windows
 import { createMainWindow } from './mainWindow';
 import { createReaderProcess } from './readerProcess';
+
+// Services
 import { IPCService } from './ipcService';
 import { GlobalStore } from './GlobalStore';
+
 import { RegisterGlobalShortcuts } from './Menu/RegisterGlobalShortcuts';
 
 export type RendererWindows = {
@@ -39,6 +45,9 @@ app.on('window-all-closed', () => {
 
 (async () => {
   await app.whenReady();
+
+  // Await folder checks
+  await startup();
 
   new RegisterGlobalShortcuts();
 

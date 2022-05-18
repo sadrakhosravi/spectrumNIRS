@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 
 /**
@@ -27,15 +27,23 @@ export class AppStatesViewModel {
   }
 
   /**
+   * Sets the application
+   */
+  public set appLoading(value: boolean) {
+    this._isLoading = value;
+  }
+
+  /**
    * Sets the current path of the app as a state
    */
-  @action public navigateTo(path: AppNavStatesEnum) {
+  @action public async navigateTo(path: AppNavStatesEnum) {
     this._isLoading = true;
-
     this.route = path;
 
     setTimeout(() => {
-      this._isLoading = false;
-    }, 1500);
+      runInAction(() => {
+        this.appLoading = false;
+      });
+    }, 1000);
   }
 }

@@ -31,7 +31,7 @@ export class RegisterGlobalShortcuts {
 
     // Dev mode only
     setTimeout(() => {
-      this.setDevModeReload();
+      // this.setDevModeReload();
     }, 2000);
   }
 

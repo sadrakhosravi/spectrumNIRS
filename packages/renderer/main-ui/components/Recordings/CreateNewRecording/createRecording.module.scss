@@ -1,0 +1,11 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.MainContainer {
+  padding: $gap-3xl $gap-2xl;
+}
+
+.Form {
+  margin-top: $gap-lg;
+  margin-bottom: $gap-lg;
+}

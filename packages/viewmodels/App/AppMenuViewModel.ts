@@ -12,7 +12,7 @@ import { MenuChannels } from '../../utils/channels/MenuChannels';
 import type { SubMenuItemModel } from '../../models/App/Menu/SubMenuItemModel';
 
 // Menu items
-import { File } from './MenuItems/File';
+import { FileMenu } from './MenuItems/FileMenu';
 
 export interface IMenu {
   label: string;
@@ -22,7 +22,7 @@ export interface IMenu {
 }
 
 // The default application menu template
-const defaultMenuTemplate: IMenu[] = [File];
+const defaultMenuTemplate: IMenu[] = [FileMenu];
 
 /**
  * Handles the main application menu templates and updates

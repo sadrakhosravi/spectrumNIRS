@@ -67,7 +67,8 @@ label {
 }
 
 input[type='text'],
-input[type='number'] {
+input[type='number'],
+textarea {
   width: 100%;
   padding: $gap-2xs $gap-base;
   background-color: $color-bg-tertiary;
@@ -96,6 +97,10 @@ input[type='number'] {
       color: $color-text-primary;
     }
   }
+}
+
+textarea {
+  min-height: 15rem;
 }
 
 h1 {

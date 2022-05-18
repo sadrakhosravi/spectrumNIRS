@@ -17,6 +17,10 @@
   }
 }
 
+.Button:disabled {
+  background-color: $color-bg-secondary;
+}
+
 .ButtonRed {
   background-color: #fa5044;
 }

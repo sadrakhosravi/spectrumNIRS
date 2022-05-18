@@ -33,7 +33,7 @@ export class RecordingModel {
   /**
    * The timestamp that the recording was created at.
    */
-  private timestamp: number;
+  private createdTimestamp: number;
   /**
    * The last update timestamp
    */
@@ -50,8 +50,8 @@ export class RecordingModel {
     this.recordingDescription = description;
     this.devices = devices;
 
-    this.timestamp = Date.now();
-    this.lastUpdateTimestamp = this.timestamp;
+    this.createdTimestamp = Date.now();
+    this.lastUpdateTimestamp = this.createdTimestamp;
 
     // Only create a record if its a new record.
     isNewRecord && this.createDatabaseRecord();
@@ -82,7 +82,7 @@ export class RecordingModel {
    * The data that the recording was created.
    */
   public get dateCreated() {
-    return this.timestamp;
+    return this.createdTimestamp;
   }
 
   /**
@@ -95,13 +95,13 @@ export class RecordingModel {
   /**
    * Updates the database record.
    */
-  private createDatabaseRecord() {
-    ServiceManager.dbConnection.exec(
-      `INSERT INTO recordings VALUES(?, ?, ?, ?, ?, ?)`,
+  private async createDatabaseRecord() {
+    await ServiceManager.dbConnection.run(
+      'INSERT INTO recordings VALUES(?, ?, ?, ?, ?, ?)',
       this.id,
       this.name,
       this.description,
-      Date.now(),
+      this.createdTimestamp,
       Date.now(),
       'Testtt',
     );

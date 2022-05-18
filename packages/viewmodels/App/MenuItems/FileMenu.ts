@@ -9,7 +9,7 @@ import { AppNavStatesEnum } from '../../../utils/types/AppStateEnum';
 /**
  * File menu and its logic.
  */
-export const File = {
+export const FileMenu = {
   label: 'File',
   id: nanoid(),
 
@@ -17,12 +17,12 @@ export const File = {
   submenu: [
     // New Recording
     new SubMenuItemModel('New Recording', `${ShortcutsEnum.CTRL}+${ShortcutsEnum.SHIFT}+N`, () => {
-      appRouterVM.navigateTo(AppNavStatesEnum.CALIBRATION);
+      appRouterVM.navigateTo(AppNavStatesEnum.NEW_RECORDING);
     }),
 
     // Open Recording
     new SubMenuItemModel('Open Recording', `${ShortcutsEnum.CTRL}+O`, () => {
-      console.log('New Recording');
+      appRouterVM.navigateTo(AppNavStatesEnum.HOME);
     }),
 
     // Close Recording
