@@ -1,8 +1,18 @@
+/*---------------------------------------------------------------------------------------------
+ *  Beast Device Reader Module.
+ *  Runs in a web worker.
+ *  Has global.gc() access.
+ *  @version 0.1.0
+ *--------------------------------------------------------------------------------------------*/
+
 import Beast from './Beast';
 
 // Interfaces
 import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from '../../api/device-api';
 import { BeastCmd } from './BeastCommandsEnum,';
+
+// Worker data types
+import { DeviceWorkerEventEnum, DeviceWorkerEventDataType } from '../../api/Types';
 
 export class BeastDeviceReader {
   /**
@@ -86,7 +96,7 @@ export class BeastDeviceReader {
    */
   public handleDeviceStart() {
     console.log('Starting Device...');
-    this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.START, true);
+    return this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.START, true);
   }
 
   /**
@@ -95,6 +105,13 @@ export class BeastDeviceReader {
   public handleDeviceStop() {
     console.log('Stopping Device...');
     this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.STOP, true);
+  }
+
+  /**
+   * @returns the parsed buffer from the beast parser and empties its buffer.
+   */
+  public getData() {
+    return this.deviceParser.getData();
   }
 
   /**
@@ -113,8 +130,6 @@ export class BeastDeviceReader {
       device.off('disconnect', handleDisconnect);
       device.off(BeastCmd.ADC_DATA, this.handleDeviceData);
 
-      this.deviceParser.dataEmitter.removeAllListeners('data');
-
       // Listen for connection again
       this.init();
     };
@@ -128,7 +143,6 @@ export class BeastDeviceReader {
   private listenForDeviceData() {
     const device = this.physicalDevice.getDevice();
 
-    this.listenForParserData();
     device.on(BeastCmd.ADC_DATA, this.handleDeviceData.bind(this));
   }
 
@@ -136,17 +150,36 @@ export class BeastDeviceReader {
   private handleDeviceData(data: Buffer) {
     this.deviceParser.processPacket(data);
   }
-
-  /**
-   * Listens for device parser `data` event to signal when data is ready.
-   */
-  private listenForParserData() {
-    this.deviceParser.dataEmitter.on('data', () => {
-      const unPackedData = this.deviceParser.getData();
-      // ipcService.sendDeviceData(unPackedData);
-      self.postMessage(unPackedData);
-    });
-  }
 }
 
-new BeastDeviceReader();
+// Beast reader instance.
+const beastReader = new BeastDeviceReader();
+
+// Listeners from the main process.
+self.addEventListener('message', ({ data }: { data: DeviceWorkerEventDataType }) => {
+  // Match the event with the function to execute.
+  switch (data.event) {
+    case DeviceWorkerEventEnum.GET_DATA:
+      beastReader.getData();
+      break;
+
+    // Start request
+    case DeviceWorkerEventEnum.START:
+      // beastReader.handleDeviceStart();
+      break;
+
+    // Stop request
+    case DeviceWorkerEventEnum.STOP:
+      beastReader.handleDeviceStop();
+      break;
+
+    // Settings update request
+    case DeviceWorkerEventEnum.SETTINGS_UPDATE:
+      beastReader.handleDeviceSettingsUpdate(data.data);
+      break;
+
+    // Command did not match
+    default:
+      throw new Error('Command did not match!');
+  }
+});

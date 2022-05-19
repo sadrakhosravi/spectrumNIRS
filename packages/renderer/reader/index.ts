@@ -1,16 +1,10 @@
-// Import Reader
-const worker = new Worker(new URL('./Devices/Beast/BeastDeviceReader.ts', import.meta.url), {
-  type: 'module',
-});
-
-worker.addEventListener('message', ({ data }: any) => {
-  console.log(data);
-});
-
 // Import IPC service
 // import './ReaderIPCService';
 
 // Device Manager
 import { DeviceManager } from './models/DeviceManager';
 
-new DeviceManager();
+// Initialize the device manager after 1 second to ensure the main UI is loaded first
+setTimeout(() => {
+  new DeviceManager();
+}, 1000);

@@ -12,6 +12,13 @@ import { GlobalStore } from './GlobalStore';
 
 import { RegisterGlobalShortcuts } from './Menu/RegisterGlobalShortcuts';
 
+// Expose the garbage collector
+// Only should be used in edge cases by calling global.gc()
+// Used in reader process to avoid large data buildup before collection.
+require('v8').setFlagsFromString('--expose_gc');
+global.gc = require('vm').runInNewContext('gc');
+app.commandLine.appendSwitch('js-flags', '--expose_gc');
+
 export type RendererWindows = {
   mainWindow: Electron.BrowserWindow | null;
   reader: Electron.BrowserWindow | null;

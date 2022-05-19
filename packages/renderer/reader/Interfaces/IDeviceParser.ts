@@ -1,4 +1,3 @@
-import EventEmitter from 'events';
 import { DeviceADCDataType } from 'reader/types/DeviceDataType';
 
 export interface IDeviceParser {
@@ -16,9 +15,4 @@ export interface IDeviceParser {
    * @returns the buffered device data type.
    */
   getData(): DeviceADCDataType[];
-
-  /**
-   * The event emitter to signal when data is ready.
-   */
-  dataEmitter: EventEmitter;
 }

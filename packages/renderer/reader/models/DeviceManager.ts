@@ -4,26 +4,34 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import { ipcRenderer } from 'electron';
+
+// Models
+import { DeviceModel } from './DeviceModel';
 
 // IPC Channels
 import { DeviceChannels } from '@utils/channels/DeviceChannels';
 
 // Devices
+import { devices } from '../Devices/Devices';
 
 /**
  * The main device manager state handler, updates will be sent to the UI thread automatically.
  */
 export class DeviceManager {
   /**
-   * All active device module instances singleton.
-   * Any class should use this module instance for device communication.
+   * A list of all the device names and their worker url.
    */
-  @observable protected devices: any[];
+  protected devices: typeof devices;
+  /**
+   * Instances of all the active device workers
+   */
+  @observable protected activeDevices: DeviceModel[];
 
   constructor() {
-    this.devices = [];
+    this.devices = devices;
+    this.activeDevices = [];
     makeObservable(this);
 
     this.init();
@@ -47,10 +55,37 @@ export class DeviceManager {
   }
 
   /**
+   * The data getter function sent to the device model to pass the data to this class.
+   */
+  public dataGetter = (data: any) => {
+    console.log(data);
+  };
+
+  /**
    * Handles device addition
    */
-  private handleDeviceAddition(_event: Electron.IpcRendererEvent, deviceName: string) {
-    console.log(deviceName);
+  @action private handleDeviceAddition(_event: Electron.IpcRendererEvent, deviceName: string) {
+    // First check if the device is not already there.
+    const isDeviceActive = this.activeDevices.find(
+      (device) => device.name.toLocaleLowerCase() === deviceName.toLocaleLowerCase(),
+    );
+
+    // Device already exists
+    if (isDeviceActive) return;
+
+    // Find the list from the list.
+    const device = this.devices.find(
+      (device) => device.name.toLocaleLowerCase() === deviceName.toLocaleLowerCase(),
+    );
+
+    // Device was not found, this only happens if something went wrong.
+    if (!device) return;
+
+    // Create the device worker.
+    const deviceInstance = new DeviceModel(device.name, device.workerURL, this.dataGetter);
+
+    // Add it to the observables.
+    this.activeDevices.push(deviceInstance);
   }
 
   /**

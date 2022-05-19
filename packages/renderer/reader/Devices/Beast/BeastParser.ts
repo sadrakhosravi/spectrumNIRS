@@ -2,7 +2,6 @@ import { IDeviceParser } from '../../api/device-api';
 
 // Type
 import type { DeviceADCDataType } from 'reader/types/DeviceDataType';
-import EventEmitter from 'events';
 
 export type UnpackedDataType = {
   [key: string]: number[];
@@ -23,7 +22,6 @@ export class BeastParser implements IDeviceParser {
   private bufferSize: number;
   private dataBuff: DeviceADCDataType[];
   private channelsLsbMsb: ChannelsLsbMsbType;
-  private emitter: EventEmitter;
 
   // private led_num: number;
 
@@ -31,10 +29,9 @@ export class BeastParser implements IDeviceParser {
     // this.pd_num = 0; // 0 ~ 7 -- this variable is set by user
     this.bytes_count = 8 * 2; // msb lsb
     this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
-    this.bufferFactor = 2;
+    this.bufferFactor = 1;
     this.dataBuff = [];
     this.bufferSize = 512 * this.bufferFactor;
-    this.emitter = new EventEmitter();
 
     // Channels MSB LSB
     this.channelsLsbMsb = {
@@ -74,24 +71,10 @@ export class BeastParser implements IDeviceParser {
   }
 
   /**
-   * The parser data emitter, use `data` event to listen for data.
-   */
-  public get dataEmitter() {
-    return this.emitter;
-  }
-
-  /**
    * @returns the data buffer and frees the data from the parser memory.
    */
   public getData() {
     return this.dataBuff.splice(0);
-  }
-
-  /**
-   * Emits the `data` event when data is ready.
-   */
-  private emitData() {
-    this.emitter.emit('data');
   }
 
   /**
@@ -173,9 +156,9 @@ export class BeastParser implements IDeviceParser {
 
     this.dataBuff.push(res);
 
-    // When 2 frames are stored, emit data ready.
-    if (this.dataBuff.length === 2) {
-      this.emitData();
+    // Something went wrong, empty memory
+    if (this.dataBuff.length === 50) {
+      this.getData();
     }
   };
 }
