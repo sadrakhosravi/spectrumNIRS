@@ -79,6 +79,7 @@ export const DeviceSelector = ({ open, closeSetter }: DeviceSelectorType) => {
         actionButtons={<Button text="Add Device" disabled={selectedDevice === ''} />}
         closeSetter={closeSetter}
       >
+        {/* Iterate over devices and display them */}
         {filteredDevices.map((deviceName) => (
           <ListItem
             key={deviceName}

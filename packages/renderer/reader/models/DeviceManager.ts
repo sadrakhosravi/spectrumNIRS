@@ -12,6 +12,9 @@ import { DeviceChannels } from '@utils/channels/DeviceChannels';
 
 // Devices
 
+/**
+ * The main device manager state handler, updates will be sent to the UI thread automatically.
+ */
 export class DeviceManager {
   /**
    * All active device module instances singleton.

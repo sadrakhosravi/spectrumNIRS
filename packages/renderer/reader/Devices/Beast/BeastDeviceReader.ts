@@ -1,11 +1,10 @@
-import Beast from './Devices/Beast/Beast';
+import Beast from './Beast';
 
 // Interfaces
-import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from './api/device-api';
-import { readerIPCService as ipcService } from './ReaderIPCService';
-import { BeastCmd } from './Devices/Beast/BeastCommandsEnum,';
+import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from '../../api/device-api';
+import { BeastCmd } from './BeastCommandsEnum,';
 
-export class DeviceReader {
+export class BeastDeviceReader {
   /**
    * The device classes
    */
@@ -35,7 +34,7 @@ export class DeviceReader {
     this.physicalDevice.waitForDevice().then(() => {
       // When the device connects
       this.isDeviceConnected = true;
-      ipcService.sendDeviceConnected(true);
+      // ipcService.sendDeviceConnected(true);
       this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
       this.listenForInitialWalkthrough();
       this.listenForDeviceData();
@@ -60,6 +59,14 @@ export class DeviceReader {
     device.on(BeastCmd.SET_VERSION, (version: string) =>
       console.log('Beast Version Received: ' + version),
     );
+
+    setTimeout(() => {
+      this.deviceInput?.updateSettings({
+        LEDValues: [92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 76],
+        numOfLEDs: 15,
+        numOfPDs: 7,
+      });
+    }, 1500);
   }
 
   /**
@@ -70,7 +77,8 @@ export class DeviceReader {
     console.log(settings);
     const status = this.deviceInput?.updateSettings(settings);
     this.deviceParser.setPDNum(settings.numOfPDs);
-    ipcService.sendDeviceInputStatus(status);
+    // ipcService.sendDeviceInputStatus(status);
+    console.log(status);
   }
 
   /**
@@ -99,7 +107,7 @@ export class DeviceReader {
     const handleDisconnect = () => {
       console.log('Device disconnected ...');
       this.isDeviceConnected = false;
-      ipcService.sendDeviceConnected(false);
+      // ipcService.sendDeviceConnected(false);
 
       // Remove listeners
       device.off('disconnect', handleDisconnect);
@@ -135,9 +143,10 @@ export class DeviceReader {
   private listenForParserData() {
     this.deviceParser.dataEmitter.on('data', () => {
       const unPackedData = this.deviceParser.getData();
-      ipcService.sendDeviceData(unPackedData);
+      // ipcService.sendDeviceData(unPackedData);
+      self.postMessage(unPackedData);
     });
   }
 }
 
-export default new DeviceReader();
+new BeastDeviceReader();
