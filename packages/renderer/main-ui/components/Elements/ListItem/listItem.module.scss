@@ -1,0 +1,68 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.ListItem {
+  position: relative;
+  width: 100%;
+  height: 6rem;
+  padding: 0 $gap-2xl;
+  gap: $gap-xl;
+  border-bottom: 1px solid rgba($color: #fff, $alpha: 0.2);
+  z-index: 5;
+  @include flex-center;
+  @include hover-state-secondary;
+}
+
+.ListItemActive {
+  @include ring;
+}
+
+.Active {
+  border-left: 6px solid $color-primary;
+  background-color: rgba($color: $color-primary, $alpha: 0.15);
+}
+
+.Icon {
+  width: 5%;
+
+  svg {
+    fill: rgba($color: #fff, $alpha: 0.25);
+  }
+}
+
+.Info {
+  position: relative;
+  width: 100%;
+
+  span {
+    display: block;
+  }
+
+  span:last-child {
+    color: rgba($color: #fff, $alpha: 0.5);
+  }
+}
+
+.LastUpdate {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.Buttons {
+  width: 15%;
+  justify-content: flex-end;
+  @include flex-center;
+
+  button {
+    height: 100%;
+    padding: 0 $gap-base;
+    @include hover-state-secondary;
+    @include active-focus-state;
+  }
+}
+
+.Disabled {
+  pointer-events: none;
+}

@@ -64,7 +64,11 @@ export const OpenRecordings = observer(() => {
           onClick={() => handleRefreshBtnClick()}
         />
       }
-      closable={false}
+      noContentMessage={
+        recordingVM.recordings.length === 0
+          ? 'No recordings found! Please create a recording or import from a file.'
+          : null
+      }
     >
       <div className={styles.ContentClickArea} onClick={() => setSelectedRecording('')} />
 
@@ -85,9 +89,7 @@ export const OpenRecordings = observer(() => {
       {recordingVM.recordings.length === 0 && (
         <div className={styles.NoRecordsContainer}>
           <FiInfo size="102px" opacity={0.6} strokeWidth={1.5} />
-          <span className="text-larger">
-            No recordings found! Please create a recording or import from a file.
-          </span>
+          <span className="text-larger"></span>
         </div>
       )}
     </DialogContainer>

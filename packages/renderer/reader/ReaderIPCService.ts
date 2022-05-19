@@ -13,6 +13,13 @@ class ReaderIPCService {
   }
 
   /**
+   * Sends the given parameter and channel name to the UI process.
+   */
+  public sendToUI(channel: string, value?: any) {
+    ipcRenderer.sendTo(1, channel, value);
+  }
+
+  /**
    * Sends an IPC message to the main webContents
    */
   public sendDeviceConnected(value: boolean) {

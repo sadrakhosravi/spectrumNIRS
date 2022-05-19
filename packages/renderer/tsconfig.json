@@ -6,7 +6,7 @@
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "strict": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "noUnusedLocals": true,

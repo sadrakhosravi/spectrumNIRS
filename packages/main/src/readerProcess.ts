@@ -9,6 +9,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      nodeIntegrationInWorker: true,
     },
   });
 

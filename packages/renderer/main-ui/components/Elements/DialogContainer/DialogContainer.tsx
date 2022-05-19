@@ -7,15 +7,16 @@ import * as styles from './dialogContainer.module.scss';
 import { CloseButton } from '../../Elements/Buttons';
 
 // Icons
-import { FiCornerUpLeft } from 'react-icons/fi';
+import { FiCornerUpLeft, FiInfo } from 'react-icons/fi';
 import Tippy from '@tippyjs/react';
 
 type DialogContainerType = {
   title: string;
   actionButtons: JSX.Element | JSX.Element[];
   topBarActionButtons?: JSX.Element | JSX.Element[];
+  noContentMessage?: string | null;
   searchInput?: JSX.Element;
-  closable?: boolean;
+  closeSetter?: (value: boolean) => void;
   children: React.ReactNode;
   backButtonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
@@ -25,7 +26,8 @@ export const DialogContainer = ({
   actionButtons,
   topBarActionButtons,
   searchInput,
-  closable,
+  noContentMessage,
+  closeSetter,
   children,
   backButtonOnClick,
 }: DialogContainerType) => {
@@ -46,11 +48,25 @@ export const DialogContainer = ({
           {/* Search area */}
           {searchInput && <span className={styles.SearchContainer}>{searchInput}</span>}
           {actionButtons && <span className={styles.ActionButtons}>{topBarActionButtons}</span>}
-          {closable && <CloseButton className={styles.CloseButton} />}
+          {closeSetter && (
+            <CloseButton className={styles.CloseButton} onClick={() => closeSetter(false)} />
+          )}
         </div>
 
         {/* Content Area */}
-        <div className={styles.ContentArea}>{children}</div>
+        <div className={styles.ContentArea}>
+          {children}
+
+          {/* Show a message if no recording exits */}
+          {noContentMessage && (
+            <div className={styles.NoContentContainer}>
+              <FiInfo size="102px" opacity={0.6} strokeWidth={1.5} />
+              <span className="text-larger">
+                No recordings found! Please create a recording or import from a file.
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* Bottom Bar */}
         <div className={styles.BottomBar}>{actionButtons}</div>

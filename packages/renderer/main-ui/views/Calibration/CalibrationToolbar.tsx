@@ -5,7 +5,7 @@ import * as styles from './calibration.module.scss';
 
 // Components
 import { Button } from '/@/components/Elements/Buttons/Button';
-import { DeviceList } from '../../components/Device';
+import { ActiveDeviceList } from '../../components/Device';
 import { ChartViewSwitcher } from '/@/components/Chart';
 
 // Icons
@@ -66,7 +66,7 @@ export const CalibrationToolbar = () => {
       <div className={styles.ActionButtonContainer}>
         <ChartViewSwitcher />
         <span className={styles.DeviceListButtonContainer}>
-          <DeviceList />
+          <ActiveDeviceList />
         </span>
 
         <Button text="Start" onClick={calibrationToolbarVM.handleDeviceStart} />

@@ -8,15 +8,3 @@
   left: 0;
   top: 0;
 }
-
-.NoRecordsContainer {
-  flex-direction: column;
-  gap: $gap-lg;
-  @include absolute-center;
-  @include flex-center;
-
-  span {
-    opacity: 0.6;
-    text-align: center;
-  }
-}
