@@ -11,19 +11,25 @@ import { deviceManagerVM } from '@viewmodels/VMStore';
 import { Separator } from '/@/components/Elements/Separator';
 
 export const DeviceSettingsTab = observer(() => {
-  const deviceOptions = deviceManagerVM.activeDevices.map((device) => {
-    return {
-      name: device.name,
-      value: device.id,
-    };
-  });
+  const deviceOptions = deviceManagerVM.activeDevices.map((device) => ({
+    name: device.name,
+    value: device.id,
+  }));
 
-  const [currDeviceId] = React.useState(deviceManagerVM.activeDevices[0].id);
+  const [currDeviceId, setCurrDeviceId] = React.useState(
+    deviceOptions.length !== 0 && deviceOptions[0].value,
+  );
+
+  React.useEffect(() => {
+    setCurrDeviceId(
+      deviceManagerVM.activeDevices.length !== 0 && deviceManagerVM.activeDevices[0].id,
+    );
+  }, [deviceManagerVM.activeDevices.length]);
 
   const currDevice = deviceManagerVM.activeDevices.find((device) => device.id === currDeviceId);
   const currVal = { name: currDevice?.name || '', value: currDevice?.name || '' };
 
-  return (
+  return deviceManagerVM.activeDevices.length !== 0 ? (
     <>
       <Row>
         <Column width="33.3%">
@@ -36,5 +42,7 @@ export const DeviceSettingsTab = observer(() => {
       <Separator />
       {currDevice && <DeviceSettings device={currDevice} />}
     </>
+  ) : (
+    <span>No device found! Please add a device first.</span>
   );
 });

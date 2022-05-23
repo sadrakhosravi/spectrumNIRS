@@ -52,7 +52,7 @@ export const ActiveDeviceList = observer(() => {
 
           <div className={styles.ActionButtons}>
             <ButtonIconText
-              text="Add Device"
+              text="Add/Remove Device"
               icon={<FiServer size="15px" strokeWidth={3} />}
               onClick={() => setAddDeviceOpen(true)}
             />

@@ -14,7 +14,7 @@ export const ChannelSeries = ({ settingsToggle, channelRef, name, color }: Chann
   return (
     <button className={styles.ChannelInfo} onClick={settingsToggle} ref={channelRef}>
       <span style={{ backgroundColor: color }} />
-      <span>{name || 'No Series Name'}</span>
+      <span>{name || 'No Name'}</span>
     </button>
   );
 };

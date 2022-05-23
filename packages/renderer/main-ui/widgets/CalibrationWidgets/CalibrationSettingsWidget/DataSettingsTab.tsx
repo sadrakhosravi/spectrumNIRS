@@ -4,9 +4,6 @@ import { observer } from 'mobx-react-lite';
 // Components
 import { Row, Column } from '/@/components/Elements/Grid';
 
-// View Models
-import { deviceManagerVM } from '@viewmodels/VMStore';
-
 const coefKey = 'hardwareCoef';
 
 export const DataSettingsTab = observer(() => {
@@ -16,7 +13,6 @@ export const DataSettingsTab = observer(() => {
     const value = parseFloat(e.target.value);
     if (value < 0) return;
     if (value > 100000) return;
-    deviceManagerVM.activeDevices[0].setCalibrationFactor(value);
     window.localStorage.setItem(coefKey, value.toString());
   };
 
@@ -24,7 +20,6 @@ export const DataSettingsTab = observer(() => {
   React.useEffect(() => {
     const coef = window.localStorage.getItem(coefKey);
     if (!coef) return;
-    deviceManagerVM.activeDevices[0].setCalibrationFactor(parseFloat(coef));
   }, []);
 
   return (
@@ -39,7 +34,7 @@ export const DataSettingsTab = observer(() => {
           <input
             id={inputId}
             type={'number'}
-            value={deviceManagerVM.activeDevices[0].deviceCalibrationFactor}
+            value={1}
             onChange={handleInputChange}
             min={0}
             max={10000}

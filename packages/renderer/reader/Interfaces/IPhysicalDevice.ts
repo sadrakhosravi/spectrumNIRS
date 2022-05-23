@@ -1,16 +1,19 @@
 import type { Socket } from 'socket.io';
+import type { DeviceInfoType } from 'reader/models/Types';
 
 export interface IPhysicalDevice {
   /**
    * @returns the current socket.io server instance.
    */
   getIO(): Socket;
-
   /**
    * @return the device communication instance.
    */
   getDevice(): Socket;
-
+  /**
+   * @returns the complete information about the device and its channels.
+   */
+  getDeviceInfo(): DeviceInfoType;
   /**
    * @returns the serial number of the device
    */

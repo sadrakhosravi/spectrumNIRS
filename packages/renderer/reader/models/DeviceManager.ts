@@ -15,23 +15,33 @@ import { DeviceChannels } from '@utils/channels/DeviceChannels';
 
 // Devices
 import { devices } from '../Devices/Devices';
+import { ReaderChannels } from '@utils/channels';
+
+// Types
+import type { DeviceNameType } from './Types';
+import { DeviceReader } from './DeviceReader';
 
 /**
- * The main device manager state handler, updates will be sent to the UI thread automatically.
+ * The main device manager state handler, updates will be sent to the UI thread.
  */
 export class DeviceManager {
   /**
    * A list of all the device names and their worker url.
    */
-  protected devices: typeof devices;
+  private devices: typeof devices;
   /**
    * Instances of all the active device workers
    */
   @observable protected activeDevices: DeviceModel[];
+  /**
+   * The device reader class instance.
+   */
+  private deviceReader: DeviceReader;
 
   constructor() {
     this.devices = devices;
     this.activeDevices = [];
+    this.deviceReader = new DeviceReader(this.activeDevices);
     makeObservable(this);
 
     this.init();
@@ -45,21 +55,25 @@ export class DeviceManager {
     ipcRenderer.on(DeviceChannels.DEVICE_ADD, this.handleDeviceAddition.bind(this));
 
     // Listen for device settings update
-    ipcRenderer.on(DeviceChannels.DEVICE_UPDATE, this.handleDeviceSettingsUpdate.bind(this));
+    ipcRenderer.on(
+      DeviceChannels.DEVICE_SETTINGS_UPDATE,
+      this.handleDeviceSettingsUpdate.bind(this),
+    );
 
     // Listen for device removal
     ipcRenderer.on(DeviceChannels.DEVICE_REMOVE, this.handleDeviceRemoval.bind(this));
 
     // Listen for all device names.
-    ipcRenderer.on(DeviceChannels.ALL_DEVICE_NAME, this.handleGetAlLDeviceNames.bind(this));
-  }
+    ipcRenderer.on(DeviceChannels.GET_ALL_DEVICE_NAMES, this.handleGetAlLDeviceNames.bind(this));
 
-  /**
-   * The data getter function sent to the device model to pass the data to this class.
-   */
-  public dataGetter = (data: any) => {
-    console.log(data);
-  };
+    // Listen for active update.
+    ipcRenderer.on(DeviceChannels.GET_ALL_ACTIVE_DEVICES, this.handleGetActiveDevices.bind(this));
+
+    // Listen for device start and start all devices.
+    ipcRenderer.on(ReaderChannels.START, () =>
+      this.activeDevices.forEach((device) => device.startDevice()),
+    );
+  }
 
   /**
    * Handles device addition
@@ -82,7 +96,11 @@ export class DeviceManager {
     if (!device) return;
 
     // Create the device worker.
-    const deviceInstance = new DeviceModel(device.name, device.workerURL, this.dataGetter);
+    const deviceInstance = new DeviceModel(
+      device.name,
+      device.workerURL,
+      this.deviceReader.dataGetter,
+    );
 
     // Add it to the observables.
     this.activeDevices.push(deviceInstance);
@@ -96,21 +114,47 @@ export class DeviceManager {
     name: string,
     newSettings: any,
   ) {
-    console.log(name, newSettings);
+    const device = this.activeDevices.find((device) => device.name === name);
+    if (!device) return;
+
+    device.updateSettings(newSettings);
+  }
+
+  /**
+   * Handles the IPC request for all active devices by returning them as device info.
+   */
+  private handleGetActiveDevices() {
+    this.activeDevices.forEach((device) => {
+      device.sendDeviceInfo();
+    });
   }
 
   /**
    * Handles the device removal and device's module memory cleanup.
    */
   private handleDeviceRemoval(_event: Electron.IpcRendererEvent, deviceName: string) {
-    console.log(deviceName);
+    const deviceToRemoveIndex = this.activeDevices.findIndex(
+      (device) => device.name === deviceName,
+    );
+
+    // No device found, something has gone wrong here. There should be a device.
+    if (deviceToRemoveIndex === -1) throw new Error('Device not found!');
+
+    // Stop the device and remove it from the list
+    this.activeDevices[deviceToRemoveIndex].stopDevice();
+    this.activeDevices.splice(deviceToRemoveIndex, 1);
   }
 
   /**
    * Gets the list of all available device module names and sends them to the main UI.
    */
   private handleGetAlLDeviceNames(event: Electron.IpcRendererEvent) {
-    const devices = ['Beast', 'V5', 'SyncPulse'];
-    ipcRenderer.sendTo(event.senderId, DeviceChannels.ALL_DEVICE_NAME, devices);
+    const devicesInfo: DeviceNameType[] = devices.map((device) => {
+      // Check if the device is active.
+      const isDeviceActive = this.activeDevices.find((d) => d.name === device.name);
+      return { name: device.name, isActive: isDeviceActive ? true : false };
+    });
+
+    ipcRenderer.sendTo(event.senderId, DeviceChannels.ALL_DEVICE_NAMES, devicesInfo);
   }
 }

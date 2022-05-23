@@ -87,7 +87,7 @@ export const ChannelLaneItem = observer(({ chart, chartIndex }: ChannelLaneItemT
                   settingsToggle={handleOpenChannelSettings}
                 />
               ))}
-              {chartVM.charts[chartIndex].series.length === 0 && 'No Series'}
+              {chartVM.charts[chartIndex].series.length === 0 && <p></p>}
 
               {/* <GainButton /> */}
               {/* Channel Action Buttons */}

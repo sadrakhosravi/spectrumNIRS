@@ -8,7 +8,7 @@
 import { BarChartModel } from '../../models/Chart';
 
 // Types
-import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
+import type { DeviceADCDataType } from '../../renderer/reader/models/Types';
 
 // View Models
 import { deviceManagerVM } from '../VMStore';

@@ -15,13 +15,13 @@ import { Listbox } from '../Elements/Listbox';
 import { RangeSliderWithInput } from '../Form/RangeSliderWithInput';
 
 // Types
-import type { DeviceModel } from '@models/Device/DeviceModel';
+import type { DeviceModelProxy } from '@models/Device/DeviceProxyModel';
 
 // ID
 const ledIDBase = 'led-intensities-';
 
 type DeviceSettingsType = {
-  device: DeviceModel;
+  device: DeviceModelProxy;
 };
 
 export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
@@ -42,7 +42,7 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
 
     const clearSpan = () => (timeoutRef = setTimeout(() => (statusSpan.innerText = ''), 3500));
 
-    ipcRenderer.on(ReaderChannels.DEVICE_INPUT_RESPONSE, (_event, status: boolean | undefined) => {
+    ipcRenderer.on(ReaderChannels.START, (_event, status: boolean | undefined) => {
       // Clear the timeout first
       if (timeoutRef) {
         window.clearTimeout(timeoutRef);
@@ -71,7 +71,7 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
     });
 
     return () => {
-      ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_INPUT_RESPONSE);
+      // ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_INPUT_RESPONSE);
     };
   }, []);
   return (
@@ -94,7 +94,7 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
         {/* Adjust LED intensity */}
       </Row>
       <div className={styles.LEDIntensitiesContainer}>
-        {new Array(device.activeLEDs).fill(0).map((_, i) => (
+        {device.LEDs.map((_, i) => (
           <RangeSliderWithInput
             id={ledIDBase + i}
             key={ledIDBase + i + 'range-slider'}

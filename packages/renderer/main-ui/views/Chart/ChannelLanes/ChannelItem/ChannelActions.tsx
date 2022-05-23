@@ -47,15 +47,16 @@ export const ChannelActions = observer(({ chart, chartIndex }: ChannelActionsTyp
           <FiMinimize2 {...iconSettings} title={'Minimize Channel'} />
         )}
       </button>
-      {chartVM.charts[chartIndex].series[0].lpFilter && (
-        <Tippy content="Lowpass Filter Active">
-          <button
-            className={`${styles.ChannelActionButton} ${styles.ChannelActionButtonDisabled} `}
-          >
-            <FiFilter {...iconSettings} />
-          </button>
-        </Tippy>
-      )}
+      {chartVM.charts[chartIndex].series.length !== 0 &&
+        chartVM.charts[chartIndex].series[0].lpFilter && (
+          <Tippy content="Lowpass Filter Active">
+            <button
+              className={`${styles.ChannelActionButton} ${styles.ChannelActionButtonDisabled} `}
+            >
+              <FiFilter {...iconSettings} />
+            </button>
+          </Tippy>
+        )}
     </div>
   );
 });

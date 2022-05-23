@@ -14,7 +14,7 @@ import { ColorHEX, SolidFill, SolidLine } from '@arction/lcjs';
 import type { Filter } from '../Filters/Lowpass';
 
 // View Models
-import { deviceManagerVM } from '../../viewmodels/VMStore';
+// import { deviceManagerVM } from '../../viewmodels/VMStore';
 import { Lowpass } from '../Filters';
 
 export class ChartSeries {
@@ -110,7 +110,7 @@ export class ChartSeries {
    * Applies the gain value and adds Array of the data to the series.
    */
   public addArrayY(data: Float32Array | Int32Array | number[]) {
-    const deviceCalibFactor = deviceManagerVM.activeDevices[0].deviceCalibrationFactor;
+    const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
     if (this.lowpassFilter) {
@@ -127,7 +127,7 @@ export class ChartSeries {
    * Applies the gain value and adds obj array to the series.
    */
   public addArrayXY(data: { x: number; y: number }[]) {
-    const deviceCalibFactor = deviceManagerVM.activeDevices[0].deviceCalibrationFactor;
+    const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
     console.time('gain');
@@ -142,7 +142,7 @@ export class ChartSeries {
    * Applies the gain value and adds single data point to the series.
    */
   public addPoint(data: { x: number; y: number }) {
-    const deviceCalibFactor = deviceManagerVM.activeDevices[0].deviceCalibrationFactor;
+    const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
     if (this.lowpassFilter) {

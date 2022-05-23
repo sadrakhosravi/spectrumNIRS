@@ -10,10 +10,10 @@ import { ReaderChannels } from '../../utils/channels';
 
 // Types
 import type { IReactionDisposer } from 'mobx';
-import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
+import type { DeviceADCDataType } from '../../renderer/reader/models/Types';
 
 // View Models
-import { chartVM, barChartVM, deviceManagerVM } from '../../viewmodels/VMStore';
+import { chartVM, barChartVM } from '../../viewmodels/VMStore';
 
 export class DataManagerModel {
   private reactions: IReactionDisposer[];
@@ -36,7 +36,7 @@ export class DataManagerModel {
    * Initializes the class
    */
   private init() {
-    this.channelName = 'ch' + deviceManagerVM.activeDevices[0].selectedPD;
+    this.channelName = 'ch' + 2; // FIXME: Add device channel
     this.handleReactions();
     this.streamDeviceDataToMainChart();
   }
@@ -55,12 +55,12 @@ export class DataManagerModel {
       },
     );
 
-    const selectedPDReactionDisposer = reaction(
-      () => deviceManagerVM.activeDevices[0].selectedPD,
-      () => (this.channelName = 'ch' + deviceManagerVM.activeDevices[0].selectedPD),
-    );
+    // const selectedPDReactionDisposer = reaction(
+    //   () => deviceManagerVM.activeDevices[0].selectedPD,
+    //   () => (this.channelName = 'ch' + deviceManagerVM.activeDevices[0].selectedPD),
+    // );
 
-    this.reactions.push(chartViewReactionDisposer, selectedPDReactionDisposer);
+    this.reactions.push(chartViewReactionDisposer);
   }
 
   /**

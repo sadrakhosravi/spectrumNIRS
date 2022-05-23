@@ -36,7 +36,7 @@ export const recordingVM = new RecordingViewModel();
 /**
  * Device Manager view model
  */
-export const deviceManagerVM = new DeviceManagerViewModel();
+export const deviceManagerVM: DeviceManagerViewModel = new DeviceManagerViewModel();
 
 /// ------------------------- Chart -------------------------///
 /**

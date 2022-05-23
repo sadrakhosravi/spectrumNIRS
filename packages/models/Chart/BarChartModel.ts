@@ -23,7 +23,7 @@ import type {
   Axis,
   CustomTick,
 } from '@arction/lcjs';
-import type { ChannelDataType } from '../../renderer/reader/types/DeviceDataType';
+import type { ChannelDataType } from '../../renderer/reader/models/Types';
 
 // Theme
 import {

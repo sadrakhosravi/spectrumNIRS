@@ -8,28 +8,17 @@ import * as styles from './statusBar.module.scss';
 import { StatusBarItem } from './';
 
 // Icon
-import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiXCircle } from 'react-icons/fi';
 
 // View Model
-import { deviceManagerVM } from '@store';
+// import { deviceManagerVM } from '@store';
 
 export const StatusBar = observer(() => {
   return (
     <footer className={styles.StatusBar}>
       <div className={styles.LeftItems}></div>
       <div className={styles.RightItems}>
-        <StatusBarItem
-          icon={
-            deviceManagerVM.activeDevices[0].isDeviceConnected ? (
-              <FiCheckCircle size={18} strokeWidth={2.5} color="green" />
-            ) : (
-              <FiXCircle size={18} strokeWidth={2.5} color="red" />
-            )
-          }
-          text={`Beast Status: ${
-            deviceManagerVM.activeDevices[0].isDeviceConnected ? 'Connected' : 'Disconnected'
-          }`}
-        />
+        <StatusBarItem icon={<FiXCircle />} text={'No Connected'} />
       </div>
     </footer>
   );

@@ -2,6 +2,8 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
 // Components
+import { Loader } from '../components/Elements/Loader';
+
 import { LeftPanel } from '../components/LeftPanel';
 import { StatusBar } from '../components/StatusBar';
 
@@ -17,6 +19,9 @@ import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 export const AppRouter = observer(() => {
   return (
     <>
+      {/* App Loader - Uses react portal and observer to hide and show */}
+      <Loader />
+
       {/* Main Container */}
       <div className="main-container">
         {/* Show app dashboard */}

@@ -28,7 +28,7 @@ export class ChartModel {
   protected dashboard: Dashboard | undefined;
 
   constructor() {
-    this.availableRows = new SortedNumberSet(new Array(30).fill(0).map((_, i) => i));
+    this.availableRows = new SortedNumberSet(new Array(50).fill(0).map((_, i) => i));
     this.dashboard = undefined;
   }
 

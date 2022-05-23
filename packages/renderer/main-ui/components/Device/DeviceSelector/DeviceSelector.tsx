@@ -1,74 +1,71 @@
 import * as React from 'react';
-import { ipcRenderer } from 'electron';
+import { observer } from 'mobx-react-lite';
 
 // Components
 import { Dialog } from '../../Elements/Dialog';
-import { DialogContainer } from '../../Elements/DialogContainer';
-
-// Services
-import MainWinIPCService from '../../../MainWinIPCService';
-
-// IPC Channels
-import { DeviceChannels } from '@utils/channels/DeviceChannels';
 import { ListItem } from '../../Elements/ListItem/ListItem';
+import { DialogContainer } from '../../Elements/DialogContainer';
 import { SearchInput } from '../../Form';
-import { Button } from '../../Elements/Buttons';
+
+// View models
+import { deviceManagerVM } from '@store';
+import { appRouterVM } from '@store';
 
 type DeviceSelectorType = {
   open: boolean;
   closeSetter: (value: boolean) => void;
 };
 
-export const DeviceSelector = ({ open, closeSetter }: DeviceSelectorType) => {
-  const [devices, setDevices] = React.useState<string[]>([]);
-  const [filteredDevices, setFilteredDevices] = React.useState<string[]>([]);
-  const [selectedDevice, setSelectedDevice] = React.useState('');
+export const DeviceSelector = observer(({ open, closeSetter }: DeviceSelectorType) => {
+  const [filteredDevices, setFilteredDevices] = React.useState(deviceManagerVM.allDevices);
   const searchInputId = React.useId();
 
   React.useEffect(() => {
-    ipcRenderer.on(DeviceChannels.ALL_DEVICE_NAME, (_event, deviceNames: string[]) => {
-      setDevices(deviceNames);
-      setFilteredDevices(deviceNames);
-    });
-
     // Request data from the reader process
-    MainWinIPCService.sendToReader(DeviceChannels.GET_ALL_DEVICE_NAME);
+    deviceManagerVM.requestAllDevicesInfo();
 
     // Focus on the search box
     document.getElementById(searchInputId)?.focus();
-
-    // Cleanup listeners
-    return () => {
-      ipcRenderer.removeAllListeners(DeviceChannels.ALL_DEVICE_NAME);
-    };
   }, []);
+
+  // Update filtered state when the device manager changes
+  React.useEffect(() => {
+    setFilteredDevices(deviceManagerVM.allDevices);
+  }, [deviceManagerVM.allDevices]);
 
   // Handles search input changes and filters the device list.
   const handleSearchInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.target.value) {
-        setFilteredDevices(devices);
+        setFilteredDevices(deviceManagerVM.allDevices);
       }
 
       const inputVal = e.target.value.toLocaleLowerCase();
-      const filteredDevices = devices.filter((deviceName) =>
-        deviceName.toLocaleLowerCase().includes(inputVal),
+      const filteredDevices = deviceManagerVM.allDevices.filter((device) =>
+        device.name.toLocaleLowerCase().includes(inputVal),
       );
       setFilteredDevices(filteredDevices);
     },
-    [devices],
+    [deviceManagerVM.allDevices],
   );
 
   // Sends the selected device to be added in the reader process.
-  const handleSelectDevice = React.useCallback((deviceName: string) => {
-    MainWinIPCService.sendToReader(DeviceChannels.DEVICE_ADD, deviceName);
-    closeSetter(false);
+  const handleSelectDevice = React.useCallback((deviceName: string, isActive: boolean) => {
+    const loadingStr = isActive ? 'Removing Device Module...' : 'Adding Device Module...';
+    appRouterVM.setAppLoading(true, true, loadingStr, 1000);
+
+    if (isActive) {
+      deviceManagerVM.sendRemoveDeviceRequestToReader(deviceName);
+      return;
+    }
+
+    deviceManagerVM.sendAddDeviceRequestToReader(deviceName);
   }, []);
 
   return (
     <Dialog open={open} closeSetter={closeSetter}>
       <DialogContainer
-        title="Devices"
+        title="Device Modules"
         searchInput={
           <SearchInput
             id={searchInputId}
@@ -76,23 +73,23 @@ export const DeviceSelector = ({ open, closeSetter }: DeviceSelectorType) => {
             onChange={handleSearchInputChange}
           />
         }
-        actionButtons={<Button text="Add Device" disabled={selectedDevice === ''} />}
+        actionButtons={<></>}
         closeSetter={closeSetter}
       >
         {/* Iterate over devices and display them */}
-        {filteredDevices.map((deviceName) => (
+        {filteredDevices.map((device, i) => (
           <ListItem
-            key={deviceName}
-            id={deviceName}
-            isSelected={selectedDevice === deviceName}
-            title={deviceName}
-            active={true}
-            setter={setSelectedDevice}
-            onClick={() => handleSelectDevice(deviceName)}
-            onDoubleClick={() => handleSelectDevice(deviceName)}
+            key={device.name + i}
+            id={device.name}
+            buttonText={device.isActive ? 'Remove Device' : 'Add Device'}
+            title={device.name}
+            description={'Version: 0.1.0'}
+            active={device.isActive}
+            onClick={() => handleSelectDevice(device.name, device.isActive)}
+            onDoubleClick={() => handleSelectDevice(device.name, device.isActive)}
           />
         ))}
       </DialogContainer>
     </Dialog>
   );
-};
+});

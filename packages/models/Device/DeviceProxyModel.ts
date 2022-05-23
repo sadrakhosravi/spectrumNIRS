@@ -5,8 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { action, makeObservable, observable, reaction } from 'mobx';
-import { ipcRenderer } from 'electron';
-import { ReaderChannels } from '../../utils/channels';
+import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 
 export type DeviceSettingsType = {
   numOfPDs: number;
@@ -15,27 +14,19 @@ export type DeviceSettingsType = {
 };
 
 // Services
-import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
+// import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 
-// Types
+// View Models
+import { appRouterVM, chartVM } from '../../viewmodels/VMStore';
+
+// Types & Enum
 import type { IReactionDisposer } from 'mobx';
-// import type { DeviceADCDataType } from '../../renderer/reader/types/DeviceDataType';
+import type { DeviceInfoType } from '../../renderer/reader/models/Types';
+import type { ChartSeries, DashboardChart } from '../Chart';
+import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
+import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 
-// // View Model
-// import { chartVM } from '../../viewmodels/VMStore';
-
-export type DeviceInfoType = {
-  id: string;
-  name: string;
-  numOfPDs: number;
-  numOfLEDs: number;
-  samplingRate: number;
-  defaultCalibrationFactor: number;
-  activeLEDs?: number;
-  activePDs?: number;
-};
-
-export class DeviceModel {
+export class DeviceModelProxy {
   public readonly id: string;
   /**
    * Device name.
@@ -50,9 +41,13 @@ export class DeviceModel {
    */
   public readonly PDs: number[];
   /**
-   * Device calibration factor.
+   * The PD channel names.
    */
-  @observable private calibrationFactor: number;
+  public readonly PDChannelNames: string[];
+  /**
+   * The calculated channel names.
+   */
+  public readonly calculatedChannelNames: string[];
   /**
    * Current active LEDs.
    */
@@ -85,28 +80,38 @@ export class DeviceModel {
    * Observable reaction disposer array.
    */
   private reactions: IReactionDisposer[];
+  /**
+   * The chart channels created by this device.
+   */
+  private chartChannels: { chart: DashboardChart; series: ChartSeries }[];
 
   constructor(deviceInfo: DeviceInfoType) {
     this.id = deviceInfo.id;
     this.name = deviceInfo.name;
     this.LEDs = new Array(deviceInfo.numOfLEDs).fill(0).map((_, i) => (_ = i + 1));
     this.PDs = new Array(deviceInfo.numOfPDs).fill(0).map((_, i) => (_ = i + 1));
-    this.calibrationFactor = deviceInfo.defaultCalibrationFactor;
+    this.PDChannelNames = deviceInfo.PDChannelNames;
+    this.calculatedChannelNames = deviceInfo.calculatedChannelNames;
 
-    this._activeLEDs = deviceInfo.activeLEDs || 1;
-    this._activePDs = deviceInfo.activePDs || 1;
+    // Observables
+    this._activeLEDs = 1;
+    this._activePDs = 1;
     this._selectedPD = 2;
-    this._samplingRate = deviceInfo.samplingRate;
+    this._samplingRate = deviceInfo.defaultSamplingRate;
 
     this.isConnected = false;
     this.isStarted = false;
     this._LEDIntensities = new Array(deviceInfo.numOfLEDs).fill(0);
 
+    // Trackers
     this.reactions = [];
+    this.chartChannels = [];
 
     makeObservable(this);
+
     this.handleReactions();
     this.initListeners();
+    this.createChartChannels();
   }
 
   /**
@@ -159,13 +164,6 @@ export class DeviceModel {
   }
 
   /**
-   * @returns the device calibration factor.
-   */
-  public get deviceCalibrationFactor() {
-    return this.calibrationFactor;
-  }
-
-  /**
    * Sets whether the device is connected or not.
    */
   @action public setIsDeviceConnected(value: boolean) {
@@ -211,26 +209,39 @@ export class DeviceModel {
   }
 
   /**
-   * Sets the device calibration factor.
+   * Creates the chart channels based on the device information and keeps
+   * a reference to them.
    */
-  @action public setCalibrationFactor(num: number) {
-    this.calibrationFactor = num;
+  private createChartChannels() {
+    console.log(this.PDChannelNames);
+    // If the app is in calibration, create calibration chart
+    if (appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
+      // Add chart channels
+      this.PDChannelNames.forEach((channelName) => {
+        const chart = chartVM.addChart();
+        const series = chartVM.addSeries(chart.id, channelName);
+
+        this.chartChannels.push({ chart, series });
+      });
+    }
+  }
+
+  /**
+   * Deletes the chart channels that was created by the device.
+   */
+  private deleteChartChannels() {
+    this.chartChannels.forEach((chart) => {
+      chartVM.removeChart(chart.chart.id);
+    });
+    console.log(this.chartChannels[0].chart);
+    this.chartChannels.length = 0;
   }
 
   /**
    * Initializes all event listeners.
    */
   private initListeners() {
-    this.listenForDeviceConnection();
-  }
-
-  /**
-   * Listens for device connection.
-   */
-  @action private listenForDeviceConnection() {
-    ipcRenderer.on(ReaderChannels.DEVICE_CONNECTED, () => {
-      this.isConnected = true;
-    });
+    // Listeners
   }
 
   /**
@@ -238,19 +249,18 @@ export class DeviceModel {
    */
   public sendDeviceSettingsToReader = () => {
     // Should wait for react to re-render first.
-    requestAnimationFrame(() => {
-      MainWinIPCService.sendToReader(
-        ReaderChannels.DEVICE_SETTING_UPDATE,
-        this.getDeviceSettings(),
-      );
-    });
+    MainWinIPCService.sendToReader(
+      DeviceChannels.DEVICE_SETTINGS_UPDATE,
+      this.name,
+      this.getDeviceSettings(),
+    );
   };
 
   /**
    * @returns the device settings read from the UI.
    * TODO: Update the LED intensities to use observable instead of getElementById.
    */
-  private getDeviceSettings = () => {
+  protected getDeviceSettings = () => {
     console.log('Update');
     // The settings object
     const settings: DeviceSettingsType = {
@@ -297,8 +307,6 @@ export class DeviceModel {
   public cleanup() {
     this.reactions.forEach((disposer) => disposer());
     this.reactions.length = 0;
-
-    // Remove listeners
-    ipcRenderer.removeAllListeners(ReaderChannels.DEVICE_CONNECTED);
+    this.deleteChartChannels();
   }
 }

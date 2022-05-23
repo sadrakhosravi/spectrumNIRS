@@ -151,3 +151,12 @@ h3 {
   width: 100%;
   z-index: 50;
 }
+
+#spectrum-loading-portal {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 35px);
+  z-index: 99999;
+  top: 35px;
+  left: 0;
+}

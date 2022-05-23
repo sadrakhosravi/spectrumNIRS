@@ -2,7 +2,6 @@
 @import '@styles/mixins';
 
 .LoaderContainer {
-  background-color: $color-bg-dark1;
   width: 100%;
   height: calc(100% - $size-title-bar);
   justify-content: center;
@@ -14,6 +13,14 @@
   position: absolute;
   top: $size-title-bar;
   left: 0;
+}
+
+.LoaderSolid {
+  background-color: $color-bg-dark1;
+}
+
+.LoaderTransparent {
+  background-color: rgba($color: $color-bg-dark1, $alpha: 0.6);
 }
 
 .Loader {

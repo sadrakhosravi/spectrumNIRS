@@ -14,13 +14,13 @@ export class CalibrationToolbarViewModel {
    * Sends a device start signal to the reader process
    */
   public handleDeviceStart() {
-    MainWinIPCService.sendToReader(ReaderChannels.DEVICE_START);
+    MainWinIPCService.sendToReader(ReaderChannels.START);
   }
 
   /**
    * Sends a device start signal to the reader process
    */
   public handleDeviceStop() {
-    MainWinIPCService.sendToReader(ReaderChannels.DEVICE_STOP);
+    MainWinIPCService.sendToReader(ReaderChannels.STOP);
   }
 }

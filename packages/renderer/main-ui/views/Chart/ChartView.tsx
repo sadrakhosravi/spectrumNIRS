@@ -15,7 +15,6 @@ import {
   chartVM,
   initChartVM,
   disposeChartVM,
-  deviceManagerVM,
   barChartVM,
   initBarChartVM,
   disposeBarChartVM,
@@ -30,20 +29,11 @@ export const ChartView = observer(() => {
     if (!chartVM) initChartVM();
     chartVM.init(id);
     chartVM.addChart();
-    chartVM.addSeries(chartVM.charts[0].id, 'Ambient');
 
     return () => {
       console.log('Chart Cleanup');
       disposeChartVM();
     };
-  }, []);
-
-  // Update charts based on the number of active channels
-  React.useEffect(() => {
-    for (let i = 0; i < deviceManagerVM.activeDevices[0].activeLEDs; i++) {
-      const chart = chartVM.addChart();
-      chartVM.addSeries(chart.getId(), `Channel ${chart.getChartRowIndex()}`);
-    }
   }, []);
 
   // On chart bart view, load the bar view chart

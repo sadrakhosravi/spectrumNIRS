@@ -8,7 +8,6 @@ import { nanoid } from 'nanoid';
 import { observable } from 'mobx';
 
 // Types
-import type { DeviceInfoType } from '../Device/DeviceModel';
 
 // Database Service
 import ServiceManager from '../../services/ServiceManager';
@@ -29,7 +28,7 @@ export class RecordingModel {
   /**
    * The devices used in the recording.
    */
-  @observable private devices: DeviceInfoType[];
+  @observable private devices: any[];
   /**
    * The timestamp that the recording was created at.
    */
@@ -39,12 +38,7 @@ export class RecordingModel {
    */
   private lastUpdateTimestamp: number;
 
-  constructor(
-    name: string,
-    description: string,
-    devices: DeviceInfoType[] | [],
-    isNewRecord: boolean,
-  ) {
+  constructor(name: string, description: string, devices: any[] | [], isNewRecord: boolean) {
     this.id = nanoid();
     this.recordingName = name;
     this.recordingDescription = description;

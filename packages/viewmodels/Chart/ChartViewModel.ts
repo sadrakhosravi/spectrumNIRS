@@ -125,6 +125,11 @@ export class ChartViewModel {
    * @returns the chart id
    */
   @action public addChart() {
+    console.log('ADD CHART');
+    // If the first chart does not have a series, nothing was added before
+    if (this.charts.length === 1 && this.charts[0].series.length === 0)
+      return this.charts[0].dashboardChart;
+
     const chart = this.model.addChartXY();
     const chartId = chart.getId();
     this.charts.push({
@@ -132,6 +137,7 @@ export class ChartViewModel {
       id: chartId,
       series: [],
     });
+
     return chart;
   }
 
@@ -140,8 +146,12 @@ export class ChartViewModel {
    */
   @action public removeChart(chartId: string) {
     const chartIndex = this.charts.findIndex((chart) => chart.id === chartId);
-
     if (chartIndex === -1) return;
+
+    if (chartIndex === 0) {
+      this.removeSeries(chartIndex);
+      return;
+    }
 
     // Remove the chart and its series
     this.removeChartAndSeries(chartIndex);
@@ -154,7 +164,11 @@ export class ChartViewModel {
    * Removes the last chart from the observable if charts are more than 1.
    */
   @action public removeLastChart() {
-    if (this.charts.length === 1) return;
+    // Dont remove the last chart for x axis synchronization
+    if (this.charts.length === 1) {
+      this.removeSeries(0);
+      return;
+    }
 
     // Remove the chart and series
     const lastChartIndex = this.charts.length - 1;
@@ -181,6 +195,14 @@ export class ChartViewModel {
   }
 
   /**
+   * Disposes the chart series and removes its reference from the observable.
+   */
+  @action private removeSeries(chartIndex: number) {
+    this.charts[chartIndex].series.forEach((series) => series.dispose());
+    this.charts[chartIndex].series.length = 0;
+  }
+
+  /**
    * Adds a new series to the given chart object
    */
   @action public addSeries(chartId: string, seriesName: string, seriesColor?: string) {
@@ -197,6 +219,8 @@ export class ChartViewModel {
 
     const series = chart.dashboardChart.addLineSeries(seriesName || 'No Name', color || '#fff');
     chart.series.push(series);
+
+    return series;
   }
 
   /**

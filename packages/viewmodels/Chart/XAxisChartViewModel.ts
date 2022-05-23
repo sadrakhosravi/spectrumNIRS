@@ -140,6 +140,9 @@ export class XAxisChartViewModel {
    * Sets the X axis time division and releases it.
    */
   @action public setTimeDiv = (timeDiv?: DivisionsType) => {
+    const attachedChart = this.model.getAttachedChart();
+    if (!attachedChart) return;
+
     const xAxis = this.model.getXAxis() as Axis;
 
     if (timeDiv) {
@@ -157,9 +160,9 @@ export class XAxisChartViewModel {
       };
     }
 
-    const attachedChart = this.model.getAttachedChart();
     const interval = xAxis.getInterval();
-    const seriesXMax = attachedChart?.getSeries()[0].getXMax();
+    const seriesXMax =
+      attachedChart.getSeries().length !== 0 && attachedChart.getSeries()[0].getXMax();
 
     let end = interval.end;
 

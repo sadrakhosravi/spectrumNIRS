@@ -8,11 +8,21 @@
 import Beast from './Beast';
 
 // Interfaces
-import { IDevice, IPhysicalDevice, IDeviceParser, IDeviceInput } from '../../api/device-api';
+import {
+  IDevice,
+  IPhysicalDevice,
+  IDeviceParser,
+  IDeviceInput,
+  sendDataToProcess,
+} from '../../api/device-api';
 import { BeastCmd } from './BeastCommandsEnum,';
 
 // Worker data types
-import { DeviceWorkerEventEnum, DeviceWorkerEventDataType } from '../../api/Types';
+import {
+  EventFromDeviceToWorkerEnum,
+  EventFromDeviceToWorkerType,
+  EventFromWorkerEnum,
+} from '../../api/Types';
 
 export class BeastDeviceReader {
   /**
@@ -38,13 +48,17 @@ export class BeastDeviceReader {
    * Initializes the device reader and waits for device connection
    */
   public async init() {
+    this.sendDeviceInfo();
     console.log('Waiting for device');
 
     // Wait for device to connect
     this.physicalDevice.waitForDevice().then(() => {
       // When the device connects
       this.isDeviceConnected = true;
-      // ipcService.sendDeviceConnected(true);
+
+      // Inform the process
+      sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, true);
+
       this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
       this.listenForInitialWalkthrough();
       this.listenForDeviceData();
@@ -84,11 +98,10 @@ export class BeastDeviceReader {
    * @param settings
    */
   public handleDeviceSettingsUpdate(settings: any) {
-    console.log(settings);
-    const status = this.deviceInput?.updateSettings(settings);
     this.deviceParser.setPDNum(settings.numOfPDs);
-    // ipcService.sendDeviceInputStatus(status);
-    console.log(status);
+
+    const status = this.deviceInput?.updateSettings(settings);
+    if (!status) return;
   }
 
   /**
@@ -108,10 +121,10 @@ export class BeastDeviceReader {
   }
 
   /**
-   * @returns the parsed buffer from the beast parser and empties its buffer.
+   * Sends the parsed buffer from the device to the reader process.
    */
-  public getData() {
-    return this.deviceParser.getData();
+  public emitData() {
+    sendDataToProcess(EventFromWorkerEnum.DEVICE_DATA, this.deviceParser.getData());
   }
 
   /**
@@ -124,7 +137,9 @@ export class BeastDeviceReader {
     const handleDisconnect = () => {
       console.log('Device disconnected ...');
       this.isDeviceConnected = false;
-      // ipcService.sendDeviceConnected(false);
+
+      // Inform the process
+      sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, false);
 
       // Remove listeners
       device.off('disconnect', handleDisconnect);
@@ -135,6 +150,14 @@ export class BeastDeviceReader {
     };
 
     device.on('disconnect', handleDisconnect);
+  }
+
+  /**
+   * Sends the device info object to the reader process.
+   */
+  private sendDeviceInfo() {
+    const info = this.physicalDevice.getDeviceInfo();
+    sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
   }
 
   /**
@@ -156,25 +179,25 @@ export class BeastDeviceReader {
 const beastReader = new BeastDeviceReader();
 
 // Listeners from the main process.
-self.addEventListener('message', ({ data }: { data: DeviceWorkerEventDataType }) => {
+self.addEventListener('message', ({ data }: { data: EventFromDeviceToWorkerType }) => {
   // Match the event with the function to execute.
   switch (data.event) {
-    case DeviceWorkerEventEnum.GET_DATA:
-      beastReader.getData();
+    case EventFromDeviceToWorkerEnum.GET_DATA:
+      beastReader.emitData();
       break;
 
     // Start request
-    case DeviceWorkerEventEnum.START:
-      // beastReader.handleDeviceStart();
+    case EventFromDeviceToWorkerEnum.START:
+      beastReader.handleDeviceStart();
       break;
 
     // Stop request
-    case DeviceWorkerEventEnum.STOP:
+    case EventFromDeviceToWorkerEnum.STOP:
       beastReader.handleDeviceStop();
       break;
 
     // Settings update request
-    case DeviceWorkerEventEnum.SETTINGS_UPDATE:
+    case EventFromDeviceToWorkerEnum.SETTINGS_UPDATE:
       beastReader.handleDeviceSettingsUpdate(data.data);
       break;
 

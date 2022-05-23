@@ -1,4 +1,4 @@
-import { DeviceADCDataType } from 'reader/types/DeviceDataType';
+import { DeviceADCDataType } from '../models/Types';
 
 export interface IDeviceParser {
   /**

@@ -7,6 +7,7 @@ import {
 } from '../Interfaces';
 
 import type { Socket } from 'socket.io';
+import { EventFromDeviceToWorkerEnum } from './Types';
 
 export type {
   IPhysicalDevice,
@@ -31,3 +32,21 @@ export interface IDevice {
   Parser: Parser<IDeviceParser>;
   Input: Input<IDeviceInput>;
 }
+
+/**
+ * A function for sending worker's data to the reader process.
+ */
+export const sendDataToProcess = (eventName: string, data: any) => {
+  self.postMessage({ event: eventName, data });
+};
+
+/**
+ * A function to send messages to the device worker.
+ */
+export const sendMessageToDeviceWorker = (
+  worker: Worker,
+  event: EventFromDeviceToWorkerEnum,
+  message?: any,
+) => {
+  worker.postMessage({ event, data: message });
+};

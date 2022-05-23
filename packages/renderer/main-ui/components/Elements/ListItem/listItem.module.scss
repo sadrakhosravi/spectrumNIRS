@@ -20,10 +20,15 @@
 .Active {
   border-left: 6px solid $color-primary;
   background-color: rgba($color: $color-primary, $alpha: 0.15);
+
+  .Icon svg {
+    fill: rgba($color: $color-primary, $alpha: 0.25);
+    stroke: $color-primary;
+  }
 }
 
 .Icon {
-  width: 5%;
+  width: 4rem;
 
   svg {
     fill: rgba($color: #fff, $alpha: 0.25);
@@ -51,7 +56,7 @@
 }
 
 .Buttons {
-  width: 15%;
+  width: 15rem;
   justify-content: flex-end;
   @include flex-center;
 

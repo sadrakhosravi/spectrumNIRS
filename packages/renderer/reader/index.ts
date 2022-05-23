@@ -1,5 +1,5 @@
 // Import IPC service
-// import './ReaderIPCService';
+import './ReaderIPCService';
 
 // Device Manager
 import { DeviceManager } from './models/DeviceManager';

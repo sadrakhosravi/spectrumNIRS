@@ -8,38 +8,33 @@ import { FiServer } from 'react-icons/fi';
 import { Button } from '../Buttons';
 
 type ListItem = {
-  id: string;
+  id?: string;
   title: string;
-  isSelected: boolean;
+  buttonText: string;
   disabled?: boolean;
   active?: boolean;
   lastUpdate?: number;
   description?: string;
-  setter?: (id: string) => void;
   onDoubleClick?: React.MouseEventHandler<HTMLDivElement>;
   onClick?: React.MouseEventHandler<HTMLDivElement | HTMLButtonElement>;
 };
 
 export const ListItem = ({
-  id,
   title,
   disabled,
   description,
   lastUpdate,
-  isSelected,
   active,
-  setter,
+  buttonText,
   onClick,
   onDoubleClick,
 }: ListItem) => {
   return (
     <div
       className={`${styles.ListItem} ${disabled ? styles.Disabled : ''} ${
-        isSelected ? styles.ListItemActive : ''
-      } ${active ? styles.Active : ''}`}
-      title="Double click to open the recording"
+        active ? styles.Active : ''
+      }`}
       onDoubleClick={onDoubleClick}
-      onClick={() => setter && setter(id)}
       tabIndex={1}
     >
       <span className={styles.Icon}>
@@ -52,7 +47,7 @@ export const ListItem = ({
       </span>
       {!disabled && (
         <span className={styles.Buttons}>
-          <Button text="Select" onClick={onClick} />
+          <Button text={buttonText} onClick={onClick} />
         </span>
       )}
     </div>

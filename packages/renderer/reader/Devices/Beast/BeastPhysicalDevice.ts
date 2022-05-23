@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 // Interfaces
 import { INIRSDevice } from 'reader/Interfaces';
 import type { Socket } from 'socket.io';
+import type { DeviceInfoType } from 'reader/models/Types';
 
 // Enums / Interfaces
 import { IO_SERVER } from './BeastCommandsEnum,';
@@ -27,6 +28,23 @@ export class BeastPhysicalDevice implements INIRSDevice {
    */
   public static getName(): 'Beast' {
     return 'Beast';
+  }
+
+  /**
+   * @returns the device information object.
+   */
+  public getDeviceInfo(): DeviceInfoType {
+    return {
+      id: this.getDeviceSerialNumber(),
+      name: BeastPhysicalDevice.getName(),
+      version: this.getVersion(),
+      numOfLEDs: this.getSupportedLEDNum(),
+      numOfPDs: this.getSupportedPDNum(),
+      supportedSamplingRate: this.getSupportedSamplingRates(),
+      defaultSamplingRate: this.getDefaultSamplingRate(),
+      PDChannelNames: this.getPDChannelNames(),
+      calculatedChannelNames: this.getCalculatedChannelNames(),
+    };
   }
 
   /**
@@ -90,6 +108,22 @@ export class BeastPhysicalDevice implements INIRSDevice {
    */
   public getSupportedSamplingRates() {
     return [1000, 500, 250, 100, 50, 30, 20, 10];
+  }
+
+  /**
+   * @returns the PD channel names.
+   */
+  public getPDChannelNames() {
+    const channelNames = ['Ambient'];
+    for (let i = 0; i < this.getSupportedLEDNum(); i++) channelNames.push(`LED${i + 1}`);
+    return channelNames;
+  }
+
+  /**
+   * @returns the calculated channel names.
+   */
+  public getCalculatedChannelNames() {
+    return ['O2Hb', 'HHb', 'THb', 'TOI'];
   }
 
   /**

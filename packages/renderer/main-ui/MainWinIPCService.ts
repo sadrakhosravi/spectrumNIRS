@@ -6,8 +6,8 @@ export class MainWinIPCService {
   /**
    * Sends an IPC message on a specified channel to Reader process
    */
-  public sendToReader(channel: string, args?: any) {
-    ipcRenderer.sendTo(2, channel, args);
+  public sendToReader(channel: string, arg1?: any, arg2?: any) {
+    ipcRenderer.sendTo(2, channel, arg1, arg2);
   }
 }
 
