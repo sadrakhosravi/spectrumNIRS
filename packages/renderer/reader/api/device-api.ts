@@ -18,7 +18,7 @@ export type {
 } from '../Interfaces';
 
 type Device<I> = new () => I;
-type Input<I> = new (io: Socket) => I;
+type Input<I> = new (io?: Socket) => I;
 type Parser<I> = new () => I;
 
 /**
@@ -33,11 +33,18 @@ export interface IDevice {
   Input: Input<IDeviceInput>;
 }
 
+/** Device settings type */
+export type DeviceSettingsType = {
+  numOfLEDs: number;
+  numOfPDs: number;
+  LEDValues: number[];
+};
+
 /**
  * A function for sending worker's data to the reader process.
  */
-export const sendDataToProcess = (eventName: string, data: any) => {
-  self.postMessage({ event: eventName, data });
+export const sendDataToProcess = (eventName: string, data: any, transfer?: Transferable[]) => {
+  self.postMessage({ event: eventName, data }, { transfer });
 };
 
 /**

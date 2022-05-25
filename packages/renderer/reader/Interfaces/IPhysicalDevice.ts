@@ -1,15 +1,24 @@
 import type { Socket } from 'socket.io';
 import type { DeviceInfoType } from 'reader/models/Types';
+import { ChildProcessWithoutNullStreams } from 'child_process';
 
 export interface IPhysicalDevice {
   /**
+   * Spawn the device
+   */
+  spawnDevice?: { (): ChildProcessWithoutNullStreams };
+  /**
+   * Kills any spawned instances and does listener/memory cleanup.
+   */
+  cleanup?: { (): void };
+  /**
    * @returns the current socket.io server instance.
    */
-  getIO(): Socket;
+  getIO(): Socket | ChildProcessWithoutNullStreams;
   /**
    * @return the device communication instance.
    */
-  getDevice(): Socket;
+  getDevice(): Socket | ChildProcessWithoutNullStreams;
   /**
    * @returns the complete information about the device and its channels.
    */

@@ -41,7 +41,7 @@ export class DeviceManager {
   constructor() {
     this.devices = devices;
     this.activeDevices = [];
-    this.deviceReader = new DeviceReader(this.activeDevices);
+    this.deviceReader = new DeviceReader();
     makeObservable(this);
 
     this.init();
@@ -70,9 +70,10 @@ export class DeviceManager {
     ipcRenderer.on(DeviceChannels.GET_ALL_ACTIVE_DEVICES, this.handleGetActiveDevices.bind(this));
 
     // Listen for device start and start all devices.
-    ipcRenderer.on(ReaderChannels.START, () =>
-      this.activeDevices.forEach((device) => device.startDevice()),
-    );
+    ipcRenderer.on(ReaderChannels.START, this.handleStart.bind(this));
+
+    // Listen for stop device.
+    ipcRenderer.on(ReaderChannels.STOP, this.handleStop.bind(this));
   }
 
   /**
@@ -96,37 +97,10 @@ export class DeviceManager {
     if (!device) return;
 
     // Create the device worker.
-    const deviceInstance = new DeviceModel(
-      device.name,
-      device.workerURL,
-      this.deviceReader.dataGetter,
-    );
+    const deviceInstance = new DeviceModel(device.name, device.workerURL);
 
     // Add it to the observables.
     this.activeDevices.push(deviceInstance);
-  }
-
-  /**
-   * Listens for device settings update changes from the UI thread.
-   */
-  private handleDeviceSettingsUpdate(
-    _event: Electron.IpcRendererEvent,
-    name: string,
-    newSettings: any,
-  ) {
-    const device = this.activeDevices.find((device) => device.name === name);
-    if (!device) return;
-
-    device.updateSettings(newSettings);
-  }
-
-  /**
-   * Handles the IPC request for all active devices by returning them as device info.
-   */
-  private handleGetActiveDevices() {
-    this.activeDevices.forEach((device) => {
-      device.sendDeviceInfo();
-    });
   }
 
   /**
@@ -142,7 +116,51 @@ export class DeviceManager {
 
     // Stop the device and remove it from the list
     this.activeDevices[deviceToRemoveIndex].stopDevice();
+    this.activeDevices[deviceToRemoveIndex].removeDevice();
     this.activeDevices.splice(deviceToRemoveIndex, 1);
+  }
+
+  /**
+   * Handles the start signal from the UI
+   */
+  private handleStart() {
+    this.activeDevices.forEach((device) => device.startDevice());
+    this.deviceReader.startDataAcquisition(this.activeDevices);
+  }
+
+  /**
+   * Handles the stop signal from the UI.
+   */
+  private handleStop() {
+    this.deviceReader.stopDataAcquisitionLoop();
+    this.activeDevices.forEach((device) => device.stopDevice());
+  }
+
+  /**
+   * Listens for device settings update changes from the UI thread.
+   */
+  private handleDeviceSettingsUpdate(
+    _event: Electron.IpcRendererEvent,
+    name: string,
+    newSettings: any,
+  ) {
+    console.log(name);
+    console.log(this.activeDevices[0].name);
+    const device = this.activeDevices.find((device) => device.name === name);
+    if (!device) return;
+
+    console.log(device);
+
+    device.updateSettings(newSettings);
+  }
+
+  /**
+   * Handles the IPC request for all active devices by returning them as device info.
+   */
+  private handleGetActiveDevices() {
+    this.activeDevices.forEach((device) => {
+      device.sendDeviceInfo();
+    });
   }
 
   /**

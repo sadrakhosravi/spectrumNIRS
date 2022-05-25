@@ -3,14 +3,9 @@ import { BeastCmd } from './BeastCommandsEnum,';
 // Types
 import type { Socket } from 'socket.io';
 import { IDeviceInput } from 'reader/Interfaces';
+import type { DeviceSettingsType } from '../../api/device-api';
 
 export type MessageType = string | string[] | boolean | number | number[];
-
-type SettingsType = {
-  numOfLEDs: number;
-  numOfPDs: number;
-  LEDValues: number[];
-};
 
 export class BeastInput implements IDeviceInput {
   /**
@@ -44,7 +39,7 @@ export class BeastInput implements IDeviceInput {
   /**
    * Sends the new settings to the Beast controller
    */
-  public updateSettings(settings: SettingsType) {
+  public updateSettings(settings: DeviceSettingsType) {
     // Reset the previous data
     const formattedSettings = this.parseSettings(settings);
     console.log(formattedSettings);
@@ -57,7 +52,7 @@ export class BeastInput implements IDeviceInput {
    * @param settings the settings object to parse.
    * @returns the correctly formatted object to be sent to the controller.
    */
-  private parseSettings(settings: SettingsType) {
+  private parseSettings(settings: DeviceSettingsType) {
     // Get the num of LEDs and PDs that will be active
     // const { numOfLEDs } = settings;
 

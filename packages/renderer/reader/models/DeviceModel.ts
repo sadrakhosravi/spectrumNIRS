@@ -34,10 +34,6 @@ export class DeviceModel {
    */
   public readonly workerURL: URL;
   /**
-   * The data getter to pass the data to the DeviceManager parent class.
-   */
-  private readonly dataGetter: (data: any, deviceName: string) => void;
-  /**
    * The worker instance of the device.
    */
   private worker: Worker;
@@ -63,10 +59,9 @@ export class DeviceModel {
   private reactions: IReactionDisposer[];
 
   // Constructor
-  constructor(name: string, workerURL: URL, dataGetter: (data: any, deviceName: string) => void) {
+  constructor(name: string, workerURL: URL) {
     this.name = name;
     this.workerURL = workerURL;
-    this.dataGetter = dataGetter;
 
     // Observables
     this.connected = false;
@@ -118,6 +113,13 @@ export class DeviceModel {
    */
   public stopDevice() {
     sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.STOP);
+  }
+
+  /**
+   * Removes the device and its worker
+   */
+  public removeDevice() {
+    sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.STOP);
 
     // Terminate the worker after 100ms
     setTimeout(() => {
@@ -145,6 +147,7 @@ export class DeviceModel {
    * Sends the updated settings to the worker device.
    */
   public updateSettings(settings: any) {
+    console.log(settings);
     sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.SETTINGS_UPDATE, settings);
   }
 
@@ -172,6 +175,13 @@ export class DeviceModel {
   }
 
   /**
+   * Sends the device data to the UI process through IPC.
+   */
+  private sendDataToUI(data: any) {
+    readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
+  }
+
+  /**
    * Sends the device information that was spawned and received from the worker
    * to the UI thread.
    */
@@ -186,7 +196,7 @@ export class DeviceModel {
     switch (data.event) {
       // Device data
       case EventFromWorkerEnum.DEVICE_DATA:
-        this.dataGetter(data.data, this.name);
+        this.sendDataToUI(data.data);
         break;
 
       // Connection status update

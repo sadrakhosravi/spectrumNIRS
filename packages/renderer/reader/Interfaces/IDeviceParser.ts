@@ -1,10 +1,10 @@
-import { DeviceADCDataType } from '../models/Types';
+// import { DeviceADCDataType } from '../models/Types';
 
 export interface IDeviceParser {
   /**
    * Processes raw data an return the unpacked data.
    */
-  processPacket: (packet: Buffer) => any;
+  processPacket: (packet: any) => any;
 
   /**
    * Sets the active PD number.
@@ -14,5 +14,5 @@ export interface IDeviceParser {
   /**
    * @returns the buffered device data type.
    */
-  getData(): DeviceADCDataType[];
+  getData(): any;
 }

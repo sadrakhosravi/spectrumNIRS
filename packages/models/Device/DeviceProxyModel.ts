@@ -21,10 +21,14 @@ import { appRouterVM, chartVM } from '../../viewmodels/VMStore';
 
 // Types & Enum
 import type { IReactionDisposer } from 'mobx';
-import type { DeviceInfoType } from '../../renderer/reader/models/Types';
+import type {
+  DeviceDataTypeWithMetaData,
+  DeviceInfoType,
+} from '../../renderer/reader/models/Types';
 import type { ChartSeries, DashboardChart } from '../Chart';
 import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 import { DeviceChannels } from '../../utils/channels/DeviceChannels';
+import { ipcRenderer } from 'electron';
 
 export class DeviceModelProxy {
   public readonly id: string;
@@ -94,7 +98,7 @@ export class DeviceModelProxy {
     this.calculatedChannelNames = deviceInfo.calculatedChannelNames;
 
     // Observables
-    this._activeLEDs = 1;
+    this._activeLEDs = deviceInfo.numOfLEDs;
     this._activePDs = 1;
     this._selectedPD = 2;
     this._samplingRate = deviceInfo.defaultSamplingRate;
@@ -242,6 +246,15 @@ export class DeviceModelProxy {
    */
   private initListeners() {
     // Listeners
+    ipcRenderer.on(DeviceChannels.DEVICE_DATA + this.name, this.handleDeviceData.bind(this));
+  }
+
+  private handleDeviceData(_event: Electron.IpcRendererEvent, data: DeviceDataTypeWithMetaData[]) {
+    data.forEach((dataPacket) => {
+      this.chartChannels.forEach((channel, i) => {
+        channel.series.addArrayY(dataPacket.data['ch1']['led' + i], 10);
+      });
+    });
   }
 
   /**
@@ -273,7 +286,7 @@ export class DeviceModelProxy {
       const ledSlider = document.getElementById('led-intensities-' + i) as HTMLInputElement;
       settings.LEDValues.push(~~ledSlider.value);
     }
-
+    console.log(settings);
     return settings;
   };
 

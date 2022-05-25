@@ -14,6 +14,7 @@ import { IDevice } from 'reader/api/device-api';
 
 const Beast: IDevice = {
   Device: BeastPhysicalDevice,
+  //@ts-ignore
   Input: BeastInput,
   Parser: BeastParser,
 };

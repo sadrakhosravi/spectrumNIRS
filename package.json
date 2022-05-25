@@ -64,6 +64,7 @@
     "@arction/lcjs": "^3.4.0",
     "@headlessui/react": "^1.6.1",
     "@tippyjs/react": "^4.2.6",
+    "avsc": "^5.7.4",
     "better-sqlite3": "^7.5.3",
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",

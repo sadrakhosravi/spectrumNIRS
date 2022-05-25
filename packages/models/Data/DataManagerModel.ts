@@ -70,7 +70,7 @@ export class DataManagerModel {
     ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_e, dataArr: DeviceADCDataType[]) => {
       requestAnimationFrame(() => {
         dataArr.forEach((data) => {
-          const channelData = data[this.channelName];
+          const channelData = data[this.channelName as keyof DeviceADCDataType];
 
           for (let i = 0; i < chartVM.charts.length; i++) {
             chartVM.charts[i].series[0].addArrayY(channelData['led' + i]);

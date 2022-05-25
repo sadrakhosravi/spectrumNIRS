@@ -4,4 +4,5 @@
  */
 export const devices = [
   { name: 'Beast', workerURL: new URL('./Beast/BeastDeviceReader.ts', import.meta.url) },
+  { name: 'V5/V4', workerURL: new URL('./V5/V5DeviceReader.ts', import.meta.url) },
 ];

@@ -109,7 +109,7 @@ export class ChartSeries {
   /**
    * Applies the gain value and adds Array of the data to the series.
    */
-  public addArrayY(data: Float32Array | Int32Array | number[]) {
+  public addArrayY(data: Float32Array | Int32Array | number[], step?: number) {
     const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
@@ -120,7 +120,7 @@ export class ChartSeries {
     // For each is faster here
     data.forEach((point) => (point *= gainVal * deviceCalibFactor));
 
-    this.series.addArrayY(data, 1);
+    this.series.addArrayY(data, step);
   }
 
   /**

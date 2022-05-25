@@ -18,8 +18,8 @@ export class RegisterGlobalShortcuts {
   private registeredShortcuts: string[];
   constructor() {
     this.registeredShortcuts = [];
-    this.init();
-    this.listenForChangesFromUI();
+    // this.init();
+    // this.listenForChangesFromUI();
   }
 
   /**
@@ -42,7 +42,7 @@ export class RegisterGlobalShortcuts {
     renderers.mainWindow?.webContents.on('did-navigate', () => {
       globalShortcut.unregisterAll();
       this.registeredShortcuts.length = 0;
-      this.init();
+      // this.init();
     });
   }
 

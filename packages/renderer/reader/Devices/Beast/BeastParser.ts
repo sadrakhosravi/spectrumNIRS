@@ -1,7 +1,7 @@
 import { IDeviceParser } from '../../api/device-api';
 
 // Type
-import type { DeviceADCDataType } from '../../models/Types';
+import type { DeviceADCDataType, DeviceDataTypeWithMetaData } from '../../models/Types';
 
 export type UnpackedDataType = {
   [key: string]: number[];
@@ -20,7 +20,7 @@ export class BeastParser implements IDeviceParser {
   private msb_indices: number[];
   private bufferFactor: number;
   private bufferSize: number;
-  private dataBuff: DeviceADCDataType[];
+  private dataBuff: DeviceDataTypeWithMetaData[];
   private channelsLsbMsb: ChannelsLsbMsbType;
 
   // private led_num: number;
@@ -91,6 +91,11 @@ export class BeastParser implements IDeviceParser {
    * @returns an object containing the processed data of all the channels of beast hardware.
    */
   public processPacket = (packet: Buffer) => {
+    // Meta data obj
+    const metadata: DeviceDataTypeWithMetaData['metadata'] = {
+      timestamp: Date.now(),
+    };
+
     const data = new Uint8Array(packet);
     const dataLength = data.length;
     const msbIndicesLength = this.msb_indices.length;
@@ -112,7 +117,7 @@ export class BeastParser implements IDeviceParser {
     // Create each LED for each channel.
     for (let i = 0; i < 16; i++) {
       for (let j = 0; j < 8; j++) {
-        res[`ch${j + 1}`][`led${i}`] = [];
+        res[`ch${j + 1}` as keyof DeviceADCDataType][`led${i}`] = [];
       }
     }
 
@@ -150,11 +155,11 @@ export class BeastParser implements IDeviceParser {
           (this.channelsLsbMsb[channelIndex].msb[i] << 8);
         d = (d << 16) >> 16;
 
-        res[channelIndex][`led${ledNum}`].push(d);
+        res[channelIndex as keyof DeviceADCDataType][`led${ledNum}`].push(d);
       }
     }
 
-    this.dataBuff.push(res);
+    this.dataBuff.push({ data: res, metadata });
 
     // Something went wrong, empty memory
     if (this.dataBuff.length === 50) {

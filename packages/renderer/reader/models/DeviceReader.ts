@@ -12,24 +12,33 @@ export class DeviceReader {
   /**
    * The active devices reference from the device manager model.
    */
-  private readonly activeDevices: DeviceModel[];
+  private activeDevices!: DeviceModel[];
   /**
    * The data acquisition loop accurate interval timer instance or null.
    */
   private loopInterval: AccurateTimer | null;
+  /**
+   * The forced garbage collection interval.
+   */
+  private gcInterval: AccurateTimer | null;
 
-  constructor(activeDevices: DeviceModel[]) {
-    this.activeDevices = activeDevices;
+  constructor() {
     this.loopInterval = null;
+    this.gcInterval = null;
   }
 
   /**
    * Starts the devices and the data acquisition loop.
    */
-  public startDataAcquisition() {
+  public startDataAcquisition(activeDevices: DeviceModel[]) {
+    this.activeDevices = activeDevices;
+
     // Start the loop interval
-    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 100);
+    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 200);
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 20000);
+
     this.loopInterval.start();
+    this.gcInterval.start();
   }
 
   /**
@@ -38,13 +47,7 @@ export class DeviceReader {
   public stopDataAcquisitionLoop() {
     setImmediate(() => this.loopInterval?.stop);
     this.loopInterval?.stop();
-  }
-
-  /**
-   * The data getter callback function. The parameters will hold the device data and deviceName.
-   */
-  public dataGetter(_data: any, deviceName: string) {
-    console.log(deviceName);
+    this.gcInterval?.stop();
   }
 
   /**
@@ -52,5 +55,13 @@ export class DeviceReader {
    */
   private handleDataAcquisition() {
     this.activeDevices.forEach((device) => device.sendGetDataRequest());
+  }
+
+  /**
+   * Handle forced garbage collection.
+   */
+  private handleGarbageCollection() {
+    //@ts-ignore
+    global.gc();
   }
 }

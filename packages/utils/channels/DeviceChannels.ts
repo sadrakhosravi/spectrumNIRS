@@ -39,4 +39,8 @@ export enum DeviceChannels {
    * Device streaming status as boolean.
    */
   STREAMING_STATUS = 'device:streaming-status',
+  /**
+   * Device data channel. The device name should be added to the end!
+   */
+  DEVICE_DATA = 'device:data-',
 }

@@ -34,6 +34,25 @@ export type DeviceADCDataType = {
 };
 
 /**
+ * The device data along with the meta data added when the packet reached
+ * Spectrum.
+ */
+export type DeviceDataTypeWithMetaData = {
+  data: DeviceADCDataType;
+  metadata: {
+    timestamp: number;
+  };
+};
+
+/**
+ * The device name and its data and metadata
+ */
+export type DeviceNameAndDataType = {
+  deviceName: string;
+  data: DeviceDataTypeWithMetaData;
+};
+
+/**
  * ADC Device data as a single channel.
  * Key indices starts with `led` + the `led index`.
  * @example LED name: 'led0'. LED 0 is the ambient.

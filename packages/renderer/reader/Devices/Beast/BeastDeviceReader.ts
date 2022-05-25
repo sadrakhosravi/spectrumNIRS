@@ -8,6 +8,7 @@
 import Beast from './Beast';
 
 // Interfaces
+import type { Socket } from 'socket.io';
 import {
   IDevice,
   IPhysicalDevice,
@@ -59,7 +60,7 @@ export class BeastDeviceReader {
       // Inform the process
       sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, true);
 
-      this.deviceInput = new this.device.Input(this.physicalDevice.getDevice());
+      this.deviceInput = new this.device.Input(this.physicalDevice.getDevice() as Socket);
       this.listenForInitialWalkthrough();
       this.listenForDeviceData();
 
