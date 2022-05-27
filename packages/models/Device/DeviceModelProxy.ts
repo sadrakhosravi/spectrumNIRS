@@ -30,6 +30,10 @@ import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 import { ipcRenderer } from 'electron';
 
+/**
+ * The proxy device model used to synchronize the UI with the
+ * reader process device model class.
+ */
 export class DeviceModelProxy {
   public readonly id: string;
   /**
@@ -52,6 +56,10 @@ export class DeviceModelProxy {
    * The calculated channel names.
    */
   public readonly calculatedChannelNames: string[];
+  /**
+   * A boolean indication if the device has probe settings.
+   */
+  public readonly hasProbeSettings: boolean;
   /**
    * Current active LEDs.
    */
@@ -88,6 +96,11 @@ export class DeviceModelProxy {
    * The chart channels created by this device.
    */
   private chartChannels: { chart: DashboardChart; series: ChartSeries }[];
+  /**
+   * The start time stamp of the recording NOT the device.
+   * Used to sync devices with time offset.
+   */
+  private startTimestamp: number;
 
   constructor(deviceInfo: DeviceInfoType) {
     this.id = deviceInfo.id;
@@ -96,6 +109,7 @@ export class DeviceModelProxy {
     this.PDs = new Array(deviceInfo.numOfPDs).fill(0).map((_, i) => (_ = i + 1));
     this.PDChannelNames = deviceInfo.PDChannelNames;
     this.calculatedChannelNames = deviceInfo.calculatedChannelNames;
+    this.hasProbeSettings = deviceInfo.hasProbeSettings;
 
     // Observables
     this._activeLEDs = deviceInfo.numOfLEDs;
@@ -111,11 +125,15 @@ export class DeviceModelProxy {
     this.reactions = [];
     this.chartChannels = [];
 
+    // Recording
+    this.startTimestamp = Date.now();
+
     makeObservable(this);
 
     this.handleReactions();
     this.initListeners();
-    this.createChartChannels();
+
+    setTimeout(() => this.createChartChannels(), chartVM.loaded ? 50 : 500);
   }
 
   /**
@@ -213,15 +231,35 @@ export class DeviceModelProxy {
   }
 
   /**
+   * Sets the recording start timestamp.
+   */
+  public setStartTimeStamp(timestamp: number) {
+    this.startTimestamp = timestamp;
+  }
+
+  /**
    * Creates the chart channels based on the device information and keeps
    * a reference to them.
    */
   private createChartChannels() {
-    console.log(this.PDChannelNames);
     // If the app is in calibration, create calibration chart
     if (appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
       // Add chart channels
       this.PDChannelNames.forEach((channelName) => {
+        const chart = chartVM.addChart();
+        const series = chartVM.addSeries(chart.id, channelName);
+
+        this.chartChannels.push({ chart, series });
+      });
+    }
+
+    // If the app is in record or review, create calculated channels.
+    if (
+      appRouterVM.route === AppNavStatesEnum.RECORD ||
+      appRouterVM.route === AppNavStatesEnum.REVIEW
+    ) {
+      // Add chart channels
+      this.calculatedChannelNames.forEach((channelName) => {
         const chart = chartVM.addChart();
         const series = chartVM.addSeries(chart.id, channelName);
 
@@ -233,11 +271,10 @@ export class DeviceModelProxy {
   /**
    * Deletes the chart channels that was created by the device.
    */
-  private deleteChartChannels() {
+  private disposeChartChannels() {
     this.chartChannels.forEach((chart) => {
       chartVM.removeChart(chart.chart.id);
     });
-    console.log(this.chartChannels[0].chart);
     this.chartChannels.length = 0;
   }
 
@@ -246,13 +283,27 @@ export class DeviceModelProxy {
    */
   private initListeners() {
     // Listeners
-    ipcRenderer.on(DeviceChannels.DEVICE_DATA + this.name, this.handleDeviceData.bind(this));
+    setTimeout(() => {
+      ipcRenderer.on(DeviceChannels.DEVICE_DATA + this.name, this.handleDeviceData.bind(this));
+    }, 100);
   }
 
+  /**
+   * Handles the incoming data from the reader process.
+   */
   private handleDeviceData(_event: Electron.IpcRendererEvent, data: DeviceDataTypeWithMetaData[]) {
     data.forEach((dataPacket) => {
       this.chartChannels.forEach((channel, i) => {
-        channel.series.addArrayY(dataPacket.data['ch1']['led' + i], 10);
+        const channelDataY = dataPacket.data['ch1']['led' + i];
+        const channelDataX = new Array(channelDataY.length).fill(0);
+        const timestamp = dataPacket.metadata.timestamp;
+
+        for (let i = 0; i < channelDataX.length; i++) {
+          // Assume sampling rate is constant
+          channelDataX[i] = timestamp + i * 10 - this.startTimestamp;
+        }
+
+        channel.series.addArrayXY(channelDataX, channelDataY);
       });
     });
   }
@@ -304,14 +355,42 @@ export class DeviceModelProxy {
       () => this.sendDeviceSettingsToReader(),
     );
 
-    const intensityChange = reaction(
+    const intensityChangeDisposer = reaction(
       () => this._LEDIntensities,
       () => {
         console.log('Intensity Change');
       },
     );
 
-    this.reactions.push(LEDChangeReactionDisposer, PDChangeReactionDisposer, intensityChange);
+    // Handle chart channel creation
+    const chartChannelCreatorDisposer = reaction(
+      () => appRouterVM.route,
+      () => {
+        if (
+          appRouterVM.route === AppNavStatesEnum.CALIBRATION ||
+          appRouterVM.route === AppNavStatesEnum.RECORD ||
+          appRouterVM.route === AppNavStatesEnum.REVIEW
+        ) {
+          // Dispose the current channels
+          this.disposeChartChannels();
+
+          // Create new channels.
+          setTimeout(
+            () => {
+              this.createChartChannels();
+            },
+            chartVM.loaded ? 100 : 1500,
+          );
+        }
+      },
+    );
+
+    this.reactions.push(
+      LEDChangeReactionDisposer,
+      PDChangeReactionDisposer,
+      intensityChangeDisposer,
+      chartChannelCreatorDisposer,
+    );
   }
 
   /**
@@ -320,6 +399,6 @@ export class DeviceModelProxy {
   public cleanup() {
     this.reactions.forEach((disposer) => disposer());
     this.reactions.length = 0;
-    this.deleteChartChannels();
+    this.disposeChartChannels();
   }
 }

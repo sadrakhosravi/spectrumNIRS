@@ -6,6 +6,7 @@
 
 // Default Services
 import { DatabaseService } from './DatabaseService';
+import { ElectronStoreService } from './ElectronStoreService';
 
 // Interfaces
 import type { IServices } from './IServicesInterface';
@@ -16,13 +17,19 @@ export class ServiceManager {
    */
   private databaseService: DatabaseService;
   /**
+   * The electron store service instance.
+   */
+  private electronStoreService: ElectronStoreService;
+
+  /**
    * All services instance.
    */
   private services: IServices[];
 
   constructor() {
     this.databaseService = new DatabaseService();
-    this.services = [this.databaseService];
+    this.electronStoreService = new ElectronStoreService();
+    this.services = [this.databaseService, this.electronStoreService];
 
     (async () => {
       await this.init();
@@ -37,9 +44,16 @@ export class ServiceManager {
   }
 
   /**
+   * The electron store service instance.
+   */
+  public get store() {
+    return this.electronStoreService.store;
+  }
+
+  /**
    * Starts the service manager and all sub services.
    */
-  public async init() {
+  private async init() {
     this.services.forEach(async (service) => await service.initService());
     console.log('initialized');
   }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
 // Styles
@@ -14,7 +15,6 @@ import { FiLock } from 'react-icons/fi';
 // View Models
 import { chartVM } from '@store';
 import { XAxisChartViewModel } from '@viewmodels/index';
-import { observer } from 'mobx-react-lite';
 
 const xAxisContainerId = 'x-axis-chart-container';
 
@@ -25,7 +25,7 @@ export const XAxis = observer(() => {
     xAxisVM.init(xAxisContainerId, chartVM.charts[0].dashboardChart.chart);
 
     return () => {
-      xAxisVM.cleanup();
+      xAxisVM.dispose();
     };
   }, []);
 

@@ -15,10 +15,6 @@ export class V5Parser implements IDeviceParser {
    */
   private BATCH_SIZE: number;
   /**
-   * The number of data elements per each data point
-   */
-  private NUM_OF_ELEMENTS_PER_DATAPOINT: 6;
-  /**
    * The number of PD Channels
    */
   private PD_CHANNELS: number;
@@ -29,7 +25,6 @@ export class V5Parser implements IDeviceParser {
   constructor() {
     this.dataBuff = [];
     this.BATCH_SIZE = 10;
-    this.NUM_OF_ELEMENTS_PER_DATAPOINT = 6;
     this.PD_CHANNELS = 6;
 
     this.serializer = Avro.Type.forValue(
@@ -89,10 +84,12 @@ export class V5Parser implements IDeviceParser {
     for (let i = 0; i < this.BATCH_SIZE; i += 1) {
       const data = lines[i].split(',');
 
-      // Parse the numbers
-      for (let j = 0; j < this.NUM_OF_ELEMENTS_PER_DATAPOINT; j += 1) {
-        res.ch1[`led${j}`].push(~~data[j]); // Parse numbers
-      }
+      res.ch1['led0'].push(~~data[5]);
+      res.ch1['led1'].push(~~data[0]);
+      res.ch1['led2'].push(~~data[1]);
+      res.ch1['led3'].push(~~data[2]);
+      res.ch1['led4'].push(~~data[3]);
+      res.ch1['led5'].push(~~data[4]);
     }
 
     // Add to internal buffer

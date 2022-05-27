@@ -21,7 +21,7 @@ export class FilterSettingsViewModel {
 
   constructor(chartVM: ChartViewModel) {
     this.chartVM = chartVM;
-    this.samplingRate = 1000;
+    this.samplingRate = 100;
     this.isActive = false;
     this.cutoffFrequency = 5;
     this.order = 6;

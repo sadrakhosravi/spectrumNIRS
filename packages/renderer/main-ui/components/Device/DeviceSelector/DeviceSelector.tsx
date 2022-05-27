@@ -11,13 +11,18 @@ import { SearchInput } from '../../Form';
 import { deviceManagerVM } from '@store';
 import { appRouterVM } from '@store';
 
+// Services
+import ServiceManager from '../../../../../services/ServiceManager';
+
 type DeviceSelectorType = {
   open: boolean;
   closeSetter: (value: boolean) => void;
 };
 
 export const DeviceSelector = observer(({ open, closeSetter }: DeviceSelectorType) => {
-  const [filteredDevices, setFilteredDevices] = React.useState(deviceManagerVM.allDevices);
+  const [filteredDevices, setFilteredDevices] = React.useState(
+    ServiceManager.store.deviceStore.store.allDeviceNamesAndInfo,
+  );
   const searchInputId = React.useId();
 
   React.useEffect(() => {
@@ -30,8 +35,8 @@ export const DeviceSelector = observer(({ open, closeSetter }: DeviceSelectorTyp
 
   // Update filtered state when the device manager changes
   React.useEffect(() => {
-    setFilteredDevices(deviceManagerVM.allDevices);
-  }, [deviceManagerVM.allDevices]);
+    setFilteredDevices(ServiceManager.store.deviceStore.store.allDeviceNamesAndInfo);
+  }, [ServiceManager.store.deviceStore.store.allDeviceNamesAndInfo]);
 
   // Handles search input changes and filters the device list.
   const handleSearchInputChange = React.useCallback(

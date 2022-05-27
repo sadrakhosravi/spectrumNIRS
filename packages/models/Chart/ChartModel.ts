@@ -57,7 +57,6 @@ export class ChartModel {
       rowIndex: firstAvailableRow,
       defaultAxisX: undefined,
     }) as ChartType;
-
     return new DashboardChart(chart, firstAvailableRow);
   }
 

@@ -2,25 +2,25 @@ import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
 // Interfaces
-import type { INIRSDevice } from 'reader/Interfaces';
+import type { IPhysicalDevice } from 'reader/Interfaces';
 import type { DeviceInfoType } from 'reader/models/Types';
 
-export class V5PhysicalDevice implements INIRSDevice {
+export class SyncPulsePhysicalDevice implements IPhysicalDevice {
   /**
    * The V5's spawned device instances.
    * There should always be one instance of the V5 running.
    */
-  private V5Instances: ChildProcessWithoutNullStreams[];
+  private syncPulseInstances: ChildProcessWithoutNullStreams[];
 
   constructor() {
-    this.V5Instances = [];
+    this.syncPulseInstances = [];
   }
 
   /**
    * @returns the name of the device - `V5/V4`.
    */
-  public static getName(): 'V5/V4' {
-    return 'V5/V4';
+  public static getName(): 'Sync Pulse' {
+    return 'Sync Pulse';
   }
 
   /**
@@ -29,7 +29,7 @@ export class V5PhysicalDevice implements INIRSDevice {
   public getDeviceInfo(): DeviceInfoType {
     return {
       id: this.getDeviceSerialNumber(),
-      name: V5PhysicalDevice.getName(),
+      name: SyncPulsePhysicalDevice.getName(),
       version: this.getVersion(),
       numOfLEDs: this.getSupportedLEDNum(),
       numOfPDs: this.getSupportedPDNum(),
@@ -37,7 +37,7 @@ export class V5PhysicalDevice implements INIRSDevice {
       defaultSamplingRate: this.getDefaultSamplingRate(),
       PDChannelNames: this.getPDChannelNames(),
       calculatedChannelNames: this.getCalculatedChannelNames(),
-      hasProbeSettings: true,
+      hasProbeSettings: false,
     };
   }
 
@@ -45,71 +45,70 @@ export class V5PhysicalDevice implements INIRSDevice {
    * @returns the maximum number of supported LEDs
    */
   public getSupportedLEDNum() {
-    return 5;
+    return 0;
   }
 
   /**
    * @returns the maximum supported number of PDs
    */
   public getSupportedPDNum() {
-    return 1;
+    return 0;
   }
 
   /**
    * @returns the current beast socket communication instance.
    */
   public getIO() {
-    return this.V5Instances[0] as ChildProcessWithoutNullStreams;
+    return this.syncPulseInstances[0] as ChildProcessWithoutNullStreams;
   }
 
   /**
    * @returns the beast connection instance or null of not connected.
    */
   public getClient() {
-    return this.V5Instances[0] as ChildProcessWithoutNullStreams;
+    return this.syncPulseInstances[0] as ChildProcessWithoutNullStreams;
   }
 
   /**
    * @returns a boolean if the beast has joined the Spectrum's IO server.
    */
   public getIsConnected() {
-    return this.V5Instances.length !== 0;
+    return this.syncPulseInstances.length !== 0;
   }
 
   /**
    * @returns the current device communication plugin version.
    */
   public getVersion() {
-    return '0.5.0';
+    return '0.3.0';
   }
 
   /**
    * @returns the default sampling rate of the device.
    */
   public getDefaultSamplingRate() {
-    return 100;
+    return 1;
   }
 
   /**
    * @returns the device serial number.
    */
   public getDeviceSerialNumber() {
-    return 'v5-ibl-zx1';
+    return 'sync-pulse-ibl-zx1';
   }
 
   /**
    * @returns an array of all the supported sampling rates.
    */
   public getSupportedSamplingRates() {
-    return [100, 50, 25, 20, 10, 5, 2, 1];
+    return [1];
   }
 
   /**
    * @returns the PD channel names.
    */
   public getPDChannelNames() {
-    const channelNames = ['Ambient'];
-    for (let i = 0; i < this.getSupportedLEDNum(); i++) channelNames.push(`LED${i + 1}`);
+    const channelNames = ['Sync Pulse'];
     return channelNames;
   }
 
@@ -117,14 +116,14 @@ export class V5PhysicalDevice implements INIRSDevice {
    * @returns the calculated channel names.
    */
   public getCalculatedChannelNames() {
-    return ['O2Hb', 'HHb', 'THb', 'TOI'];
+    return ['Sync Pulse'];
   }
 
   /**
    * @returns the current device communication instance.
    */
   public getDevice() {
-    return this.V5Instances[0] as ChildProcessWithoutNullStreams;
+    return this.syncPulseInstances[0] as ChildProcessWithoutNullStreams;
   }
 
   /**
@@ -132,7 +131,7 @@ export class V5PhysicalDevice implements INIRSDevice {
    */
   public spawnDevice() {
     // Kill each previous instance first if any exists
-    this.V5Instances.forEach((instance) => {
+    this.syncPulseInstances.forEach((instance) => {
       instance.removeAllListeners();
       instance.kill();
     });
@@ -140,12 +139,12 @@ export class V5PhysicalDevice implements INIRSDevice {
     // Spawn a new instance
     const readerPath =
       process.env.MODE === 'development'
-        ? path.join(process.env.PWD as string, 'packages', 'drivers', 'v5', 'reader.exe')
+        ? path.join(process.env.PWD as string, 'packages', 'drivers', 'syncpulse', 'ftdi-pulse.exe')
         : '';
     const spawnedDevice = spawn(readerPath);
     spawnedDevice.stdout.setEncoding('utf-8');
 
-    this.V5Instances.push(spawnedDevice);
+    this.syncPulseInstances.push(spawnedDevice);
     return spawnedDevice;
   }
 
@@ -164,10 +163,10 @@ export class V5PhysicalDevice implements INIRSDevice {
    * Cleans up the listeners and the device instance.
    */
   public cleanup() {
-    this.V5Instances.forEach((instance) => {
+    this.syncPulseInstances.forEach((instance) => {
       instance.removeAllListeners();
       instance.kill();
     });
-    this.V5Instances.length = 0;
+    this.syncPulseInstances.length = 0;
   }
 }

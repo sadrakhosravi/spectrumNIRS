@@ -34,11 +34,11 @@ export class DeviceReader {
     this.activeDevices = activeDevices;
 
     // Start the loop interval
-    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 200);
-    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 20000);
+    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 50);
+    // this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 20000);
 
     this.loopInterval.start();
-    this.gcInterval.start();
+    // this.gcInterval.start();
   }
 
   /**
@@ -60,7 +60,8 @@ export class DeviceReader {
   /**
    * Handle forced garbage collection.
    */
-  private handleGarbageCollection() {
+  protected handleGarbageCollection() {
+    console.log(process.getHeapStatistics());
     //@ts-ignore
     global.gc();
   }

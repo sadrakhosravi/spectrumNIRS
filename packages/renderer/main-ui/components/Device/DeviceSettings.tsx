@@ -15,7 +15,7 @@ import { Listbox } from '../Elements/Listbox';
 import { RangeSliderWithInput } from '../Form/RangeSliderWithInput';
 
 // Types
-import type { DeviceModelProxy } from '@models/Device/DeviceProxyModel';
+import type { DeviceModelProxy } from '@models/Device/DeviceModelProxy';
 
 // ID
 const ledIDBase = 'led-intensities-';

@@ -181,7 +181,11 @@ export class XAxisChartViewModel {
   /**
    * Performs memory and listener cleanups
    */
-  public cleanup() {
+  public dispose() {
     this.model.dispose();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    this.model = null;
   }
 }

@@ -44,6 +44,7 @@ export class BeastPhysicalDevice implements INIRSDevice {
       defaultSamplingRate: this.getDefaultSamplingRate(),
       PDChannelNames: this.getPDChannelNames(),
       calculatedChannelNames: this.getCalculatedChannelNames(),
+      hasProbeSettings: true,
     };
   }
 

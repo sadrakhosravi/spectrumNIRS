@@ -7,6 +7,9 @@
 import { action, makeObservable, observable } from 'mobx';
 import { ipcRenderer } from 'electron';
 
+// Service Manager
+import ServiceManager from '../../../services/ServiceManager';
+
 // Models
 import { DeviceModel } from './DeviceModel';
 
@@ -114,6 +117,12 @@ export class DeviceManager {
     // No device found, something has gone wrong here. There should be a device.
     if (deviceToRemoveIndex === -1) throw new Error('Device not found!');
 
+    // Remove the device from the global store
+    ServiceManager.store.deviceStore.removeDeviceStoreState(
+      'activeDeviceModules',
+      this.activeDevices[deviceToRemoveIndex].name,
+    );
+
     // Stop the device and remove it from the list
     this.activeDevices[deviceToRemoveIndex].stopDevice();
     this.activeDevices[deviceToRemoveIndex].removeDevice();
@@ -124,6 +133,9 @@ export class DeviceManager {
    * Handles the start signal from the UI
    */
   private handleStart() {
+    // Set the recording status
+    ServiceManager.store.deviceStore.setDeviceStoreValue('isRecordingData', true);
+
     this.activeDevices.forEach((device) => device.startDevice());
     this.deviceReader.startDataAcquisition(this.activeDevices);
   }
@@ -134,6 +146,9 @@ export class DeviceManager {
   private handleStop() {
     this.deviceReader.stopDataAcquisitionLoop();
     this.activeDevices.forEach((device) => device.stopDevice());
+
+    // Set the recording status
+    ServiceManager.store.deviceStore.setDeviceStoreValue('isRecordingData', false);
   }
 
   /**
@@ -158,21 +173,22 @@ export class DeviceManager {
    * Handles the IPC request for all active devices by returning them as device info.
    */
   private handleGetActiveDevices() {
-    this.activeDevices.forEach((device) => {
-      device.sendDeviceInfo();
-    });
+    // this.activeDevices.forEach((device) => {
+    //   device.sendDeviceInfo();
+    // });
   }
 
   /**
    * Gets the list of all available device module names and sends them to the main UI.
    */
-  private handleGetAlLDeviceNames(event: Electron.IpcRendererEvent) {
+  private handleGetAlLDeviceNames() {
     const devicesInfo: DeviceNameType[] = devices.map((device) => {
       // Check if the device is active.
       const isDeviceActive = this.activeDevices.find((d) => d.name === device.name);
       return { name: device.name, isActive: isDeviceActive ? true : false };
     });
 
-    ipcRenderer.sendTo(event.senderId, DeviceChannels.ALL_DEVICE_NAMES, devicesInfo);
+    // Set the state in the global store
+    ServiceManager.store.deviceStore.setDeviceStoreValue('allDeviceNamesAndInfo', devicesInfo);
   }
 }

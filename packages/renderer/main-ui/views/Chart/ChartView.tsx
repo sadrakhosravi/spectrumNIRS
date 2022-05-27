@@ -10,6 +10,9 @@ import { ChannelLanes } from './ChannelLanes/ChannelLanes';
 import { XAxis } from './XAxis/XAxis';
 import { SensorInfo } from './SensorInfo/SensorInfo';
 
+// Icons
+import { FiInfo } from 'react-icons/fi';
+
 // View models
 import {
   chartVM,
@@ -28,7 +31,6 @@ export const ChartView = observer(() => {
   React.useLayoutEffect(() => {
     if (!chartVM) initChartVM();
     chartVM.init(id);
-    chartVM.addChart();
 
     return () => {
       console.log('Chart Cleanup');
@@ -53,8 +55,20 @@ export const ChartView = observer(() => {
       <div className={styles.ChartContainer}>
         {chartVM.currentView === 'bar' && <div className={styles.ChartBarView} id={barChartId} />}
         <span style={{ visibility: chartVM.currentView === 'line' ? 'visible' : 'hidden' }}>
-          <XAxis />
-          <SensorInfo />
+          {chartVM.charts.length > 0 && (
+            <>
+              <XAxis />
+              <SensorInfo />
+            </>
+          )}
+          {chartVM.charts.length === 0 && (
+            <div className={styles.EmptyChartMessage}>
+              <span>
+                <FiInfo size="66px" strokeWidth={1.7} />
+                <p>Please add a device to start.</p>
+              </span>
+            </div>
+          )}
         </span>
         <div
           className={styles.ChartAreaContainer}

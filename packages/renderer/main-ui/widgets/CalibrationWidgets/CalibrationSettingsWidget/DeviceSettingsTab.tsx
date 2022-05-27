@@ -11,7 +11,11 @@ import { deviceManagerVM } from '@viewmodels/VMStore';
 import { Separator } from '/@/components/Elements/Separator';
 
 export const DeviceSettingsTab = observer(() => {
-  const deviceOptions = deviceManagerVM.activeDevices.map((device) => ({
+  const devicesWithProbeSettings = deviceManagerVM.activeDevices.filter(
+    (device) => device.hasProbeSettings === true,
+  );
+
+  const deviceOptions = devicesWithProbeSettings.map((device) => ({
     name: device.name,
     value: device.id,
   }));

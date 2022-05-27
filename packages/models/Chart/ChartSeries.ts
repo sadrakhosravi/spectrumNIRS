@@ -126,16 +126,18 @@ export class ChartSeries {
   /**
    * Applies the gain value and adds obj array to the series.
    */
-  public addArrayXY(data: { x: number; y: number }[]) {
+  public addArrayXY(x: number[] | Float32Array, y: number[] | Float32Array) {
     const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
-    console.time('gain');
     // For each is faster here
-    data.forEach((point) => (point.y *= gainVal * deviceCalibFactor));
-    console.timeEnd('gain');
+    y.forEach((yVal) => (yVal *= gainVal * deviceCalibFactor));
 
-    this.series.add(data);
+    if (this.lowpassFilter) {
+      this.lowpassFilter.multiStep(y, true);
+    }
+
+    this.series.addArraysXY(x, y);
   }
 
   /**

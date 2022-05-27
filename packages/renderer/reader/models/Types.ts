@@ -11,6 +11,7 @@ export type DeviceInfoType = {
   supportedSamplingRate: number[];
   PDChannelNames: string[];
   calculatedChannelNames: string[];
+  hasProbeSettings: boolean;
 };
 
 /**

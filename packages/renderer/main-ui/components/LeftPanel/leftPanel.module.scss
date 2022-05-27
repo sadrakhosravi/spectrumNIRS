@@ -68,5 +68,5 @@ $button-height: 70px;
   height: $button-height;
   width: 4px;
   background: $color-primary;
-  transition: top 0.25s cubic-bezier(0.69, 0.07, 0.62, 1.31);
+  transition: top 0.25s ease-in;
 }

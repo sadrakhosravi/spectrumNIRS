@@ -8,7 +8,7 @@ import { builtinModules } from 'module';
 import reactVite from '@vitejs/plugin-react';
 import electronRenderer from 'vite-plugin-electron/renderer';
 import polyfillExports from 'vite-plugin-electron/polyfill-exports';
-import resolve from 'vite-plugin-resolve';
+import resolve, { lib2esm } from 'vite-plugin-resolve';
 
 import checker from 'vite-plugin-checker';
 
@@ -41,6 +41,14 @@ const config = {
     polyfillExports(),
     resolve({
       sqlite3: 'export default require("sqlite3");',
+      // Use lib2esm() to easy to convert ESM
+      serialport: lib2esm(
+        // CJS lib name
+        'serialport',
+        // export memebers
+        ['SerialPort', 'SerialPortMock'],
+        { format: 'cjs' },
+      ),
     }),
     checker({
       typescript: {

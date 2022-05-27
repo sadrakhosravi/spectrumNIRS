@@ -7,6 +7,7 @@
 import { action, makeObservable, observable, reaction, computed } from 'mobx';
 import { ipcRenderer } from 'electron';
 import ReaderChannels from '../../utils/channels/ReaderChannels';
+import { AxisTickStrategies } from '@arction/lcjs';
 
 // Models
 import { ChartModel } from '../../models/Chart';
@@ -62,13 +63,17 @@ export class ChartViewModel {
    */
   private dashboardHeight: string;
   /**
-   * An array of all the reaction functions for later dispose
-   */
-  private reactions: IReactionDisposer[];
-  /**
    * The current chart view.
    */
   @observable private currView: 'line' | 'bar';
+  /**
+   * Whether the chart has been initialized.
+   */
+  private chartLoaded: boolean;
+  /**
+   * An array of all the reaction functions for later dispose
+   */
+  private reactions: IReactionDisposer[];
 
   constructor() {
     this.model = new ChartModel();
@@ -79,6 +84,7 @@ export class ChartViewModel {
     this.xAxisHeight = '40px';
     this.dashboardHeight = `calc(100% - ${this.xAxisHeight})`;
     this.currView = 'line';
+    this.chartLoaded = false;
     // Make this class observable
     makeObservable(this);
     this.reactions = [];
@@ -100,10 +106,18 @@ export class ChartViewModel {
   }
 
   /**
+   * Whether the chart has been initialized.
+   */
+  public get loaded() {
+    return this.chartLoaded;
+  }
+
+  /**
    * Creates the dashboard instance.
    */
   public init(containerId: string) {
     if (!this.model.getDashboard()) this.model.createDashboard(containerId);
+    this.chartLoaded = true;
   }
 
   /**
@@ -121,15 +135,25 @@ export class ChartViewModel {
   }
 
   /**
+   * Does the initial chart setup when the recording has started.
+   */
+  public startCharts() {
+    this.charts.forEach((chart) => {
+      chart.dashboardChart.chart
+        .getDefaultAxisX()
+        .setTickStrategy(AxisTickStrategies.Time, (timeTick) => {
+          const newTick = timeTick.setTimeOrigin(Date.now());
+
+          return newTick;
+        });
+    });
+  }
+
+  /**
    * Adds a new chart to the dashboard instance.
    * @returns the chart id
    */
   @action public addChart() {
-    console.log('ADD CHART');
-    // If the first chart does not have a series, nothing was added before
-    if (this.charts.length === 1 && this.charts[0].series.length === 0)
-      return this.charts[0].dashboardChart;
-
     const chart = this.model.addChartXY();
     const chartId = chart.getId();
     this.charts.push({
@@ -147,11 +171,6 @@ export class ChartViewModel {
   @action public removeChart(chartId: string) {
     const chartIndex = this.charts.findIndex((chart) => chart.id === chartId);
     if (chartIndex === -1) return;
-
-    if (chartIndex === 0) {
-      this.removeSeries(chartIndex);
-      return;
-    }
 
     // Remove the chart and its series
     this.removeChartAndSeries(chartIndex);
@@ -305,6 +324,7 @@ export class ChartViewModel {
       () => this.charts.length,
       () => {
         const totalCharts = this.charts.length;
+        if (totalCharts === 0) return;
 
         // Update chart heights
         this.model.updateChartsHeight(this.charts.map((chart) => chart.dashboardChart.chart));

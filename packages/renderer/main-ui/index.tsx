@@ -1,6 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
+// Global states
+import '@models/App/GlobalStateModel';
+
 // Start Service Manager
 import '../../services/ServiceManager';
 
@@ -16,7 +19,9 @@ import './MainWinIPCService';
 // Components
 import { App } from './App';
 
-const container = document.getElementById('main') as HTMLElement;
-const root = createRoot(container);
+setTimeout(() => {
+  const container = document.getElementById('main') as HTMLElement;
+  const root = createRoot(container);
 
-root.render(<App />);
+  root.render(<App />);
+}, 200);

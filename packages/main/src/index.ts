@@ -57,6 +57,7 @@ app.on('window-all-closed', () => {
   await startup();
 
   new RegisterGlobalShortcuts();
+  new GlobalStore();
 
   const mainWindow = createMainWindow();
   renderers.mainWindow = mainWindow;
@@ -66,7 +67,6 @@ app.on('window-all-closed', () => {
 
   // Start the IPC service
   new IPCService(renderers);
-  new GlobalStore();
 })();
 
 /**

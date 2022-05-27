@@ -25,12 +25,12 @@ const navigationItems: NavigationItems[] = [
   {
     text: 'Record',
     icon: FiActivity,
-    path: AppNavStatesEnum.NONE,
+    path: AppNavStatesEnum.RECORD,
   },
   {
     text: 'Review',
     icon: FiSearch,
-    path: AppNavStatesEnum.NONE,
+    path: AppNavStatesEnum.REVIEW,
   },
   {
     text: 'Calibration',

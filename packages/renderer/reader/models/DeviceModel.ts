@@ -4,7 +4,7 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
+import { action, IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 import { readerIPCService } from '../ReaderIPCService';
 
 // Device api
@@ -22,6 +22,7 @@ import { DeviceChannels } from '@utils/channels/DeviceChannels';
 
 // Types
 import type { DeviceInfoType } from './Types';
+import ServiceManager from '../../../services/ServiceManager';
 
 export class DeviceModel {
   /**
@@ -121,6 +122,16 @@ export class DeviceModel {
   public removeDevice() {
     sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.STOP);
 
+    // Remove the info to the global state
+    const currentDevices =
+      ServiceManager.store.deviceStore.getDeviceStoreValue('activeDeviceModules');
+    const currentDeviceIndex = currentDevices.findIndex(
+      (activeDevice) => activeDevice.name === this.name,
+    );
+    currentDevices.splice(currentDeviceIndex, 1);
+
+    ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', currentDevices);
+
     // Terminate the worker after 100ms
     setTimeout(() => {
       // Worker cleanups
@@ -135,13 +146,13 @@ export class DeviceModel {
     sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.GET_DATA);
   }
 
-  /**
-   * Sends the device info the UI thread.
-   */
-  public sendDeviceInfo() {
-    if (!this.info) return;
-    readerIPCService.sendToUI(DeviceChannels.DEVICE_INFO, toJS(this.info));
-  }
+  // /**
+  //  * Sends the device info the UI thread.
+  //  */
+  // public setDeviceInfo() {
+  //   if (!this.info) return;
+  //   readerIPCService.sendToUI(DeviceChannels.DEVICE_INFO, toJS(this.info));
+  // }
 
   /**
    * Sends the updated settings to the worker device.
@@ -187,6 +198,13 @@ export class DeviceModel {
    */
   private setDeviceInfo(deviceInfo: DeviceInfoType) {
     this.info = deviceInfo;
+
+    const currentDevices =
+      ServiceManager.store.deviceStore.getDeviceStoreValue('activeDeviceModules');
+    currentDevices.push(deviceInfo);
+
+    // Add the info to the global state
+    ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', currentDevices);
   }
 
   /**
@@ -212,7 +230,6 @@ export class DeviceModel {
       // Device info object
       case EventFromWorkerEnum.DEVICE_INFO:
         this.setDeviceInfo(data.data);
-        this.sendDeviceInfo();
         break;
 
       default:

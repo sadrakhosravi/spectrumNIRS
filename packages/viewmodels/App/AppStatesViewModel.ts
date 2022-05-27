@@ -52,13 +52,13 @@ export class AppStatesViewModel {
    * Sets the current path of the app as a state
    */
   @action public async navigateTo(path: AppNavStatesEnum) {
-    this.setAppLoading(true);
+    // this.setAppLoading(true);
     this.route = path;
 
-    setTimeout(() => {
-      runInAction(() => {
-        this.setAppLoading(false);
-      });
-    }, 1000);
+    // setTimeout(() => {
+    //   runInAction(() => {
+    //     this.setAppLoading(false);
+    //   });
+    // }, 1000);
   }
 }

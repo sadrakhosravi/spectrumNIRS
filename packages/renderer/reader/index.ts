@@ -1,3 +1,6 @@
+// Import services
+import ServiceManager from '../../services/ServiceManager';
+
 // Import IPC service
 import './ReaderIPCService';
 
@@ -8,3 +11,9 @@ import { DeviceManager } from './models/DeviceManager';
 setTimeout(() => {
   new DeviceManager();
 }, 1000);
+
+// Before process reload, empty the state,
+window.onbeforeunload = () => {
+  ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', []);
+  ServiceManager.store.deviceStore.setDeviceStoreValue('allDeviceNamesAndInfo', []);
+};

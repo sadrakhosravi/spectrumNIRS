@@ -31,6 +31,7 @@ export const ActiveDeviceList = observer(() => {
         text="Devices"
         dropDownIndicator
         onClick={() => setIsOpen(true)}
+        disabled={deviceManagerVM.isRecordingData}
       />
       {isOpen && (
         <Popover

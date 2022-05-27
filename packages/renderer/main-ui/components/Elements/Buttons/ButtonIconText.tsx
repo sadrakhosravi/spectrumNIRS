@@ -12,6 +12,7 @@ type ButtonIconText = {
   className?: string;
   buttonRef?: React.LegacyRef<HTMLButtonElement>;
   dropDownIndicator?: boolean;
+  disabled?: boolean;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -21,6 +22,7 @@ export const ButtonIconText = ({
   className,
   buttonRef,
   dropDownIndicator,
+  disabled,
   onClick,
 }: ButtonIconText) => {
   return (
@@ -28,6 +30,7 @@ export const ButtonIconText = ({
       className={`${styles.Button} ${styles.IconTextButton} ${className || ''}`}
       ref={buttonRef}
       onClick={onClick}
+      disabled={disabled}
     >
       {icon}
       {text}

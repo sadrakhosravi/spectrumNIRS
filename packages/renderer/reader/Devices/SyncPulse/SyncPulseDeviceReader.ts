@@ -5,8 +5,7 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-// V5 device module
-import V5 from './V5';
+import SyncPulse from './SyncPulse';
 
 // Interfaces
 import {
@@ -25,7 +24,7 @@ import {
 } from '../../api/Types';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 
-export class V5DeviceReader {
+export class SyncPulseDeviceReader {
   /**
    * The device classes
    */
@@ -36,7 +35,7 @@ export class V5DeviceReader {
   protected isDeviceConnected: boolean;
 
   constructor() {
-    this.device = V5;
+    this.device = SyncPulse;
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
     this.deviceInput = null;
@@ -98,8 +97,9 @@ export class V5DeviceReader {
   /**
    * Sends a signal to the device to start sending/recording data.
    */
-  public async handleDeviceStart() {
+  public handleDeviceStart() {
     console.log('Starting Device...');
+
     // Spawn the device first
     (this.physicalDevice.spawnDevice as () => ChildProcessWithoutNullStreams)();
 
@@ -167,29 +167,29 @@ export class V5DeviceReader {
 }
 
 // Beast reader instance.
-const v5DeviceReader = new V5DeviceReader();
+const syncPulseReader = new SyncPulseDeviceReader();
 
 // Listeners from the main process.
 self.addEventListener('message', ({ data }: { data: EventFromDeviceToWorkerType }) => {
   // Match the event with the function to execute.
   switch (data.event) {
     case EventFromDeviceToWorkerEnum.GET_DATA:
-      v5DeviceReader.emitData();
+      syncPulseReader.emitData();
       break;
 
     // Start request
     case EventFromDeviceToWorkerEnum.START:
-      v5DeviceReader.handleDeviceStart();
+      syncPulseReader.handleDeviceStart();
       break;
 
     // Stop request
     case EventFromDeviceToWorkerEnum.STOP:
-      v5DeviceReader.handleDeviceStop();
+      syncPulseReader.handleDeviceStop();
       break;
 
     // Settings update request
     case EventFromDeviceToWorkerEnum.SETTINGS_UPDATE:
-      v5DeviceReader.handleDeviceSettingsUpdate(data.data);
+      syncPulseReader.handleDeviceSettingsUpdate(data.data);
       break;
 
     // Command did not match

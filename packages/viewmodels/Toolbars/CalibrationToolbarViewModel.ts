@@ -9,11 +9,15 @@
 import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 import ReaderChannels from '../../utils/channels/ReaderChannels';
 
+// View Models
+import { deviceManagerVM } from '../VMStore';
+
 export class CalibrationToolbarViewModel {
   /**
    * Sends a device start signal to the reader process
    */
   public handleDeviceStart() {
+    deviceManagerVM.initRecordingStart();
     MainWinIPCService.sendToReader(ReaderChannels.START);
   }
 

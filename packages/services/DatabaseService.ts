@@ -4,21 +4,18 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { ipcRenderer } from 'electron';
 import Sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 // Schema
 import { RecordingTable } from './database/RecordingTable';
 
-// Channels
-import { PathChannels } from '../utils/channels';
-
 // Interfaces
 import type { IServices } from './IServicesInterface';
 
 // Types
 import type { Database } from 'sqlite';
+import globalPathsModel from '../models/App/GlobalStateModel';
 export type DatabaseConnectionType = Database<Sqlite3.Database, Sqlite3.Statement>;
 
 export class DatabaseService implements IServices {
@@ -35,11 +32,9 @@ export class DatabaseService implements IServices {
    * Initialize service.
    */
   public initService = async () => {
-    const dbPath = (await ipcRenderer.invoke(PathChannels.DB_FILE_PATH)) as string;
-
     // Create the database or connection instance.
     this.dbConnection = await open({
-      filename: dbPath,
+      filename: globalPathsModel.dbFilePath,
       driver: Sqlite3.Database,
     });
 

@@ -12,6 +12,7 @@ import { DeviceManagerViewModel } from './Device/DeviceManagerViewModel';
 
 import { ChartViewModel } from './Chart/ChartViewModel';
 import { BarChartViewModel } from './Chart/BarChartViewModel';
+// import { XAxisChartViewModel } from './Chart/XAxisChartViewModel';
 
 import { RecordingViewModel } from './Recording/RecordingViewModel';
 
@@ -80,3 +81,23 @@ export const disposeBarChartVM = () => {
   barChartVM?.dispose();
   barChartVM = null;
 };
+
+// /**
+//  * X axis chart view model instance.
+//  */
+// export let xAxisChartVM: XAxisChartViewModel | null;
+
+// /**
+//  * Initializes the barChartVM instance
+//  */
+// export const initXAxisChartVM = () => {
+//   if (!xAxisChartVM) xAxisChartVM = new XAxisChartViewModel();
+// };
+
+// /**
+//  * Disposes the bar chart view model instance.
+//  */
+// export const disposeXAxisChartVM = () => {
+//   xAxisChartVM?.dispose();
+//   xAxisChartVM = null;
+// };
