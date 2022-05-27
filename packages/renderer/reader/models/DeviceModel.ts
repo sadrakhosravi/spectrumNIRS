@@ -4,18 +4,12 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
+import * as Comlink from 'comlink';
+import { IReactionDisposer, makeObservable, observable } from 'mobx';
 import { readerIPCService } from '../ReaderIPCService';
 
 // Device api
-import { sendMessageToDeviceWorker } from '../api/device-api';
-
-// Worker message types
-import {
-  EventFromWorkerEnum,
-  EventFromDeviceToWorkerEnum,
-  EventFromWorkerType,
-} from '../api/Types';
+import { IDeviceReader } from '../api/device-api';
 
 // IPC Channels
 import { DeviceChannels } from '@utils/channels/DeviceChannels';
@@ -59,6 +53,8 @@ export class DeviceModel {
    */
   private reactions: IReactionDisposer[];
 
+  wrappedWorker: Comlink.Remote<IDeviceReader>;
+
   // Constructor
   constructor(name: string, workerURL: URL) {
     this.name = name;
@@ -74,6 +70,7 @@ export class DeviceModel {
 
     // Create the worker instance.
     this.worker = new Worker(workerURL, { type: 'module' });
+    this.wrappedWorker = Comlink.wrap<IDeviceReader>(this.worker);
 
     // Reactions
     this.reactions = [];
@@ -106,21 +103,22 @@ export class DeviceModel {
    * Sends a command to the worker to start the device
    */
   public startDevice() {
-    sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.START);
+    // sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.START);
+    this.wrappedWorker.handleDeviceStart();
   }
 
   /**
    * Closes the device and removes all listeners.
    */
-  public stopDevice() {
-    sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.STOP);
+  public async stopDevice() {
+    await this.wrappedWorker.handleDeviceStop();
   }
 
   /**
    * Removes the device and its worker
    */
-  public removeDevice() {
-    sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.STOP);
+  public async removeDevice() {
+    await this.wrappedWorker.handleDeviceStop();
 
     // Remove the info to the global state
     const currentDevices =
@@ -142,31 +140,26 @@ export class DeviceModel {
   /**
    * Sends a request to get the data from the worker.
    */
-  public sendGetDataRequest() {
-    sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.GET_DATA);
+  public async sendGetDataRequest() {
+    this.wrappedWorker.getData().then((data) => {
+      readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
+    });
   }
-
-  // /**
-  //  * Sends the device info the UI thread.
-  //  */
-  // public setDeviceInfo() {
-  //   if (!this.info) return;
-  //   readerIPCService.sendToUI(DeviceChannels.DEVICE_INFO, toJS(this.info));
-  // }
 
   /**
    * Sends the updated settings to the worker device.
    */
   public updateSettings(settings: any) {
-    console.log(settings);
-    sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.SETTINGS_UPDATE, settings);
+    this.wrappedWorker.handleDeviceSettingsUpdate(settings);
+    // sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.SETTINGS_UPDATE, settings);
   }
 
   /**
    * Attaches worker listeners.
    */
   private init() {
-    this.worker.addEventListener('message', this.handleWorkerMessage.bind(this));
+    // this.worker.addEventListener('message', this.handleWorkerMessage.bind(this));
+    this.wrappedWorker.getDeviceInfo().then((info) => this.setDeviceInfo(info));
   }
 
   /**
@@ -176,20 +169,11 @@ export class DeviceModel {
     // Dispose reactions
     this.reactions.forEach((reaction) => reaction());
 
-    // Dispose listeners
-    this.worker.removeEventListener('message', this.handleReactions);
-
     // Terminate the worker
+    this.wrappedWorker[Comlink.releaseProxy];
     this.worker.terminate();
     //@ts-ignore
     this.worker = null;
-  }
-
-  /**
-   * Sends the device data to the UI process through IPC.
-   */
-  private sendDataToUI(data: any) {
-    readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
   }
 
   /**
@@ -205,50 +189,5 @@ export class DeviceModel {
 
     // Add the info to the global state
     ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', currentDevices);
-  }
-
-  /**
-   * Message handler for messages from the device worker.
-   */
-  @action private handleWorkerMessage({ data }: { data: EventFromWorkerType }) {
-    switch (data.event) {
-      // Device data
-      case EventFromWorkerEnum.DEVICE_DATA:
-        this.sendDataToUI(data.data);
-        break;
-
-      // Connection status update
-      case EventFromWorkerEnum.DEVICE_CONNECTION_STATUS:
-        this.connected = data.data;
-        break;
-
-      // Device connection input status
-      case EventFromWorkerEnum.INPUT_STATUS:
-        this.errorMessage = data.data;
-        break;
-
-      // Device info object
-      case EventFromWorkerEnum.DEVICE_INFO:
-        this.setDeviceInfo(data.data);
-        break;
-
-      default:
-        throw new Error('Command not support!');
-    }
-  }
-
-  /**
-   * Handles observable change reactions.
-   */
-  private handleReactions() {
-    const connectionStatusReactionDisposer = reaction(
-      () => this.connected,
-      () => {
-        readerIPCService.sendToUI(DeviceChannels.CONNECTION_STATUS, this.connected);
-      },
-    );
-
-    // Add reactions
-    this.reactions.push(connectionStatusReactionDisposer);
   }
 }

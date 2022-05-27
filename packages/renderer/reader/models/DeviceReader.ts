@@ -61,7 +61,6 @@ export class DeviceReader {
    * Handle forced garbage collection.
    */
   protected handleGarbageCollection() {
-    console.log(process.getHeapStatistics());
     //@ts-ignore
     global.gc();
   }

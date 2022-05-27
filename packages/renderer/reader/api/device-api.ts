@@ -18,6 +18,8 @@ export type {
   IDeviceReader,
 } from '../Interfaces';
 
+export type { DeviceDataTypeWithMetaData, DeviceADCDataType } from '../models/Types';
+
 type Device<I> = new () => I;
 type Input<I> = new (io?: Socket) => I;
 type Parser<I> = new () => I;

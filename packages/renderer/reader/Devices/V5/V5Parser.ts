@@ -20,7 +20,6 @@ export type V5ParserDataType = {
 };
 
 export class V5Parser implements IDeviceParser {
-  private dataBuff: DeviceDataTypeWithMetaData[];
   /**
    * The number of data points per packet.
    */
@@ -34,7 +33,6 @@ export class V5Parser implements IDeviceParser {
    */
   protected serializer: Avro.Type;
   constructor() {
-    this.dataBuff = [];
     this.BATCH_SIZE = 10;
 
     this.res = {
@@ -63,13 +61,6 @@ export class V5Parser implements IDeviceParser {
         omitRecordMethods: true,
       },
     );
-  }
-
-  /**
-   * @returns the data buffer and frees the data from the parser memory.
-   */
-  public getData() {
-    return this.dataBuff.splice(0);
   }
 
   /**
@@ -105,12 +96,6 @@ export class V5Parser implements IDeviceParser {
     }
 
     // Add to internal buffer
-    this.dataBuff.push({ data: this.res, metadata });
-
-    // Check for memory leaks`
-    if (this.dataBuff.length > 25) {
-      // Something has gone wrong here, avoid memory leaks
-      this.dataBuff.length = 0;
-    }
+    return { data: this.res, metadata };
   };
 }

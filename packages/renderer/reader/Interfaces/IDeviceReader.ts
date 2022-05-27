@@ -1,9 +1,21 @@
 import type { DeviceSettingsType } from '@models/Device/DeviceModelProxy';
+import AccurateTimer from '@utils/helpers/AccurateTimer';
+import type { DeviceDataTypeWithMetaData, DeviceInfoType } from 'reader/models/Types';
 
 /**
  * Device reader interface. Each device module should implement this interface.
  */
 export interface IDeviceReader {
+  /**
+   * Stores the device internal data buffer.
+   */
+  internalBuffer: DeviceDataTypeWithMetaData[];
+
+  /**
+   * The garbage collection interval.
+   */
+  gcInterval: AccurateTimer;
+
   /**
    * Initializes the device reader. Registers listeners
    * and send device info the UI thread.
@@ -42,7 +54,7 @@ export interface IDeviceReader {
    * Calls the `getData()` method on the device parser and emits the
    * device data to the parent process.
    */
-  emitData(): void;
+  getData(): DeviceDataTypeWithMetaData[];
 
   /**
    * Listens for device disconnect signal.
@@ -56,7 +68,7 @@ export interface IDeviceReader {
    * Sends device data information to the parent process
    * to be sent to the UI process.
    */
-  sendDeviceInfo(): void;
+  getDeviceInfo(): DeviceInfoType;
 
   /**
    * Should attach a listener to device data stream.
@@ -68,4 +80,9 @@ export interface IDeviceReader {
    * parse the packet.
    */
   handleDeviceData(data: Buffer | string): void;
+
+  /**
+   * Calls the `global.gc` to force garbage collection.
+   */
+  handleGarbageCollection(): void;
 }

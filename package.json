@@ -66,6 +66,7 @@
     "@tippyjs/react": "^4.2.6",
     "avsc": "^5.7.4",
     "better-sqlite3": "^7.5.3",
+    "comlink": "^4.3.1",
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",
     "fili": "^2.0.3",

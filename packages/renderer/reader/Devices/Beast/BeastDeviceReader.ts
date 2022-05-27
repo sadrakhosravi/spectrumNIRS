@@ -5,6 +5,7 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
+import * as Comlink from 'comlink';
 import Beast from './Beast';
 
 // Interfaces
@@ -14,17 +15,12 @@ import {
   IPhysicalDevice,
   IDeviceParser,
   IDeviceInput,
-  sendDataToProcess,
   IDeviceReader,
+  DeviceDataTypeWithMetaData,
+  // IDeviceReader,
 } from '../../api/device-api';
 import { BeastCmd } from './BeastCommandsEnum,';
-
-// Worker data types
-import {
-  EventFromDeviceToWorkerEnum,
-  EventFromDeviceToWorkerType,
-  EventFromWorkerEnum,
-} from '../../api/Types';
+import AccurateTimer from '@utils/helpers/AccurateTimer';
 
 export class BeastDeviceReader implements IDeviceReader {
   /**
@@ -36,12 +32,18 @@ export class BeastDeviceReader implements IDeviceReader {
   protected deviceParser: IDeviceParser;
   private isDeviceConnected: boolean;
 
+  public readonly gcInterval: AccurateTimer;
+  public readonly internalBuffer: DeviceDataTypeWithMetaData[];
+
   constructor() {
     this.device = Beast;
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
     this.deviceInput = null;
     this.isDeviceConnected = false;
+
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 25 * 1000);
+    this.internalBuffer = [];
 
     this.init();
   }
@@ -50,7 +52,6 @@ export class BeastDeviceReader implements IDeviceReader {
    * Initializes the device reader and waits for device connection
    */
   public async init() {
-    this.sendDeviceInfo();
     console.log('Waiting for device');
 
     // Wait for device to connect
@@ -59,7 +60,7 @@ export class BeastDeviceReader implements IDeviceReader {
       this.isDeviceConnected = true;
 
       // Inform the process
-      sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, true);
+      // sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, true);
 
       this.deviceInput = new this.device.Input(this.physicalDevice.getDevice() as Socket);
       this.listenForInitialWalkthrough();
@@ -113,6 +114,7 @@ export class BeastDeviceReader implements IDeviceReader {
   public handleDeviceStart() {
     console.log('Starting Device...');
     this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.START, true);
+    this.gcInterval.start();
   }
 
   /**
@@ -120,14 +122,15 @@ export class BeastDeviceReader implements IDeviceReader {
    */
   public handleDeviceStop() {
     console.log('Stopping Device...');
+    this.gcInterval.stop();
     this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.STOP, true);
   }
 
   /**
    * Sends the parsed buffer from the device to the reader process.
    */
-  public emitData() {
-    sendDataToProcess(EventFromWorkerEnum.DEVICE_DATA, this.deviceParser.getData());
+  public getData(): DeviceDataTypeWithMetaData[] {
+    return this.internalBuffer.splice(0);
   }
 
   /**
@@ -142,7 +145,7 @@ export class BeastDeviceReader implements IDeviceReader {
       this.isDeviceConnected = false;
 
       // Inform the process
-      sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, false);
+      // sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, false);
 
       // Remove listeners
       device.off('disconnect', handleDisconnect);
@@ -158,9 +161,8 @@ export class BeastDeviceReader implements IDeviceReader {
   /**
    * Sends the device info object to the reader process.
    */
-  public sendDeviceInfo() {
-    const info = this.physicalDevice.getDeviceInfo();
-    sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
+  public getDeviceInfo() {
+    return this.physicalDevice.getDeviceInfo();
   }
 
   /**
@@ -174,38 +176,24 @@ export class BeastDeviceReader implements IDeviceReader {
 
   // Handle device ADC data.
   public handleDeviceData(data: Buffer) {
-    this.deviceParser.processPacket(data);
+    this.internalBuffer.push(this.deviceParser.processPacket(data));
+
+    // Check for memory leaks
+    // If the condition is true, something has gone wrong
+    if (this.internalBuffer.length > 50) {
+      this.internalBuffer.length = 0;
+    }
+  }
+
+  /**
+   * Calls the `global.gc` to force garbage collection.
+   */
+  public handleGarbageCollection(): void {
+    //@ts-ignore
+    global.gc();
   }
 }
 
 // Beast reader instance.
 const beastReader = new BeastDeviceReader();
-
-// Listeners from the main process.
-self.addEventListener('message', ({ data }: { data: EventFromDeviceToWorkerType }) => {
-  // Match the event with the function to execute.
-  switch (data.event) {
-    case EventFromDeviceToWorkerEnum.GET_DATA:
-      beastReader.emitData();
-      break;
-
-    // Start request
-    case EventFromDeviceToWorkerEnum.START:
-      beastReader.handleDeviceStart();
-      break;
-
-    // Stop request
-    case EventFromDeviceToWorkerEnum.STOP:
-      beastReader.handleDeviceStop();
-      break;
-
-    // Settings update request
-    case EventFromDeviceToWorkerEnum.SETTINGS_UPDATE:
-      beastReader.handleDeviceSettingsUpdate(data.data);
-      break;
-
-    // Command did not match
-    default:
-      throw new Error('Command did not match!');
-  }
-});
+Comlink.expose(beastReader);

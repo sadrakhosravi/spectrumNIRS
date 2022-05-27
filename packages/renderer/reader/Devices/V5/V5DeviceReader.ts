@@ -5,6 +5,8 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
+import * as Comlink from 'comlink';
+
 // V5 device module
 import V5 from './V5';
 
@@ -16,15 +18,14 @@ import {
   IDeviceInput,
   sendDataToProcess,
   IDeviceReader,
+  DeviceDataTypeWithMetaData,
 } from '../../api/device-api';
 
 // Worker data types
-import {
-  EventFromDeviceToWorkerEnum,
-  EventFromDeviceToWorkerType,
-  EventFromWorkerEnum,
-} from '../../api/Types';
+import { EventFromWorkerEnum } from '../../api/Types';
+
 import { ChildProcessWithoutNullStreams } from 'child_process';
+import AccurateTimer from '@utils/helpers/AccurateTimer';
 
 export class V5DeviceReader implements IDeviceReader {
   /**
@@ -32,15 +33,23 @@ export class V5DeviceReader implements IDeviceReader {
    */
   private device: IDevice;
   private physicalDevice: IPhysicalDevice;
-  private deviceInput: IDeviceInput | null;
   protected deviceParser: IDeviceParser;
+  private deviceInput: IDeviceInput | null;
+
   protected isDeviceConnected: boolean;
+
+  public readonly gcInterval: AccurateTimer;
+  public readonly internalBuffer: DeviceDataTypeWithMetaData[];
 
   constructor() {
     this.device = V5;
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
     this.deviceInput = null;
+
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 20000);
+
+    this.internalBuffer = [];
     this.isDeviceConnected = false;
 
     this.init();
@@ -50,39 +59,8 @@ export class V5DeviceReader implements IDeviceReader {
    * Initializes the device reader and waits for device connection
    */
   public async init() {
-    this.sendDeviceInfo();
     this.deviceInput = new this.device.Input();
     console.log('Waiting for device');
-
-    // // Wait for device to connect
-    // this.physicalDevice.waitForDevice().then(() => {
-    //   // When the device connects
-    //   this.isDeviceConnected = true;
-
-    //   // Inform the process
-    //   sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, true);
-
-    //   this.deviceInput = new this.device.Input(this.physicalDevice.getDevice() as Socket);
-    //   this.listenForInitialWalkthrough();
-
-    //   // Listen for device disconnect
-    //   this.listenForDeviceDisconnect();
-
-    //   console.log('Device Connected');
-    // });
-  }
-
-  /**
-   * Attaches and sends the initial walkthrough events and commands.
-   */
-  public listenForInitialWalkthrough() {
-    // setTimeout(() => {
-    //   this.deviceInput?.updateSettings({
-    //     LEDValues: [92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 76],
-    //     numOfLEDs: 15,
-    //     numOfPDs: 7,
-    //   });
-    // }, 1500);
   }
 
   /**
@@ -90,6 +68,7 @@ export class V5DeviceReader implements IDeviceReader {
    * @param settings
    */
   public handleDeviceSettingsUpdate(settings: any) {
+    console.log('Settings Update from Comlink');
     this.deviceParser.setPDNum(settings.numOfPDs);
 
     const status = this.deviceInput?.updateSettings(settings);
@@ -107,11 +86,7 @@ export class V5DeviceReader implements IDeviceReader {
     (this.physicalDevice.spawnDevice as () => ChildProcessWithoutNullStreams)();
 
     this.listenForDeviceData();
-
-    setInterval(() => {
-      //@ts-ignore
-      global.gc();
-    }, 10000);
+    this.gcInterval.start();
   }
 
   /**
@@ -119,15 +94,15 @@ export class V5DeviceReader implements IDeviceReader {
    */
   public handleDeviceStop() {
     console.log('Stopping Device...');
-
+    this.gcInterval.stop();
     (this.physicalDevice.cleanup as any)();
   }
 
   /**
    * Sends the parsed buffer from the device to the reader process.
    */
-  public emitData() {
-    sendDataToProcess(EventFromWorkerEnum.DEVICE_DATA, this.deviceParser.getData());
+  public getData(): DeviceDataTypeWithMetaData[] {
+    return this.internalBuffer.splice(0);
   }
 
   /**
@@ -154,9 +129,13 @@ export class V5DeviceReader implements IDeviceReader {
   /**
    * Sends the device info object to the reader process.
    */
-  public sendDeviceInfo() {
-    const info = this.physicalDevice.getDeviceInfo();
-    sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
+  public getDeviceInfo() {
+    // sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
+    return this.physicalDevice.getDeviceInfo();
+  }
+
+  public checkData() {
+    console.log(this.internalBuffer.length);
   }
 
   /**
@@ -164,44 +143,31 @@ export class V5DeviceReader implements IDeviceReader {
    */
   public listenForDeviceData() {
     const device = this.physicalDevice.getDevice() as ChildProcessWithoutNullStreams;
-
     device.stdout.on('data', this.handleDeviceData.bind(this));
   }
 
-  // Handle device ADC data.
+  /**
+   * Parses the device data and stores it in the internal buffer.
+   */
   public handleDeviceData(data: Buffer) {
-    this.deviceParser.processPacket(data);
+    this.internalBuffer.push(this.deviceParser.processPacket(data));
+
+    // Check for memory leaks.
+    // If the condition if true, something has gone wrong.
+    if (this.internalBuffer.length > 30) {
+      this.internalBuffer.length = 0;
+    }
+  }
+
+  /**
+   * Handles garbage collection
+   */
+  public handleGarbageCollection() {
+    //@ts-ignore
+    global.gc();
   }
 }
 
 // Beast reader instance.
 const v5DeviceReader = new V5DeviceReader();
-
-// Listeners from the main process.
-self.addEventListener('message', ({ data }: { data: EventFromDeviceToWorkerType }) => {
-  // Match the event with the function to execute.
-  switch (data.event) {
-    case EventFromDeviceToWorkerEnum.GET_DATA:
-      v5DeviceReader.emitData();
-      break;
-
-    // Start request
-    case EventFromDeviceToWorkerEnum.START:
-      v5DeviceReader.handleDeviceStart();
-      break;
-
-    // Stop request
-    case EventFromDeviceToWorkerEnum.STOP:
-      v5DeviceReader.handleDeviceStop();
-      break;
-
-    // Settings update request
-    case EventFromDeviceToWorkerEnum.SETTINGS_UPDATE:
-      v5DeviceReader.handleDeviceSettingsUpdate(data.data);
-      break;
-
-    // Command did not match
-    default:
-      throw new Error('Command did not match!');
-  }
-});
+Comlink.expose(v5DeviceReader);

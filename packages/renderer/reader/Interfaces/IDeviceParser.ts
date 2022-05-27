@@ -1,10 +1,12 @@
 // import { DeviceADCDataType } from '../models/Types';
 
+import type { DeviceDataTypeWithMetaData } from 'reader/models/Types';
+
 export interface IDeviceParser {
   /**
    * Processes raw data an return the unpacked data.
    */
-  processPacket: (packet: any) => any;
+  processPacket: (packet: any) => DeviceDataTypeWithMetaData;
 
   /**
    * Sets the active PD number.
@@ -14,5 +16,5 @@ export interface IDeviceParser {
   /**
    * @returns the buffered device data type.
    */
-  getData(): any;
+  getData?: { (): any };
 }

@@ -167,7 +167,6 @@ export class BeastParser implements IDeviceParser {
   private msb_indices: number[];
   private bufferFactor: number;
   private bufferSize: number;
-  private dataBuff: DeviceDataTypeWithMetaData[];
   private channelsLsbMsb: ChannelsLsbMsbType;
 
   /**
@@ -182,7 +181,6 @@ export class BeastParser implements IDeviceParser {
     this.bytes_count = 8 * 2; // msb lsb
     this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
     this.bufferFactor = 1;
-    this.dataBuff = [];
     this.bufferSize = 512 * this.bufferFactor;
 
     // Channels MSB LSB
@@ -371,13 +369,6 @@ export class BeastParser implements IDeviceParser {
   }
 
   /**
-   * @returns the data buffer and frees the data from the parser memory.
-   */
-  public getData() {
-    return this.dataBuff.splice(0);
-  }
-
-  /**
    * Sets the total active PD number.
    */
   public setPDNum = (num: number) => {
@@ -445,11 +436,6 @@ export class BeastParser implements IDeviceParser {
       }
     }
 
-    this.dataBuff.push({ data: this.res, metadata });
-
-    // Something went wrong, empty memory
-    if (this.dataBuff.length === 50) {
-      this.getData();
-    }
+    return { data: this.res, metadata };
   };
 }

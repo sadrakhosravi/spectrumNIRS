@@ -25,27 +25,18 @@ export type PulseParserDataType = {
 };
 
 export class SyncPulseParser implements IDeviceParser {
-  private dataBuff: DeviceDataTypeWithMetaData[];
   private readonly PACKET_SIZE: number;
   /**
    * The parsed result object of Spectrum
    */
   private res: PulseParserDataType & DeviceADCDataType;
   constructor() {
-    this.dataBuff = [];
     this.PACKET_SIZE = 2;
     this.res = {
       ADC1: {
         ch0: new Int32Array(this.PACKET_SIZE),
       },
     };
-  }
-
-  /**
-   * @returns the data buffer and frees the data from the parser memory.
-   */
-  public getData() {
-    return this.dataBuff.splice(0);
   }
 
   /**
@@ -101,12 +92,6 @@ export class SyncPulseParser implements IDeviceParser {
     }
 
     // // Add to internal buffer
-    this.dataBuff.push({ data: this.res, metadata });
-
-    // Check for memory leaks`
-    if (this.dataBuff.length > 25) {
-      // Something has gone wrong here, avoid memory leaks
-      this.dataBuff.length = 0;
-    }
+    return { data: this.res, metadata };
   };
 }
