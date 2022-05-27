@@ -15,6 +15,7 @@ export type {
   IDeviceParser,
   IDeviceStream,
   IDeviceInput,
+  IDeviceReader,
 } from '../Interfaces';
 
 type Device<I> = new () => I;

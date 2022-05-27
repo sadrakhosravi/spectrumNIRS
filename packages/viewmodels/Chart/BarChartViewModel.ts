@@ -34,9 +34,12 @@ export class BarChartViewModel {
   /**
    * Adds the ADC data to the chart
    */
-  public addData = (data: DeviceADCDataType) => {
-    const ADCData = data[`ch${deviceManagerVM.activeDevices[0].selectedPD}`];
-    this.model.appendData(ADCData);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public addData = (_data: DeviceADCDataType) => {
+    // const ADCData = data[`ch${deviceManagerVM.activeDevices[0].selectedPD}`];
+    // this.model.appendData(ADCData);
   };
 
   /**

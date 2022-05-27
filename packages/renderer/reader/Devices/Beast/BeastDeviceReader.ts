@@ -15,6 +15,7 @@ import {
   IDeviceParser,
   IDeviceInput,
   sendDataToProcess,
+  IDeviceReader,
 } from '../../api/device-api';
 import { BeastCmd } from './BeastCommandsEnum,';
 
@@ -25,7 +26,7 @@ import {
   EventFromWorkerEnum,
 } from '../../api/Types';
 
-export class BeastDeviceReader {
+export class BeastDeviceReader implements IDeviceReader {
   /**
    * The device classes
    */
@@ -74,7 +75,7 @@ export class BeastDeviceReader {
   /**
    * Attaches and sends the initial walkthrough events and commands.
    */
-  private listenForInitialWalkthrough() {
+  public listenForInitialWalkthrough() {
     const device = this.physicalDevice.getDevice();
 
     // On 'Connection', ask for version - this is a must
@@ -102,7 +103,8 @@ export class BeastDeviceReader {
     this.deviceParser.setPDNum(settings.numOfPDs);
 
     const status = this.deviceInput?.updateSettings(settings);
-    if (!status) return;
+    if (!status) return false;
+    return status;
   }
 
   /**
@@ -110,7 +112,7 @@ export class BeastDeviceReader {
    */
   public handleDeviceStart() {
     console.log('Starting Device...');
-    return this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.START, true);
+    this.isDeviceConnected && this.deviceInput?.sendCommand(BeastCmd.START, true);
   }
 
   /**
@@ -156,7 +158,7 @@ export class BeastDeviceReader {
   /**
    * Sends the device info object to the reader process.
    */
-  private sendDeviceInfo() {
+  public sendDeviceInfo() {
     const info = this.physicalDevice.getDeviceInfo();
     sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
   }
@@ -164,14 +166,14 @@ export class BeastDeviceReader {
   /**
    * Listen for device ADC data.
    */
-  private listenForDeviceData() {
+  public listenForDeviceData() {
     const device = this.physicalDevice.getDevice();
 
     device.on(BeastCmd.ADC_DATA, this.handleDeviceData.bind(this));
   }
 
   // Handle device ADC data.
-  private handleDeviceData(data: Buffer) {
+  public handleDeviceData(data: Buffer) {
     this.deviceParser.processPacket(data);
   }
 }

@@ -294,7 +294,9 @@ export class DeviceModelProxy {
   private handleDeviceData(_event: Electron.IpcRendererEvent, data: DeviceDataTypeWithMetaData[]) {
     data.forEach((dataPacket) => {
       this.chartChannels.forEach((channel, i) => {
-        const channelDataY = dataPacket.data['ch1']['led' + i];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const channelDataY = dataPacket.data['ADC1']['ch' + i];
         const channelDataX = new Array(channelDataY.length).fill(0);
         const timestamp = dataPacket.metadata.timestamp;
 

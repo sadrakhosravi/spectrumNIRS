@@ -73,6 +73,8 @@ export class DataManagerModel {
           const channelData = data[this.channelName as keyof DeviceADCDataType];
 
           for (let i = 0; i < chartVM.charts.length; i++) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
             chartVM.charts[i].series[0].addArrayY(channelData['led' + i]);
           }
         });

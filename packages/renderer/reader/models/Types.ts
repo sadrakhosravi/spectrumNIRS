@@ -22,17 +22,17 @@ export type DeviceNameType = {
   isActive: boolean;
 };
 
-/**
- * The first index is the channel keys: starts with `'ch'` + `channel index`.
- * The seconds index is the LED keys: starts with `led` + `led index`.
- * The channel name starts with 'ch1' and the LED name starts with 'led0' which is the ambient.
- * @example Channel name: 'ch1' | LED name: 'led0'.
- */
-export type DeviceADCDataType = {
-  [key: string]: {
-    [key: string]: number[];
-  };
-};
+/// ---------------------------- Spectrum Device Data Types ---------------------------- ///
+
+// Standard data type that spectrum parses each data to.
+type DeviceADCKeyNumbersRange = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+type DeviceADCKeyType = `ADC${DeviceADCKeyNumbersRange}`;
+
+type DeviceChannelKeyNumbersRange = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type DeviceChannelKeyType = `ch${DeviceChannelKeyNumbersRange}`;
+
+export type DeviceChannelDataType = Partial<Record<DeviceChannelKeyType, Int32Array>>;
+export type DeviceADCDataType = Partial<Record<DeviceADCKeyType, DeviceChannelDataType>>;
 
 /**
  * The device data along with the meta data added when the packet reached
@@ -61,3 +61,5 @@ export type DeviceNameAndDataType = {
 export type ChannelDataType = {
   [key: string]: number[];
 };
+
+/// ---------------------------- Spectrum Device Data Types - END ---------------------------- ///

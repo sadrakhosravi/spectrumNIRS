@@ -18,10 +18,27 @@ enum PinStatus {
   DOWN = 'DN',
 }
 
+export type PulseParserDataType = {
+  ADC1: {
+    ch0: Int32Array;
+  };
+};
+
 export class SyncPulseParser implements IDeviceParser {
   private dataBuff: DeviceDataTypeWithMetaData[];
+  private readonly PACKET_SIZE: number;
+  /**
+   * The parsed result object of Spectrum
+   */
+  private res: PulseParserDataType & DeviceADCDataType;
   constructor() {
     this.dataBuff = [];
+    this.PACKET_SIZE = 2;
+    this.res = {
+      ADC1: {
+        ch0: new Int32Array(this.PACKET_SIZE),
+      },
+    };
   }
 
   /**
@@ -50,13 +67,6 @@ export class SyncPulseParser implements IDeviceParser {
       timestamp: Date.now(),
     };
 
-    // Create the result obj
-    const res: DeviceADCDataType = {
-      ch1: {
-        led0: [],
-      },
-    };
-
     // Split the data
     const splittedStr = packet.split(' ');
 
@@ -80,16 +90,18 @@ export class SyncPulseParser implements IDeviceParser {
       const pinStatus = splittedStr[4];
 
       if (pinStatus === PinStatus.UP) {
-        res.ch1.led0.push(0, 5);
+        this.res.ADC1.ch0[0] = 0;
+        this.res.ADC1.ch0[1] = 5;
       }
 
       if (pinStatus === PinStatus.DOWN) {
-        res.ch1.led0.push(5, 0);
+        this.res.ADC1.ch0[0] = 5;
+        this.res.ADC1.ch0[1] = 0;
       }
     }
 
     // // Add to internal buffer
-    this.dataBuff.push({ data: res, metadata });
+    this.dataBuff.push({ data: this.res, metadata });
 
     // Check for memory leaks`
     if (this.dataBuff.length > 25) {

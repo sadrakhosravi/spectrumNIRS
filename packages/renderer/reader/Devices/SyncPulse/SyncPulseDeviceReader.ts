@@ -14,6 +14,7 @@ import {
   IDeviceParser,
   IDeviceInput,
   sendDataToProcess,
+  IDeviceReader,
 } from '../../api/device-api';
 
 // Worker data types
@@ -24,7 +25,7 @@ import {
 } from '../../api/Types';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 
-export class SyncPulseDeviceReader {
+export class SyncPulseDeviceReader implements IDeviceReader {
   /**
    * The device classes
    */
@@ -73,7 +74,7 @@ export class SyncPulseDeviceReader {
   /**
    * Attaches and sends the initial walkthrough events and commands.
    */
-  protected listenForInitialWalkthrough() {
+  public listenForInitialWalkthrough() {
     // setTimeout(() => {
     //   this.deviceInput?.updateSettings({
     //     LEDValues: [92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 76],
@@ -91,7 +92,8 @@ export class SyncPulseDeviceReader {
     this.deviceParser.setPDNum(settings.numOfPDs);
 
     const status = this.deviceInput?.updateSettings(settings);
-    if (!status) return;
+    if (!status) return false;
+    return status;
   }
 
   /**
@@ -146,7 +148,7 @@ export class SyncPulseDeviceReader {
   /**
    * Sends the device info object to the reader process.
    */
-  private sendDeviceInfo() {
+  public sendDeviceInfo() {
     const info = this.physicalDevice.getDeviceInfo();
     sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
   }
@@ -154,14 +156,14 @@ export class SyncPulseDeviceReader {
   /**
    * Listen for device ADC data.
    */
-  private listenForDeviceData() {
+  public listenForDeviceData() {
     const device = this.physicalDevice.getDevice() as ChildProcessWithoutNullStreams;
 
     device.stdout.on('data', this.handleDeviceData.bind(this));
   }
 
   // Handle device ADC data.
-  private handleDeviceData(data: Buffer) {
+  public handleDeviceData(data: Buffer) {
     this.deviceParser.processPacket(data);
   }
 }

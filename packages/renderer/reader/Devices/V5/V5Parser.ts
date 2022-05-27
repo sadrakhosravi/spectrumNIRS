@@ -2,10 +2,21 @@ import { IDeviceParser } from '../../api/device-api';
 import Avro from 'avsc';
 
 // Type
-import type { DeviceADCDataType, DeviceDataTypeWithMetaData } from '../../models/Types';
+import type { DeviceDataTypeWithMetaData, DeviceADCDataType } from '../../models/Types';
 
 export type UnpackedDataType = {
   [key: string]: number[];
+};
+
+export type V5ParserDataType = {
+  ADC1: {
+    ch0: Int32Array;
+    ch1: Int32Array;
+    ch2: Int32Array;
+    ch3: Int32Array;
+    ch4: Int32Array;
+    ch5: Int32Array;
+  };
 };
 
 export class V5Parser implements IDeviceParser {
@@ -15,9 +26,9 @@ export class V5Parser implements IDeviceParser {
    */
   private BATCH_SIZE: number;
   /**
-   * The number of PD Channels
+   * The result object after data has been parsed
    */
-  private PD_CHANNELS: number;
+  private res: DeviceADCDataType & V5ParserDataType;
   /**
    * Data serializer
    */
@@ -25,7 +36,17 @@ export class V5Parser implements IDeviceParser {
   constructor() {
     this.dataBuff = [];
     this.BATCH_SIZE = 10;
-    this.PD_CHANNELS = 6;
+
+    this.res = {
+      ADC1: {
+        ch0: new Int32Array(this.BATCH_SIZE),
+        ch1: new Int32Array(this.BATCH_SIZE),
+        ch2: new Int32Array(this.BATCH_SIZE),
+        ch3: new Int32Array(this.BATCH_SIZE),
+        ch4: new Int32Array(this.BATCH_SIZE),
+        ch5: new Int32Array(this.BATCH_SIZE),
+      },
+    };
 
     this.serializer = Avro.Type.forValue(
       {
@@ -70,30 +91,21 @@ export class V5Parser implements IDeviceParser {
       timestamp: Date.now(),
     };
 
-    const res: DeviceADCDataType = {
-      ch1: {},
-    };
-
     const lines = packet.split('\r\n');
-
-    // Create each LED for each channel.
-    for (let i = 0; i < this.PD_CHANNELS; i++) {
-      res['ch1'][`led${i}`] = [];
-    }
 
     for (let i = 0; i < this.BATCH_SIZE; i += 1) {
       const data = lines[i].split(',');
 
-      res.ch1['led0'].push(~~data[5]);
-      res.ch1['led1'].push(~~data[0]);
-      res.ch1['led2'].push(~~data[1]);
-      res.ch1['led3'].push(~~data[2]);
-      res.ch1['led4'].push(~~data[3]);
-      res.ch1['led5'].push(~~data[4]);
+      this.res.ADC1['ch0'][i] = ~~data[5];
+      this.res.ADC1['ch1'][i] = ~~data[0];
+      this.res.ADC1['ch2'][i] = ~~data[1];
+      this.res.ADC1['ch3'][i] = ~~data[2];
+      this.res.ADC1['ch4'][i] = ~~data[3];
+      this.res.ADC1['ch5'][i] = ~~data[4];
     }
 
     // Add to internal buffer
-    this.dataBuff.push({ data: res, metadata });
+    this.dataBuff.push({ data: this.res, metadata });
 
     // Check for memory leaks`
     if (this.dataBuff.length > 25) {
