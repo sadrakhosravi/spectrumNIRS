@@ -1,8 +1,24 @@
 import type { Socket } from 'socket.io';
-import type { DeviceInfoType } from 'reader/models/Types';
+import type { DeviceInfoType } from 'reader/api/Types';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 
 export interface IPhysicalDevice {
+  /**
+   * @returns the maximum number of supported LEDs
+   */
+  getSupportedLEDNum(): number;
+  /**
+   * @returns the maximum supported number of PDs
+   */
+  getSupportedPDNum(): number;
+  /**
+   * @returns the calculated channel names.
+   */
+  getCalculatedChannelNames(): string[];
+  /**
+   * @returns the PD channel names.
+   */
+  getPDChannelNames(): string[];
   /**
    * Spawn the device
    */

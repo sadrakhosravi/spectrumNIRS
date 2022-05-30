@@ -11,17 +11,25 @@ export class BeastInput implements IDeviceInput {
   /**
    * The Beast socket.io connection instance.
    */
-  private socket: Socket;
+  private socket: Socket | null;
 
-  constructor(socket: Socket) {
-    this.socket = socket;
+  constructor() {
+    this.socket = null;
   }
 
   /**
    * Checks whether the connection is established with the hardware.
    */
   public getIsConnected() {
+    if (!this.socket) return false;
     return this.socket.connected;
+  }
+
+  /**
+   * Sets the Beast socket connection instance.
+   */
+  public setIO(socket: Socket): void {
+    this.socket = socket;
   }
 
   /**
@@ -33,7 +41,7 @@ export class BeastInput implements IDeviceInput {
    */
   public sendCommand(command: BeastCmd, message: MessageType) {
     if (!this.getIsConnected()) return;
-    return this.socket.emit(command, message);
+    return this.socket?.emit(command, message);
   }
 
   /**
@@ -43,7 +51,7 @@ export class BeastInput implements IDeviceInput {
     // Reset the previous data
     const formattedSettings = this.parseSettings(settings);
     console.log(formattedSettings);
-    const status = this.socket.emit(BeastCmd.SET_SETTINGS, formattedSettings);
+    const status = this.socket?.emit(BeastCmd.SET_SETTINGS, formattedSettings);
     return status;
   }
 

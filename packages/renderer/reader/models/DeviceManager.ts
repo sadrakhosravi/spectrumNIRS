@@ -12,6 +12,7 @@ import ServiceManager from '../../../services/ServiceManager';
 
 // Models
 import { DeviceModel } from './DeviceModel';
+import RegisterDevices from './RegisterDevice';
 
 // IPC Channels
 import { DeviceChannels } from '@utils/channels/DeviceChannels';
@@ -21,7 +22,7 @@ import { devices } from '../Devices/Devices';
 import { ReaderChannels } from '@utils/channels';
 
 // Types
-import type { DeviceNameType } from './Types';
+import type { DeviceNameType } from '../api/Types';
 import { DeviceReader } from './DeviceReader';
 
 /**
@@ -53,7 +54,10 @@ export class DeviceManager {
   /**
    * Initializes the class and adds listeners.
    */
-  private init() {
+  private async init() {
+    // Register devices first
+    await RegisterDevices.registerInDB();
+
     // Listen for device addition
     ipcRenderer.on(DeviceChannels.DEVICE_ADD, this.handleDeviceAddition.bind(this));
 

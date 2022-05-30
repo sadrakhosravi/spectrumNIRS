@@ -1,8 +1,7 @@
 import { IDeviceParser } from '../../api/device-api';
-import Avro from 'avsc';
 
 // Type
-import type { DeviceDataTypeWithMetaData, DeviceADCDataType } from '../../models/Types';
+import type { DeviceDataTypeWithMetaData, DeviceADCDataType } from '../../api/Types';
 
 export type UnpackedDataType = {
   [key: string]: number[];
@@ -28,10 +27,6 @@ export class V5Parser implements IDeviceParser {
    * The result object after data has been parsed
    */
   private res: DeviceADCDataType & V5ParserDataType;
-  /**
-   * Data serializer
-   */
-  protected serializer: Avro.Type;
   constructor() {
     this.BATCH_SIZE = 10;
 
@@ -45,22 +40,6 @@ export class V5Parser implements IDeviceParser {
         ch5: new Int32Array(this.BATCH_SIZE),
       },
     };
-
-    this.serializer = Avro.Type.forValue(
-      {
-        ch1: {
-          led0: [1020, 7000, 1000, 1223, 123, 12313, 12315, 12357, 12345, 12345],
-          led1: [1020, 7000, 1000, 1223, 123, 12313, 12315, 12357, 12345, 12345],
-          led2: [1020, 7000, 1000, 1223, 123, 12313, 12315, 12357, 12345, 12345],
-          led3: [1020, 7000, 1000, 1223, 123, 12313, 12315, 12357, 12345, 12345],
-          led4: [1020, 7000, 1000, 1223, 123, 12313, 12315, 12357, 12345, 12345],
-          led5: [1020, 7000, 1000, 1223, 123, 12313, 12315, 12357, 12345, 12345],
-        },
-      },
-      {
-        omitRecordMethods: true,
-      },
-    );
   }
 
   /**

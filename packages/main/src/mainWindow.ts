@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { URL } from 'url';
 
 function createWindow() {
@@ -55,11 +55,21 @@ function createWindow() {
   return browserWindow;
 }
 
+let count = 0;
+
 /**
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
 export function createMainWindow() {
   const window = createWindow();
   window.on('close', () => app.quit());
+
+  if (import.meta.env.DEV) {
+    ipcMain.handle('open-dev-tools', () => {
+      count === 0 && true;
+      count = 2;
+    });
+  }
+
   return window;
 }

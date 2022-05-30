@@ -16,16 +16,17 @@ import {
   IPhysicalDevice,
   IDeviceParser,
   IDeviceInput,
-  sendDataToProcess,
   IDeviceReader,
   DeviceDataTypeWithMetaData,
+  IDeviceSettings,
 } from '../../api/device-api';
-
-// Worker data types
-import { EventFromWorkerEnum } from '../../api/Types';
 
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
+import V5Calculation from './calc/V5Calculation';
+import { V5ParserDataType } from './V5Parser';
+import { DeviceSettingsType } from '@models/Device/DeviceModelProxy';
+import { serialize } from 'v8';
 
 export class V5DeviceReader implements IDeviceReader {
   /**
@@ -34,22 +35,35 @@ export class V5DeviceReader implements IDeviceReader {
   private device: IDevice;
   private physicalDevice: IPhysicalDevice;
   protected deviceParser: IDeviceParser;
-  private deviceInput: IDeviceInput | null;
+  protected deviceInput: IDeviceInput;
 
   protected isDeviceConnected: boolean;
 
   public readonly gcInterval: AccurateTimer;
   public readonly internalBuffer: DeviceDataTypeWithMetaData[];
 
+  public readonly deviceCalculations: V5Calculation;
+  public readonly deviceSettings: IDeviceSettings;
+  dataBuff: Buffer;
+
   constructor() {
     this.device = V5;
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
-    this.deviceInput = null;
+    this.deviceInput = new this.device.Input();
+
+    this.deviceCalculations = new V5Calculation();
+    this.deviceSettings = new this.device.Settings(
+      this.physicalDevice,
+      this.deviceInput,
+      this.deviceParser,
+      this.deviceCalculations,
+    );
 
     this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 20000);
 
     this.internalBuffer = [];
+    this.dataBuff = Buffer.alloc(411);
     this.isDeviceConnected = false;
 
     this.init();
@@ -59,22 +73,19 @@ export class V5DeviceReader implements IDeviceReader {
    * Initializes the device reader and waits for device connection
    */
   public async init() {
-    this.deviceInput = new this.device.Input();
     console.log('Waiting for device');
+
+    // Initialize the device classes if needed
+    this.deviceCalculations.init(this.physicalDevice.getDeviceInfo());
+    this.deviceCalculations.setBatchSize(10);
   }
 
   /**
    * Sends the updated settings to the device.
    * @param settings
    */
-  public handleDeviceSettingsUpdate(settings: any) {
-    console.log('Settings Update from Comlink');
-    this.deviceParser.setPDNum(settings.numOfPDs);
-
-    const status = this.deviceInput?.updateSettings(settings);
-    if (!status) return false;
-
-    return status;
+  public handleDeviceSettingsUpdate(settings: DeviceSettingsType) {
+    return this.deviceSettings.updateSettings(settings);
   }
 
   /**
@@ -101,8 +112,9 @@ export class V5DeviceReader implements IDeviceReader {
   /**
    * Sends the parsed buffer from the device to the reader process.
    */
-  public getData(): DeviceDataTypeWithMetaData[] {
-    return this.internalBuffer.splice(0);
+  public getData(): Buffer {
+    this.dataBuff = serialize(this.internalBuffer.splice(0));
+    return Comlink.transfer(this.dataBuff, [this.dataBuff.buffer]);
   }
 
   /**
@@ -117,7 +129,7 @@ export class V5DeviceReader implements IDeviceReader {
       this.isDeviceConnected = false;
 
       // Inform the process
-      sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, false);
+      // sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, false);
 
       // Listen for connection again
       this.init();
@@ -135,7 +147,7 @@ export class V5DeviceReader implements IDeviceReader {
   }
 
   public checkData() {
-    console.log(this.internalBuffer.length);
+    console.log(this.dataBuff);
   }
 
   /**
@@ -150,7 +162,10 @@ export class V5DeviceReader implements IDeviceReader {
    * Parses the device data and stores it in the internal buffer.
    */
   public handleDeviceData(data: Buffer) {
-    this.internalBuffer.push(this.deviceParser.processPacket(data));
+    const parsedData = this.deviceParser.processPacket(data);
+    parsedData.calcData = this.deviceCalculations.processData(parsedData.data as V5ParserDataType);
+
+    this.internalBuffer.push(parsedData);
 
     // Check for memory leaks.
     // If the condition if true, something has gone wrong.

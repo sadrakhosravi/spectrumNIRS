@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 // Interfaces
 import { INIRSDevice } from 'reader/Interfaces';
 import type { Socket } from 'socket.io';
-import type { DeviceInfoType } from 'reader/models/Types';
+import type { DeviceInfoType } from 'reader/api/Types';
 
 // Enums / Interfaces
 import { IO_SERVER } from './BeastCommandsEnum,';

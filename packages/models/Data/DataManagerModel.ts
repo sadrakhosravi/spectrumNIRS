@@ -10,10 +10,10 @@ import { ReaderChannels } from '../../utils/channels';
 
 // Types
 import type { IReactionDisposer } from 'mobx';
-import type { DeviceADCDataType } from '../../renderer/reader/models/Types';
+import type { DeviceADCDataType } from '../../renderer/reader/api/Types';
 
 // View Models
-import { chartVM, barChartVM } from '../../viewmodels/VMStore';
+import { chartVM } from '../../viewmodels/VMStore';
 
 export class DataManagerModel {
   private reactions: IReactionDisposer[];
@@ -88,8 +88,8 @@ export class DataManagerModel {
   private streamDeviceDataToCalibration() {
     ipcRenderer.on(ReaderChannels.DEVICE_DATA, (_e, dataArr: DeviceADCDataType[]) => {
       requestAnimationFrame(() => {
-        dataArr.forEach((data) => {
-          barChartVM?.addData(data);
+        dataArr.forEach(() => {
+          // barChartVM?.addData(data);
         });
       });
     });

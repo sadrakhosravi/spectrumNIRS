@@ -3,7 +3,7 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
 // Interfaces
 import type { INIRSDevice } from 'reader/Interfaces';
-import type { DeviceInfoType } from 'reader/models/Types';
+import type { DeviceInfoType } from 'reader/api/Types';
 
 export class V5PhysicalDevice implements INIRSDevice {
   /**

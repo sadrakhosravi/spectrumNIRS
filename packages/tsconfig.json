@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["node"],
+    "types": ["node", "sharedworker"],
 
     "lib": ["ESNext", "dom", "dom.iterable"]
   },

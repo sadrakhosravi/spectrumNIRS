@@ -23,7 +23,6 @@ import type {
   Axis,
   CustomTick,
 } from '@arction/lcjs';
-import type { ChannelDataType } from '../../renderer/reader/models/Types';
 
 // Theme
 import {
@@ -71,14 +70,6 @@ export class BarChartModel {
    * White color for rectangles
    */
   private whiteColor: SolidFill;
-  /**
-   * Previous time stamp used to limit chart updates in milliseconds.
-   */
-  private prevTS: number;
-  /**
-   * The update interval in milliseconds.
-   */
-  private readonly updateIntervalInMS: number;
 
   constructor() {
     this.chart = null;
@@ -92,8 +83,6 @@ export class BarChartModel {
     this.redColor = new SolidFill().setColor(ColorRGBA(242, 67, 79));
     this.blueColor = new SolidFill().setColor(ColorRGBA(42, 171, 240));
     this.whiteColor = new SolidFill().setColor(ColorRGBA(255, 255, 255));
-    this.prevTS = Date.now();
-    this.updateIntervalInMS = 100;
   }
 
   /**
@@ -107,19 +96,15 @@ export class BarChartModel {
 
   /**
    * Adds the data to the series and plots the data on the graph.
-   * @param data Channel Data Type
+   * @param data Channel Data Type as an array of numbers, the first number should be the ambient.
    */
-  public appendData(data: ChannelDataType) {
-    const currTS = Date.now();
-    if (currTS - this.prevTS < this.updateIntervalInMS) return;
-
-    const lastPointIndex = data['led1'].length - 1;
-    const ambient = data['led0'][lastPointIndex];
+  public appendData(data: number[]) {
+    const ambient = data[0];
 
     requestAnimationFrame(() => {
       for (let i = 0; i < this.rectangles.length - 1; i++) {
         // Only plot the last value in the array.
-        const dataPointY = data[`led${i + 1}`][lastPointIndex];
+        const dataPointY = data[i + 1];
 
         // Update rectangle dimensions.
         this.rectangles[i].setDimensions({
@@ -133,8 +118,6 @@ export class BarChartModel {
         ...this.rectangles[this.rectangles.length - 1].getDimensionsPositionAndSize(),
         height: ambient, // Subtract the ambient from the reading
       });
-
-      this.prevTS = currTS;
     });
   }
 

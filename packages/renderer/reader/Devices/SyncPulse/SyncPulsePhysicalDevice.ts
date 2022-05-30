@@ -3,7 +3,7 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
 // Interfaces
 import type { IPhysicalDevice } from 'reader/Interfaces';
-import type { DeviceInfoType } from 'reader/models/Types';
+import type { DeviceInfoType } from 'reader/api/Types';
 
 export class SyncPulsePhysicalDevice implements IPhysicalDevice {
   /**

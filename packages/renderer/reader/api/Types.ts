@@ -1,37 +1,96 @@
 /**
- * Types of events that the device worker module will receive.
+ * Device information object type.
  */
-export enum EventFromDeviceToWorkerEnum {
-  START = 'start',
-  STOP = 'stop',
-  SETTINGS_UPDATE = 'settings_update',
-  GET_DATA = 'get-data',
-}
-
-/**
- * Message data structure that the device worker
- * module will receive from the reader process.
- */
-export type EventFromDeviceToWorkerType = {
-  event: EventFromDeviceToWorkerEnum;
-  data: any;
+export type DeviceInfoType = {
+  id: string;
+  name: string;
+  version: string;
+  numOfPDs: number;
+  numOfLEDs: number;
+  defaultSamplingRate: number;
+  supportedSamplingRate: number[];
+  PDChannelNames: string[];
+  calculatedChannelNames: string[];
+  hasProbeSettings: boolean;
 };
 
 /**
- * Events names that the device worker will send to the reader process.
+ * Device name type used for fetching all device names.
  */
-export enum EventFromWorkerEnum {
-  DEVICE_CONNECTION_STATUS = 'device:connection-status',
-  INPUT_STATUS = 'device:input-status',
-  DEVICE_SPI_DATA = 'device:data-spi',
-  DEVICE_DATA = 'device:data',
-  DEVICE_INFO = 'device:info',
-}
+export type DeviceNameType = {
+  name: string;
+  isActive: boolean;
+};
+
+/// ---------------------------- Spectrum Device Data Types ---------------------------- ///
+
+// Standard data type that spectrum parses each data to.
+type DeviceADCKeyNumbersRange = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+type DeviceADCKeyType = `ADC${DeviceADCKeyNumbersRange}`;
+
+type DeviceChannelKeyNumbersRange =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15
+  | 16
+  | 17
+  | 18;
+type DeviceChannelKeyType = `ch${DeviceChannelKeyNumbersRange}`;
+
+type DeviceChannelDataType0 = Record<'ch0', Int32Array>;
+type DevDeviceChannelKeyType1 = Record<'ADC1', DeviceChannelDataType0>;
+
+export type DeviceChannelDataType = DeviceChannelDataType0 &
+  Partial<Record<DeviceChannelKeyType, Int32Array>>;
+export type DeviceADCDataType = DevDeviceChannelKeyType1 &
+  Partial<Record<DeviceADCKeyType, DeviceChannelDataType>>;
 
 /**
- * The data type sent by the worker threads to the reader process.
+ * The device calculated data type.
  */
-export type EventFromWorkerType = {
-  event: EventFromWorkerEnum;
-  data: any;
+export type DeviceCalculatedDataType = {
+  [key: string]: Float32Array;
 };
+
+/**
+ * The device data along with the meta data added when the packet reached
+ * Spectrum.
+ */
+export type DeviceDataTypeWithMetaData = {
+  data: DeviceADCDataType;
+  calcData?: DeviceCalculatedDataType;
+  metadata: {
+    timestamp: number;
+  };
+};
+
+/**
+ * The device name and its data and metadata
+ */
+export type DeviceNameAndDataType = {
+  deviceName: string;
+  data: DeviceDataTypeWithMetaData;
+};
+
+/**
+ * ADC Device data as a single channel.
+ * Key indices starts with `led` + the `led index`.
+ * @example LED name: 'led0'. LED 0 is the ambient.
+ */
+export type ChannelDataType = {
+  [key: string]: number[];
+};
+
+/// ---------------------------- Spectrum Device Data Types - END ---------------------------- ///

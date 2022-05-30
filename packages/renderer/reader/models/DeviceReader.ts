@@ -34,7 +34,7 @@ export class DeviceReader {
     this.activeDevices = activeDevices;
 
     // Start the loop interval
-    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 50);
+    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 35);
     this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 12000);
 
     this.loopInterval.start();
@@ -54,7 +54,7 @@ export class DeviceReader {
    * Runs the data acquisition loop.
    */
   private handleDataAcquisition() {
-    this.activeDevices.forEach((device) => device.sendGetDataRequest());
+    this.activeDevices.forEach((device) => device.getDeviceData());
   }
 
   /**

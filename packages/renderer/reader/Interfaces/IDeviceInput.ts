@@ -1,5 +1,4 @@
 import { MessageType } from 'reader/Devices/Beast/BeastInput';
-import { BeastCmd } from 'reader/Devices/Beast/BeastCommandsEnum,';
 
 export interface IDeviceInput {
   /**
@@ -8,16 +7,17 @@ export interface IDeviceInput {
   getIsConnected(): boolean;
 
   /**
+   * Sets the device io instance for communication.
+   * Typically this should happen after the device is connected.
+   */
+  setIO(io: any): void;
+
+  /**
    * Sends a command to the Beast firmware.
    * @param command the channel/command name to send.
    * @param message the containing message.
    * @returns boolean if the message was sent of undefined if the socket
    *          is not connected.
    */
-  sendCommand(command: BeastCmd, message: MessageType): boolean | undefined;
-
-  /**
-   * Sends the new settings to the Beast controller
-   */
-  updateSettings(settings: any): boolean;
+  sendCommand(command: string | undefined, message: MessageType): boolean | undefined;
 }

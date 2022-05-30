@@ -12,7 +12,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",
-    "types": ["node"],
+    "types": ["node", "sharedworker"],
     "baseUrl": "./",
     "paths": {
       "/@/*": ["main-ui/*"],

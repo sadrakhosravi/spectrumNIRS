@@ -5,14 +5,13 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 // Models
 import { RecordingModel } from '../../models/Recording/RecordingModel';
 
 // Types
 import type { RecordingType } from '../../models/Recording/RecordingTypes';
-import ServiceManager from '../../services/ServiceManager';
 
 export class RecordingViewModel {
   /**
@@ -66,16 +65,14 @@ export class RecordingViewModel {
    * Retrieves a list of all recordings in the from the database.
    */
   @action public loadAllRecordings = async () => {
-    const data = (await ServiceManager.dbConnection.all(
-      'SELECT * FROM recordings',
-    )) as RecordingType[];
-
-    if (data.length === 0) return; // No recordings found
-
-    runInAction(() => {
-      this.allRecordings = data;
-      this.searchedRec = this.allRecordings;
-    });
+    // const data = (await ServiceManager.dbConnection.all(
+    //   'SELECT * FROM recordings',
+    // )) as RecordingType[];
+    // if (data.length === 0) return; // No recordings found
+    // runInAction(() => {
+    //   this.allRecordings = data;
+    //   this.searchedRec = this.allRecordings;
+    // });
   };
 
   /**

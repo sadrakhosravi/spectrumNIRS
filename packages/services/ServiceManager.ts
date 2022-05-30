@@ -30,10 +30,6 @@ export class ServiceManager {
     this.databaseService = new DatabaseService();
     this.electronStoreService = new ElectronStoreService();
     this.services = [this.databaseService, this.electronStoreService];
-
-    (async () => {
-      await this.init();
-    })();
   }
 
   /**
@@ -53,10 +49,19 @@ export class ServiceManager {
   /**
    * Starts the service manager and all sub services.
    */
-  private async init() {
+  public async init() {
     this.services.forEach(async (service) => await service.initService());
     console.log('initialized');
   }
 }
 
-export default new ServiceManager();
+let serviceManager: ServiceManager;
+
+(async () => {
+  serviceManager = new ServiceManager();
+  await serviceManager.init();
+})();
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+export default serviceManager;

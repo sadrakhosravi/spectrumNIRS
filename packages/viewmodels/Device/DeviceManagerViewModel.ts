@@ -18,8 +18,9 @@ import { DeviceModelProxy } from '../../models/Device/DeviceModelProxy';
 import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 
 // Types
-import type { DeviceNameType, DeviceInfoType } from '../../renderer/reader/models/Types';
+import type { DeviceNameType, DeviceInfoType } from '../../renderer/reader/api/Types';
 import type { IReactionDisposer } from 'mobx';
+import { ReaderChannels } from '../../utils/channels';
 
 export class DeviceManagerViewModel {
   /**
@@ -81,7 +82,23 @@ export class DeviceManagerViewModel {
     this.startTimestamp = Date.now();
 
     // Set the start time stamp on each device.
-    this.activeDevices.forEach((device) => device.setStartTimeStamp(this.startTimestamp));
+    this.activeDevices.forEach((device) => device.start(this.startTimestamp));
+
+    // Send the signal to the reader process.
+    MainWinIPCService.sendToReader(ReaderChannels.START);
+  }
+
+  /**
+   * Stops the device proxy.
+   */
+  public stopRecording() {
+    const stopTimestamp = Date.now();
+
+    // Send the signal to the reader process.
+    MainWinIPCService.sendToReader(ReaderChannels.STOP);
+
+    // Set the start time stamp on each device.
+    this.activeDevices.forEach((device) => device.stop(stopTimestamp));
   }
 
   /**

@@ -7,7 +7,13 @@ import { Toolbar } from './Toolbar';
 
 // Toolbars
 import { CalibrationToolbar } from '/@/views/Calibration';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 export const ToolbarRouter = observer(() => {
-  return <Toolbar>{appRouterVM.route === 'calibration' && <CalibrationToolbar />}</Toolbar>;
+  return (
+    <Toolbar>
+      {(appRouterVM.route === AppNavStatesEnum.CALIBRATION ||
+        appRouterVM.route === AppNavStatesEnum.RECORD) && <CalibrationToolbar />}
+    </Toolbar>
+  );
 });

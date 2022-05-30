@@ -1,7 +1,7 @@
 import { IDeviceParser } from '../../api/device-api';
 
 // Type
-import type { DeviceADCDataType, DeviceDataTypeWithMetaData } from '../../models/Types';
+import type { DeviceADCDataType, DeviceDataTypeWithMetaData } from '../../api/Types';
 
 export type UnpackedDataType = {
   [key: string]: number[];

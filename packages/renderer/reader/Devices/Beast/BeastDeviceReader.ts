@@ -7,6 +7,7 @@
 
 import * as Comlink from 'comlink';
 import Beast from './Beast';
+import { serialize } from 'v8';
 
 // Interfaces
 import type { Socket } from 'socket.io';
@@ -34,16 +35,18 @@ export class BeastDeviceReader implements IDeviceReader {
 
   public readonly gcInterval: AccurateTimer;
   public readonly internalBuffer: DeviceDataTypeWithMetaData[];
+  private dataBuff: Buffer;
 
   constructor() {
     this.device = Beast;
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
-    this.deviceInput = null;
+    this.deviceInput = new this.device.Input();
     this.isDeviceConnected = false;
 
     this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 25 * 1000);
     this.internalBuffer = [];
+    this.dataBuff = Buffer.alloc(8192 * 3);
 
     this.init();
   }
@@ -86,14 +89,6 @@ export class BeastDeviceReader implements IDeviceReader {
     device.on(BeastCmd.SET_VERSION, (version: string) =>
       console.log('Beast Version Received: ' + version),
     );
-
-    setTimeout(() => {
-      this.deviceInput?.updateSettings({
-        LEDValues: [92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 76],
-        numOfLEDs: 15,
-        numOfPDs: 7,
-      });
-    }, 1500);
   }
 
   /**
@@ -103,9 +98,8 @@ export class BeastDeviceReader implements IDeviceReader {
   public handleDeviceSettingsUpdate(settings: any) {
     this.deviceParser.setPDNum(settings.numOfPDs);
 
-    const status = this.deviceInput?.updateSettings(settings);
-    if (!status) return false;
-    return status;
+    // const status = this.deviceInput?.updateSettings(settings);
+    return false;
   }
 
   /**
@@ -129,8 +123,9 @@ export class BeastDeviceReader implements IDeviceReader {
   /**
    * Sends the parsed buffer from the device to the reader process.
    */
-  public getData(): DeviceDataTypeWithMetaData[] {
-    return this.internalBuffer.splice(0);
+  public getData(): Buffer {
+    this.dataBuff = serialize(this.internalBuffer.splice(0));
+    return Comlink.transfer(this.dataBuff, [this.dataBuff.buffer]);
   }
 
   /**
@@ -176,7 +171,9 @@ export class BeastDeviceReader implements IDeviceReader {
 
   // Handle device ADC data.
   public handleDeviceData(data: Buffer) {
-    this.internalBuffer.push(this.deviceParser.processPacket(data));
+    const parsedData = this.deviceParser.processPacket(data);
+
+    this.internalBuffer.push(parsedData);
 
     // Check for memory leaks
     // If the condition is true, something has gone wrong

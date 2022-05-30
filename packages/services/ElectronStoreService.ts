@@ -11,7 +11,7 @@ import { PathChannels } from '../utils/channels';
 
 // Interfaces
 import type { IServices } from './IServicesInterface';
-import type { DeviceInfoType } from '../renderer/reader/models/Types';
+import type { DeviceInfoType } from '../renderer/reader/api/Types';
 
 // Store schemas
 import { schema } from '../main/src/GlobalStore/DeviceStoreSchema';

@@ -130,8 +130,11 @@ export class ChartSeries {
     const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
+    const length = y.length;
     // For each is faster here
-    y.forEach((yVal) => (yVal *= gainVal * deviceCalibFactor));
+    for (let i = 0; i < length; i++) {
+      y[i] = y[i] * gainVal * deviceCalibFactor;
+    }
 
     if (this.lowpassFilter) {
       this.lowpassFilter.multiStep(y, true);

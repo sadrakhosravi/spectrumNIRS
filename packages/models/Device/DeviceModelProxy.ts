@@ -4,7 +4,11 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
+import { ipcRenderer } from 'electron';
+import { deserialize } from 'v8';
 import { action, makeObservable, observable, reaction } from 'mobx';
+
+// Services
 import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 
 export type DeviceSettingsType = {
@@ -13,22 +17,15 @@ export type DeviceSettingsType = {
   LEDValues: number[];
 };
 
-// Services
-// import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
-
 // View Models
-import { appRouterVM, chartVM } from '../../viewmodels/VMStore';
+import { appRouterVM, chartVM, barChartVM } from '../../viewmodels/VMStore';
 
 // Types & Enum
 import type { IReactionDisposer } from 'mobx';
-import type {
-  DeviceDataTypeWithMetaData,
-  DeviceInfoType,
-} from '../../renderer/reader/models/Types';
+import type { DeviceDataTypeWithMetaData, DeviceInfoType } from '../../renderer/reader/api/Types';
 import type { ChartSeries, DashboardChart } from '../Chart';
 import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 import { DeviceChannels } from '../../utils/channels/DeviceChannels';
-import { ipcRenderer } from 'electron';
 
 /**
  * The proxy device model used to synchronize the UI with the
@@ -101,6 +98,10 @@ export class DeviceModelProxy {
    * Used to sync devices with time offset.
    */
   private startTimestamp: number;
+  /**
+   * The stop timestamp.
+   */
+  protected stopTimestamp: number;
 
   constructor(deviceInfo: DeviceInfoType) {
     this.id = deviceInfo.id;
@@ -114,7 +115,7 @@ export class DeviceModelProxy {
     // Observables
     this._activeLEDs = deviceInfo.numOfLEDs;
     this._activePDs = 1;
-    this._selectedPD = 2;
+    this._selectedPD = 1;
     this._samplingRate = deviceInfo.defaultSamplingRate;
 
     this.isConnected = false;
@@ -127,11 +128,11 @@ export class DeviceModelProxy {
 
     // Recording
     this.startTimestamp = Date.now();
+    this.stopTimestamp = 0;
 
     makeObservable(this);
 
     this.handleReactions();
-    this.initListeners();
 
     setTimeout(() => this.createChartChannels(), chartVM.loaded ? 50 : 500);
   }
@@ -233,8 +234,52 @@ export class DeviceModelProxy {
   /**
    * Sets the recording start timestamp.
    */
-  public setStartTimeStamp(timestamp: number) {
+  public start(timestamp: number) {
     this.startTimestamp = timestamp;
+
+    setTimeout(() => {
+      // Listen for calibration data
+      if (appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
+        chartVM.currentView === 'line' &&
+          ipcRenderer.on(
+            DeviceChannels.DEVICE_DATA + this.name,
+            this.handleDeviceDataCalibration.bind(this),
+          );
+
+        chartVM.currentView === 'bar' &&
+          ipcRenderer.on(
+            DeviceChannels.DEVICE_DATA + this.name,
+            this.handleDeviceIntensityCalibrationData.bind(this),
+          );
+      }
+
+      // Listen for calculated data
+      if (appRouterVM.route === AppNavStatesEnum.RECORD) {
+        ipcRenderer.on(
+          DeviceChannels.DEVICE_DATA + this.name,
+          this.handleDeviceDataCalculated.bind(this),
+        );
+      }
+    }, 1);
+  }
+
+  public stop(timestamp: number) {
+    this.stopTimestamp = timestamp;
+
+    ipcRenderer.removeListener(
+      DeviceChannels.DEVICE_DATA + this.name,
+      this.handleDeviceDataCalculated,
+    );
+    ipcRenderer.removeListener(
+      DeviceChannels.DEVICE_DATA + this.name,
+      this.handleDeviceDataCalibration,
+    );
+
+    ipcRenderer.removeListener(
+      DeviceChannels.DEVICE_DATA + this.name,
+      this.handleDeviceIntensityCalibrationData,
+    );
+    ipcRenderer.removeAllListeners(DeviceChannels.DEVICE_DATA + this.name);
   }
 
   /**
@@ -279,24 +324,39 @@ export class DeviceModelProxy {
   }
 
   /**
-   * Initializes all event listeners.
+   * Handles the incoming data from the reader process.
    */
-  private initListeners() {
-    // Listeners
-    setTimeout(() => {
-      ipcRenderer.on(DeviceChannels.DEVICE_DATA + this.name, this.handleDeviceData.bind(this));
-    }, 100);
+  private handleDeviceDataCalculated(_event: Electron.IpcRendererEvent, dataBuffer: Buffer) {
+    const data = deserialize(dataBuffer) as DeviceDataTypeWithMetaData[];
+
+    data.forEach((dataPacket) => {
+      this.calculatedChannelNames.forEach((channel, i) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const channelDataY = dataPacket.calcData[channel];
+        const channelDataX = new Array(channelDataY.length).fill(0);
+        const timestamp = dataPacket.metadata.timestamp;
+
+        for (let i = 0; i < channelDataX.length; i++) {
+          // Assume sampling rate is constant
+          channelDataX[i] = timestamp + i * 10 - this.startTimestamp;
+        }
+
+        this.chartChannels[i].series.addArrayXY(channelDataX, channelDataY);
+      });
+    });
   }
 
   /**
    * Handles the incoming data from the reader process.
    */
-  private handleDeviceData(_event: Electron.IpcRendererEvent, data: DeviceDataTypeWithMetaData[]) {
+  private handleDeviceDataCalibration(_event: Electron.IpcRendererEvent, dataBuffer: Buffer) {
+    const data = deserialize(dataBuffer) as DeviceDataTypeWithMetaData[];
     data.forEach((dataPacket) => {
       this.chartChannels.forEach((channel, i) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const channelDataY = dataPacket.data['ADC1']['ch' + i];
+        const channelDataY = dataPacket.data['ADC' + this.selectedPD]['ch' + i];
         const channelDataX = new Array(channelDataY.length).fill(0);
         const timestamp = dataPacket.metadata.timestamp;
 
@@ -308,6 +368,27 @@ export class DeviceModelProxy {
         channel.series.addArrayXY(channelDataX, channelDataY);
       });
     });
+  }
+
+  private handleDeviceIntensityCalibrationData(
+    _event: Electron.IpcRendererEvent,
+    dataBuffer: Buffer,
+  ) {
+    const data = deserialize(dataBuffer) as DeviceDataTypeWithMetaData[];
+    if (data.length === 0) return;
+
+    const dataPoint: number[] = [];
+    const dataPacket = data[data.length - 1];
+
+    for (const ADC in dataPacket.data) {
+      const channels = Object.keys((dataPacket.data as any)[ADC]);
+
+      channels.forEach((channel) => {
+        const pointPacket = (dataPacket.data as any)[ADC][channel];
+        dataPoint.push(pointPacket[pointPacket.length - 1]);
+      });
+    }
+    barChartVM?.addData(dataPoint);
   }
 
   /**
@@ -339,7 +420,6 @@ export class DeviceModelProxy {
       const ledSlider = document.getElementById('led-intensities-' + i) as HTMLInputElement;
       settings.LEDValues.push(~~ledSlider.value);
     }
-    console.log(settings);
     return settings;
   };
 

@@ -15,7 +15,7 @@ import { IDeviceReader } from '../api/device-api';
 import { DeviceChannels } from '@utils/channels/DeviceChannels';
 
 // Types
-import type { DeviceInfoType } from './Types';
+import type { DeviceInfoType } from '../api/Types';
 import ServiceManager from '../../../services/ServiceManager';
 
 export class DeviceModel {
@@ -140,8 +140,8 @@ export class DeviceModel {
   /**
    * Sends a request to get the data from the worker.
    */
-  public async sendGetDataRequest() {
-    this.wrappedWorker.getData().then((data) => {
+  public async getDeviceData() {
+    this.wrappedWorker.getData().then((data: Buffer) => {
       readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
     });
   }

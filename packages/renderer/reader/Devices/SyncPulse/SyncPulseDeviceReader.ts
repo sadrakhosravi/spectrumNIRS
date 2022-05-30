@@ -23,6 +23,7 @@ import {
 
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
+import { serialize } from 'v8';
 
 export class SyncPulseDeviceReader implements IDeviceReader {
   /**
@@ -30,7 +31,7 @@ export class SyncPulseDeviceReader implements IDeviceReader {
    */
   private device: IDevice;
   private physicalDevice: IPhysicalDevice;
-  private deviceInput: IDeviceInput | null;
+  protected deviceInput: IDeviceInput | null;
   protected deviceParser: IDeviceParser;
   protected isDeviceConnected: boolean;
 
@@ -62,12 +63,9 @@ export class SyncPulseDeviceReader implements IDeviceReader {
    * Sends the updated settings to the device.
    * @param settings
    */
-  public handleDeviceSettingsUpdate(settings: any) {
-    this.deviceParser.setPDNum(settings.numOfPDs);
-
-    const status = this.deviceInput?.updateSettings(settings);
-    if (!status) return false;
-    return status;
+  public handleDeviceSettingsUpdate(_settings: any) {
+    throw new Error('Sync pulse does not have any settings to update!');
+    return false;
   }
 
   /**
@@ -95,8 +93,8 @@ export class SyncPulseDeviceReader implements IDeviceReader {
   /**
    * Sends the parsed buffer from the device to the reader process.
    */
-  public getData(): DeviceDataTypeWithMetaData[] {
-    return this.internalBuffer.splice(0);
+  public getData(): Buffer {
+    return serialize(this.internalBuffer.splice(0));
   }
 
   /**

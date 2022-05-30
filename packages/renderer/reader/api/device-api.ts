@@ -2,12 +2,10 @@ import {
   IPhysicalDevice,
   INIRSDevice,
   IDeviceParser,
-  // IDeviceStream,
   IDeviceInput,
+  IDeviceSettings,
+  IDeviceCalculation,
 } from '../Interfaces';
-
-import type { Socket } from 'socket.io';
-import { EventFromDeviceToWorkerEnum } from './Types';
 
 export type {
   IPhysicalDevice,
@@ -16,24 +14,32 @@ export type {
   IDeviceStream,
   IDeviceInput,
   IDeviceReader,
+  IDeviceCalculation,
+  IDeviceSettings,
 } from '../Interfaces';
 
-export type { DeviceDataTypeWithMetaData, DeviceADCDataType } from '../models/Types';
+export type { DeviceDataTypeWithMetaData, DeviceADCDataType } from './Types';
 
 type Device<I> = new () => I;
-type Input<I> = new (io?: Socket) => I;
+type Input<I> = new (io?: any) => I;
 type Parser<I> = new () => I;
+type Settings<I> = new (
+  physicalDevice: IPhysicalDevice,
+  deviceInput: IDeviceInput,
+  deviceParser: IDeviceParser,
+  deviceCalculation: IDeviceCalculation,
+) => I;
 
 /**
  * The device plugin interface.
  * Each device should export an object containing all the classes implemented.
- * @version 0.1.0
+ * @version 0.2.0
  */
 export interface IDevice {
   Device: Device<INIRSDevice | IPhysicalDevice>;
-  // Stream: IDeviceStream;
   Parser: Parser<IDeviceParser>;
   Input: Input<IDeviceInput>;
+  Settings: Settings<IDeviceSettings>;
 }
 
 /** Device settings type */
@@ -53,10 +59,6 @@ export const sendDataToProcess = (eventName: string, data: any, transfer?: Trans
 /**
  * A function to send messages to the device worker.
  */
-export const sendMessageToDeviceWorker = (
-  worker: Worker,
-  event: EventFromDeviceToWorkerEnum,
-  message?: any,
-) => {
+export const sendMessageToDeviceWorker = (worker: Worker, message?: any) => {
   worker.postMessage({ event, data: message });
 };

@@ -1,56 +1,56 @@
 /*---------------------------------------------------------------------------------------------
  *  Database Service.
- *  SQLITE database connection service.
+ *  Connects to the database shared worker thread using Comlink.
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import Sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-
-// Schema
-import { RecordingTable } from './database/RecordingTable';
+import * as Comlink from 'comlink';
+import { ipcRenderer } from 'electron';
 
 // Interfaces
 import type { IServices } from './IServicesInterface';
-
-// Types
-import type { Database } from 'sqlite';
-import globalPathsModel from '../models/App/GlobalStateModel';
-export type DatabaseConnectionType = Database<Sqlite3.Database, Sqlite3.Statement>;
+import type { DatabaseSharedWorker } from '../sharedWorkers/databaseSharedWorker';
 
 export class DatabaseService implements IServices {
-  dbConnection: DatabaseConnectionType | null;
+  /**
+   * The database worker shared worker instance.
+   */
+  private dbWorker!: SharedWorker;
+
+  dbConnection: Comlink.Remote<DatabaseSharedWorker> | null;
   constructor() {
     this.dbConnection = null;
   }
 
   public get connection() {
-    return this.dbConnection as DatabaseConnectionType;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    return this.dbConnection as DatabaseSharedWorker;
   }
 
   /**
    * Initialize service.
    */
   public initService = async () => {
-    // Create the database or connection instance.
-    this.dbConnection = await open({
-      filename: globalPathsModel.dbFilePath,
-      driver: Sqlite3.Database,
-    });
+    console.log('Shared worker created');
+    this.dbWorker = new SharedWorker(
+      new URL('../sharedWorkers/databaseSharedWorker.ts', import.meta.url),
+      { type: 'module' },
+    );
 
-    // Apply pragmas
-    await this.dbConnection.exec('PRAGMA journal_mode = WAL;');
-    await this.dbConnection.exec('PRAGMA auto_vacuum = INCREMENTAL;');
-    await this.dbConnection.exec('PRAGMA synchronous = normal;');
+    this.dbConnection = Comlink.wrap(this.dbWorker.port);
 
-    // Update Schema
-    await new RecordingTable(this.dbConnection).init();
+    if (process.env.NODE_ENV === 'development') {
+      setTimeout(() => {
+        ipcRenderer.invoke('open-dev-tools');
+      }, 1000);
+    }
   };
 
   /**
    * Shut down service.
    */
   async shutdownService() {
-    this.dbConnection?.close();
+    // this.dbConnection?.close();
   }
 }

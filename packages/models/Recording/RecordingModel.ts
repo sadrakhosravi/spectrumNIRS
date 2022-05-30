@@ -7,11 +7,6 @@
 import { nanoid } from 'nanoid';
 import { observable } from 'mobx';
 
-// Types
-
-// Database Service
-import ServiceManager from '../../services/ServiceManager';
-
 export class RecordingModel {
   /**
    * Unique id of the recording instance.
@@ -90,14 +85,14 @@ export class RecordingModel {
    * Updates the database record.
    */
   private async createDatabaseRecord() {
-    await ServiceManager.dbConnection.run(
-      'INSERT INTO recordings VALUES(?, ?, ?, ?, ?, ?)',
-      this.id,
-      this.name,
-      this.description,
-      this.createdTimestamp,
-      Date.now(),
-      'Testtt',
-    );
+    // await ServiceManager.dbConnection.run(
+    //   'INSERT INTO recordings VALUES(?, ?, ?, ?, ?, ?)',
+    //   this.id,
+    //   this.name,
+    //   this.description,
+    //   this.createdTimestamp,
+    //   Date.now(),
+    //   'Testtt',
+    // );
   }
 }

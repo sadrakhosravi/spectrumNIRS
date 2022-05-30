@@ -1,6 +1,6 @@
 import type { DeviceSettingsType } from '@models/Device/DeviceModelProxy';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
-import type { DeviceDataTypeWithMetaData, DeviceInfoType } from 'reader/models/Types';
+import type { DeviceDataTypeWithMetaData, DeviceInfoType } from 'reader/api/Types';
 
 /**
  * Device reader interface. Each device module should implement this interface.
@@ -54,7 +54,7 @@ export interface IDeviceReader {
    * Calls the `getData()` method on the device parser and emits the
    * device data to the parent process.
    */
-  getData(): DeviceDataTypeWithMetaData[];
+  getData(): Buffer;
 
   /**
    * Listens for device disconnect signal.

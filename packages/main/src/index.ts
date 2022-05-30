@@ -73,6 +73,8 @@ app.on('window-all-closed', () => {
  * Install dev extensions on dev mode only
  */
 if (import.meta.env.DEV) {
+  app.commandLine.appendSwitch('remote-debugging-port', '1919');
+
   app
     .whenReady()
     .then(async () => {

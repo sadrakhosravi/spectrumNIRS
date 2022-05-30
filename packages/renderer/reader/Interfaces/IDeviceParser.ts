@@ -1,6 +1,6 @@
 // import { DeviceADCDataType } from '../models/Types';
 
-import type { DeviceDataTypeWithMetaData } from 'reader/models/Types';
+import type { DeviceDataTypeWithMetaData } from 'reader/api/Types';
 
 export interface IDeviceParser {
   /**
