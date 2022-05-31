@@ -1,7 +1,7 @@
 import { IDeviceParser } from '../../api/device-api';
 
 // Type
-import type { DeviceADCDataType, DeviceDataTypeWithMetaData } from '../../api/Types';
+import type { DeviceDataTypeWithMetaData } from '../../api/Types';
 
 export type UnpackedDataType = {
   [key: string]: number[];
@@ -167,12 +167,8 @@ export class BeastParser implements IDeviceParser {
   private msb_indices: number[];
   private bufferFactor: number;
   private bufferSize: number;
+  private frameSizeInBytes: number;
   private channelsLsbMsb: ChannelsLsbMsbType;
-
-  /**
-   * The parsed result object of Spectrum
-   */
-  private res: BeastParserDataType & DeviceADCDataType;
 
   // private led_num: number;
 
@@ -182,188 +178,190 @@ export class BeastParser implements IDeviceParser {
     this.msb_indices = [13, 11, 9, 7, 5, 3, 1, 15]; // ch1 ch2 ch3 ... led
     this.bufferFactor = 1;
     this.bufferSize = 512 * this.bufferFactor;
+    this.frameSizeInBytes = 8192;
 
     // Channels MSB LSB
     this.channelsLsbMsb = {
       ADC1: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC2: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC3: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC4: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC5: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC6: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC7: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
       ADC8: {
-        lsb: new Int32Array(this.bufferSize),
-        msb: new Int32Array(this.bufferSize),
+        lsb: new Int32Array(this.bufferSize).fill(0),
+        msb: new Int32Array(this.bufferSize).fill(0),
       },
     };
+  }
 
-    // Parsed result obj
-    this.res = {
+  private createResObj(): any {
+    return {
       ADC1: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC2: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC3: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC4: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC5: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC6: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC7: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
       ADC8: {
-        ch0: new Int32Array(this.bufferSize),
-        ch1: new Int32Array(this.bufferSize),
-        ch2: new Int32Array(this.bufferSize),
-        ch3: new Int32Array(this.bufferSize),
-        ch4: new Int32Array(this.bufferSize),
-        ch5: new Int32Array(this.bufferSize),
-        ch6: new Int32Array(this.bufferSize),
-        ch7: new Int32Array(this.bufferSize),
-        ch8: new Int32Array(this.bufferSize),
-        ch9: new Int32Array(this.bufferSize),
-        ch10: new Int32Array(this.bufferSize),
-        ch11: new Int32Array(this.bufferSize),
-        ch12: new Int32Array(this.bufferSize),
-        ch13: new Int32Array(this.bufferSize),
-        ch14: new Int32Array(this.bufferSize),
-        ch15: new Int32Array(this.bufferSize),
+        ch0: [],
+        ch1: [],
+        ch2: [],
+        ch3: [],
+        ch4: [],
+        ch5: [],
+        ch6: [],
+        ch7: [],
+        ch8: [],
+        ch9: [],
+        ch10: [],
+        ch11: [],
+        ch12: [],
+        ch13: [],
+        ch14: [],
+        ch15: [],
       },
     };
   }
@@ -387,15 +385,17 @@ export class BeastParser implements IDeviceParser {
       timestamp: Date.now(),
     };
 
+    // Create a new obj for every packet.
+    const res = this.createResObj();
+
     const data = new Uint8Array(packet);
-    const dataLength = data.length;
     const msbIndicesLength = this.msb_indices.length;
 
     let msbArrIndex = new Array(this.msb_indices.length).fill(0);
     let lsbArrIndex = new Array(this.msb_indices.length).fill(0);
 
     // Loops over the entire array buffer
-    for (let i = 0; i < dataLength; i++) {
+    for (let i = 0; i < this.frameSizeInBytes; i++) {
       // Find MSBs and LSBs
       for (let j = 0; j < msbIndicesLength; j++) {
         const channelIndex = 'ADC' + (j + 1);
@@ -420,9 +420,8 @@ export class BeastParser implements IDeviceParser {
 
     // Bit shifts & data sort
     for (let i = 0; i < 512; i++) {
+      const ledNum = this.channelsLsbMsb['ADC8'].lsb[i];
       for (let j = 0; j < 7; j++) {
-        const ledNum = this.channelsLsbMsb['ADC8'].lsb[i];
-
         const channelIndex = 'ADC' + (j + 1);
 
         let d =
@@ -430,12 +429,12 @@ export class BeastParser implements IDeviceParser {
           (this.channelsLsbMsb[channelIndex as keyof ChannelsLsbMsbType].msb[i] << 8);
         d = (d << 16) >> 16;
 
-        this.res[channelIndex as keyof BeastParserDataType][
+        res[channelIndex as keyof BeastParserDataType][
           `ch${ledNum}` as keyof BeastParserDataType['ADC1']
-        ][i] = d;
+        ].push(d);
       }
     }
 
-    return { data: this.res, metadata };
+    return { data: res, metadata };
   };
 }

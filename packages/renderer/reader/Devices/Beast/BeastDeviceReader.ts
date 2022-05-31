@@ -26,6 +26,7 @@ import AccurateTimer from '@utils/helpers/AccurateTimer';
 
 // Calc
 import BeastCalculation from './calc/BeastCalculation';
+import { BeastParserDataType } from './BeastParser';
 
 export class BeastDeviceReader implements IDeviceReader {
   /**
@@ -61,7 +62,7 @@ export class BeastDeviceReader implements IDeviceReader {
 
     this.isDeviceConnected = false;
 
-    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 25 * 1000);
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 30 * 1000);
     this.internalBuffer = [];
     this.dataBuff = Buffer.alloc(8192 * 3);
 
@@ -80,6 +81,7 @@ export class BeastDeviceReader implements IDeviceReader {
       this.isDeviceConnected = true;
 
       this.deviceInput?.setIO(this.physicalDevice.getDevice() as Socket);
+      this.deviceCalculation.init(this.physicalDevice.getDeviceInfo());
       this.listenForInitialWalkthrough();
       this.listenForDeviceData();
 
@@ -186,7 +188,11 @@ export class BeastDeviceReader implements IDeviceReader {
   // Handle device ADC data.
   public handleDeviceData(data: Buffer) {
     const parsedData = this.deviceParser.processPacket(data);
+    parsedData.calcData = this.deviceCalculation.processData(
+      parsedData.data as BeastParserDataType,
+    );
 
+    // Add the object the internal buff.
     this.internalBuffer.push(parsedData);
 
     // Check for memory leaks

@@ -5,6 +5,7 @@ import { col2, col3 } from './e_coef';
 import type { DeviceCalculatedDataType, DeviceInfoType } from 'reader/api/Types';
 import type { V5ParserDataType } from '../../V5/V5Parser';
 import type { IDeviceCalculation } from 'reader/Interfaces';
+import { BeastParserDataType } from '../BeastParser';
 
 /**
  * Calculations of the V5 device channels
@@ -100,7 +101,7 @@ class BeastCalculation implements IDeviceCalculation {
   public init(deviceInfo: DeviceInfoType) {
     this.LEDIntensities = new Array(deviceInfo.numOfLEDs).fill(0);
     this.calcChannelNames = deviceInfo.calculatedChannelNames;
-    this.PDChannels = deviceInfo.PDChannelNames.length;
+    this.PDChannels = 6;
 
     // Setup the static objects
     this.dataPointArr = new Float32Array(this.PDChannels);
@@ -140,7 +141,7 @@ class BeastCalculation implements IDeviceCalculation {
    * @param data
    * @returns
    */
-  public processData = (data: V5ParserDataType) => {
+  public processData = (data: BeastParserDataType) => {
     // Create an array to store once data point of the batch
 
     // For each batch, go through individual data point and calculate the values
