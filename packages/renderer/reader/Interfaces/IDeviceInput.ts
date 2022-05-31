@@ -19,5 +19,5 @@ export interface IDeviceInput {
    * @returns boolean if the message was sent of undefined if the socket
    *          is not connected.
    */
-  sendCommand(command: string | undefined, message: MessageType): boolean | undefined;
+  sendCommand(command: string | undefined, message: MessageType | any): boolean | undefined;
 }

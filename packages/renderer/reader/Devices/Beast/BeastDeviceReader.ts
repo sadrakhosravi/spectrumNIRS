@@ -17,11 +17,15 @@ import {
   IDeviceParser,
   IDeviceInput,
   IDeviceReader,
+  IDeviceSettings,
   DeviceDataTypeWithMetaData,
   // IDeviceReader,
 } from '../../api/device-api';
 import { BeastCmd } from './BeastCommandsEnum,';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
+
+// Calc
+import BeastCalculation from './calc/BeastCalculation';
 
 export class BeastDeviceReader implements IDeviceReader {
   /**
@@ -31,6 +35,10 @@ export class BeastDeviceReader implements IDeviceReader {
   private physicalDevice: IPhysicalDevice;
   private deviceInput: IDeviceInput | null;
   protected deviceParser: IDeviceParser;
+
+  private deviceCalculation: BeastCalculation;
+  private deviceSettings: IDeviceSettings;
+
   private isDeviceConnected: boolean;
 
   public readonly gcInterval: AccurateTimer;
@@ -42,6 +50,15 @@ export class BeastDeviceReader implements IDeviceReader {
     this.physicalDevice = new this.device.Device();
     this.deviceParser = new this.device.Parser();
     this.deviceInput = new this.device.Input();
+
+    this.deviceCalculation = new BeastCalculation();
+    this.deviceSettings = new this.device.Settings(
+      this.physicalDevice,
+      this.deviceInput,
+      this.deviceParser,
+      this.deviceCalculation,
+    );
+
     this.isDeviceConnected = false;
 
     this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 25 * 1000);
@@ -62,10 +79,7 @@ export class BeastDeviceReader implements IDeviceReader {
       // When the device connects
       this.isDeviceConnected = true;
 
-      // Inform the process
-      // sendDataToProcess(EventFromWorkerEnum.DEVICE_CONNECTION_STATUS, true);
-
-      this.deviceInput = new this.device.Input(this.physicalDevice.getDevice() as Socket);
+      this.deviceInput?.setIO(this.physicalDevice.getDevice() as Socket);
       this.listenForInitialWalkthrough();
       this.listenForDeviceData();
 
@@ -98,7 +112,7 @@ export class BeastDeviceReader implements IDeviceReader {
   public handleDeviceSettingsUpdate(settings: any) {
     this.deviceParser.setPDNum(settings.numOfPDs);
 
-    // const status = this.deviceInput?.updateSettings(settings);
+    this.deviceSettings.updateSettings(settings);
     return false;
   }
 
