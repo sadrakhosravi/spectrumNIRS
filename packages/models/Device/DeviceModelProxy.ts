@@ -367,21 +367,21 @@ export class DeviceModelProxy {
    * Handles the incoming data from the reader process.
    */
   private handleDeviceDataCalibration(event: MessageEvent<Buffer>) {
+    const selectedPD = this.selectedPD;
     const data = deserialize(event.data) as DeviceDataTypeWithMetaData[];
 
-    data.forEach((dataPacket) => {
-      const dataTimestamp = dataPacket.metadata.timestamp;
+    for (let i = 0; i < data.length; i++) {
+      // Get the current packet timestamp.
+      const startTS = data[i].metadata.timestamp - this.startTimestamp;
 
-      // Add data to each series buffer
-      for (let i = 0; i < this.chartChannels.length; i++) {
+      // Add the packet to each chart.
+      for (let j = 0; j < this.chartChannels.length; j++) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
-        const channelDataY = dataPacket.data[('ADC' + this.selectedPD) as any][
-          'ch' + i
-        ] as Int32Array;
-        this.chartChannels[i].series.addArrayY(channelDataY, dataTimestamp - this.startTimestamp);
+        const channelDataY = data[i].data[('ADC' + selectedPD) as any]['ch' + j] as Int32Array;
+        this.chartChannels[j].series.addArrayY(channelDataY, startTS);
       }
-    });
+    }
   }
 
   private handleDeviceIntensityCalibrationData(event: MessageEvent<Buffer>) {

@@ -172,9 +172,11 @@ export class ChartSeries {
       this.lowpassFilter.multiStep(data, true);
     }
 
-    // For is faster here
-    for (let i = 0; i < data.length; i++) {
-      data[i] *= gainVal * deviceCalibFactor;
+    if (gainVal !== 1 && deviceCalibFactor !== 1) {
+      // For is faster here
+      for (let i = 0; i < data.length; i++) {
+        data[i] *= gainVal * deviceCalibFactor;
+      }
     }
 
     this.series.addArrayY(data, this.timeDelta, start);
@@ -232,7 +234,7 @@ export class ChartSeries {
   @action public changeSeriesColor(color: string) {
     this.series.setStrokeStyle(
       new SolidLine({
-        thickness: -1,
+        thickness: 1,
         fillStyle: new SolidFill({ color: ColorHEX(color || '#fff') }),
       }),
     );

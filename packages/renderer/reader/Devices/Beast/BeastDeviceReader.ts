@@ -62,7 +62,7 @@ export class BeastDeviceReader implements IDeviceReader {
 
     this.isDeviceConnected = false;
 
-    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 30 * 1000);
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 45 * 1000);
     this.internalBuffer = [];
     this.dataBuff = Buffer.alloc(8192 * 3);
 

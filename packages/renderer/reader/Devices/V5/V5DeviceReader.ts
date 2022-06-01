@@ -60,7 +60,7 @@ export class V5DeviceReader implements IDeviceReader {
       this.deviceCalculations,
     );
 
-    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 20000);
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 30 * 1000);
 
     this.internalBuffer = [];
     this.dataBuff = Buffer.alloc(411);
