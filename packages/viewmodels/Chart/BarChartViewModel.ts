@@ -32,7 +32,6 @@ export class BarChartViewModel {
    * Adds the ADC data to the chart
    */
   public addData = (data: number[]) => {
-    console.log(data);
     this.model.appendData(data);
   };
 

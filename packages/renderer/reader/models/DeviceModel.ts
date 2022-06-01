@@ -6,17 +6,18 @@
 
 import * as Comlink from 'comlink';
 import { IReactionDisposer, makeObservable, observable } from 'mobx';
-import { readerIPCService } from '../ReaderIPCService';
+// import { readerIPCService } from '../ReaderIPCService';
 
 // Device api
 import { IDeviceReader } from '../api/device-api';
 
 // IPC Channels
-import { DeviceChannels } from '@utils/channels/DeviceChannels';
+// import { DeviceChannels } from '@utils/channels/DeviceChannels';
 
 // Types
 import type { DeviceInfoType } from '../api/Types';
 import ServiceManager from '../../../services/ServiceManager';
+import { ipcRenderer } from 'electron';
 
 export class DeviceModel {
   /**
@@ -52,8 +53,14 @@ export class DeviceModel {
    * Observable reaction disposers
    */
   private reactions: IReactionDisposer[];
-
+  /**
+   * The Comlink wrapped worker instance.
+   */
   wrappedWorker: Comlink.Remote<IDeviceReader>;
+  /**
+   * The message port used to transfer owner ship of the data buffer.
+   */
+  private ports: MessageChannel;
 
   // Constructor
   constructor(name: string, workerURL: URL) {
@@ -74,6 +81,10 @@ export class DeviceModel {
 
     // Reactions
     this.reactions = [];
+
+    // Instead of using IPC that serializes the data again,
+    // transfer ownership of the object to other context using message ports.
+    this.ports = new MessageChannel();
 
     this.init();
   }
@@ -118,6 +129,9 @@ export class DeviceModel {
    * Removes the device and its worker
    */
   public async removeDevice() {
+    this.ports.port1.close();
+    this.ports.port2.close();
+
     await this.wrappedWorker.handleDeviceStop();
 
     // Remove the info to the global state
@@ -141,8 +155,11 @@ export class DeviceModel {
    * Sends a request to get the data from the worker.
    */
   public async getDeviceData() {
-    this.wrappedWorker.getData().then((data: Buffer) => {
-      readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
+    this.wrappedWorker.getData().then((data: Buffer | null) => {
+      if (data === null) return;
+
+      this.ports.port2.postMessage(data, [data.buffer]);
+      // readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
     });
   }
 
@@ -157,9 +174,19 @@ export class DeviceModel {
   /**
    * Attaches worker listeners.
    */
-  private init() {
-    // this.worker.addEventListener('message', this.handleWorkerMessage.bind(this));
-    this.wrappedWorker.getDeviceInfo().then((info) => this.setDeviceInfo(info));
+  private async init() {
+    const info = await this.wrappedWorker.getDeviceInfo();
+
+    // Send device port to the UI thread.
+    ipcRenderer.postMessage('port:handle', info.name, [this.ports.port1]);
+
+    // Start both ports.
+    this.ports.port1.start();
+    this.ports.port2.start();
+
+    setTimeout(() => {
+      this.setDeviceInfo(info);
+    }, 10);
   }
 
   /**

@@ -21,6 +21,13 @@ import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 import type { DeviceNameType, DeviceInfoType } from '../../renderer/reader/api/Types';
 import type { IReactionDisposer } from 'mobx';
 import { ReaderChannels } from '../../utils/channels';
+import { ipcRenderer } from 'electron';
+import { chartVM } from '../VMStore';
+
+export type DevicesMessagePortType = {
+  port: MessagePort;
+  name: string;
+};
 
 export class DeviceManagerViewModel {
   /**
@@ -39,6 +46,7 @@ export class DeviceManagerViewModel {
    * Recording start time stamp or 0.
    */
   private startTimestamp: number;
+  private devicesMessagePort: DevicesMessagePortType[];
 
   constructor() {
     this.availableDevices = [];
@@ -46,6 +54,7 @@ export class DeviceManagerViewModel {
     this.reactions = [];
     this.startTimestamp = 0;
 
+    this.devicesMessagePort = [];
     // States
 
     makeObservable(this);
@@ -86,6 +95,10 @@ export class DeviceManagerViewModel {
 
     // Send the signal to the reader process.
     MainWinIPCService.sendToReader(ReaderChannels.START);
+
+    chartVM.charts.forEach((chart) => chart.series[0].clearData());
+    chartVM.handleRecordingStart();
+    chartVM.charts[0].dashboardChart.chart.getDefaultAxisX().setInterval(0, 30_000);
   }
 
   /**
@@ -99,6 +112,8 @@ export class DeviceManagerViewModel {
 
     // Set the start time stamp on each device.
     this.activeDevices.forEach((device) => device.stop(stopTimestamp));
+
+    chartVM.handleRecordingStop();
   }
 
   /**
@@ -141,10 +156,15 @@ export class DeviceManagerViewModel {
    * Attaches the event listeners.
    */
   private init() {
-    // Listen for device names
+    ipcRenderer.on('device:port', (event, name) => {
+      const port = event.ports[0];
 
-    // Listen for device info (device created)
-    // ipcRenderer.on(DeviceChannels.DEVICE_INFO, this.handleDeviceInfo.bind(this));
+      if (!port)
+        throw new Error('Port is missing from the event object. Something has gone wrong!');
+
+      // Add it to the array.
+      this.devicesMessagePort.push({ port, name });
+    });
 
     // Request all active devices info on initialization.
     this.requestAllActiveDevices();
@@ -154,7 +174,15 @@ export class DeviceManagerViewModel {
    * Creates a device proxy model for the device that was created in the reader process.
    */
   @action private createDeviceProxy(deviceInfo: DeviceInfoType) {
-    const deviceModel = new DeviceModelProxy(deviceInfo);
+    const portIndex = this.devicesMessagePort.findIndex(
+      (devicePort) => devicePort.name === deviceInfo.name,
+    );
+
+    if (portIndex === -1) throw new Error('Device name and device port name mismatch!');
+
+    const port = this.devicesMessagePort.splice(portIndex, 1)[0];
+
+    const deviceModel = new DeviceModelProxy(deviceInfo, port.port);
     this.activeDevices.push(deviceModel);
   }
 
@@ -162,28 +190,8 @@ export class DeviceManagerViewModel {
    * Handle observable reactions.
    */
   private handleReactions() {
-    // Updates device proxy classes based on the device status
-    // const deviceListUpdateDisposer = reaction(
-    //   () => this.availableDevices,
-    //   () => {
-    //     // Check for available device status and delete proxy objects that are still active.
-    //     this.availableDevices.forEach((device) => {
-    //       const deviceIndex = this.activeDevices.findIndex(
-    //         (activeDevice) => activeDevice.name === device.name,
-    //       );
-
-    //       // If the device is still available but is not active remove it from the list
-    //       // and cleanup listeners.
-    //       if (deviceIndex !== -1 && !device.isActive) {
-    //         this.activeDevices[deviceIndex].cleanup();
-    //         this.activeDevices.splice(deviceIndex, 1);
-    //       }
-    //     });
-    //   },
-    // );
-
     // Update active devices based on the global state
-    const test = reaction(
+    const activeDeviceReactionDisposer = reaction(
       () => ServiceManager.store.deviceStore.store.activeDeviceModules,
       () => {
         const devices = ServiceManager.store.deviceStore.store.activeDeviceModules;
@@ -215,6 +223,6 @@ export class DeviceManagerViewModel {
     );
 
     // Add reactions to the trackable array.
-    this.reactions.push(test);
+    this.reactions.push(activeDeviceReactionDisposer);
   }
 }

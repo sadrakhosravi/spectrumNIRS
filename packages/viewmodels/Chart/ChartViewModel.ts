@@ -7,7 +7,6 @@
 import { action, makeObservable, observable, reaction, computed } from 'mobx';
 import { ipcRenderer } from 'electron';
 import ReaderChannels from '../../utils/channels/ReaderChannels';
-import { AxisTickStrategies } from '@arction/lcjs';
 
 // Models
 import { ChartModel } from '../../models/Chart';
@@ -74,6 +73,10 @@ export class ChartViewModel {
    * An array of all the reaction functions for later dispose
    */
   private reactions: IReactionDisposer[];
+  /**
+   * The data draw `requestAnimation` id to cancel.
+   */
+  private dataDrawFrame: number;
 
   constructor() {
     this.model = new ChartModel();
@@ -85,6 +88,7 @@ export class ChartViewModel {
     this.dashboardHeight = `calc(100% - ${this.xAxisHeight})`;
     this.currView = 'line';
     this.chartLoaded = false;
+    this.dataDrawFrame = 0;
     // Make this class observable
     makeObservable(this);
     this.reactions = [];
@@ -135,18 +139,30 @@ export class ChartViewModel {
   }
 
   /**
-   * Does the initial chart setup when the recording has started.
+   * Creates a smooth scrolling animation by pushing max fps.
    */
-  public startCharts() {
-    this.charts.forEach((chart) => {
-      chart.dashboardChart.chart
-        .getDefaultAxisX()
-        .setTickStrategy(AxisTickStrategies.Time, (timeTick) => {
-          const newTick = timeTick.setTimeOrigin(Date.now());
+  public handleRecordingStart() {
+    const allSeries = this.charts.map((chart) => chart.series[0]);
+    let tPrev = performance.now();
 
-          return newTick;
-        });
-    });
+    const streamMoreData = () => {
+      const tNow = performance.now();
+      const tDelta = tNow - tPrev;
+      allSeries.forEach((series) => series.appendData(tDelta));
+
+      tPrev = tNow;
+
+      this.dataDrawFrame = requestAnimationFrame(streamMoreData);
+    };
+
+    streamMoreData();
+  }
+
+  /**
+   * Stops the data draw animation frame.
+   */
+  public handleRecordingStop() {
+    cancelAnimationFrame(this.dataDrawFrame);
   }
 
   /**

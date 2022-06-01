@@ -54,7 +54,7 @@ export interface IDeviceReader {
    * Calls the `getData()` method on the device parser and emits the
    * device data to the parent process.
    */
-  getData(): Buffer;
+  getData(): Buffer | null;
 
   /**
    * Listens for device disconnect signal.

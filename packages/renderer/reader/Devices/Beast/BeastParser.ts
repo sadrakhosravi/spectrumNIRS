@@ -167,7 +167,7 @@ export class BeastParser implements IDeviceParser {
   private msb_indices: number[];
   private bufferFactor: number;
   private bufferSize: number;
-  private frameSizeInBytes: number;
+  protected frameSizeInBytes: number;
   private channelsLsbMsb: ChannelsLsbMsbType;
 
   // private led_num: number;
@@ -389,13 +389,15 @@ export class BeastParser implements IDeviceParser {
     const res = this.createResObj();
 
     const data = new Uint8Array(packet);
+    const dataLength = data.length;
+
     const msbIndicesLength = this.msb_indices.length;
 
     let msbArrIndex = new Array(this.msb_indices.length).fill(0);
     let lsbArrIndex = new Array(this.msb_indices.length).fill(0);
 
     // Loops over the entire array buffer
-    for (let i = 0; i < this.frameSizeInBytes; i++) {
+    for (let i = 0; i < dataLength; i++) {
       // Find MSBs and LSBs
       for (let j = 0; j < msbIndicesLength; j++) {
         const channelIndex = 'ADC' + (j + 1);
@@ -420,8 +422,8 @@ export class BeastParser implements IDeviceParser {
 
     // Bit shifts & data sort
     for (let i = 0; i < 512; i++) {
-      const ledNum = this.channelsLsbMsb['ADC8'].lsb[i];
       for (let j = 0; j < 7; j++) {
+        const ledNum = this.channelsLsbMsb['ADC8'].lsb[i];
         const channelIndex = 'ADC' + (j + 1);
 
         let d =

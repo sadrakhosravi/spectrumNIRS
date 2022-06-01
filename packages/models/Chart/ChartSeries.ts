@@ -38,6 +38,19 @@ export class ChartSeries {
    * Lowpass filter instance or none.
    */
   @observable private lowpassFilter: Filter | null;
+  /**
+   * The sampling rate of the device controlling this series.
+   */
+  private samplingRate: number;
+  /**
+   * The internal buffer of the data to be appended to the chart.
+   * The first index contains X values array that will be matched with the second index that contains
+   * the Y values array.
+   */
+  public dataBuffX: number[];
+  public dataBuffY: number[];
+  newDataModulus: number;
+  newDataPointsCount: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -46,6 +59,15 @@ export class ChartSeries {
     this.seriesColor = seriesColor;
     this.seriesGainVal = 1;
     this.lowpassFilter = null;
+
+    this.dataBuffX = [];
+    this.dataBuffY = [];
+
+    this.samplingRate = 100;
+
+    // Variables used for appending data calculation
+    this.newDataPointsCount = 0;
+    this.newDataModulus = 0;
 
     this.setLineSeriesStrokeStyle();
     this.setSeriesCleaning(30 * 1000);
@@ -79,6 +101,33 @@ export class ChartSeries {
    */
   public getChartId() {
     return this.chartId;
+  }
+
+  /**
+   * The sampling rate of the device controlling the series.
+   */
+  public get seriesSamplingRate() {
+    return this.samplingRate;
+  }
+
+  /**
+   * Appends data to the internal series data buffer to the plotted.
+   */
+  public addData(x: number[], y: number[]) {
+    this.dataBuffX = this.dataBuffX.concat(x);
+    this.dataBuffY = this.dataBuffY.concat(y);
+  }
+
+  /**
+   * Check for the incoming data points and append the internal buffer smoothly.
+   */
+  public appendData(tDelta: number) {
+    // The number of new data points to be added
+    this.newDataPointsCount = this.samplingRate * (tDelta / 1000) + this.newDataModulus;
+    this.newDataModulus = this.newDataPointsCount % 1;
+    this.newDataPointsCount = Math.floor(this.newDataPointsCount);
+
+    this.addArrayXY(this.dataBuffX, this.dataBuffY);
   }
 
   /**
@@ -140,7 +189,10 @@ export class ChartSeries {
       this.lowpassFilter.multiStep(y, true);
     }
 
-    this.series.addArraysXY(x, y);
+    this.series.addArraysXY(
+      (x as number[]).splice(0, this.newDataPointsCount),
+      (y as number[]).splice(0, this.newDataPointsCount),
+    );
   }
 
   /**
@@ -156,6 +208,13 @@ export class ChartSeries {
     data.y *= gainVal * deviceCalibFactor;
 
     this.series.add(data);
+  }
+
+  /**
+   * Clears the series and remove all data points.
+   */
+  public clearData() {
+    this.series.clear();
   }
 
   /**

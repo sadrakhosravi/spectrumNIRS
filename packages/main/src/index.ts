@@ -11,6 +11,7 @@ import { IPCService } from './ipcService';
 import { GlobalStore } from './GlobalStore';
 
 import { RegisterGlobalShortcuts } from './Menu/RegisterGlobalShortcuts';
+import { MessagePortManager } from './MessagePortManager/MessagePortManager';
 
 // Expose the garbage collector
 // Only should be used in edge cases by calling global.gc()
@@ -67,6 +68,9 @@ app.on('window-all-closed', () => {
 
   // Start the IPC service
   new IPCService(renderers);
+
+  // Start Port manager
+  new MessagePortManager();
 })();
 
 /**

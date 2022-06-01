@@ -71,7 +71,7 @@ class V5Calculation implements IDeviceCalculation {
     this.wavelengths = new Uint16Array([950, 730, 810, 850, 650]);
     this.c_beta = new Float32Array([-1.2132, -0.0728, 1.8103, 1.1433, -11.5816]);
 
-    this.BATCH_SIZE = 1;
+    this.BATCH_SIZE = 10;
     this.PDChannels = 1;
 
     // Do the initial coefficient calculations.

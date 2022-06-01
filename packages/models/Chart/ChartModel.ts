@@ -68,14 +68,9 @@ export class ChartModel {
       numberOfColumns: 1,
       numberOfRows: this.maxRowCount,
       disableAnimations: true,
-      maxFps: 30,
+      maxFps: 24,
       container: chartContainerId,
       theme: spectrumTheme,
-      lineAntiAlias: true,
-      antialias: true,
-      webgl: {
-        version: 'webgl2',
-      },
     });
     this.applyDashboardDefaults();
     return this.dashboard;
