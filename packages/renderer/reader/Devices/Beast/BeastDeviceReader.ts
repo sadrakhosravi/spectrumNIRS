@@ -139,7 +139,8 @@ export class BeastDeviceReader implements IDeviceReader {
   /**
    * Sends the parsed buffer from the device to the reader process.
    */
-  public getData(): Buffer {
+  public getData(): Buffer | null {
+    if (this.internalBuffer.length === 0) return null;
     this.dataBuff = serialize(this.internalBuffer.splice(0));
     return Comlink.transfer(this.dataBuff, [this.dataBuff.buffer]);
   }

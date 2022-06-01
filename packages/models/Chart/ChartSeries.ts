@@ -42,15 +42,11 @@ export class ChartSeries {
    * The sampling rate of the device controlling this series.
    */
   private samplingRate: number;
-  /**
-   * The internal buffer of the data to be appended to the chart.
-   * The first index contains X values array that will be matched with the second index that contains
-   * the Y values array.
-   */
-  public dataBuffX: number[];
+
   public dataBuffY: number[];
   newDataModulus: number;
   newDataPointsCount: number;
+  timeDelta: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -60,10 +56,10 @@ export class ChartSeries {
     this.seriesGainVal = 1;
     this.lowpassFilter = null;
 
-    this.dataBuffX = [];
     this.dataBuffY = [];
 
     this.samplingRate = 100;
+    this.timeDelta = 1000 / this.samplingRate;
 
     // Variables used for appending data calculation
     this.newDataPointsCount = 0;
@@ -97,13 +93,6 @@ export class ChartSeries {
   }
 
   /**
-   * @returns the parent chart's unique id
-   */
-  public getChartId() {
-    return this.chartId;
-  }
-
-  /**
    * The sampling rate of the device controlling the series.
    */
   public get seriesSamplingRate() {
@@ -111,11 +100,28 @@ export class ChartSeries {
   }
 
   /**
+   * @returns the parent chart's unique id
+   */
+  public getChartId() {
+    return this.chartId;
+  }
+
+  /**
+   * Sets the series sampling rate.
+   */
+  public setSeriesSamplingRate(samplingRate: number) {
+    this.samplingRate = samplingRate;
+
+    // Update time delta too
+    this.timeDelta = 1000 / this.samplingRate;
+  }
+
+  /**
    * Appends data to the internal series data buffer to the plotted.
    */
-  public addData(x: number[], y: number[]) {
-    this.dataBuffX = this.dataBuffX.concat(x);
-    this.dataBuffY = this.dataBuffY.concat(y);
+  public addData(y: number[]) {
+    // this.dataBuffY = this.dataBuffY.concat(y);
+    this.addArrayY(y, 10);
   }
 
   /**
@@ -127,7 +133,7 @@ export class ChartSeries {
     this.newDataModulus = this.newDataPointsCount % 1;
     this.newDataPointsCount = Math.floor(this.newDataPointsCount);
 
-    this.addArrayXY(this.dataBuffX, this.dataBuffY);
+    this.addArrayY(this.dataBuffY, this.timeDelta);
   }
 
   /**
@@ -158,7 +164,7 @@ export class ChartSeries {
   /**
    * Applies the gain value and adds Array of the data to the series.
    */
-  public addArrayY(data: Float32Array | Int32Array | number[], step?: number) {
+  public addArrayY(data: Float32Array | Int32Array | number[], start: number) {
     const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
@@ -166,10 +172,12 @@ export class ChartSeries {
       this.lowpassFilter.multiStep(data, true);
     }
 
-    // For each is faster here
-    data.forEach((point) => (point *= gainVal * deviceCalibFactor));
+    // For is faster here
+    for (let i = 0; i < data.length; i++) {
+      data[i] *= gainVal * deviceCalibFactor;
+    }
 
-    this.series.addArrayY(data, step);
+    this.series.addArrayY(data, this.timeDelta, start);
   }
 
   /**
@@ -246,7 +254,7 @@ export class ChartSeries {
     const data = XYDataGenerator.staticData(30 * 1000);
     data.then((dp) => {
       const arrY = dp.map((point) => point.y);
-      this.addArrayY(arrY);
+      this.addArrayY(arrY, 10);
     });
   }
 

@@ -317,6 +317,9 @@ export class DeviceModelProxy {
         const chart = chartVM.addChart();
         const series = chartVM.addSeries(chart.id, channelName);
 
+        series.setSeriesCleaning(360 * this.samplingRate);
+        series.setSeriesSamplingRate(this.samplingRate);
+
         this.chartChannels.push({ chart, series });
       });
     }
@@ -355,7 +358,7 @@ export class DeviceModelProxy {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const channelDataY = Array.from(dataPacket.calcData[channel]);
-        this.chartChannels[i].series.addData(channelDataX, Array.from(channelDataY));
+        this.chartChannels[i].series.addData(Array.from(channelDataY));
       });
     });
   }
@@ -365,27 +368,19 @@ export class DeviceModelProxy {
    */
   private handleDeviceDataCalibration(event: MessageEvent<Buffer>) {
     const data = deserialize(event.data) as DeviceDataTypeWithMetaData[];
-    const dataLength = data[0].data.ADC1.ch0.length;
 
     data.forEach((dataPacket) => {
-      // Calculate the X time for each sample
-      const channelDataX = new Array(dataLength).fill(0);
       const dataTimestamp = dataPacket.metadata.timestamp;
 
-      for (let i = 0; i < channelDataX.length; i++) {
-        // Assume sampling rate is constant
-        channelDataX[i] = dataTimestamp + this.timeDelta * i - this.startTimestamp;
-      }
-
-      // // Add data to each series buffer
-      this.chartChannels.forEach((channel, i) => {
+      // Add data to each series buffer
+      for (let i = 0; i < this.chartChannels.length; i++) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        //@ts-ignore
         const channelDataY = dataPacket.data[('ADC' + this.selectedPD) as any][
           'ch' + i
-        ] as number[];
-        channel.series.addData(channelDataX, Array.from(channelDataY));
-      });
+        ] as Int32Array;
+        this.chartChannels[i].series.addArrayY(channelDataY, dataTimestamp - this.startTimestamp);
+      }
     });
   }
 

@@ -267,6 +267,7 @@ export class DashboardChart {
       // .setScrollStrategy(undefined)
       .setScrollStrategy(AxisScrollStrategies.fitting)
       .setNibStyle(emptyLine)
+      .disableAnimations()
       .setThickness(65)
       .setStrokeStyle(
         new SolidLine({

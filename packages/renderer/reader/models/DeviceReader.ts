@@ -11,6 +11,7 @@ import type { DeviceModel } from './DeviceModel';
 export class DeviceReader {
   /**
    * The active devices reference from the device manager model.
+   *
    */
   private activeDevices!: DeviceModel[];
   /**
@@ -34,7 +35,7 @@ export class DeviceReader {
     this.activeDevices = activeDevices;
 
     // Start the loop interval
-    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 35);
+    this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 100);
     this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 60 * 1000);
 
     this.loopInterval.start();
