@@ -182,6 +182,41 @@ export class DashboardChart {
     return chartSeries;
   }
 
+  public removeGridLines() {
+    const [axisX, axisY] = this.chart.getDefaultAxes();
+
+    axisX
+      .setTickStrategy(AxisTickStrategies.Time, (ticks) =>
+        ticks
+          .setMajorTickStyle((majorTick: VisibleTicks) =>
+            majorTick.setLabelFillStyle(hiddenLabelStyle).setGridStrokeStyle(emptyLine),
+          )
+          .setMinorTickStyle((minorTick: VisibleTicks) =>
+            minorTick.setLabelFillStyle(hiddenLabelStyle).setGridStrokeStyle(emptyLine),
+          ),
+      )
+      .setThickness(0)
+      .setStrokeStyle(emptyLine)
+      .setMouseInteractions(false);
+
+    axisY.setTickStrategy(AxisTickStrategies.Numeric, (ticks) =>
+      ticks
+        .setMajorTickStyle((majorTickStyle) =>
+          majorTickStyle
+            .setTickLength(5)
+            .setGridStrokeStyle(emptyLine)
+            .setLabelFont(fontStyle)
+            .setLabelFillStyle(fontFillStyle),
+        )
+        .setMinorTickStyle((minorTick: VisibleTicks) =>
+          minorTick
+            .setGridStrokeStyle(emptyLine)
+            .setLabelFont(fontStyle)
+            .setLabelFillStyle(fontFillStyle),
+        ),
+    );
+  }
+
   /**
    * Hides the chart axes to not overlap with other charts
    * while maximizing charts

@@ -3,14 +3,6 @@
 
 $container-size: 40px;
 
-.XAxisContainer {
-  background: #0a0a0a;
-  width: 100%;
-  height: $container-size;
-  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
-  display: flex;
-}
-
 .XAxisLeft {
   padding: $gap-sm;
   width: 180px;

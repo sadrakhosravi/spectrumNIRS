@@ -98,6 +98,9 @@ export class BeastDeviceSettings implements IDeviceSettings {
     const formattedSettings = this.parseSettings(settings);
     const status = this.deviceInput?.sendCommand(BeastCmd.SET_SETTINGS, formattedSettings);
 
+    this.deviceCalculation.setLEDIntensities &&
+      this.deviceCalculation.setLEDIntensities(settings.LEDValues);
+
     return status ? true : false;
   }
 

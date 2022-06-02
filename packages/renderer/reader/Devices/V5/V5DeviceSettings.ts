@@ -113,7 +113,7 @@ export class V5DeviceSettings implements IDeviceSettings {
 
     // Update the intensities of the calculation class.
     this.deviceCalculation?.setLEDIntensities &&
-      this.deviceCalculation.setLEDIntensities(this.ledIntensities);
+      this.deviceCalculation.setLEDIntensities(toJS(this.ledIntensities));
 
     const formattedSettings = this.parseSettings(settings.LEDValues);
 

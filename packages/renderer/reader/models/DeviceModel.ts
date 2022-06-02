@@ -126,6 +126,11 @@ export class DeviceModel {
   }
 
   /**
+   * @returns the device message port instance.
+   */
+  public getDevicePort() {}
+
+  /**
    * Removes the device and its worker
    */
   public async removeDevice() {

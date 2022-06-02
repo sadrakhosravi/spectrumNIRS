@@ -165,7 +165,6 @@ export class V5DeviceReader implements IDeviceReader {
   public handleDeviceData(data: Buffer) {
     const parsedData = this.deviceParser.processPacket(data);
     parsedData.calcData = this.deviceCalculations.processData(parsedData.data as V5ParserDataType);
-
     this.internalBuffer.push(parsedData);
 
     // Check for memory leaks.

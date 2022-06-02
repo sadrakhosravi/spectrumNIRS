@@ -110,14 +110,12 @@ export class DeviceModelProxy {
    * The stop timestamp.
    */
   protected stopTimestamp: number;
-  /**
-   * The time delta between each samples of the device data.
-   */
-  private timeDelta: number;
 
   constructor(deviceInfo: DeviceInfoType, devicePort: MessagePort) {
     this.id = deviceInfo.id;
+
     this.devicePort = devicePort;
+    this.devicePort.start();
 
     this.name = deviceInfo.name;
     this.LEDs = new Array(deviceInfo.numOfLEDs).fill(0).map((_, i) => (_ = i + 1));
@@ -143,10 +141,6 @@ export class DeviceModelProxy {
     // Recording
     this.startTimestamp = Date.now();
     this.stopTimestamp = 0;
-
-    this.timeDelta = 1000 / this._samplingRate; // 1000 MS divided by the sampling rate
-
-    console.log(this.timeDelta);
 
     makeObservable(this);
 
@@ -255,40 +249,31 @@ export class DeviceModelProxy {
   public start(timestamp: number) {
     this.startTimestamp = timestamp;
 
-    setTimeout(() => {
-      // Listen for calibration data
-      if (appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
-        chartVM.currentView === 'line' &&
-          this.devicePort.addEventListener('message', this.handleDeviceDataCalibration.bind(this));
+    // Listen for calibration data
+    if (appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
+      console.log('CALIBRATION');
+      chartVM.currentView === 'line' &&
+        this.devicePort.addEventListener('message', this.handleDeviceDataCalibration);
 
-        chartVM.currentView === 'bar' &&
-          this.devicePort.addEventListener(
-            'message',
-            this.handleDeviceIntensityCalibrationData.bind(this),
-          );
-      }
+      chartVM.currentView === 'bar' &&
+        this.devicePort.addEventListener('message', this.handleDeviceIntensityCalibrationData);
+    }
 
-      // Listen for calculated data
-      if (appRouterVM.route === AppNavStatesEnum.RECORD) {
-        this.devicePort.addEventListener('message', this.handleDeviceDataCalculated.bind(this));
-      }
+    // Listen for calculated data
+    if (appRouterVM.route === AppNavStatesEnum.RECORD) {
+      console.log('CALCULATION');
 
-      this.devicePort.start();
-    }, 1);
+      this.devicePort.addEventListener('message', this.handleDeviceDataCalculated);
+    }
   }
 
   public stop(timestamp: number) {
     this.stopTimestamp = timestamp;
 
     // Remove listeners
-    this.devicePort.removeEventListener('message', this.handleDeviceDataCalibration.bind(this));
-
-    this.devicePort.removeEventListener(
-      'message',
-      this.handleDeviceIntensityCalibrationData.bind(this),
-    );
-
-    this.devicePort.removeEventListener('message', this.handleDeviceDataCalculated.bind(this));
+    this.devicePort.removeEventListener('message', this.handleDeviceDataCalibration);
+    this.devicePort.removeEventListener('message', this.handleDeviceDataCalculated);
+    this.devicePort.removeEventListener('message', this.handleDeviceIntensityCalibrationData);
   }
 
   /**
@@ -315,14 +300,17 @@ export class DeviceModelProxy {
       // Add chart channels
       this.calculatedChannelNames.forEach((channelName) => {
         const chart = chartVM.addChart();
+        chart.removeGridLines();
         const series = chartVM.addSeries(chart.id, channelName);
-
-        series.setSeriesCleaning(360 * this.samplingRate);
-        series.setSeriesSamplingRate(this.samplingRate);
-
         this.chartChannels.push({ chart, series });
       });
     }
+
+    // Set the series sampling rate
+    this.chartChannels.forEach((channel) => {
+      channel.series.setSeriesCleaning(360 * this.samplingRate);
+      channel.series.setSeriesSamplingRate(this.samplingRate);
+    });
   }
 
   /**
@@ -338,56 +326,54 @@ export class DeviceModelProxy {
   /**
    * Handles the incoming data from the reader process.
    */
-  private handleDeviceDataCalculated(event: MessageEvent<Buffer>) {
+  private handleDeviceDataCalculated = (event: MessageEvent<Buffer>) => {
     const data = deserialize(event.data) as DeviceDataTypeWithMetaData[];
-    const dataLength = (data[0].calcData as DeviceCalculatedDataType)[
-      this.calculatedChannelNames[0]
-    ].length;
+    console.log('calculated');
 
-    data.forEach((dataPacket) => {
-      // Calculate the X time for each sample
-      const channelDataX = new Array(dataLength).fill(0);
-      const dataTimestamp = dataPacket.metadata.timestamp;
+    requestAnimationFrame(() => {
+      for (let i = 0; i < data.length; i++) {
+        // Get the current packet timestamp.
+        const startTS = data[i].metadata.timestamp - this.startTimestamp;
 
-      for (let i = 0; i < channelDataX.length; i++) {
-        // Assume sampling rate is constant
-        channelDataX[i] = dataTimestamp + this.timeDelta * i - this.startTimestamp;
+        // Add the packet to each chart.
+        for (let j = 0; j < this.calculatedChannelNames.length; j++) {
+          const channelDataY = (data[i].calcData as DeviceCalculatedDataType)[
+            this.calculatedChannelNames[j]
+          ];
+          this.chartChannels[j].series.addArrayY(channelDataY, startTS);
+        }
       }
-
-      this.calculatedChannelNames.forEach((channel, i) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const channelDataY = Array.from(dataPacket.calcData[channel]);
-        this.chartChannels[i].series.addData(Array.from(channelDataY));
-      });
     });
-  }
+  };
 
   /**
    * Handles the incoming data from the reader process.
    */
-  private handleDeviceDataCalibration(event: MessageEvent<Buffer>) {
+  private handleDeviceDataCalibration = (event: MessageEvent<Buffer>) => {
     const selectedPD = this.selectedPD;
     const data = deserialize(event.data) as DeviceDataTypeWithMetaData[];
+    console.log('calibration');
 
-    for (let i = 0; i < data.length; i++) {
-      // Get the current packet timestamp.
-      const startTS = data[i].metadata.timestamp - this.startTimestamp;
+    requestAnimationFrame(() => {
+      for (let i = 0; i < data.length; i++) {
+        // Get the current packet timestamp.
+        const startTS = data[i].metadata.timestamp - this.startTimestamp;
 
-      // Add the packet to each chart.
-      for (let j = 0; j < this.chartChannels.length; j++) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        const channelDataY = data[i].data[('ADC' + selectedPD) as any]['ch' + j] as Int32Array;
-        this.chartChannels[j].series.addArrayY(channelDataY, startTS);
+        // Add the packet to each chart.
+        for (let j = 0; j < this.chartChannels.length; j++) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-ignore
+          const channelDataY = data[i].data[('ADC' + selectedPD) as any]['ch' + j] as Int32Array;
+          this.chartChannels[j].series.addArrayY(channelDataY, startTS);
+        }
       }
-    }
-  }
+    });
+  };
 
-  private handleDeviceIntensityCalibrationData(event: MessageEvent<Buffer>) {
+  private handleDeviceIntensityCalibrationData = (event: MessageEvent<Buffer>) => {
     const deviceData = deserialize(event.data) as DeviceDataTypeWithMetaData[];
     if (event.data.length === 0) return;
-
+    console.log('intensities');
     const dataPoint: number[] = [];
     const dataPacket = deviceData[deviceData.length - 1];
 
@@ -400,7 +386,7 @@ export class DeviceModelProxy {
       });
     }
     barChartVM?.addData(dataPoint);
-  }
+  };
 
   /**
    * Sends the new device settings to the reader process.
@@ -494,6 +480,7 @@ export class DeviceModelProxy {
     this.reactions.length = 0;
     this.disposeChartChannels();
 
+    this.stop(0);
     this.devicePort.close();
   }
 }

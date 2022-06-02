@@ -67,10 +67,11 @@ export class ChartModel {
     this.dashboard = lcjs().Dashboard({
       numberOfColumns: 1,
       numberOfRows: this.maxRowCount,
-      maxFps: 18,
+      maxFps: 30,
       container: chartContainerId,
       theme: spectrumTheme,
       antialias: true,
+      lineAntiAlias: true,
     });
     this.applyDashboardDefaults();
     return this.dashboard;

@@ -8,7 +8,9 @@ import { CalibrationWidgets } from './CalibrationWidgets';
 export const WidgetsRouter = observer(() => {
   return (
     <div style={{ paddingRight: '20px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {appRouterVM.route === 'calibration' && <CalibrationWidgets />}
+      {(appRouterVM.route === 'calibration' || appRouterVM.route === 'record') && (
+        <CalibrationWidgets />
+      )}
     </div>
   );
 });

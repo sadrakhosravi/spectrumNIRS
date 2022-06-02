@@ -155,11 +155,9 @@ class V5Calculation implements IDeviceCalculation {
       this.calcDataRes['O2Hb'][i] = this.hemodynamicsArr[0];
       this.calcDataRes['HHb'][i] = this.hemodynamicsArr[1];
       this.calcDataRes['THb'][i] = this.hemodynamicsArr[2];
-
-      // const dataArray = this.calcHemodynamics(data[i].ADC1);
-      // dataArray[dataArray.length - 1] = this.calcTOI(data[i].ADC1);
-      // calculatedData[i] = dataArray;
+      this.calcDataRes['TOI'][i] = this.calcTOI(this.dataPointArr);
     }
+
     return this.calcDataRes;
   };
 
@@ -245,21 +243,21 @@ class V5Calculation implements IDeviceCalculation {
    * Calculates the Tissue Oxygenation Index from the intensities and raw PD (ADC) values
    * @returns the TOI calculated from the intensities and raw PD (ADC) values from the sensor
    */
-  protected calcTOI = (rawPDValues: number[]) => {
+  protected calcTOI = (sample: Float32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (this.LEDIntensities[0] / 255) * 4095,
-      (this.LEDIntensities[1] / 255) * 4095,
-      (this.LEDIntensities[3] / 255) * 4095,
-      (this.LEDIntensities[4] / 255) * 4095,
+      (this.LEDIntensities[0] / 255) * 4096,
+      (this.LEDIntensities[1] / 255) * 4096,
+      (this.LEDIntensities[3] / 255) * 4096,
+      (this.LEDIntensities[4] / 255) * 4096,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here
     const L_coefreq = new Float32Array([
-      rawPDValues[0] / rawPDValues[2],
-      rawPDValues[1] / rawPDValues[2],
-      rawPDValues[3] / rawPDValues[2],
-      rawPDValues[4] / rawPDValues[2],
+      sample[1] / sample[3],
+      sample[2] / sample[3],
+      sample[4] / sample[3],
+      sample[5] / sample[3],
     ]);
 
     // Create an array of size: number of LEDs and fill it with 1.0
@@ -277,11 +275,7 @@ class V5Calculation implements IDeviceCalculation {
     }
 
     // Take the absolute value and multiply by 100 to get a positive percentage
-    TOI = Math.abs(TOI) * 100;
-    if (!TOI || TOI === Infinity) TOI = 0;
-
-    // FIXME: Fix TOI Coefficients
-    TOI = TOI / 2.25;
+    TOI = TOI * 100;
 
     return TOI;
   };

@@ -3,6 +3,7 @@
 
 $x-axis-height: 40px;
 $sensor-info-width: 30px;
+$container-size: 40px;
 
 .ChartContainer {
   position: absolute;
@@ -11,6 +12,14 @@ $sensor-info-width: 30px;
   width: 100%;
   height: calc(100% - $size-toolbar);
   background-color: #0a0a0a;
+}
+
+.XAxisContainer {
+  background: #0a0a0a;
+  width: 100%;
+  height: $container-size;
+  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
+  display: flex;
 }
 
 .ChartAreaContainer {

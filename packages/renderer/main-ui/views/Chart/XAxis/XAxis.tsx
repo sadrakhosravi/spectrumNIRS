@@ -41,7 +41,7 @@ export const XAxis = observer(() => {
   }, [chartVM.parentContainerStyle]);
 
   return (
-    <div className={styles.XAxisContainer}>
+    <>
       <div className={styles.XAxisLeft}>
         <span>Time Div</span>
         <Listbox options={xAxisVM.divisions} value={xAxisVM.timeDiv} setter={xAxisVM.setTimeDiv} />
@@ -53,6 +53,6 @@ export const XAxis = observer(() => {
         />
       </div>
       <div id={xAxisContainerId} className={styles.XAxisRight}></div>
-    </div>
+    </>
   );
 });

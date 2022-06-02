@@ -55,9 +55,16 @@ export const ChartView = observer(() => {
       <div className={styles.ChartContainer}>
         {chartVM.currentView === 'bar' && <div className={styles.ChartBarView} id={barChartId} />}
         <span style={{ visibility: chartVM.currentView === 'line' ? 'visible' : 'hidden' }}>
+          <div className={styles.XAxisContainer}>
+            {chartVM.charts.length > 0 && (
+              <>
+                <XAxis />
+              </>
+            )}
+          </div>
+
           {chartVM.charts.length > 0 && (
             <>
-              <XAxis />
               <SensorInfo />
             </>
           )}
