@@ -73,7 +73,7 @@ class BeastCalculation implements IDeviceCalculation {
     this.c_beta = new Float32Array([-1.2132, -0.0728, 1.8103, 1.1433, -11.5816]);
 
     this.BATCH_SIZE = 32;
-    this.PDChannels = 1;
+    this.PDChannels = 16;
 
     // Do the initial coefficient calculations.
     this.waveIndex = this.calcWaveIndex();
@@ -121,8 +121,9 @@ class BeastCalculation implements IDeviceCalculation {
    * Sets the updated LED intensities of the device used for TOI calculation.
    */
   public setLEDIntensities(LEDIntensities: number[]) {
-    if (LEDIntensities.length !== this.PDChannels - 1)
-      throw new Error('The supplied LED intensities are not in the correct format for V5.');
+    console.log(LEDIntensities);
+    if (LEDIntensities.length !== 16)
+      throw new Error('The supplied LED intensities are not in the correct format for Beast.');
     this.LEDIntensities = LEDIntensities;
   }
 
@@ -146,7 +147,7 @@ class BeastCalculation implements IDeviceCalculation {
     for (let i = 0; i < this.BATCH_SIZE; i += 1) {
       // Put one sample from the hardware into the dataPoint array.
       for (let j = 0; j < this.PDChannels; j++) {
-        this.dataPointArr[j] = data.ADC1[('ch' + j) as keyof V5ParserDataType['ADC1']][i];
+        this.dataPointArr[j] = data.ADC3[('ch' + j) as keyof V5ParserDataType['ADC1']][i];
       }
 
       // Calculate that sample.
@@ -244,10 +245,10 @@ class BeastCalculation implements IDeviceCalculation {
   protected calcTOI = (sample: Float32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (this.LEDIntensities[0] / 255) * 4096,
-      (this.LEDIntensities[1] / 255) * 4096,
-      (this.LEDIntensities[3] / 255) * 4096,
-      (this.LEDIntensities[4] / 255) * 4096,
+      (this.LEDIntensities[11] / 255) * 4096,
+      (this.LEDIntensities[12] / 255) * 4096,
+      (this.LEDIntensities[13] / 255) * 4096,
+      (this.LEDIntensities[14] / 255) * 4096,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here
