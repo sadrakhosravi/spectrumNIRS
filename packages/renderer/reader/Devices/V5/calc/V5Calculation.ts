@@ -66,6 +66,10 @@ class V5Calculation implements IDeviceCalculation {
    * The number of ADCs/PD of the device.
    */
   private numOfADCs: number;
+  ADCRes: number;
+  ADCMaxVal: number;
+  DACRes: number;
+  DACMaxVal: number;
 
   constructor() {
     this.LEDIntensities = [];
@@ -78,6 +82,12 @@ class V5Calculation implements IDeviceCalculation {
     this.BATCH_SIZE = 10;
     this.PDChannels = 1;
     this.numOfADCs = 1;
+
+    // ADC Resolution
+    this.ADCRes = 12;
+    this.ADCMaxVal = Math.pow(2, this.ADCRes) - 1;
+    this.DACRes = 8;
+    this.DACMaxVal = Math.pow(2, this.DACRes) - 1;
 
     // Do the initial coefficient calculations.
     this.waveIndex = this.calcWaveIndex();
@@ -224,7 +234,7 @@ class V5Calculation implements IDeviceCalculation {
     // Subtract the baseline from each raw value and divide by (4096 - ADC)
     // The first element of the sample array is the ambient/baseline
     for (let i = 1; i < this.PDChannels; i += 1) {
-      sample[i] = (sample[i] - sample[0]) / 4096;
+      sample[i] = (sample[i] - sample[0]) / this.ADCMaxVal;
 
       // If the value is less than 0.001, replace it with 0.001
       if (sample[i] < 0.001) sample[i] = 0.001;
@@ -258,10 +268,10 @@ class V5Calculation implements IDeviceCalculation {
   protected calcTOI = (sample: Float32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (this.LEDIntensities[0] / 255) * 4096,
-      (this.LEDIntensities[1] / 255) * 4096,
-      (this.LEDIntensities[3] / 255) * 4096,
-      (this.LEDIntensities[4] / 255) * 4096,
+      (this.LEDIntensities[0] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[1] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[3] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[4] / this.DACMaxVal) * this.ADCMaxVal,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here

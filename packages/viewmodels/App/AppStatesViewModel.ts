@@ -35,6 +35,8 @@ export class AppStatesViewModel {
     message?: string,
     timerInMS?: number,
   ) {
+    if (status === this.loading.status) return;
+
     this.loading = {
       status,
       transparent: transparent || false,

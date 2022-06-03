@@ -163,6 +163,13 @@ export class DeviceManagerViewModel {
   }
 
   /**
+   * @returns the device settings
+   */
+  public async getDeviceSettings(deviceName: string) {
+    return await this.reader.getDeviceInfo(deviceName);
+  }
+
+  /**
    * Sends a request to the reader process to get all device names and status.
    */
   @action public async getAvailableDevices() {

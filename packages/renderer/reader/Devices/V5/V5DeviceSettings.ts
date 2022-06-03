@@ -39,7 +39,7 @@ export class V5DeviceSettings implements IDeviceSettings {
   /**
    * Current LED intensities.
    */
-  @observable private ledIntensities: number[];
+  @observable protected ledIntensities: number[];
   /**
    * The device pre-gain.
    */
@@ -111,12 +111,8 @@ export class V5DeviceSettings implements IDeviceSettings {
   @action public updateSettings(settings: DeviceSettingsType) {
     this.ledIntensities = settings.LEDValues;
 
-    // Update the intensities of the calculation class.
-    this.deviceCalculation?.setLEDIntensities &&
-      this.deviceCalculation.setLEDIntensities(toJS(this.ledIntensities));
-
     const formattedSettings = this.parseSettings(settings.LEDValues);
-
+    this.deviceCalculation.setLEDIntensities(settings.LEDValues.map((set) => (set += 50)));
     // Update the physical device
     const status = this.deviceInput?.sendCommand(undefined, formattedSettings);
 

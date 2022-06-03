@@ -382,8 +382,10 @@ export class DeviceModelProxy {
    * Sends the new device settings to the reader process.
    */
   public sendDeviceSettingsToReader = () => {
-    const settings = this.getDeviceSettings();
-    deviceManagerVM.updateDeviceSettings(settings, this.name);
+    setTimeout(() => {
+      const settings = this.getDeviceSettings();
+      deviceManagerVM.updateDeviceSettings(settings, this.name);
+    }, 30);
   };
 
   /**
@@ -443,7 +445,7 @@ export class DeviceModelProxy {
             () => {
               this.createChartChannels();
             },
-            chartVM.loaded ? 100 : 1500,
+            chartVM.loaded ? 200 : 1500,
           );
         }
       },

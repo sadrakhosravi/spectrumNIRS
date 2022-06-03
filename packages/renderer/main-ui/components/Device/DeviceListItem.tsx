@@ -11,9 +11,15 @@ type DeviceListItemType = {
   name: string;
   isConnected: boolean;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onSettingsClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-export const DeviceListItem = ({ name, isConnected, onClick }: DeviceListItemType) => {
+export const DeviceListItem = ({
+  name,
+  isConnected,
+  onClick,
+  onSettingsClick,
+}: DeviceListItemType) => {
   return (
     <div className={styles.DeviceListItem} onClick={onClick}>
       <FiServer size="20px" />
@@ -32,6 +38,7 @@ export const DeviceListItem = ({ name, isConnected, onClick }: DeviceListItemTyp
         className={styles.DeviceSettingsButton}
         icon={<FiSettings size="16px" />}
         text="Settings"
+        onClick={onSettingsClick}
       />
     </div>
   );

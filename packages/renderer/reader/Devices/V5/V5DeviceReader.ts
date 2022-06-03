@@ -45,7 +45,6 @@ export class V5DeviceReader implements IDeviceReader {
 
   public readonly deviceCalculations: V5Calculation;
   public readonly deviceSettings: IDeviceSettings;
-  dataBuff: Buffer;
 
   constructor() {
     this.device = V5;
@@ -64,7 +63,6 @@ export class V5DeviceReader implements IDeviceReader {
     this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 30 * 1000);
 
     this.internalBuffer = [];
-    this.dataBuff = Buffer.alloc(411);
     this.isDeviceConnected = false;
 
     this.init();
@@ -115,8 +113,8 @@ export class V5DeviceReader implements IDeviceReader {
    */
   public getData(): Buffer | null {
     if (this.internalBuffer.length === 0) return null;
-    this.dataBuff = serialize(this.internalBuffer.splice(0));
-    return Comlink.transfer(this.dataBuff, [this.dataBuff.buffer]);
+    const buff = serialize(this.internalBuffer.splice(0));
+    return Comlink.transfer(buff, [buff.buffer]);
   }
 
   /**
@@ -146,10 +144,6 @@ export class V5DeviceReader implements IDeviceReader {
   public getDeviceInfo() {
     // sendDataToProcess(EventFromWorkerEnum.DEVICE_INFO, info);
     return this.physicalDevice.getDeviceInfo();
-  }
-
-  public checkData() {
-    console.log(this.dataBuff);
   }
 
   /**

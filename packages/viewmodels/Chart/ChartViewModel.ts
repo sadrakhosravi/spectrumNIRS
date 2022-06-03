@@ -202,11 +202,11 @@ export class ChartViewModel {
     // Remove the synchronization first.
     this.removeAxisSynchronization();
 
-    this.charts[chartIndex].series.forEach((series) => series.dispose());
-    this.charts[chartIndex].series.length = 0;
+    this.removeSeries(chartIndex);
     const rowIndexFreed = this.charts[chartIndex].dashboardChart.dispose();
 
     this.model.addFreedRowIndex(rowIndexFreed);
+    this.colors.addColorIndex(rowIndexFreed);
   }
 
   /**
@@ -227,6 +227,7 @@ export class ChartViewModel {
     if (!chart) throw new Error('The chart was not found! Try again');
 
     // If no colors, randomly generate one from the color palette.
+
     let color = seriesColor;
     if (!color) {
       color = this.colors.getNextColor(chart.dashboardChart.getChartRowIndex());

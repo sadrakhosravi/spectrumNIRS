@@ -21,7 +21,7 @@ export class ChartModel {
   /**
    * A Set of all the available rows in the given instance
    */
-  private availableRows: SortedNumberSet;
+  public availableRows: SortedNumberSet;
   /**
    * The LCJS dashboard instance.
    */
@@ -67,7 +67,7 @@ export class ChartModel {
     this.dashboard = lcjs().Dashboard({
       numberOfColumns: 1,
       numberOfRows: this.maxRowCount,
-      maxFps: 30,
+      maxFps: 20,
       container: chartContainerId,
       theme: spectrumTheme,
       antialias: true,

@@ -16,12 +16,16 @@ import { DeviceSelector } from './DeviceSelector/DeviceSelector';
 import { FiServer, FiRefreshCcw } from 'react-icons/fi';
 
 // View Model
-import { deviceManagerVM } from '@store';
+import { appRouterVM, deviceManagerVM } from '@store';
+import { DeviceAdvancedSettings } from './DeviceAdvnacedSettings/DeviceAdvancedSettings';
 
 export const ActiveDeviceList = observer(() => {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
+
   const [isAddDeviceOpen, setAddDeviceOpen] = React.useState(false);
+  const [isDeviceSettingOpen, setIsDeviceSettingsOpen] = React.useState(false);
+  const [deviceSettings, setDeviceSettings] = React.useState<string | null>(null);
 
   return (
     <>
@@ -47,6 +51,11 @@ export const ActiveDeviceList = observer(() => {
                 key={device.id}
                 name={device.name}
                 isConnected={device.isDeviceConnected}
+                onSettingsClick={() => {
+                  appRouterVM.setAppLoading(true, true, 'Loading settings...');
+                  setDeviceSettings(device.name);
+                  setIsDeviceSettingsOpen(true);
+                }}
               />
             ))}
           </div>
@@ -63,6 +72,13 @@ export const ActiveDeviceList = observer(() => {
       )}
 
       {isAddDeviceOpen && <DeviceSelector open={isAddDeviceOpen} closeSetter={setAddDeviceOpen} />}
+      {isDeviceSettingOpen && deviceSettings && (
+        <DeviceAdvancedSettings
+          deviceName={deviceSettings}
+          open={isDeviceSettingOpen}
+          closeSetter={setIsDeviceSettingsOpen}
+        />
+      )}
     </>
   );
 });

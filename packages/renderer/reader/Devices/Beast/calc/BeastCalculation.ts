@@ -63,6 +63,10 @@ class BeastCalculation implements IDeviceCalculation {
    * The array format is `[ambient, ch1, ch2, ch3, ch4, ch5]`.
    */
   private dataPointArr: Float32Array;
+  ADCRes: number;
+  ADCMaxVal: number;
+  DACRes: number;
+  DACMaxVal: number;
 
   constructor() {
     this.LEDIntensities = [];
@@ -74,6 +78,12 @@ class BeastCalculation implements IDeviceCalculation {
 
     this.BATCH_SIZE = 32;
     this.PDChannels = 16;
+
+    // ADC Resolution
+    this.ADCRes = 15;
+    this.ADCMaxVal = Math.pow(2, this.ADCRes) - 1;
+    this.DACRes = 7;
+    this.DACMaxVal = Math.pow(2, this.DACRes) - 1;
 
     // Do the initial coefficient calculations.
     this.waveIndex = this.calcWaveIndex();
@@ -213,7 +223,7 @@ class BeastCalculation implements IDeviceCalculation {
     // Subtract the baseline from each raw value and divide by (4096 - ADC)
     // The first element of the sample array is the ambient/baseline
     for (let i = 1; i < this.PDChannels; i += 1) {
-      sample[i] = (sample[i] - sample[0]) / 32767;
+      sample[i] = (sample[i] - sample[0]) / this.ADCMaxVal;
 
       // If the value is less than 0.001, replace it with 0.001
       if (sample[i] < 0.001) sample[i] = 0.001;
@@ -247,10 +257,10 @@ class BeastCalculation implements IDeviceCalculation {
   protected calcTOI = (sample: Float32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (this.LEDIntensities[11] / 255) * 32767,
-      (this.LEDIntensities[12] / 255) * 32767,
-      (this.LEDIntensities[13] / 255) * 32767,
-      (this.LEDIntensities[14] / 255) * 32767,
+      (this.LEDIntensities[11] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[12] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[13] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[14] / this.DACMaxVal) * this.ADCMaxVal,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here

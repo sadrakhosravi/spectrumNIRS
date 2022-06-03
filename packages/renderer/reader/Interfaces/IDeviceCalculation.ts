@@ -20,5 +20,5 @@ export interface IDeviceCalculation {
   /**
    * Sets the LED intensity values for calculation
    */
-  setLEDIntensities?: { (LEDIntensities: number[]): void };
+  setLEDIntensities: { (LEDIntensities: number[]): void };
 }
