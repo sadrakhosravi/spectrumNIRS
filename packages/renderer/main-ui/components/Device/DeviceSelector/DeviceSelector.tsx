@@ -11,23 +11,18 @@ import { SearchInput } from '../../Form';
 import { deviceManagerVM } from '@store';
 import { appRouterVM } from '@store';
 
-// Services
-import ServiceManager from '../../../../../services/ServiceManager';
-
 type DeviceSelectorType = {
   open: boolean;
   closeSetter: (value: boolean) => void;
 };
 
 export const DeviceSelector = observer(({ open, closeSetter }: DeviceSelectorType) => {
-  const [filteredDevices, setFilteredDevices] = React.useState(
-    ServiceManager.store.deviceStore.store.allDeviceNamesAndInfo,
-  );
+  const [filteredDevices, setFilteredDevices] = React.useState(deviceManagerVM.allDevices);
   const searchInputId = React.useId();
 
   React.useEffect(() => {
     // Request data from the reader process
-    deviceManagerVM.requestAllDevicesInfo();
+    deviceManagerVM.getAvailableDevices();
 
     // Focus on the search box
     document.getElementById(searchInputId)?.focus();
@@ -35,8 +30,8 @@ export const DeviceSelector = observer(({ open, closeSetter }: DeviceSelectorTyp
 
   // Update filtered state when the device manager changes
   React.useEffect(() => {
-    setFilteredDevices(ServiceManager.store.deviceStore.store.allDeviceNamesAndInfo);
-  }, [ServiceManager.store.deviceStore.store.allDeviceNamesAndInfo]);
+    setFilteredDevices(deviceManagerVM.allDevices);
+  }, [deviceManagerVM.allDevices]);
 
   // Handles search input changes and filters the device list.
   const handleSearchInputChange = React.useCallback(
@@ -60,11 +55,11 @@ export const DeviceSelector = observer(({ open, closeSetter }: DeviceSelectorTyp
     appRouterVM.setAppLoading(true, true, loadingStr, 1000);
 
     if (isActive) {
-      deviceManagerVM.sendRemoveDeviceRequestToReader(deviceName);
+      deviceManagerVM.removeDevice(deviceName);
       return;
     }
 
-    deviceManagerVM.sendAddDeviceRequestToReader(deviceName);
+    deviceManagerVM.addDevice(deviceName);
   }, []);
 
   return (

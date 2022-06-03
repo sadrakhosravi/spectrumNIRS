@@ -42,14 +42,16 @@ const config = {
     resolve({
       sqlite3: 'export default require("sqlite3");',
       'better-sqlite3': 'export default require("better-sqlite3");',
+
       // Use lib2esm() to easy to convert ESM
       serialport: lib2esm(
         // CJS lib name
         'serialport',
-        // export memebers
+        // export members
         ['SerialPort', 'SerialPortMock'],
         { format: 'cjs' },
       ),
+
       snappy: 'export default require("snappy");',
     }),
     checker({

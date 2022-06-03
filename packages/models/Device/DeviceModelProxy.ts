@@ -7,9 +7,6 @@
 import { deserialize } from 'v8';
 import { action, makeObservable, observable, reaction } from 'mobx';
 
-// Services
-import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
-
 export type DeviceSettingsType = {
   numOfPDs: number;
   numOfLEDs: number;
@@ -17,7 +14,7 @@ export type DeviceSettingsType = {
 };
 
 // View Models
-import { appRouterVM, chartVM, barChartVM } from '../../viewmodels/VMStore';
+import { appRouterVM, chartVM, barChartVM, deviceManagerVM } from '../../viewmodels/VMStore';
 
 // Types & Enum
 import type { IReactionDisposer } from 'mobx';
@@ -28,7 +25,6 @@ import type {
 } from '../../renderer/reader/api/Types';
 import type { ChartSeries, DashboardChart } from '../Chart';
 import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
-import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 
 /**
  * The proxy device model used to synchronize the UI with the
@@ -60,7 +56,7 @@ export class DeviceModelProxy {
   /**
    * The calculated channel names.
    */
-  public readonly calculatedChannelNames: string[];
+  public readonly calcChannelNames: string[];
   /**
    * A boolean indication if the device has probe settings.
    */
@@ -118,21 +114,21 @@ export class DeviceModelProxy {
     this.devicePort.start();
 
     this.name = deviceInfo.name;
-    this.LEDs = new Array(deviceInfo.numOfLEDs).fill(0).map((_, i) => (_ = i + 1));
-    this.PDs = new Array(deviceInfo.numOfPDs).fill(0).map((_, i) => (_ = i + 1));
+    this.LEDs = new Array(deviceInfo.numOfChannelsPerPD).fill(0).map((_, i) => (_ = i + 1));
+    this.PDs = new Array(deviceInfo.numOfADCs).fill(0).map((_, i) => (_ = i + 1));
     this.PDChannelNames = deviceInfo.PDChannelNames;
-    this.calculatedChannelNames = deviceInfo.calculatedChannelNames;
+    this.calcChannelNames = deviceInfo.calculatedChannelNames;
     this.hasProbeSettings = deviceInfo.hasProbeSettings;
 
     // Observables
-    this._activeLEDs = deviceInfo.numOfLEDs;
+    this._activeLEDs = deviceInfo.numOfChannelsPerPD;
     this._activePDs = 1;
     this._selectedPD = 1;
     this._samplingRate = deviceInfo.defaultSamplingRate;
 
     this.isConnected = false;
     this.isStarted = false;
-    this._LEDIntensities = new Array(deviceInfo.numOfLEDs).fill(0);
+    this._LEDIntensities = new Array(deviceInfo.numOfChannelsPerPD).fill(0);
 
     // Trackers
     this.reactions = [];
@@ -251,7 +247,6 @@ export class DeviceModelProxy {
 
     // Listen for calibration data
     if (appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
-      console.log('CALIBRATION');
       chartVM.currentView === 'line' &&
         this.devicePort.addEventListener('message', this.handleDeviceDataCalibration);
 
@@ -261,8 +256,6 @@ export class DeviceModelProxy {
 
     // Listen for calculated data
     if (appRouterVM.route === AppNavStatesEnum.RECORD) {
-      console.log('CALCULATION');
-
       this.devicePort.addEventListener('message', this.handleDeviceDataCalculated);
     }
   }
@@ -298,7 +291,7 @@ export class DeviceModelProxy {
       appRouterVM.route === AppNavStatesEnum.REVIEW
     ) {
       // Add chart channels
-      this.calculatedChannelNames.forEach((channelName) => {
+      this.calcChannelNames.forEach((channelName) => {
         const chart = chartVM.addChart();
         chart.removeGridLines();
         const series = chartVM.addSeries(chart.id, channelName);
@@ -308,7 +301,7 @@ export class DeviceModelProxy {
 
     // Set the series sampling rate
     this.chartChannels.forEach((channel) => {
-      channel.series.setSeriesCleaning(360 * this.samplingRate);
+      channel.series.setSeriesCleaning(1);
       channel.series.setSeriesSamplingRate(this.samplingRate);
     });
   }
@@ -328,7 +321,6 @@ export class DeviceModelProxy {
    */
   private handleDeviceDataCalculated = (event: MessageEvent<Buffer>) => {
     const data = deserialize(event.data) as DeviceDataTypeWithMetaData[];
-    console.log('calculated');
 
     requestAnimationFrame(() => {
       for (let i = 0; i < data.length; i++) {
@@ -336,9 +328,9 @@ export class DeviceModelProxy {
         const startTS = data[i].metadata.timestamp - this.startTimestamp;
 
         // Add the packet to each chart.
-        for (let j = 0; j < this.calculatedChannelNames.length; j++) {
-          const channelDataY = (data[i].calcData as DeviceCalculatedDataType)[
-            this.calculatedChannelNames[j]
+        for (let j = 0; j < this.calcChannelNames.length; j++) {
+          const channelDataY = (data[i].calcData as DeviceCalculatedDataType)['ADC1'][
+            this.calcChannelNames[j]
           ];
           this.chartChannels[j].series.addArrayY(channelDataY, startTS);
         }
@@ -352,7 +344,6 @@ export class DeviceModelProxy {
   private handleDeviceDataCalibration = (event: MessageEvent<Buffer>) => {
     const selectedPD = this.selectedPD;
     const data = deserialize(event.data) as DeviceDataTypeWithMetaData[];
-    console.log('calibration');
 
     requestAnimationFrame(() => {
       for (let i = 0; i < data.length; i++) {
@@ -373,7 +364,6 @@ export class DeviceModelProxy {
   private handleDeviceIntensityCalibrationData = (event: MessageEvent<Buffer>) => {
     const deviceData = deserialize(event.data) as DeviceDataTypeWithMetaData[];
     if (event.data.length === 0) return;
-    console.log('intensities');
     const dataPoint: number[] = [];
     const dataPacket = deviceData[deviceData.length - 1];
 
@@ -392,12 +382,8 @@ export class DeviceModelProxy {
    * Sends the new device settings to the reader process.
    */
   public sendDeviceSettingsToReader = () => {
-    // Should wait for react to re-render first.
-    MainWinIPCService.sendToReader(
-      DeviceChannels.DEVICE_SETTINGS_UPDATE,
-      this.name,
-      this.getDeviceSettings(),
-    );
+    const settings = this.getDeviceSettings();
+    deviceManagerVM.updateDeviceSettings(settings, this.name);
   };
 
   /**
@@ -405,7 +391,6 @@ export class DeviceModelProxy {
    * TODO: Update the LED intensities to use observable instead of getElementById.
    */
   protected getDeviceSettings = () => {
-    console.log('Update');
     // The settings object
     const settings: DeviceSettingsType = {
       numOfPDs: this.activePDs,
@@ -437,7 +422,7 @@ export class DeviceModelProxy {
     const intensityChangeDisposer = reaction(
       () => this._LEDIntensities,
       () => {
-        console.log('Intensity Change');
+        console.log('Intensity change');
       },
     );
 

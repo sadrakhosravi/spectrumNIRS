@@ -139,26 +139,6 @@ export class ChartViewModel {
   }
 
   /**
-   * Creates a smooth scrolling animation by pushing max fps.
-   */
-  public handleRecordingStart() {
-    const allSeries = this.charts.map((chart) => chart.series[0]);
-    let tPrev = performance.now();
-
-    const streamMoreData = () => {
-      const tNow = performance.now();
-      const tDelta = tNow - tPrev;
-      allSeries.forEach((series) => series.appendData(tDelta));
-
-      tPrev = tNow;
-
-      this.dataDrawFrame = requestAnimationFrame(streamMoreData);
-    };
-
-    streamMoreData();
-  }
-
-  /**
    * Stops the data draw animation frame.
    */
   public handleRecordingStop() {

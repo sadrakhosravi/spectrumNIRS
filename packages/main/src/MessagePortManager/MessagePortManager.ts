@@ -1,28 +1,51 @@
 import { ipcMain } from 'electron';
-import type { IpcMainEvent } from 'electron';
+import type { IpcMainEvent, MessagePortMain } from 'electron';
 
-// Window obj
+// Channels
+import { MessagePortChannels } from '../../../utils/channels';
+
+// Helpers
+import { deferredPromise } from '../../../utils/helpers';
+import type { DeferredPromise } from '../../../utils/helpers';
 import { renderers } from '../index';
-
 export class MessagePortManager {
+  private readerPort: Electron.MessagePortMain | null;
+  private readerPortPromise: DeferredPromise<any>;
+
   constructor() {
+    this.readerPortPromise = deferredPromise();
+    this.readerPort = null;
     this.init();
   }
 
   /**
    * Attaches the ipc listeners.
    */
-  private init() {
-    ipcMain.on('port:handle', this.handlePort.bind(this));
+  private async init() {
+    ipcMain.handle(MessagePortChannels.READER_RENDERER, this.handleReaderPortRequest);
+    ipcMain.on('window:port', this.handleWindowPort.bind(this));
   }
 
   /**
-   * Forwards the port to the main window renderer.
+   *  Forwards the port window message port from one context to the main window process.
    */
-  private handlePort(event: IpcMainEvent, data: string) {
+  private handleWindowPort(event: IpcMainEvent, data: string) {
+    console.log('Window port');
     const [port] = event.ports;
 
-    // Send to the main window.
-    renderers.mainWindow?.webContents.postMessage('device:port', data, [port]);
+    if (data === 'reader') {
+      this.readerPort = port;
+      this.readerPortPromise.resolve(true);
+    }
   }
+
+  /**
+   * Handles the main ui request for reader message port.
+   */
+  private handleReaderPortRequest = async () => {
+    await this.readerPortPromise;
+    renderers.mainWindow?.webContents.postMessage('ports:reader', null, [
+      this.readerPort as MessagePortMain,
+    ]);
+  };
 }

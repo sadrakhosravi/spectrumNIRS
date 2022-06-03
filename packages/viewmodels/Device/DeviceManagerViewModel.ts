@@ -5,24 +5,29 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, makeObservable, observable, reaction } from 'mobx';
+import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
+import { ipcRenderer } from 'electron';
+import { MessagePortChannels } from '../../utils/channels';
+import * as Comlink from 'comlink';
 
 // Services
 import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
 import ServiceManager from '../../services/ServiceManager';
 
 // Models
-import { DeviceModelProxy } from '../../models/Device/DeviceModelProxy';
 
 // Channels
 import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 
 // Types
-import type { DeviceNameType, DeviceInfoType } from '../../renderer/reader/api/Types';
+import type { DeviceInfoType, DeviceNameType } from '../../renderer/reader/api/Types';
 import type { IReactionDisposer } from 'mobx';
-import { ReaderChannels } from '../../utils/channels';
-import { ipcRenderer } from 'electron';
+import type { DeviceManagerType } from '../../renderer/reader/models/DeviceManager';
+import type { DeviceSettingsType } from '../../models/Device/DeviceModelProxy';
+
+// View Models
 import { chartVM } from '../VMStore';
+import { DeviceModelProxy } from '../../models/Device/DeviceModelProxy';
 
 export type DevicesMessagePortType = {
   port: MessagePort;
@@ -37,7 +42,7 @@ export class DeviceManagerViewModel {
   /**
    * Active devices proxy array.
    */
-  @observable private activeDevicesProxy: DeviceModelProxy[];
+  @observable private activeDeviceProxies: DeviceModelProxy[];
   /**
    * Observables reaction disposer array.
    */
@@ -45,12 +50,13 @@ export class DeviceManagerViewModel {
   /**
    * Recording start time stamp or 0.
    */
-  private startTimestamp: number;
+  protected startTimestamp: number;
   private devicesMessagePort: DevicesMessagePortType[];
+  protected reader!: Comlink.Remote<DeviceManagerType>;
 
   constructor() {
     this.availableDevices = [];
-    this.activeDevicesProxy = [];
+    this.activeDeviceProxies = [];
     this.reactions = [];
     this.startTimestamp = 0;
 
@@ -74,7 +80,7 @@ export class DeviceManagerViewModel {
    * @returns an array of active devices.
    */
   public get activeDevices() {
-    return this.activeDevicesProxy;
+    return this.activeDeviceProxies;
   }
 
   /**
@@ -87,28 +93,26 @@ export class DeviceManagerViewModel {
   /**
    * Does initial checks and adjustments for the recording start event.
    */
-  public initRecordingStart() {
+  public async initRecordingStart() {
     this.startTimestamp = Date.now();
 
     // Set the start time stamp on each device.
     this.activeDevices.forEach((device) => device.start(this.startTimestamp));
 
-    // Send the signal to the reader process.
-    MainWinIPCService.sendToReader(ReaderChannels.START);
-
     chartVM.charts.forEach((chart) => chart.series[0].clearData());
-    chartVM.handleRecordingStart();
     chartVM.charts[0].dashboardChart.chart.getDefaultAxisX().setInterval(0, 30_000);
+
+    await this.reader.startDevices();
   }
 
   /**
    * Stops the device proxy.
    */
-  public stopRecording() {
+  public async stopRecording() {
     const stopTimestamp = Date.now();
+    console.log(stopTimestamp);
 
-    // Send the signal to the reader process.
-    MainWinIPCService.sendToReader(ReaderChannels.STOP);
+    await this.reader.stopDevices();
 
     // Set the start time stamp on each device.
     this.activeDevices.forEach((device) => device.stop(stopTimestamp));
@@ -120,29 +124,51 @@ export class DeviceManagerViewModel {
    * Sends an IPC event to the reader process to ADD the device with
    * the passed `deviceName`.
    */
-  public sendAddDeviceRequestToReader(deviceName: string) {
-    MainWinIPCService.sendToReader(DeviceChannels.DEVICE_ADD, deviceName);
+  public async addDevice(deviceName: string) {
+    const deviceInfoAndPort = await this.reader.addDevice(deviceName);
+    if (!deviceInfoAndPort || !deviceInfoAndPort.info) return;
 
-    // Update device info
-    this.requestAllDevicesInfo();
+    const deviceProxy = this.createDeviceProxy(deviceInfoAndPort.info, deviceInfoAndPort.port);
+    runInAction(() => this.activeDeviceProxies.push(deviceProxy));
+
+    this.getAvailableDevices();
   }
 
   /**
    * Sends an IPC event to the reader process to REMOVE the device with
    * the passed `deviceName`.
    */
-  public sendRemoveDeviceRequestToReader(deviceName: string) {
-    MainWinIPCService.sendToReader(DeviceChannels.DEVICE_REMOVE, deviceName);
+  @action public async removeDevice(deviceName: string) {
+    await this.reader.removeDevice(deviceName);
 
-    // Update device info
-    this.requestAllDevicesInfo();
+    // Remove the proxy device
+    const removedDeviceIndex = this.activeDeviceProxies.findIndex(
+      (device) => device.name === deviceName,
+    );
+
+    if (removedDeviceIndex === -1)
+      throw new Error('Could not remove the device proxy model. Something went wrong!');
+
+    this.activeDeviceProxies[removedDeviceIndex].cleanup();
+    runInAction(() => this.activeDeviceProxies.splice(removedDeviceIndex, 1));
+
+    await this.getAvailableDevices();
+  }
+
+  /**
+   * Updates the device settings in the reader process.
+   */
+  public async updateDeviceSettings(settings: DeviceSettingsType, deviceName: string) {
+    await this.reader.updateDeviceSettings(settings, deviceName);
   }
 
   /**
    * Sends a request to the reader process to get all device names and status.
    */
-  public requestAllDevicesInfo() {
-    MainWinIPCService.sendToReader(DeviceChannels.GET_ALL_DEVICE_NAMES);
+  @action public async getAvailableDevices() {
+    // Request all active devices info on initialization.
+    const deviceNames = await this.reader.getAllDeviceNames();
+    runInAction(() => (this.availableDevices = deviceNames));
   }
 
   /**
@@ -155,7 +181,7 @@ export class DeviceManagerViewModel {
   /**
    * Attaches the event listeners.
    */
-  private init() {
+  private async init() {
     ipcRenderer.on('device:port', (event, name) => {
       const port = event.ports[0];
 
@@ -166,59 +192,34 @@ export class DeviceManagerViewModel {
       this.devicesMessagePort.push({ port, name });
     });
 
+    ipcRenderer.once('ports:reader', (event) => {
+      const [port] = event.ports;
+      this.reader = Comlink.wrap(port);
+    });
+
+    await ipcRenderer.invoke(MessagePortChannels.READER_RENDERER);
+    await this.reader.init();
+
     // Request all active devices info on initialization.
-    this.requestAllActiveDevices();
+    const deviceNames = await this.reader.getAllDeviceNames();
+    this.availableDevices.push(...deviceNames);
   }
 
   /**
    * Creates a device proxy model for the device that was created in the reader process.
    */
-  @action private createDeviceProxy(deviceInfo: DeviceInfoType) {
-    const portIndex = this.devicesMessagePort.findIndex(
-      (devicePort) => devicePort.name === deviceInfo.name,
-    );
-
-    if (portIndex === -1) throw new Error('Device name and device port name mismatch!');
-
-    const port = this.devicesMessagePort.splice(portIndex, 1)[0];
-
-    const deviceModel = new DeviceModelProxy(deviceInfo, port.port);
-    this.activeDevices.push(deviceModel);
+  private createDeviceProxy(deviceInfo: DeviceInfoType, port: MessagePort) {
+    return new DeviceModelProxy(deviceInfo, port);
   }
 
   /**
    * Handle observable reactions.
    */
   private handleReactions() {
-    // Update active devices based on the global state
     const activeDeviceReactionDisposer = reaction(
-      () => ServiceManager.store.deviceStore.store.activeDeviceModules,
+      () => this.activeDeviceProxies.length,
       () => {
-        const devices = ServiceManager.store.deviceStore.store.activeDeviceModules;
-        devices.forEach((device) => {
-          // Find the device
-          const proxyDevice = this.activeDevices.find(
-            (activeDevice) => activeDevice.name === device.name,
-          );
-
-          // If the device does not exist create it
-          if (!proxyDevice) {
-            this.createDeviceProxy(device);
-          }
-        });
-
-        // Check for inactive device proxies
-        this.activeDevices.forEach((activeDevice, index) => {
-          const activeDeviceIndex = devices.findIndex(
-            (device) => device.name === activeDevice.name,
-          );
-
-          // Device is not active anymore, remove the proxy
-          if (activeDeviceIndex === -1) {
-            this.activeDevices[index].cleanup();
-            this.activeDevices.splice(index, 1);
-          }
-        });
+        console.log(this.activeDeviceProxies.length);
       },
     );
 

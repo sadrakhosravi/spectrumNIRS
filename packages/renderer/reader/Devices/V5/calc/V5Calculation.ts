@@ -62,6 +62,10 @@ class V5Calculation implements IDeviceCalculation {
    * The array format is `[ambient, ch1, ch2, ch3, ch4, ch5]`.
    */
   private dataPointArr: Float32Array;
+  /**
+   * The number of ADCs/PD of the device.
+   */
+  private numOfADCs: number;
 
   constructor() {
     this.LEDIntensities = [];
@@ -73,6 +77,7 @@ class V5Calculation implements IDeviceCalculation {
 
     this.BATCH_SIZE = 10;
     this.PDChannels = 1;
+    this.numOfADCs = 1;
 
     // Do the initial coefficient calculations.
     this.waveIndex = this.calcWaveIndex();
@@ -98,9 +103,10 @@ class V5Calculation implements IDeviceCalculation {
    * Initializes the device calculation class.
    */
   public init(deviceInfo: DeviceInfoType) {
-    this.LEDIntensities = new Array(deviceInfo.numOfLEDs).fill(0);
+    this.LEDIntensities = new Array(deviceInfo.numOfChannelsPerPD).fill(0);
     this.calcChannelNames = deviceInfo.calculatedChannelNames;
     this.PDChannels = deviceInfo.PDChannelNames.length;
+    this.numOfADCs = deviceInfo.numOfADCs;
 
     // Setup the static objects
     this.dataPointArr = new Float32Array(this.PDChannels);
@@ -123,6 +129,8 @@ class V5Calculation implements IDeviceCalculation {
     if (LEDIntensities.length !== this.PDChannels - 1)
       throw new Error('The supplied LED intensities are not in the correct format for V5.');
     this.LEDIntensities = LEDIntensities;
+
+    console.log(this.LEDIntensities);
   }
 
   /**
@@ -130,9 +138,13 @@ class V5Calculation implements IDeviceCalculation {
    * and memory consumption.
    */
   private createOutputObj() {
-    this.calcChannelNames.forEach((channelName) => {
-      this.calcDataRes[channelName] = new Float32Array(this.BATCH_SIZE);
-    });
+    for (let i = 0; i < this.numOfADCs; i++) {
+      this.calcDataRes['ADC' + (i + 1)] = {};
+
+      this.calcChannelNames.forEach((channelName) => {
+        this.calcDataRes['ADC' + (i + 1)][channelName] = new Float32Array(this.BATCH_SIZE);
+      });
+    }
   }
 
   /**
@@ -142,22 +154,22 @@ class V5Calculation implements IDeviceCalculation {
    */
   public processData = (data: V5ParserDataType) => {
     // Create an array to store once data point of the batch
+    for (let k = 0; k < this.numOfADCs; k++) {
+      // For each batch, go through individual data point and calculate the values
+      for (let i = 0; i < this.BATCH_SIZE; i += 1) {
+        // Put one sample from the hardware into the dataPoint array.
+        for (let j = 0; j < this.PDChannels; j++) {
+          this.dataPointArr[j] = data.ADC1[('ch' + j) as keyof V5ParserDataType['ADC1']][i];
+        }
 
-    // For each batch, go through individual data point and calculate the values
-    for (let i = 0; i < this.BATCH_SIZE; i += 1) {
-      // Put one sample from the hardware into the dataPoint array.
-      for (let j = 0; j < this.PDChannels; j++) {
-        this.dataPointArr[j] = data.ADC1[('ch' + j) as keyof V5ParserDataType['ADC1']][i];
+        // Calculate that sample.
+        this.calcHemodynamics(this.dataPointArr);
+        this.calcDataRes['ADC' + (k + 1)]['O2Hb'][i] = this.hemodynamicsArr[0];
+        this.calcDataRes['ADC' + (k + 1)]['HHb'][i] = this.hemodynamicsArr[1];
+        this.calcDataRes['ADC' + (k + 1)]['THb'][i] = this.hemodynamicsArr[2];
+        this.calcDataRes['ADC' + (k + 1)]['TOI'][i] = this.calcTOI(this.dataPointArr);
       }
-
-      // Calculate that sample.
-      this.calcHemodynamics(this.dataPointArr);
-      this.calcDataRes['O2Hb'][i] = this.hemodynamicsArr[0];
-      this.calcDataRes['HHb'][i] = this.hemodynamicsArr[1];
-      this.calcDataRes['THb'][i] = this.hemodynamicsArr[2];
-      this.calcDataRes['TOI'][i] = this.calcTOI(this.dataPointArr);
     }
-
     return this.calcDataRes;
   };
 

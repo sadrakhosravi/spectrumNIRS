@@ -13,7 +13,6 @@ import type { IReactionDisposer } from 'mobx';
 
 export class FilterSettingsViewModel {
   private chartVM: ChartViewModel;
-  private samplingRate: number;
   @observable public isActive: boolean;
   @observable public cutoffFrequency: number;
   @observable public order: number;
@@ -21,7 +20,6 @@ export class FilterSettingsViewModel {
 
   constructor(chartVM: ChartViewModel) {
     this.chartVM = chartVM;
-    this.samplingRate = 100;
     this.isActive = false;
     this.cutoffFrequency = 5;
     this.order = 6;
@@ -74,7 +72,7 @@ export class FilterSettingsViewModel {
         return;
       }
       this.chartVM.charts.forEach((chart) => {
-        chart.series[0].addSeriesLowpassFilter(this.samplingRate, this.cutoffFrequency, this.order);
+        chart.series[0].addSeriesLowpassFilter(this.cutoffFrequency, this.order);
       });
     };
 

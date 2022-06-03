@@ -5,8 +5,8 @@ export type DeviceInfoType = {
   id: string;
   name: string;
   version: string;
-  numOfPDs: number;
-  numOfLEDs: number;
+  numOfADCs: number;
+  numOfChannelsPerPD: number;
   defaultSamplingRate: number;
   supportedSamplingRate: number[];
   PDChannelNames: string[];
@@ -61,7 +61,9 @@ export type DeviceADCDataType = DevDeviceChannelKeyType1 &
  * The device calculated data type.
  */
 export type DeviceCalculatedDataType = {
-  [key: string]: Float32Array;
+  [key: string]: {
+    [key: string]: Float32Array;
+  };
 };
 
 /**

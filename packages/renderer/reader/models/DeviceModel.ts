@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as Comlink from 'comlink';
-import { IReactionDisposer, makeObservable, observable } from 'mobx';
+import { IReactionDisposer, makeObservable, observable, toJS } from 'mobx';
 // import { readerIPCService } from '../ReaderIPCService';
 
 // Device api
@@ -16,8 +16,6 @@ import { IDeviceReader } from '../api/device-api';
 
 // Types
 import type { DeviceInfoType } from '../api/Types';
-import ServiceManager from '../../../services/ServiceManager';
-import { ipcRenderer } from 'electron';
 
 export class DeviceModel {
   /**
@@ -85,8 +83,7 @@ export class DeviceModel {
     // Instead of using IPC that serializes the data again,
     // transfer ownership of the object to other context using message ports.
     this.ports = new MessageChannel();
-
-    this.init();
+    this.ports.port1.start();
   }
 
   /**
@@ -107,7 +104,15 @@ export class DeviceModel {
    * The device information object.
    */
   public get deviceInfo() {
-    return this.info;
+    return toJS(this.info);
+  }
+
+  /**
+   * Attaches worker listeners.
+   */
+  public async init() {
+    const info = await this.wrappedWorker.getDeviceInfo();
+    this.setDeviceInfo(info);
   }
 
   /**
@@ -128,7 +133,9 @@ export class DeviceModel {
   /**
    * @returns the device message port instance.
    */
-  public getDevicePort() {}
+  public getDevicePort() {
+    return this.ports.port2;
+  }
 
   /**
    * Removes the device and its worker
@@ -138,16 +145,6 @@ export class DeviceModel {
     this.ports.port2.close();
 
     await this.wrappedWorker.handleDeviceStop();
-
-    // Remove the info to the global state
-    const currentDevices =
-      ServiceManager.store.deviceStore.getDeviceStoreValue('activeDeviceModules');
-    const currentDeviceIndex = currentDevices.findIndex(
-      (activeDevice) => activeDevice.name === this.name,
-    );
-    currentDevices.splice(currentDeviceIndex, 1);
-
-    ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', currentDevices);
 
     // Terminate the worker after 100ms
     setTimeout(() => {
@@ -163,8 +160,7 @@ export class DeviceModel {
     this.wrappedWorker.getData().then((data: Buffer | null) => {
       if (data === null) return;
 
-      this.ports.port2.postMessage(data, [data.buffer]);
-      // readerIPCService.sendToUI(DeviceChannels.DEVICE_DATA + this.name, data);
+      this.ports.port1.postMessage(data, [data.buffer]);
     });
   }
 
@@ -174,24 +170,6 @@ export class DeviceModel {
   public updateSettings(settings: any) {
     this.wrappedWorker.handleDeviceSettingsUpdate(settings);
     // sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.SETTINGS_UPDATE, settings);
-  }
-
-  /**
-   * Attaches worker listeners.
-   */
-  private async init() {
-    const info = await this.wrappedWorker.getDeviceInfo();
-
-    // Send device port to the UI thread.
-    ipcRenderer.postMessage('port:handle', info.name, [this.ports.port1]);
-
-    // Start both ports.
-    this.ports.port1.start();
-    this.ports.port2.start();
-
-    setTimeout(() => {
-      this.setDeviceInfo(info);
-    }, 10);
   }
 
   /**
@@ -212,14 +190,7 @@ export class DeviceModel {
    * Sends the device information that was spawned and received from the worker
    * to the UI thread.
    */
-  private setDeviceInfo(deviceInfo: DeviceInfoType) {
+  protected setDeviceInfo(deviceInfo: DeviceInfoType) {
     this.info = deviceInfo;
-
-    const currentDevices =
-      ServiceManager.store.deviceStore.getDeviceStoreValue('activeDeviceModules');
-    currentDevices.push(deviceInfo);
-
-    // Add the info to the global state
-    ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', currentDevices);
   }
 }

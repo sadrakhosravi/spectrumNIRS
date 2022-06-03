@@ -7,8 +7,13 @@
 
 import * as Comlink from 'comlink';
 
+import { serialize } from 'v8';
+import { ChildProcessWithoutNullStreams } from 'child_process';
+
 // V5 device module
 import V5 from './V5';
+import V5Calculation from './calc/V5Calculation';
+import type { V5ParserDataType } from './V5Parser';
 
 // Interfaces
 import {
@@ -21,12 +26,8 @@ import {
   IDeviceSettings,
 } from '../../api/device-api';
 
-import { ChildProcessWithoutNullStreams } from 'child_process';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
-import V5Calculation from './calc/V5Calculation';
-import { V5ParserDataType } from './V5Parser';
 import { DeviceSettingsType } from '@models/Device/DeviceModelProxy';
-import { serialize } from 'v8';
 
 export class V5DeviceReader implements IDeviceReader {
   /**

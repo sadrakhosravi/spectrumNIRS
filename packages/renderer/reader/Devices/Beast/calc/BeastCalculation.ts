@@ -99,7 +99,7 @@ class BeastCalculation implements IDeviceCalculation {
    * Initializes the device calculation class.
    */
   public init(deviceInfo: DeviceInfoType) {
-    this.LEDIntensities = new Array(deviceInfo.numOfLEDs).fill(0);
+    this.LEDIntensities = new Array(deviceInfo.numOfChannelsPerPD).fill(0);
     this.calcChannelNames = deviceInfo.calculatedChannelNames;
     this.PDChannels = 6;
 
@@ -133,7 +133,7 @@ class BeastCalculation implements IDeviceCalculation {
    */
   private createOutputObj() {
     this.calcChannelNames.forEach((channelName) => {
-      this.calcDataRes[channelName] = new Float32Array(this.BATCH_SIZE);
+      this.calcDataRes['ADC1'][channelName] = new Float32Array(this.BATCH_SIZE);
     });
   }
 
@@ -146,16 +146,18 @@ class BeastCalculation implements IDeviceCalculation {
     // For each batch, go through individual data point and calculate the values
     for (let i = 0; i < this.BATCH_SIZE; i += 1) {
       // Put one sample from the hardware into the dataPoint array.
-      for (let j = 0; j < this.PDChannels; j++) {
-        this.dataPointArr[j] = data.ADC3[('ch' + j) as keyof V5ParserDataType['ADC1']][i];
+      for (let j = 1; j < this.PDChannels; j++) {
+        this.dataPointArr[j] = data.ADC3[('ch' + (j + 10)) as keyof V5ParserDataType['ADC1']][i];
       }
+
+      this.dataPointArr[0] = data.ADC3.ch0[i];
 
       // Calculate that sample.
       this.calcHemodynamics(this.dataPointArr);
-      this.calcDataRes['O2Hb'][i] = this.hemodynamicsArr[0];
-      this.calcDataRes['HHb'][i] = this.hemodynamicsArr[1];
-      this.calcDataRes['THb'][i] = this.hemodynamicsArr[2];
-      this.calcDataRes['TOI'][i] = this.calcTOI(this.dataPointArr);
+      this.calcDataRes['ADC1']['O2Hb'][i] = this.hemodynamicsArr[0];
+      this.calcDataRes['ADC1']['HHb'][i] = this.hemodynamicsArr[1];
+      this.calcDataRes['ADC1']['THb'][i] = this.hemodynamicsArr[2];
+      this.calcDataRes['ADC1']['TOI'][i] = this.calcTOI(this.dataPointArr);
     }
     return this.calcDataRes;
   };
@@ -211,7 +213,7 @@ class BeastCalculation implements IDeviceCalculation {
     // Subtract the baseline from each raw value and divide by (4096 - ADC)
     // The first element of the sample array is the ambient/baseline
     for (let i = 1; i < this.PDChannels; i += 1) {
-      sample[i] = (sample[i] - sample[0]) / 4096;
+      sample[i] = (sample[i] - sample[0]) / 32767;
 
       // If the value is less than 0.001, replace it with 0.001
       if (sample[i] < 0.001) sample[i] = 0.001;
@@ -245,10 +247,10 @@ class BeastCalculation implements IDeviceCalculation {
   protected calcTOI = (sample: Float32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (this.LEDIntensities[11] / 255) * 4096,
-      (this.LEDIntensities[12] / 255) * 4096,
-      (this.LEDIntensities[13] / 255) * 4096,
-      (this.LEDIntensities[14] / 255) * 4096,
+      (this.LEDIntensities[11] / 255) * 32767,
+      (this.LEDIntensities[12] / 255) * 32767,
+      (this.LEDIntensities[13] / 255) * 32767,
+      (this.LEDIntensities[14] / 255) * 32767,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here

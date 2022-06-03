@@ -42,11 +42,10 @@ export class ChartSeries {
    * The sampling rate of the device controlling this series.
    */
   private samplingRate: number;
-
-  public dataBuffY: number[];
-  newDataModulus: number;
-  newDataPointsCount: number;
-  timeDelta: number;
+  /**
+   * The time difference between each sample based on the sampling rate.
+   */
+  private timeDelta: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -56,14 +55,8 @@ export class ChartSeries {
     this.seriesGainVal = 1;
     this.lowpassFilter = null;
 
-    this.dataBuffY = [];
-
     this.samplingRate = 100;
     this.timeDelta = 1000 / this.samplingRate;
-
-    // Variables used for appending data calculation
-    this.newDataPointsCount = 0;
-    this.newDataModulus = 0;
 
     this.setLineSeriesStrokeStyle();
     this.setSeriesCleaning(30 * 1000);
@@ -117,26 +110,6 @@ export class ChartSeries {
   }
 
   /**
-   * Appends data to the internal series data buffer to the plotted.
-   */
-  public addData(y: number[]) {
-    // this.dataBuffY = this.dataBuffY.concat(y);
-    this.addArrayY(y, 10);
-  }
-
-  /**
-   * Check for the incoming data points and append the internal buffer smoothly.
-   */
-  public appendData(tDelta: number) {
-    // The number of new data points to be added
-    this.newDataPointsCount = this.samplingRate * (tDelta / 1000) + this.newDataModulus;
-    this.newDataModulus = this.newDataPointsCount % 1;
-    this.newDataPointsCount = Math.floor(this.newDataPointsCount);
-
-    this.addArrayY(this.dataBuffY, this.timeDelta);
-  }
-
-  /**
    * Sets the series gain value.
    */
   @action public setSeriesGain(value: number) {
@@ -150,8 +123,8 @@ export class ChartSeries {
    * @param cutoff the cutoff frequency of the lowpass filter.
    * @param order the order of the lowpass filter.
    */
-  @action public addSeriesLowpassFilter(samplingRate: number, cutoff: number, order: number) {
-    this.lowpassFilter = new Lowpass().createLowpassFilter(samplingRate, cutoff, order);
+  @action public addSeriesLowpassFilter(cutoff: number, order: number) {
+    this.lowpassFilter = new Lowpass().createLowpassFilter(this.samplingRate, cutoff, order);
   }
 
   /**
@@ -183,7 +156,7 @@ export class ChartSeries {
   /**
    * Applies the gain value and adds obj array to the series.
    */
-  public addArrayXY(x: number[] | Float32Array, y: number[] | Float32Array) {
+  public addArrayXY(_x: number[] | Float32Array, y: number[] | Float32Array) {
     const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
@@ -196,11 +169,6 @@ export class ChartSeries {
     if (this.lowpassFilter) {
       this.lowpassFilter.multiStep(y, true);
     }
-
-    this.series.addArraysXY(
-      (x as number[]).splice(0, this.newDataPointsCount),
-      (y as number[]).splice(0, this.newDataPointsCount),
-    );
   }
 
   /**
@@ -232,7 +200,7 @@ export class ChartSeries {
   @action public changeSeriesColor(color: string) {
     this.series.setStrokeStyle(
       new SolidLine({
-        thickness: 0.5,
+        thickness: 1.7,
         fillStyle: new SolidFill({ color: ColorHEX(color || '#fff') }),
       }),
     );
