@@ -31,6 +31,8 @@ export class V5PhysicalDevice implements INIRSDevice {
       id: this.getDeviceSerialNumber(),
       name: V5PhysicalDevice.getName(),
       version: this.getVersion(),
+      ADCRes: this.getADCResolution(),
+      DACRes: this.getDACResolution(),
       numOfChannelsPerPD: this.getSupportedLEDNum(),
       numOfADCs: this.getSupportedPDNum(),
       supportedSamplingRate: this.getSupportedSamplingRates(),
@@ -39,6 +41,20 @@ export class V5PhysicalDevice implements INIRSDevice {
       calculatedChannelNames: this.getCalculatedChannelNames(),
       hasProbeSettings: true,
     };
+  }
+
+  /**
+   * @returns the ADC resolution taking the reserved bits into account.
+   */
+  public getADCResolution(): number {
+    return 12; // 12 bits ADC.
+  }
+
+  /**
+   * @returns the LED DAC driver.
+   */
+  public getDACResolution(): number {
+    return 8; // 8 bits DAC led intensity driver.
   }
 
   /**

@@ -6,26 +6,28 @@
  *  Uses COMLINK for thread communication.
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
+import 'reflect-metadata';
 
 import * as Comlink from 'comlink';
-import BetterSqlite3 from 'better-sqlite3';
+
+import { DataSource } from 'typeorm';
 
 // Helpers
 import { checkForDbFolder } from './database/Base/checkForDbFolder';
+import { Paths } from '../utils/helpers/Paths';
 
 // Types
 import type { DatabaseConnectionType } from './database/types/Types';
 
-// Tables
-import { RecordingTable, DeviceTable } from './database';
-import { Paths } from '../utils/helpers/Paths';
+// Tables Entities
+import { RecordingTable, RecordingDataTable, DeviceConfigsTable, DevicesTable } from './database';
 
 // Queries
 import { DeviceQueries } from './database/Queries';
 
-export type DatabaseQueriesType = {
-  deviceQueries: DeviceQueries;
-};
+// export type DatabaseQueriesType = {
+//   deviceQueries: DeviceQueries;
+// };
 
 // The self managed class
 export class DatabaseSharedWorker {
@@ -36,47 +38,57 @@ export class DatabaseSharedWorker {
   /**
    * The database connection instance.
    */
-  private readonly connection: DatabaseConnectionType;
-  public readonly deviceQueries: DeviceQueries;
+  protected readonly connection: DatabaseConnectionType;
+  /**
+   * Collection of all the device queries as a class.
+   */
+  public readonly deviceQueries!: DeviceQueries;
+  initialized: boolean;
 
   constructor() {
     // Checks for db folder and creates it if not exist.
     checkForDbFolder();
     this.dbFilePath = Paths.getDBFilePath();
-    this.connection = new BetterSqlite3(this.dbFilePath);
 
-    this.applyPragmas();
-    this.synchronizeTables();
+    this.connection = new DataSource({
+      type: 'better-sqlite3',
+      database: this.dbFilePath,
+      entities: [RecordingTable, RecordingDataTable, DevicesTable, DeviceConfigsTable],
+      synchronize: true, // Debug
+      dropSchema: false, // Debug
+    });
 
+    this.initialized = false;
+  }
+
+  public async init() {
+    if (this.initialized) return true;
+
+    await this.connection.initialize();
+    await this.applyPragmas();
+
+    this.initialized = true;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     this.deviceQueries = new DeviceQueries(this.connection);
+
+    return true;
   }
 
   /**
    * Applies pragmas to the database for the best performance.
    */
   private async applyPragmas() {
-    this.connection.exec('PRAGMA journal_mode = WAL;'); // Enables WAL Mode
-    this.connection.exec('PRAGMA auto_vacuum = INCREMENTAL;'); // Enables auto vacuum
-    this.connection.exec('PRAGMA synchronous = normal;'); // Disabled full synchronous
-  }
-
-  /**
-   * Synchronizes the database tables.
-   */
-  private async synchronizeTables() {
-    // Update and checks the recording table
-    new RecordingTable(this.connection).init();
-    new DeviceTable(this.connection).init();
+    await this.connection.query('PRAGMA journal_mode = WAL;'); // Enables WAL Mode
+    await this.connection.query('PRAGMA auto_vacuum = INCREMENTAL;'); // Enables auto vacuum
+    await this.connection.query('PRAGMA synchronous = normal;'); // Disabled full synchronous
   }
 }
 
 const dbWorker: DatabaseSharedWorker = new DatabaseSharedWorker();
 
-/**
- * When a connection is made into this shared worker, expose `obj`
- * via the connection `port`.
- */
-onconnect = function (event) {
-  const port = event.ports[0];
+onconnect = async (event) => {
+  const [port] = event.ports;
   Comlink.expose(dbWorker, port);
 };

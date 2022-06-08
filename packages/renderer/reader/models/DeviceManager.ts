@@ -91,7 +91,7 @@ export class DeviceManager {
     // Device was not found, this only happens if something went wrong.
     if (!device) return;
 
-    const deviceInstance = new DeviceModel(device.name, device.workerURL);
+    const deviceInstance = new DeviceModel(device.id, device.name, device.workerURL);
 
     // Initialize the device
     await deviceInstance.init();
@@ -157,3 +157,5 @@ export class DeviceManager {
     return devicesInfo;
   }
 }
+
+export default DeviceManager;

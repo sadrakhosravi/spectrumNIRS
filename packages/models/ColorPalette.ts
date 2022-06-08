@@ -62,7 +62,6 @@ export class ColorPalette {
    * @returns the next available color from the list
    */
   public getNextColor(index?: number) {
-    console.log(index);
     let colorIndex = index;
     if (!colorIndex) {
       colorIndex = this.availableColorsIndex.getFirstAvailableItem();

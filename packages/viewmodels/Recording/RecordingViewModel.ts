@@ -99,6 +99,6 @@ export class RecordingViewModel {
    * Creates a new recording.
    */
   @action public createNewRecording(name: string, description?: string) {
-    this.currRecording = new RecordingModel(name, description || '', [], true);
+    this.currRecording = new RecordingModel(name, description || '', true);
   }
 }

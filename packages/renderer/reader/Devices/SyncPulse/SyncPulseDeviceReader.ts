@@ -16,6 +16,7 @@ import {
   IDeviceInput,
   IDeviceReader,
   DeviceDataTypeWithMetaData,
+  IDeviceConfigParsed,
   // IDeviceReader,
 } from '../../api/device-api';
 
@@ -57,6 +58,17 @@ export class SyncPulseDeviceReader implements IDeviceReader {
   public async init() {
     this.deviceInput = new this.device.Input();
     console.log('Waiting for device');
+  }
+
+  /**
+   * @returns the default configuration of the device.
+   */
+  public getDefaultConfig() {
+    return this.device.DefaultConfigs;
+  }
+
+  public setDeviceConfig(deviceConfig: IDeviceConfigParsed): void {
+    console.log(deviceConfig);
   }
 
   /**

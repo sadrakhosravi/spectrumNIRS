@@ -5,7 +5,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as Comlink from 'comlink';
-import { ipcRenderer } from 'electron';
 
 // Interfaces
 import type { IServices } from './IServicesInterface';
@@ -17,14 +16,9 @@ export class DatabaseService implements IServices {
    */
   private dbWorker!: SharedWorker;
 
-  dbConnection: Comlink.Remote<DatabaseSharedWorker> | null;
-  constructor() {
-    this.dbConnection = null;
-  }
+  dbConnection!: Comlink.Remote<DatabaseSharedWorker> | DatabaseSharedWorker;
 
   public get connection() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
     return this.dbConnection as DatabaseSharedWorker;
   }
 
@@ -32,19 +26,14 @@ export class DatabaseService implements IServices {
    * Initialize service.
    */
   public initService = async () => {
-    console.log('Shared worker created');
     this.dbWorker = new SharedWorker(
       new URL('../sharedWorkers/databaseSharedWorker.ts', import.meta.url),
       { type: 'module' },
     );
 
     this.dbConnection = Comlink.wrap(this.dbWorker.port);
-
-    if (process.env.NODE_ENV === 'development') {
-      setTimeout(() => {
-        ipcRenderer.invoke('open-dev-tools');
-      }, 1000);
-    }
+    const isInitialized = await await this.dbConnection.init(); // 2 awaits for comlink and db connection.
+    return isInitialized;
   };
 
   /**

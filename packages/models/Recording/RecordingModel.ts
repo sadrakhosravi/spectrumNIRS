@@ -6,6 +6,7 @@
 
 import { nanoid } from 'nanoid';
 import { observable } from 'mobx';
+// import ServiceManager from '../../services/ServiceManager';
 
 export class RecordingModel {
   /**
@@ -33,11 +34,11 @@ export class RecordingModel {
    */
   private lastUpdateTimestamp: number;
 
-  constructor(name: string, description: string, devices: any[] | [], isNewRecord: boolean) {
+  constructor(name: string, description: string, isNewRecord: boolean) {
     this.id = nanoid();
     this.recordingName = name;
     this.recordingDescription = description;
-    this.devices = devices;
+    this.devices = [];
 
     this.createdTimestamp = Date.now();
     this.lastUpdateTimestamp = this.createdTimestamp;
@@ -85,14 +86,6 @@ export class RecordingModel {
    * Updates the database record.
    */
   private async createDatabaseRecord() {
-    // await ServiceManager.dbConnection.run(
-    //   'INSERT INTO recordings VALUES(?, ?, ?, ?, ?, ?)',
-    //   this.id,
-    //   this.name,
-    //   this.description,
-    //   this.createdTimestamp,
-    //   Date.now(),
-    //   'Testtt',
-    // );
+    //
   }
 }

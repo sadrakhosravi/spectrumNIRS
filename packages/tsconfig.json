@@ -9,6 +9,7 @@
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "types": ["node", "sharedworker"],
@@ -22,6 +23,7 @@
     "./database/**/*",
     "./services/**/*",
     "./utils/**/*",
+    "./sharedWorkers/**/*",
     "./preload/contracts.d.ts"
   ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]

@@ -1,6 +1,7 @@
 import type { DeviceSettingsType } from '@models/Device/DeviceModelProxy';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
 import type { DeviceDataTypeWithMetaData, DeviceInfoType } from 'reader/api/Types';
+import { IDeviceConfig, IDeviceConfigParsed } from './IDeviceConfig';
 
 /**
  * Device reader interface. Each device module should implement this interface.
@@ -21,6 +22,16 @@ export interface IDeviceReader {
    * and send device info the UI thread.
    */
   init(): Promise<void>;
+
+  /**
+   * @returns the default device configuration.
+   */
+  getDefaultConfig(): IDeviceConfig;
+
+  /**
+   * Sets the device configuration last stored in the database
+   */
+  setDeviceConfig(deviceConfig: IDeviceConfigParsed): void;
 
   /**
    * Handles device walkthrough and initial handshake if the device

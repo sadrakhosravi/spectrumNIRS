@@ -5,6 +5,7 @@ import {
   IDeviceInput,
   IDeviceSettings,
   IDeviceCalculation,
+  IDeviceConfig,
 } from '../Interfaces';
 
 export type {
@@ -16,6 +17,8 @@ export type {
   IDeviceReader,
   IDeviceCalculation,
   IDeviceSettings,
+  IDeviceConfig,
+  IDeviceConfigParsed,
 } from '../Interfaces';
 
 export type { DeviceDataTypeWithMetaData, DeviceADCDataType } from './Types';
@@ -40,6 +43,7 @@ export interface IDevice {
   Parser: Parser<IDeviceParser>;
   Input: Input<IDeviceInput>;
   Settings: Settings<IDeviceSettings>;
+  DefaultConfigs: IDeviceConfig;
 }
 
 /** Device settings type */

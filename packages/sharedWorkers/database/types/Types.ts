@@ -1,8 +1,8 @@
-import type BetterSqlite3 from 'better-sqlite3';
+import type { DataSource } from 'typeorm';
 
 /**
  * The database connection type.
  */
-export type DatabaseConnectionType = BetterSqlite3.Database;
+export type DatabaseConnectionType = DataSource;
 
-export type { BetterSqlite3 };
+export type { DataSource };

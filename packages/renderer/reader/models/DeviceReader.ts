@@ -36,7 +36,7 @@ export class DeviceReader {
 
     // Start the loop interval
     this.loopInterval = new AccurateTimer(this.handleDataAcquisition.bind(this), 100);
-    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 60 * 1000);
+    this.gcInterval = new AccurateTimer(this.handleGarbageCollection.bind(this), 30 * 1000);
 
     this.loopInterval.start();
     this.gcInterval.start();

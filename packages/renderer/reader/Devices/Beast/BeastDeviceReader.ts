@@ -19,13 +19,14 @@ import {
   IDeviceReader,
   IDeviceSettings,
   DeviceDataTypeWithMetaData,
+  IDeviceConfigParsed,
   // IDeviceReader,
 } from '../../api/device-api';
 import { BeastCmd } from './BeastCommandsEnum,';
 import AccurateTimer from '@utils/helpers/AccurateTimer';
 
 // Calc
-import BeastCalculation from './calc/BeastCalculation';
+import BeastCalculation from '../../Calculations/NIRS/NIRSCalculations';
 import { BeastParserDataType } from './BeastParser';
 
 export class BeastDeviceReader implements IDeviceReader {
@@ -90,6 +91,17 @@ export class BeastDeviceReader implements IDeviceReader {
 
       console.log('Device Connected');
     });
+  }
+
+  /**
+   * @returns the default configuration of the device.
+   */
+  public getDefaultConfig() {
+    return this.device.DefaultConfigs;
+  }
+
+  public setDeviceConfig(deviceConfig: IDeviceConfigParsed): void {
+    console.log(deviceConfig);
   }
 
   /**

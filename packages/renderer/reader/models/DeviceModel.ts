@@ -5,24 +5,29 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as Comlink from 'comlink';
-import { IReactionDisposer, makeObservable, observable, toJS } from 'mobx';
-// import { readerIPCService } from '../ReaderIPCService';
+import { action, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
+import ServiceManager from '../../../services/ServiceManager';
 
 // Device api
-import { IDeviceReader } from '../api/device-api';
-
-// IPC Channels
-// import { DeviceChannels } from '@utils/channels/DeviceChannels';
+import {
+  DeviceSettingsType,
+  IDeviceConfig,
+  IDeviceConfigParsed,
+  IDeviceReader,
+} from '../api/device-api';
 
 // Types
 import type { DeviceInfoType } from '../api/Types';
 
 export class DeviceModel {
   /**
+   * The id of the device used to register in the db.
+   */
+  public readonly id: number;
+  /**
    * The name of the device.
    */
   public readonly name: string;
-
   /**
    * The URL of the device worker module.
    */
@@ -48,6 +53,10 @@ export class DeviceModel {
    */
   @observable private info: DeviceInfoType | null;
   /**
+   * The current device configuration observable object.
+   */
+  @observable private deviceConfig: IDeviceConfig & { id: number };
+  /**
    * Observable reaction disposers
    */
   private reactions: IReactionDisposer[];
@@ -61,7 +70,8 @@ export class DeviceModel {
   private ports: MessageChannel;
 
   // Constructor
-  constructor(name: string, workerURL: URL) {
+  constructor(id: number, name: string, workerURL: URL) {
+    this.id = id;
     this.name = name;
     this.workerURL = workerURL;
 
@@ -70,6 +80,24 @@ export class DeviceModel {
     this.streaming = false;
     this.info = null;
     this.errorMessage = '';
+
+    // Assign a default config object for observables to register properly.
+    this.deviceConfig = {
+      name: '',
+      description: '',
+      deviceId: 0,
+      id: 0,
+      settings: {
+        LEDIntensities: [],
+        activeLEDs: [],
+        activePDs: [],
+        deviceCalibrationFactor: 1,
+        deviceGain: 0,
+        devicePreGain: 'HIGH',
+        samplingRate: 100,
+        softwareGain: 1,
+      },
+    };
 
     makeObservable(this);
 
@@ -111,8 +139,38 @@ export class DeviceModel {
    * Attaches worker listeners.
    */
   public async init() {
+    // Init Reactions after the initial checks
+    this.handleConfigChangeReaction();
+
+    // Check for device configs and set the active config to the device.
+    await this.checkOrRegisterDeviceConfig();
+
     const info = await this.wrappedWorker.getDeviceInfo();
     this.setDeviceInfo(info);
+  }
+
+  /**
+   * Checks and applies device configs from the database.
+   */
+  @action public async checkOrRegisterDeviceConfig() {
+    const activeConfig = await ServiceManager.dbConnection.deviceQueries.selectActiveDeviceConfig(
+      this.id,
+    );
+    // If no configs found, insert the default config
+    if (!activeConfig) {
+      const defaultConfig = await this.wrappedWorker.getDefaultConfig();
+      await ServiceManager.dbConnection.deviceQueries.insertConfig(defaultConfig, this.id, true);
+      return;
+    }
+    // Set the current config - the reaction will save and apply it to the device.
+    this.deviceConfig = activeConfig as IDeviceConfig & { id: number };
+  }
+
+  /**
+   * Applies the saved configuration to the device/controller.
+   */
+  public async applySavedConfig() {
+    await this.wrappedWorker.setDeviceConfig(this.deviceConfig?.settings as IDeviceConfigParsed);
   }
 
   /**
@@ -121,6 +179,16 @@ export class DeviceModel {
   public startDevice() {
     // sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.START);
     this.wrappedWorker.handleDeviceStart();
+
+    const deviceSettings = this.deviceConfig?.settings as IDeviceConfigParsed;
+
+    setTimeout(() => {
+      this.updateSettings({
+        LEDValues: deviceSettings.LEDIntensities,
+        numOfLEDs: this.deviceInfo?.numOfChannelsPerPD as number,
+        numOfPDs: this.deviceInfo?.numOfADCs as number,
+      });
+    }, 300);
   }
 
   /**
@@ -167,9 +235,32 @@ export class DeviceModel {
   /**
    * Sends the updated settings to the worker device.
    */
-  public updateSettings(settings: any) {
-    this.wrappedWorker.handleDeviceSettingsUpdate(settings);
-    // sendMessageToDeviceWorker(this.worker, EventFromDeviceToWorkerEnum.SETTINGS_UPDATE, settings);
+  @action public async updateSettings(settings: DeviceSettingsType) {
+    await this.wrappedWorker.handleDeviceSettingsUpdate(settings);
+  }
+
+  /**
+   * Updates the device config obj.
+   */
+  @action public updateConfig(settings: any) {
+    this.deviceConfig.settings.LEDIntensities = settings.LEDValues;
+  }
+
+  /**
+   * Handles the change in device config object.
+   * Updates the device and the database.
+   */
+  public handleConfigChangeReaction() {
+    const configReaction = reaction(
+      () => this.deviceConfig.settings.LEDIntensities,
+      async () => {
+        await ServiceManager.dbConnection.deviceQueries.updateConfig(
+          toJS(this.deviceConfig.settings),
+          this.deviceConfig.id,
+        );
+      },
+    );
+    this.reactions.push(configReaction);
   }
 
   /**

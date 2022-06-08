@@ -12,6 +12,14 @@ export interface IPhysicalDevice {
    */
   getSupportedPDNum(): number;
   /**
+   * @returns the ADC resolution without the reserved bits.
+   */
+  getADCResolution(): number;
+  /**
+   * @returns the DAC resolution without the reserved bits.
+   */
+  getDACResolution(): number;
+  /**
    * @returns the calculated channel names.
    */
   getCalculatedChannelNames(): string[];
@@ -43,7 +51,6 @@ export interface IPhysicalDevice {
    * @returns the serial number of the device
    */
   getDeviceSerialNumber: () => string;
-
   /**
    * @returns - the supported sampling rates of the device
    */

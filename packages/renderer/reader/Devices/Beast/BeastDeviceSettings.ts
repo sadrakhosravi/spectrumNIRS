@@ -1,7 +1,11 @@
 import { action, makeObservable, observable, toJS } from 'mobx';
 
 // Types
-import type { DeviceSettingsType, IPhysicalDevice } from '../../api/device-api';
+import type {
+  DeviceSettingsType,
+  IDeviceConfigParsed,
+  IPhysicalDevice,
+} from '../../api/device-api';
 import type {
   IDeviceCalculation,
   IDeviceInput,
@@ -29,6 +33,8 @@ export class BeastDeviceSettings implements IDeviceSettings {
    * The device calculation class instance.
    */
   protected readonly deviceCalculation: IDeviceCalculation;
+  protected samplingRate: number;
+
   /**
    * The number of active PDs of the device.
    */
@@ -37,6 +43,7 @@ export class BeastDeviceSettings implements IDeviceSettings {
    * The number of active LEDs of the device.
    */
   @observable private activeLEDs: number;
+  ledIntensities: number[];
 
   constructor(
     physicalDevice: IPhysicalDevice,
@@ -50,6 +57,8 @@ export class BeastDeviceSettings implements IDeviceSettings {
     this.numOfSupportedPDChannels = physicalDevice.getSupportedLEDNum();
     this.numOfSupportedPDs = physicalDevice.getSupportedPDNum();
 
+    this.samplingRate = 1000;
+    this.ledIntensities = [];
     this.activeLEDs = this.numOfSupportedPDChannels;
     this.activePDs = this.numOfSupportedPDs;
 
@@ -91,12 +100,22 @@ export class BeastDeviceSettings implements IDeviceSettings {
   }
 
   /**
+   * Updates the settings based on the previously stored config.
+   */
+  @action public updateConfig(config: IDeviceConfigParsed): void {
+    this.samplingRate = config.samplingRate;
+    this.ledIntensities = config.LEDIntensities;
+  }
+
+  /**
    * Sends the new settings to the Beast controller
    */
   @action public updateSettings(settings: DeviceSettingsType) {
     // Reset the previous data
     const formattedSettings = this.parseSettings(settings);
     const status = this.deviceInput?.sendCommand(BeastCmd.SET_SETTINGS, formattedSettings);
+
+    this.ledIntensities = settings.LEDValues;
 
     this.deviceCalculation.setLEDIntensities &&
       this.deviceCalculation.setLEDIntensities(settings.LEDValues);

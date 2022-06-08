@@ -1,7 +1,11 @@
 import { action, makeObservable, observable, toJS } from 'mobx';
 
 // Types
-import type { DeviceSettingsType, IPhysicalDevice } from '../../api/device-api';
+import type {
+  DeviceSettingsType,
+  IDeviceConfigParsed,
+  IPhysicalDevice,
+} from '../../api/device-api';
 import type {
   IDeviceCalculation,
   IDeviceInput,
@@ -28,6 +32,8 @@ export class V5DeviceSettings implements IDeviceSettings {
    * The device calculation class instance.
    */
   private readonly deviceCalculation: IDeviceCalculation;
+  protected samplingRate: number;
+
   /**
    * The number of active PDs of the device.
    */
@@ -60,6 +66,8 @@ export class V5DeviceSettings implements IDeviceSettings {
     this.deviceCalculation = deviceCalculation;
     this.numOfSupportedPDChannels = physicalDevice.getSupportedLEDNum();
     this.numOfSupportedPDs = physicalDevice.getSupportedPDNum();
+
+    this.samplingRate = 100;
 
     this.ledIntensities = new Array(this.numOfSupportedPDChannels).fill(0);
     this.preGain = 'HIGH';
@@ -103,6 +111,14 @@ export class V5DeviceSettings implements IDeviceSettings {
 
   public setActiveLEDs(_activeLEDs: []) {
     // V5's active LEDs are not configurable.
+  }
+
+  /**
+   * Updates the V5's device settings.
+   */
+  @action public updateConfig(config: IDeviceConfigParsed) {
+    this.samplingRate = config.samplingRate;
+    this.ledIntensities = config.LEDIntensities;
   }
 
   /**

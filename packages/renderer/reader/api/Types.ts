@@ -5,6 +5,8 @@ export type DeviceInfoType = {
   id: string;
   name: string;
   version: string;
+  ADCRes: number;
+  DACRes: number;
   numOfADCs: number;
   numOfChannelsPerPD: number;
   defaultSamplingRate: number;

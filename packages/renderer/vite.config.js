@@ -51,6 +51,23 @@ const config = {
         ['SerialPort', 'SerialPortMock'],
         { format: 'cjs' },
       ),
+      typeorm: lib2esm(
+        // CJS lib name
+        'typeorm',
+        // export members
+        [
+          'DataSource',
+          'Entity',
+          'PrimaryGeneratedColumn',
+          'Column',
+          'OneToMany',
+          'OneToOne',
+          'ManyToOne',
+          'JoinColumn',
+          'JoinTable',
+        ],
+        { format: 'cjs' },
+      ),
 
       snappy: 'export default require("snappy");',
     }),
@@ -67,29 +84,38 @@ const config = {
     },
     port: 7777,
     rollupOptions: {
-      external: ['sqlite3', ...builtinModules.flatMap((p) => [p, `node:${p}`])],
+      external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
+    sourcemap: 'inline',
   },
   build: {
-    sourcemap: 'inline',
     target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',
+    sourcemap: 'inline',
 
     rollupOptions: {
       input: {
         main: join(PACKAGE_ROOT, 'index.html'),
         reader: join(PACKAGE_ROOT, 'reader.html'),
       },
+
       output: {
         format: 'cjs',
       },
-      external: ['sqlite3', ...builtinModules.flatMap((p) => [p, `node:${p}`])],
+      external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
 
     emptyOutDir: true,
     brotliSize: false,
     minify: 'terser',
+  },
+  worker: {
+    rollupOptions: {
+      output: {
+        format: 'cjs',
+      },
+    },
   },
   test: {
     environment: 'happy-dom',

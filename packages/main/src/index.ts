@@ -20,6 +20,9 @@ require('v8').setFlagsFromString('--expose_gc');
 global.gc = require('vm').runInNewContext('gc');
 app.commandLine.appendSwitch('js-flags', '--expose_gc');
 
+// FOR DEBUG ONLY
+app.commandLine.appendSwitch('remote-debugging-port', '1919');
+
 export type RendererWindows = {
   mainWindow: Electron.BrowserWindow | null;
   reader: Electron.BrowserWindow | null;
@@ -77,8 +80,6 @@ app.on('window-all-closed', () => {
  * Install dev extensions on dev mode only
  */
 if (import.meta.env.DEV) {
-  app.commandLine.appendSwitch('remote-debugging-port', '1919');
-
   app
     .whenReady()
     .then(async () => {

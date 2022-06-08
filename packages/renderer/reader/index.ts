@@ -1,28 +1,29 @@
 import * as Comlink from 'comlink';
 
-// Import services
-import ServiceManager from '../../services/ServiceManager';
-
-// Import IPC service
-import './ReaderIPCService';
-
-// Device Manager
-import { DeviceManager } from './models/DeviceManager';
 import { ipcRenderer } from 'electron';
 
-// Initialize the device manager after 1 second to ensure the main UI is loaded first
-setTimeout(() => {
-  const deviceManager = new DeviceManager();
+/**
+ * Starts the reader process and load async modules.
+ */
+const startReaderProcess = async () => {
+  // Initialize the service manager for database access first.
+  const serviceManager = (await import('../../services/ServiceManager')).default;
+  await serviceManager.init();
 
-  // Create a message port and send it to the main window.
-  const messagePorts = new MessageChannel();
-  ipcRenderer.postMessage('window:port', 'reader', [messagePorts.port2]);
+  setTimeout(async () => {
+    // Device Manager
+    const DeviceManager = (await import('./models/DeviceManager')).default;
 
-  Comlink.expose(deviceManager, messagePorts.port1);
-}, 100);
+    // Start the device manager.
+    const deviceManager = new DeviceManager();
 
-// Before process reload, empty the state,
-window.onbeforeunload = () => {
-  ServiceManager.store.deviceStore.setDeviceStoreValue('activeDeviceModules', []);
-  ServiceManager.store.deviceStore.setDeviceStoreValue('allDeviceNamesAndInfo', []);
+    // Create a message port and send it to the main window.
+    const messagePorts = new MessageChannel();
+    ipcRenderer.postMessage('window:port', 'reader', [messagePorts.port2]);
+
+    // Expose the device manager as a Comlink object.
+    Comlink.expose(deviceManager, messagePorts.port1);
+  }, 100);
 };
+
+startReaderProcess();

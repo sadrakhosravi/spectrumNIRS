@@ -38,6 +38,8 @@ export class BeastPhysicalDevice implements INIRSDevice {
       id: this.getDeviceSerialNumber(),
       name: BeastPhysicalDevice.getName(),
       version: this.getVersion(),
+      ADCRes: this.getADCResolution(),
+      DACRes: this.getDACResolution(),
       numOfChannelsPerPD: this.getSupportedLEDNum(),
       numOfADCs: this.getSupportedPDNum(),
       supportedSamplingRate: this.getSupportedSamplingRates(),
@@ -46,6 +48,20 @@ export class BeastPhysicalDevice implements INIRSDevice {
       calculatedChannelNames: this.getCalculatedChannelNames(),
       hasProbeSettings: true,
     };
+  }
+
+  /**
+   * @returns the ADC resolution taking the reserved bits into account.
+   */
+  public getADCResolution(): number {
+    return 15; // 16 bits but the last one is reserved.
+  }
+
+  /**
+   * @returns the LED DAC driver.
+   */
+  public getDACResolution(): number {
+    return 7; // 7 bits DAC led intensity driver.
   }
 
   /**

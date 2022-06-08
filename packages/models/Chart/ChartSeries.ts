@@ -137,8 +137,7 @@ export class ChartSeries {
   /**
    * Applies the gain value and adds Array of the data to the series.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addArrayY(data: Float32Array | Int32Array | number[], _start: number) {
+  public addArrayY(data: Float32Array | Int32Array | number[], start: number) {
     const deviceCalibFactor = 1;
     const gainVal = this.seriesGainVal;
 
@@ -151,7 +150,7 @@ export class ChartSeries {
       data[i] *= gainVal * deviceCalibFactor;
     }
 
-    this.series.addArrayY(data, this.timeDelta);
+    this.series.addArrayY(data, this.timeDelta, start);
   }
 
   /**

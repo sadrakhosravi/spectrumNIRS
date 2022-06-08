@@ -2,15 +2,13 @@ import { Matrix, pseudoInverse } from 'ml-matrix';
 import { col2, col3 } from './e_coef';
 
 // Types
-import type { DeviceCalculatedDataType, DeviceInfoType } from 'reader/api/Types';
-import type { V5ParserDataType } from '../../V5/V5Parser';
+import type { DeviceADCDataType, DeviceCalculatedDataType, DeviceInfoType } from 'reader/api/Types';
 import type { IDeviceCalculation } from 'reader/Interfaces';
-import { BeastParserDataType } from '../BeastParser';
 
 /**
  * Calculations of the V5 device channels
  */
-class BeastCalculation implements IDeviceCalculation {
+class NIRSCalculation implements IDeviceCalculation {
   private LEDIntensities: number[];
   /**
    * The device calculated channel names.
@@ -46,10 +44,6 @@ class BeastCalculation implements IDeviceCalculation {
    */
   private BATCH_SIZE: number;
   /**
-   * The object to store the processed data.
-   */
-  private calcDataRes: DeviceCalculatedDataType;
-  /**
    * The number of PD channels.
    */
   private PDChannels: number;
@@ -63,6 +57,10 @@ class BeastCalculation implements IDeviceCalculation {
    * The array format is `[ambient, ch1, ch2, ch3, ch4, ch5]`.
    */
   private dataPointArr: Float32Array;
+  /**
+   * The number of ADCs/PD of the device.
+   */
+  private numOfADCs: number;
   ADCRes: number;
   ADCMaxVal: number;
   DACRes: number;
@@ -76,13 +74,14 @@ class BeastCalculation implements IDeviceCalculation {
     this.wavelengths = new Uint16Array([950, 730, 810, 850, 650]);
     this.c_beta = new Float32Array([-1.2132, -0.0728, 1.8103, 1.1433, -11.5816]);
 
-    this.BATCH_SIZE = 32;
-    this.PDChannels = 16;
+    this.BATCH_SIZE = 10;
+    this.PDChannels = 1;
+    this.numOfADCs = 1;
 
     // ADC Resolution
-    this.ADCRes = 15;
+    this.ADCRes = 12;
     this.ADCMaxVal = Math.pow(2, this.ADCRes) - 1;
-    this.DACRes = 7;
+    this.DACRes = 8;
     this.DACMaxVal = Math.pow(2, this.DACRes) - 1;
 
     // Do the initial coefficient calculations.
@@ -93,9 +92,6 @@ class BeastCalculation implements IDeviceCalculation {
     // Defining arrays and objects here for functions use - Reason: Memory efficiency.
     this.dataPointArr = new Float32Array(10);
     this.hemodynamicsArr = new Float32Array(10).fill(0);
-
-    // Create the final object that will be returned by processData
-    this.calcDataRes = {};
   }
 
   /**
@@ -111,13 +107,20 @@ class BeastCalculation implements IDeviceCalculation {
   public init(deviceInfo: DeviceInfoType) {
     this.LEDIntensities = new Array(deviceInfo.numOfChannelsPerPD).fill(0);
     this.calcChannelNames = deviceInfo.calculatedChannelNames;
-    this.PDChannels = 6;
+    this.PDChannels = deviceInfo.PDChannelNames.length;
+    this.numOfADCs = deviceInfo.numOfADCs;
+
+    // Set ADC and DAC resolutions
+    this.ADCRes = deviceInfo.ADCRes;
+    this.DACRes = deviceInfo.DACRes;
+
+    // Calculate the max values
+    this.ADCMaxVal = Math.pow(2, this.ADCRes) - 1;
+    this.DACMaxVal = Math.pow(2, this.DACRes) - 1;
 
     // Setup the static objects
     this.dataPointArr = new Float32Array(this.PDChannels);
     this.hemodynamicsArr = new Float32Array(this.calcChannelNames.length - 1);
-
-    this.createOutputObj();
   }
 
   /**
@@ -131,10 +134,11 @@ class BeastCalculation implements IDeviceCalculation {
    * Sets the updated LED intensities of the device used for TOI calculation.
    */
   public setLEDIntensities(LEDIntensities: number[]) {
-    console.log(LEDIntensities);
-    if (LEDIntensities.length !== 16)
-      throw new Error('The supplied LED intensities are not in the correct format for Beast.');
+    if (LEDIntensities.length !== this.PDChannels - 1)
+      throw new Error('The supplied LED intensities are not in the correct format for V5.');
     this.LEDIntensities = LEDIntensities;
+
+    console.log(this.LEDIntensities);
   }
 
   /**
@@ -142,34 +146,46 @@ class BeastCalculation implements IDeviceCalculation {
    * and memory consumption.
    */
   private createOutputObj() {
-    this.calcChannelNames.forEach((channelName) => {
-      this.calcDataRes['ADC1'][channelName] = new Float32Array(this.BATCH_SIZE);
-    });
+    const calcDataRes: DeviceCalculatedDataType = {};
+
+    for (let i = 0; i < this.numOfADCs; i++) {
+      calcDataRes['ADC' + (i + 1)] = {};
+
+      this.calcChannelNames.forEach((channelName) => {
+        calcDataRes['ADC' + (i + 1)][channelName] = new Float32Array(this.BATCH_SIZE);
+      });
+    }
+
+    return calcDataRes;
   }
 
   /**
-   * Calculates the NIRS parameters for beast and return an object containing the calculated values.
+   *
+   * @param data
+   * @returns
    */
-  public processData = (data: BeastParserDataType) => {
+  public processData = <T extends DeviceADCDataType>(data: T) => {
+    // Create the output object
+    const calcDataRes = this.createOutputObj();
+
     // Create an array to store once data point of the batch
+    for (let k = 0; k < this.numOfADCs; k++) {
+      // For each batch, go through individual data point and calculate the values
+      for (let i = 0; i < this.BATCH_SIZE; i += 1) {
+        // Put one sample from the hardware into the dataPoint array.
+        for (let j = 0; j < this.PDChannels; j++) {
+          this.dataPointArr[j] = data.ADC1[('ch' + j) as keyof DeviceADCDataType['ADC1']][i];
+        }
 
-    // For each batch, go through individual data point and calculate the values
-    for (let i = 0; i < this.BATCH_SIZE; i += 1) {
-      // Put one sample from the hardware into the dataPoint array.
-      for (let j = 1; j < this.PDChannels; j++) {
-        this.dataPointArr[j] = data.ADC3[('ch' + (j + 10)) as keyof V5ParserDataType['ADC1']][i];
+        // Calculate that sample.
+        this.calcHemodynamics(this.dataPointArr);
+        calcDataRes['ADC' + (k + 1)]['O2Hb'][i] = this.hemodynamicsArr[0];
+        calcDataRes['ADC' + (k + 1)]['HHb'][i] = this.hemodynamicsArr[1];
+        calcDataRes['ADC' + (k + 1)]['THb'][i] = this.hemodynamicsArr[2];
+        calcDataRes['ADC' + (k + 1)]['TOI'][i] = this.calcTOI(this.dataPointArr);
       }
-
-      this.dataPointArr[0] = data.ADC3.ch0[i];
-
-      // Calculate that sample.
-      this.calcHemodynamics(this.dataPointArr);
-      this.calcDataRes['ADC1']['O2Hb'][i] = this.hemodynamicsArr[0];
-      this.calcDataRes['ADC1']['HHb'][i] = this.hemodynamicsArr[1];
-      this.calcDataRes['ADC1']['THb'][i] = this.hemodynamicsArr[2];
-      this.calcDataRes['ADC1']['TOI'][i] = this.calcTOI(this.dataPointArr);
     }
-    return this.calcDataRes;
+    return calcDataRes;
   };
 
   /**
@@ -257,10 +273,10 @@ class BeastCalculation implements IDeviceCalculation {
   protected calcTOI = (sample: Float32Array) => {
     // Remove 3rd element of the array - Used to normalize
     const Amp_coef = new Float32Array([
-      (this.LEDIntensities[11] / this.DACMaxVal) * this.ADCMaxVal,
-      (this.LEDIntensities[12] / this.DACMaxVal) * this.ADCMaxVal,
-      (this.LEDIntensities[13] / this.DACMaxVal) * this.ADCMaxVal,
-      (this.LEDIntensities[14] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[0] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[1] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[3] / this.DACMaxVal) * this.ADCMaxVal,
+      (this.LEDIntensities[4] / this.DACMaxVal) * this.ADCMaxVal,
     ]);
 
     // Normalize based on one Raw PD (ADC) value - LED 3 Wavelength chosen here
@@ -292,4 +308,4 @@ class BeastCalculation implements IDeviceCalculation {
   };
 }
 
-export default BeastCalculation;
+export default NIRSCalculation;

@@ -12,7 +12,6 @@ import * as Comlink from 'comlink';
 
 // Services
 import MainWinIPCService from '../../renderer/main-ui/MainWinIPCService';
-import ServiceManager from '../../services/ServiceManager';
 
 // Models
 
@@ -53,13 +52,14 @@ export class DeviceManagerViewModel {
   protected startTimestamp: number;
   private devicesMessagePort: DevicesMessagePortType[];
   protected reader!: Comlink.Remote<DeviceManagerType>;
+  isRecordingData: boolean;
 
   constructor() {
     this.availableDevices = [];
     this.activeDeviceProxies = [];
     this.reactions = [];
     this.startTimestamp = 0;
-
+    this.isRecordingData = false;
     this.devicesMessagePort = [];
     // States
 
@@ -81,13 +81,6 @@ export class DeviceManagerViewModel {
    */
   public get activeDevices() {
     return this.activeDeviceProxies;
-  }
-
-  /**
-   * The reader process recording state
-   */
-  public get isRecordingData() {
-    return ServiceManager.store.deviceStore.store.isRecordingData;
   }
 
   /**

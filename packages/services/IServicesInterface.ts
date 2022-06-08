@@ -2,7 +2,7 @@ export interface IServices {
   /**
    * Starts and initializes the service.
    */
-  initService(): void | Promise<void>;
+  initService(): boolean | Promise<boolean>;
 
   /**
    * Shuts the service down.

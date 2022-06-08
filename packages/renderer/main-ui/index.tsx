@@ -1,27 +1,28 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-// Global states
-import '@models/App/GlobalStateModel';
+/**
+ * Runs the startup and load the main UI.
+ */
+const startMainUI = async () => {
+  // Load service manager
+  const serviceManager = (await import('../../services/ServiceManager')).default;
+  await serviceManager.init();
 
-// Start Service Manager
-import '../../services/ServiceManager';
+  console.log(await serviceManager.dbConnection.initialized);
 
-// View Model Store
-import '@store';
+  setTimeout(async () => {
+    // Load view model store
+    await import('@store');
 
-// Data
-import '@models/Data/DataManagerModel';
+    // Load modules
+    const App = (await import('./App')).App;
 
-// IPC Service
-import './MainWinIPCService';
+    const container = document.getElementById('main') as HTMLElement;
+    const root = createRoot(container);
 
-// Components
-import { App } from './App';
+    root.render(<App />);
+  }, 100);
+};
 
-setTimeout(() => {
-  const container = document.getElementById('main') as HTMLElement;
-  const root = createRoot(container);
-
-  root.render(<App />);
-}, 200);
+startMainUI();

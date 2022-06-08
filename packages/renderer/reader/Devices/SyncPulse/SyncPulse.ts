@@ -9,6 +9,7 @@ import { SyncPulsePhysicalDevice } from './SyncPulsePhysicalDevice';
 import { SyncPulseInput } from './SyncPulseInput';
 import { SyncPulseParser } from './SyncPulseParser';
 import { SyncPulseDeviceSettings } from './SyncPulseDeviceSettings';
+import { SyncPulseDefaultConfig } from './SyncPulseDefaultConfig';
 
 // Interfaces
 import { IDevice } from 'reader/api/device-api';
@@ -18,6 +19,7 @@ const SyncPulse: IDevice = {
   Input: SyncPulseInput,
   Parser: SyncPulseParser,
   Settings: SyncPulseDeviceSettings,
+  DefaultConfigs: SyncPulseDefaultConfig,
 };
 
 export default SyncPulse;

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { URL } from 'url';
 
 function createWindow() {
@@ -21,6 +21,8 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       backgroundThrottling: false,
+      nodeIntegrationInWorker: true,
+      nodeIntegrationInSubFrames: true,
       enableBlinkFeatures: '',
 
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
@@ -55,8 +57,6 @@ function createWindow() {
   return browserWindow;
 }
 
-let count = 0;
-
 /**
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
@@ -65,10 +65,7 @@ export function createMainWindow() {
   window.on('close', () => app.quit());
 
   if (import.meta.env.DEV) {
-    ipcMain.handle('open-dev-tools', () => {
-      count === 0 && true;
-      count = 2;
-    });
+    window.webContents.openDevTools();
   }
 
   return window;

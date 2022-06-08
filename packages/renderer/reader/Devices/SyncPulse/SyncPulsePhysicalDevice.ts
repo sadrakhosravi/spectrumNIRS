@@ -31,6 +31,8 @@ export class SyncPulsePhysicalDevice implements IPhysicalDevice {
       id: this.getDeviceSerialNumber(),
       name: SyncPulsePhysicalDevice.getName(),
       version: this.getVersion(),
+      DACRes: this.getDACResolution(),
+      ADCRes: this.getADCResolution(),
       numOfChannelsPerPD: this.getSupportedLEDNum(),
       numOfADCs: this.getSupportedPDNum(),
       supportedSamplingRate: this.getSupportedSamplingRates(),
@@ -39,6 +41,16 @@ export class SyncPulsePhysicalDevice implements IPhysicalDevice {
       calculatedChannelNames: this.getCalculatedChannelNames(),
       hasProbeSettings: false,
     };
+  }
+
+  // Not used in this device
+  public getADCResolution(): number {
+    return 1;
+  }
+
+  // Not used in this device
+  public getDACResolution(): number {
+    return 1;
   }
 
   /**

@@ -12,7 +12,7 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 
 // V5 device module
 import V5 from './V5';
-import V5Calculation from './calc/V5Calculation';
+import V5Calculation from '../../Calculations/NIRS/NIRSCalculations';
 import type { V5ParserDataType } from './V5Parser';
 
 // Interfaces
@@ -24,6 +24,7 @@ import {
   IDeviceReader,
   DeviceDataTypeWithMetaData,
   IDeviceSettings,
+  IDeviceConfigParsed,
 } from '../../api/device-api';
 
 import AccurateTimer from '@utils/helpers/AccurateTimer';
@@ -35,8 +36,8 @@ export class V5DeviceReader implements IDeviceReader {
    */
   private device: IDevice;
   private physicalDevice: IPhysicalDevice;
-  protected deviceParser: IDeviceParser;
-  protected deviceInput: IDeviceInput;
+  private deviceParser: IDeviceParser;
+  private deviceInput: IDeviceInput;
 
   protected isDeviceConnected: boolean;
 
@@ -77,6 +78,20 @@ export class V5DeviceReader implements IDeviceReader {
     // Initialize the device classes if needed
     this.deviceCalculations.init(this.physicalDevice.getDeviceInfo());
     this.deviceCalculations.setBatchSize(10);
+  }
+
+  /**
+   * @returns the default configuration of the device.
+   */
+  public getDefaultConfig() {
+    return this.device.DefaultConfigs;
+  }
+
+  /**
+   * Applies the saved configs to the controller.
+   */
+  public setDeviceConfig(deviceConfig: IDeviceConfigParsed): void {
+    this.deviceSettings.updateConfig(deviceConfig);
   }
 
   /**
