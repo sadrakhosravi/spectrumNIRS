@@ -5,7 +5,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as Comlink from 'comlink';
-import { action, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
+import {
+  action,
+  IReactionDisposer,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+  toJS,
+} from 'mobx';
 import ServiceManager from '../../../services/ServiceManager';
 
 // Device api
@@ -63,7 +71,7 @@ export class DeviceModel {
   /**
    * The Comlink wrapped worker instance.
    */
-  wrappedWorker: Comlink.Remote<IDeviceReader>;
+  private wrappedWorker: Comlink.Remote<IDeviceReader>;
   /**
    * The message port used to transfer owner ship of the data buffer.
    */
@@ -163,7 +171,7 @@ export class DeviceModel {
       return;
     }
     // Set the current config - the reaction will save and apply it to the device.
-    this.deviceConfig = activeConfig as IDeviceConfig & { id: number };
+    runInAction(() => (this.deviceConfig = activeConfig as IDeviceConfig & { id: number }));
   }
 
   /**

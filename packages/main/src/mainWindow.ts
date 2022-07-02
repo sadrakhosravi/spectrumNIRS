@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import { URL } from 'url';
+import { renderers } from '.';
 
 function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -66,6 +67,10 @@ export function createMainWindow() {
 
   if (import.meta.env.DEV) {
     window.webContents.openDevTools();
+
+    window.webContents.on('did-navigate', () => {
+      renderers.reader?.webContents.reload();
+    });
   }
 
   return window;

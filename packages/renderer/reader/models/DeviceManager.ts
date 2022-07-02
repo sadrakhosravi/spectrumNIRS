@@ -19,6 +19,7 @@ import type { DeviceNameType } from '../api/Types';
 import type { DeviceSettingsType } from '@models/Device/DeviceModelProxy';
 import { DeviceReader } from './DeviceReader';
 import { makeObservable, observable } from 'mobx';
+import ServiceManager from '../../../services/ServiceManager';
 
 export type DeviceManagerType = DeviceManager;
 
@@ -120,11 +121,24 @@ export class DeviceManager {
   }
 
   /**
+   * Removes all devices from the reader process and the observables.
+   */
+  public async removeAllDevices() {
+    this.activeDevices.forEach(async (device) => {
+      await device.stopDevice();
+      await device.removeDevice();
+    });
+    this.activeDevices.length = 0;
+  }
+
+  /**
    * Handles the start signal from the UI
    */
   public startDevices() {
     this.activeDevices.forEach((device) => device.startDevice());
     this.deviceReader.startDataAcquisition(this.activeDevices);
+
+    ServiceManager.dbConnection.dbDeviceDataManager.start();
   }
 
   /**
@@ -133,6 +147,8 @@ export class DeviceManager {
   public stopDevices() {
     this.deviceReader.stopDataAcquisitionLoop();
     this.activeDevices.forEach((device) => device.stopDevice());
+
+    ServiceManager.dbConnection.dbDeviceDataManager.stop();
   }
 
   /**

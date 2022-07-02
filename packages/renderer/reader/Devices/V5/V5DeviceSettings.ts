@@ -128,7 +128,7 @@ export class V5DeviceSettings implements IDeviceSettings {
     this.ledIntensities = settings.LEDValues;
 
     const formattedSettings = this.parseSettings(settings.LEDValues);
-    this.deviceCalculation.setLEDIntensities(settings.LEDValues.map((set) => (set += 50)));
+    this.deviceCalculation.setLEDIntensities(settings.LEDValues);
     // Update the physical device
     const status = this.deviceInput?.sendCommand(undefined, formattedSettings);
 
@@ -141,7 +141,6 @@ export class V5DeviceSettings implements IDeviceSettings {
    * @returns a comma separated string to be sent to the hardware.
    */
   private parseSettings(settings: DeviceSettingsType['LEDValues']): string {
-    settings = settings.map((setting) => (setting += 50));
     // Format the settings as a string comma separated.
     return `${settings.join(',')},${this.preGain},${this.gain}`;
   }

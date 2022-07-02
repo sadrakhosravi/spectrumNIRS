@@ -85,7 +85,7 @@ export class XAxisModel {
    */
   private createXAxisChart(container: string) {
     this.xAxisChart = lcjs().ChartXY({
-      maxFps: 20,
+      maxFps: 50,
       container,
       antialias: true,
       lineAntiAlias: true,

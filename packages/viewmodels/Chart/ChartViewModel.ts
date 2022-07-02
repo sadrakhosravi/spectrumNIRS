@@ -17,6 +17,8 @@ import type { ChartSeries, DashboardChart } from '../../models/Chart';
 import type { Dashboard, SynchronizeAxisIntervalsHandle } from '@arction/lcjs';
 import type { CSSProperties } from 'react';
 import type { IReactionDisposer } from 'mobx';
+import { appRouterVM } from '../VMStore';
+import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 
 export type IChart = {
   dashboardChart: DashboardChart;
@@ -379,6 +381,19 @@ export class ChartViewModel {
       },
     );
 
-    this.reactions.push(chartLengthReaction, chartMaximizedReaction, chartViewChangeReaction);
+    // Handles app router change.
+    const handleAppRouteSwitch = reaction(
+      () => appRouterVM.route,
+      () => {
+        if (appRouterVM.route !== AppNavStatesEnum.CALIBRATION) this.currView = 'line';
+      },
+    );
+
+    this.reactions.push(
+      chartLengthReaction,
+      chartMaximizedReaction,
+      chartViewChangeReaction,
+      handleAppRouteSwitch,
+    );
   }
 }

@@ -51,6 +51,13 @@ const config = {
         ['SerialPort', 'SerialPortMock'],
         { format: 'cjs' },
       ),
+      v8: lib2esm(
+        // CJS lib name
+        'v8',
+        // export members
+        ['serialize'],
+        { format: 'cjs' },
+      ),
       typeorm: lib2esm(
         // CJS lib name
         'typeorm',
@@ -69,6 +76,8 @@ const config = {
         { format: 'cjs' },
       ),
 
+      'lz4-napi': lib2esm('lz4-napi', ['compress', 'uncompress', 'compressSync', 'uncompressSync']),
+
       snappy: 'export default require("snappy");',
     }),
     checker({
@@ -86,6 +95,9 @@ const config = {
     rollupOptions: {
       external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
     },
+    output: {
+      format: 'cjs',
+    },
     sourcemap: 'inline',
   },
   build: {
@@ -100,10 +112,18 @@ const config = {
         reader: join(PACKAGE_ROOT, 'reader.html'),
       },
 
+      commonjsOptions: { exclude: ['typeorm'], include: [] }, // <----
+
       output: {
         format: 'cjs',
       },
-      external: [...builtinModules.flatMap((p) => [p, `node:${p}`])],
+      external: [
+        'typeorm',
+        'better-sqlite3',
+        'sqlite3',
+        'v8',
+        ...builtinModules.flatMap((p) => [p, `node:${p}`]),
+      ],
     },
 
     emptyOutDir: true,

@@ -6,7 +6,7 @@
 
 // View Model imports - ORDER MATTERS
 import { AppMenuViewModel } from './App/AppMenuViewModel';
-import { AppStatesViewModel } from './App/AppStatesViewModel';
+import { AppRouterViewModel } from './App/AppRouterViewModel';
 
 import { DeviceManagerViewModel } from './Device/DeviceManagerViewModel';
 
@@ -20,7 +20,7 @@ import { RecordingViewModel } from './Recording/RecordingViewModel';
 /**
  * Application router view model singleton.
  */
-export const appRouterVM = new AppStatesViewModel();
+export const appRouterVM = new AppRouterViewModel();
 /**
  * Application menu view model singleton.
  */

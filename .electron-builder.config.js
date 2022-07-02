@@ -22,7 +22,7 @@ const config = {
   extraMetadata: {
     version: process.env.VITE_APP_VERSION,
   },
-  asar: false,
+  asar: true,
   // win: {
   //   target: ['nsis'],
   // },

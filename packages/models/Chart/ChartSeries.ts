@@ -45,7 +45,7 @@ export class ChartSeries {
   /**
    * The time difference between each sample based on the sampling rate.
    */
-  private timeDelta: number;
+  protected timeDelta: number;
 
   constructor(series: LineSeries, seriesColor: string | undefined, chartId: string) {
     this.series = series;
@@ -56,7 +56,7 @@ export class ChartSeries {
     this.lowpassFilter = null;
 
     this.samplingRate = 100;
-    this.timeDelta = 1000 / this.samplingRate;
+    this.timeDelta = this.samplingRate === 0 ? 0 : 1000 / this.samplingRate;
 
     this.setLineSeriesStrokeStyle();
     this.setSeriesCleaning(30 * 1000);
@@ -106,7 +106,7 @@ export class ChartSeries {
     this.samplingRate = samplingRate;
 
     // Update time delta too
-    this.timeDelta = 1000 / this.samplingRate;
+    this.timeDelta = this.samplingRate === 0 ? 0 : 1000 / this.samplingRate;
   }
 
   /**
@@ -200,7 +200,7 @@ export class ChartSeries {
   @action public changeSeriesColor(color: string) {
     this.series.setStrokeStyle(
       new SolidLine({
-        thickness: 1.7,
+        thickness: 1,
         fillStyle: new SolidFill({ color: ColorHEX(color || '#fff') }),
       }),
     );

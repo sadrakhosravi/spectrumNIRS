@@ -23,6 +23,8 @@ export type {
 
 export type { DeviceDataTypeWithMetaData, DeviceADCDataType } from './Types';
 
+import type { DeviceInfoType } from './Types';
+
 type Device<I> = new () => I;
 type Input<I> = new (io?: any) => I;
 type Parser<I> = new () => I;
@@ -52,6 +54,14 @@ export type DeviceSettingsType = {
   numOfPDs: number;
   LEDValues: number[];
 };
+
+/** The device info to be saved and retrieved from the database. */
+export type DeviceInfoSavedType = DeviceInfoType &
+  DeviceSettingsType & {
+    samplingRate: number;
+    activeLEDs: boolean[];
+    activePDs: boolean[];
+  };
 
 /**
  * A function for sending worker's data to the reader process.

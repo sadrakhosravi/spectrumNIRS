@@ -12,11 +12,19 @@ type RangeSliderWithInputType = {
   min?: number;
   max?: number;
   id?: string;
-  onBlur?: (e: any) => any;
+  defaultValue?: number;
+  onBlur?: (value: number) => any;
 };
 
-export const RangeSliderWithInput = ({ title, min, max, id, onBlur }: RangeSliderWithInputType) => {
-  const [value, setValue] = React.useState(min || 0);
+export const RangeSliderWithInput = ({
+  title,
+  min,
+  max,
+  defaultValue,
+  id,
+  onBlur,
+}: RangeSliderWithInputType) => {
+  const [value, setValue] = React.useState(defaultValue || min || 0);
 
   const onValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Convert to number
@@ -35,6 +43,11 @@ export const RangeSliderWithInput = ({ title, min, max, id, onBlur }: RangeSlide
     setValue(newVal);
   }, []);
 
+  const handleOnBlur = React.useCallback((e: any) => {
+    const value = ~~e.target.value;
+    onBlur && onBlur(value);
+  }, []);
+
   return (
     <>
       <div className={styles.RangeSliderWithInput}>
@@ -47,7 +60,8 @@ export const RangeSliderWithInput = ({ title, min, max, id, onBlur }: RangeSlide
             max={max}
             step={1}
             onChange={onValueChange}
-            onMouseUp={onBlur as React.MouseEventHandler<HTMLInputElement>}
+            //@ts-ignore
+            onMouseUp={handleOnBlur as React.MouseEventHandler<HTMLInputElement>}
           />
         </span>
         <span className={styles.InputSpan}>
@@ -57,7 +71,7 @@ export const RangeSliderWithInput = ({ title, min, max, id, onBlur }: RangeSlide
             max={max}
             onChange={(e) => {
               onValueChange(e);
-              onBlur && onBlur(e);
+              handleOnBlur(e);
             }}
           />
         </span>

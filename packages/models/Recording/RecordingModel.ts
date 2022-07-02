@@ -4,9 +4,14 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { nanoid } from 'nanoid';
-import { observable } from 'mobx';
-// import ServiceManager from '../../services/ServiceManager';
+import { makeObservable, observable, reaction, toJS } from 'mobx';
+
+// Types
+import type { IReactionDisposer } from 'mobx';
+
+// View Models
+import { deviceManagerVM } from '../../viewmodels/VMStore';
+import ServiceManager from '../../services/ServiceManager';
 
 export class RecordingModel {
   /**
@@ -16,49 +21,48 @@ export class RecordingModel {
   /**
    * The name of the recording.
    */
-  @observable private recordingName: string;
+  public readonly name: string;
   /**
    * The name of the recording.
    */
-  @observable private recordingDescription: string;
+  public readonly description: string | null;
+  /**
+   * The timestamp that the recording was created at.
+   */
+  public readonly createdTimestamp: number;
   /**
    * The devices used in the recording.
    */
   @observable private devices: any[];
   /**
-   * The timestamp that the recording was created at.
-   */
-  private createdTimestamp: number;
-  /**
    * The last update timestamp
    */
-  private lastUpdateTimestamp: number;
+  @observable protected updatedTimestamp: number;
+  reactions: IReactionDisposer[];
 
-  constructor(name: string, description: string, isNewRecord: boolean) {
-    this.id = nanoid();
-    this.recordingName = name;
-    this.recordingDescription = description;
+  constructor(
+    id: string,
+    name: string,
+    description: string | null,
+    createdTS: number,
+    updatedTS: number,
+  ) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.createdTimestamp = createdTS;
+
+    // Observables
+    this.updatedTimestamp = updatedTS;
+
     this.devices = [];
 
-    this.createdTimestamp = Date.now();
-    this.lastUpdateTimestamp = this.createdTimestamp;
+    this.reactions = [];
 
-    // Only create a record if its a new record.
-    isNewRecord && this.createDatabaseRecord();
-  }
+    makeObservable(this);
 
-  /**
-   * The name of the recording.
-   */
-  public get name() {
-    return this.recordingName;
-  }
-
-  /**
-   * The description of the recording.
-   */
-  public get description() {
-    return this.recordingDescription;
+    this.getDeviceSettings();
+    this.handleDeviceChangeReaction();
   }
 
   /**
@@ -79,13 +83,28 @@ export class RecordingModel {
    * The last update time stamp.
    */
   public get lastUpdate() {
-    return this.lastUpdateTimestamp;
+    return this.updatedTimestamp;
   }
 
   /**
-   * Updates the database record.
+   * Retrieves the device settings from the database if available.
    */
-  private async createDatabaseRecord() {
-    //
+  private async getDeviceSettings() {
+    const devices = await ServiceManager.dbConnection.recordingQueries.selectRecordingDevices(
+      this.id,
+    );
+
+    console.log(devices);
+  }
+
+  private handleDeviceChangeReaction() {
+    const deviceChangeReaction = reaction(
+      () => deviceManagerVM.activeDeviceProxies.length,
+      () => {
+        console.log(toJS(deviceManagerVM.activeDevices));
+      },
+    );
+
+    return deviceChangeReaction;
   }
 }

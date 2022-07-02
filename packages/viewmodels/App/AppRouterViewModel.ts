@@ -1,10 +1,17 @@
+/*---------------------------------------------------------------------------------------------
+ *  App Router View Model.
+ *  Uses Mobx observable pattern.
+ *  Manages the application states and routes to be used by individual components.
+ *  @version 0.1.0
+ *--------------------------------------------------------------------------------------------*/
+
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 
 /**
  * ViewModel for application states
  */
-export class AppStatesViewModel {
+export class AppRouterViewModel {
   /**
    * The current application route
    */
@@ -14,7 +21,7 @@ export class AppStatesViewModel {
    */
   @observable private loading: { status: boolean; transparent: boolean; message: string };
   constructor() {
-    this.route = AppNavStatesEnum.CALIBRATION; //FIXME: Revert back to '' as the default route. Only for debugging
+    this.route = AppNavStatesEnum.HOME; //FIXME: Revert back to '' as the default route. Only for debugging
     this.loading = { status: false, transparent: false, message: '' };
     makeObservable(this);
   }
@@ -53,14 +60,18 @@ export class AppStatesViewModel {
   /**
    * Sets the current path of the app as a state
    */
-  @action public async navigateTo(path: AppNavStatesEnum) {
-    // this.setAppLoading(true);
-    this.route = path;
+  @action public async navigateTo(
+    path: AppNavStatesEnum,
+    withLoader?: boolean,
+    transparent?: boolean,
+    message?: string,
+    timerInMS?: number,
+  ) {
+    withLoader &&
+      runInAction(() => {
+        this.setAppLoading(true, transparent, message, timerInMS);
+      });
 
-    // setTimeout(() => {
-    //   runInAction(() => {
-    //     this.setAppLoading(false);
-    //   });
-    // }, 1000);
+    requestAnimationFrame(() => runInAction(() => (this.route = path)));
   }
 }

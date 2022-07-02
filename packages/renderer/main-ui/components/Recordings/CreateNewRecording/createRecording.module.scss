@@ -9,3 +9,8 @@
   margin-top: $gap-lg;
   margin-bottom: $gap-lg;
 }
+
+.AvailableDevices {
+  margin: $gap-base 0 $gap-xl 0;
+  @include flex-center;
+}

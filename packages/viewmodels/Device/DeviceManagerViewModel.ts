@@ -5,7 +5,7 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import { ipcRenderer } from 'electron';
 import { MessagePortChannels } from '../../utils/channels';
 import * as Comlink from 'comlink';
@@ -20,13 +20,13 @@ import { DeviceChannels } from '../../utils/channels/DeviceChannels';
 
 // Types
 import type { DeviceInfoType, DeviceNameType } from '../../renderer/reader/api/Types';
-import type { IReactionDisposer } from 'mobx';
 import type { DeviceManagerType } from '../../renderer/reader/models/DeviceManager';
 import type { DeviceSettingsType } from '../../models/Device/DeviceModelProxy';
 
 // View Models
-import { chartVM } from '../VMStore';
+import { chartVM, recordingVM } from '../VMStore';
 import { DeviceModelProxy } from '../../models/Device/DeviceModelProxy';
+import ServiceManager from '../../services/ServiceManager';
 
 export type DevicesMessagePortType = {
   port: MessagePort;
@@ -41,11 +41,7 @@ export class DeviceManagerViewModel {
   /**
    * Active devices proxy array.
    */
-  @observable private activeDeviceProxies: DeviceModelProxy[];
-  /**
-   * Observables reaction disposer array.
-   */
-  private reactions: IReactionDisposer[];
+  @observable public readonly activeDeviceProxies: DeviceModelProxy[];
   /**
    * Recording start time stamp or 0.
    */
@@ -57,7 +53,6 @@ export class DeviceManagerViewModel {
   constructor() {
     this.availableDevices = [];
     this.activeDeviceProxies = [];
-    this.reactions = [];
     this.startTimestamp = 0;
     this.isRecordingData = false;
     this.devicesMessagePort = [];
@@ -66,7 +61,6 @@ export class DeviceManagerViewModel {
     makeObservable(this);
 
     this.init();
-    this.handleReactions();
   }
 
   /**
@@ -124,7 +118,13 @@ export class DeviceManagerViewModel {
     const deviceProxy = this.createDeviceProxy(deviceInfoAndPort.info, deviceInfoAndPort.port);
     runInAction(() => this.activeDeviceProxies.push(deviceProxy));
 
-    this.getAvailableDevices();
+    await this.getAvailableDevices();
+
+    const createdDevicePromise = new Promise((resolve) => {
+      setTimeout(() => resolve(true), 300);
+    });
+
+    return createdDevicePromise;
   }
 
   /**
@@ -143,9 +143,23 @@ export class DeviceManagerViewModel {
       throw new Error('Could not remove the device proxy model. Something went wrong!');
 
     this.activeDeviceProxies[removedDeviceIndex].cleanup();
-    runInAction(() => this.activeDeviceProxies.splice(removedDeviceIndex, 1));
+    runInAction(async () => {
+      this.activeDeviceProxies.splice(removedDeviceIndex, 1);
+      await this.getAvailableDevices();
+    });
+  }
 
-    await this.getAvailableDevices();
+  /**
+   * Removes all device proxies and devices from the device manager.
+   */
+  @action public async removeAllDevices() {
+    this.activeDeviceProxies.forEach((deviceProxy) => {
+      deviceProxy.cleanup();
+    });
+
+    this.activeDeviceProxies.length = 0;
+
+    await this.reader.removeAllDevices();
   }
 
   /**
@@ -208,22 +222,22 @@ export class DeviceManagerViewModel {
   /**
    * Creates a device proxy model for the device that was created in the reader process.
    */
-  private createDeviceProxy(deviceInfo: DeviceInfoType, port: MessagePort) {
+  public createDeviceProxy(deviceInfo: DeviceInfoType, port?: MessagePort) {
     return new DeviceModelProxy(deviceInfo, port);
   }
 
   /**
-   * Handle observable reactions.
+   * Updates the recording database record with the latest device configuration.
    */
-  private handleReactions() {
-    const activeDeviceReactionDisposer = reaction(
-      () => this.activeDeviceProxies.length,
-      () => {
-        console.log(this.activeDeviceProxies.length);
-      },
-    );
+  public async updateRecordingDatabaseRecord() {
+    // No recording exists, so don't update anything.
+    if (!recordingVM.currentRecording) return;
 
-    // Add reactions to the trackable array.
-    this.reactions.push(activeDeviceReactionDisposer);
+    const deviceSettings = this.activeDeviceProxies.map((device) => device.getUpdatedDeviceInfo());
+
+    await ServiceManager.dbConnection.recordingQueries.updateRecordingDevices(
+      deviceSettings,
+      recordingVM.currentRecording.id,
+    );
   }
 }

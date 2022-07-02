@@ -14,8 +14,8 @@ export class RecordingDataTable {
   @Column({ type: 'blob', nullable: false })
   data!: Blob;
 
-  @ManyToOne(() => RecordingTable, (recordingTableId) => recordingTableId.id, {
+  @ManyToOne(() => RecordingTable, (recordingTable) => recordingTable.recordingData, {
     onDelete: 'CASCADE',
   })
-  recording!: RecordingTable;
+  recording!: number;
 }

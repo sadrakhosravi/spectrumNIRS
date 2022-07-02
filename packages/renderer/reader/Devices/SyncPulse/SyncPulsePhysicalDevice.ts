@@ -33,7 +33,7 @@ export class SyncPulsePhysicalDevice implements IPhysicalDevice {
       version: this.getVersion(),
       DACRes: this.getDACResolution(),
       ADCRes: this.getADCResolution(),
-      numOfChannelsPerPD: this.getSupportedLEDNum(),
+      numOfChannelsPerPD: this.getSupportedLEDNum() + 1,
       numOfADCs: this.getSupportedPDNum(),
       supportedSamplingRate: this.getSupportedSamplingRates(),
       defaultSamplingRate: this.getDefaultSamplingRate(),
@@ -99,7 +99,7 @@ export class SyncPulsePhysicalDevice implements IPhysicalDevice {
    * @returns the default sampling rate of the device.
    */
   public getDefaultSamplingRate() {
-    return 1;
+    return 0;
   }
 
   /**

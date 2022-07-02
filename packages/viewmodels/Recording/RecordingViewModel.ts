@@ -5,13 +5,21 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
+
+// Services
+import ServiceManager from '../../services/ServiceManager';
 
 // Models
 import { RecordingModel } from '../../models/Recording/RecordingModel';
 
 // Types
-import type { RecordingType } from '../../models/Recording/RecordingTypes';
+import type { IReactionDisposer } from 'mobx';
+import type { SavedRecordingType } from '../../sharedWorkers/database/Queries/RecordingQueries';
+
+// View models
+import { appRouterVM, deviceManagerVM } from '../VMStore';
+import { AppNavStatesEnum } from '../../utils/types/AppStateEnum';
 
 export class RecordingViewModel {
   /**
@@ -21,15 +29,16 @@ export class RecordingViewModel {
   /**
    * All recordings from the database.
    */
-  @observable private allRecordings: RecordingType[];
+  @observable private allRecordings: SavedRecordingType[];
   /**
    * Searched recordings.
    */
-  @observable protected searchedRec: RecordingType[];
+  @observable protected searchedRec: SavedRecordingType[];
   /**
    * The searched string.
    */
   @observable private searchedStr: string;
+  private reactions: IReactionDisposer[];
 
   constructor() {
     this.currRecording = null;
@@ -37,7 +46,11 @@ export class RecordingViewModel {
     this.searchedRec = [];
     this.searchedStr = '';
 
+    this.reactions = [];
+
     makeObservable(this);
+
+    this.handleCurrentRecordingChange();
   }
 
   /**
@@ -62,18 +75,37 @@ export class RecordingViewModel {
   }
 
   /**
+   * Sets the current active recording.
+   */
+  @action public setCurrentRecording(recordingId: string | null) {
+    if (!recordingId) {
+      this.currRecording = null;
+      return;
+    }
+
+    const recording = this.recordings.find((rec) => rec.id === recordingId);
+
+    if (!recording) throw new Error('Cannot set the new recording. Recording not found!');
+
+    this.currRecording = new RecordingModel(
+      recording.id,
+      recording.name,
+      recording.description,
+      recording.created_timestamp,
+      recording.updated_timestamp,
+    );
+  }
+
+  /**
    * Retrieves a list of all recordings in the from the database.
    */
-  @action public loadAllRecordings = async () => {
-    // const data = (await ServiceManager.dbConnection.all(
-    //   'SELECT * FROM recordings',
-    // )) as RecordingType[];
-    // if (data.length === 0) return; // No recordings found
-    // runInAction(() => {
-    //   this.allRecordings = data;
-    //   this.searchedRec = this.allRecordings;
-    // });
-  };
+  @action public async loadAllRecordings() {
+    const recordings = await ServiceManager.dbConnection.recordingQueries.selectAllRecordings();
+    runInAction(() => {
+      this.allRecordings = recordings;
+      this.searchedRec = recordings;
+    });
+  }
 
   /**
    * Sets the searched recordings array based on the searched text
@@ -98,7 +130,61 @@ export class RecordingViewModel {
   /**
    * Creates a new recording.
    */
-  @action public createNewRecording(name: string, description?: string) {
-    this.currRecording = new RecordingModel(name, description || '', true);
+  @action public async createNewRecording(name: string, description?: string) {
+    appRouterVM.setAppLoading(true, true, 'Creating a new recording...', 1200);
+
+    const record = await ServiceManager.dbConnection.recordingQueries.insertRecording({
+      name,
+      description: description,
+      has_data: 0,
+    });
+
+    runInAction(
+      () =>
+        (this.currRecording = new RecordingModel(
+          record.id,
+          record.name,
+          record.description,
+          record.created_timestamp,
+          record.updated_timestamp,
+        )),
+    );
+
+    setTimeout(() => {
+      runInAction(() => {
+        appRouterVM.navigateTo(AppNavStatesEnum.CALIBRATION);
+      });
+    }, 500);
+  }
+
+  /**
+   * Mobx reaction for current recording changed.
+   */
+  private handleCurrentRecordingChange() {
+    const currentRecordingChangedReaction = reaction(
+      () => this.currentRecording,
+      () => {
+        // Navigate to the calibration page on setting the current recording.
+        this.currentRecording &&
+          runInAction(() =>
+            appRouterVM.navigateTo(
+              AppNavStatesEnum.CALIBRATION,
+              true,
+              false,
+              'Loading Recording...',
+              1000,
+            ),
+          );
+
+        // Navigate to the home page on closing the recording.
+        !this.currentRecording &&
+          runInAction(() => {
+            deviceManagerVM.removeAllDevices();
+            appRouterVM.navigateTo(AppNavStatesEnum.HOME, true, false, 'Saving Recording...', 1000);
+          });
+      },
+    );
+
+    this.reactions.push(currentRecordingChangedReaction);
   }
 }

@@ -14,6 +14,7 @@ import { Alert } from '../../Elements/Alert';
 // View Models
 import { appRouterVM, recordingVM } from '@store';
 import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
+import { AvailableDevices } from '../../Device/AvailableDevices/AvailableDevices';
 
 export const CreateNewRecording = () => {
   const nameInputRef = React.useRef<HTMLInputElement>(null);
@@ -69,7 +70,10 @@ export const CreateNewRecording = () => {
           {/* Separate */}
           <Separator gap="3rem" />
 
-          <span className="text-larger">Available Devices</span>
+          <span className="text-larger mb block">Available Modules</span>
+          <div className={styles.AvailableDevices}>
+            <AvailableDevices />
+          </div>
           <span className="block mt">
             <Alert
               type="info"

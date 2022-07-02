@@ -24,10 +24,8 @@ import { RecordingTable, RecordingDataTable, DeviceConfigsTable, DevicesTable } 
 
 // Queries
 import { DeviceQueries } from './database/Queries';
-
-// export type DatabaseQueriesType = {
-//   deviceQueries: DeviceQueries;
-// };
+import { RecordingQueries } from './database/Queries/RecordingQueries';
+import { DBDeviceDataManager } from './database/DeviceData/DBDeviceDataManager';
 
 // The self managed class
 export class DatabaseSharedWorker {
@@ -42,7 +40,10 @@ export class DatabaseSharedWorker {
   /**
    * Collection of all the device queries as a class.
    */
-  public readonly deviceQueries!: DeviceQueries;
+  public readonly deviceQueries: DeviceQueries;
+  public readonly recordingQueries: RecordingQueries;
+  public readonly dbDeviceDataManager: DBDeviceDataManager;
+
   initialized: boolean;
 
   constructor() {
@@ -58,6 +59,10 @@ export class DatabaseSharedWorker {
       dropSchema: false, // Debug
     });
 
+    this.deviceQueries = new DeviceQueries(this.connection);
+    this.recordingQueries = new RecordingQueries(this.connection);
+    this.dbDeviceDataManager = new DBDeviceDataManager(this.connection);
+
     this.initialized = false;
   }
 
@@ -68,10 +73,6 @@ export class DatabaseSharedWorker {
     await this.applyPragmas();
 
     this.initialized = true;
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    this.deviceQueries = new DeviceQueries(this.connection);
 
     return true;
   }

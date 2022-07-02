@@ -3,7 +3,7 @@ import { SubMenuItemModel } from '../../../models/App/Menu/SubMenuItemModel';
 
 // Shortcuts
 import { ShortcutsEnum } from '../../../main/src/Menu/ShortcutsEnum';
-import { appRouterVM } from '../../VMStore';
+import { appRouterVM, recordingVM } from '../../VMStore';
 import { AppNavStatesEnum } from '../../../utils/types/AppStateEnum';
 
 /**
@@ -26,8 +26,12 @@ export const FileMenu = {
     }),
 
     // Close Recording
-    new SubMenuItemModel('Close Recording', `${ShortcutsEnum.CTRL}+${ShortcutsEnum.SHIFT}+W`, () =>
-      appRouterVM.navigateTo(AppNavStatesEnum.HOME),
+    new SubMenuItemModel(
+      'Close Recording',
+      `${ShortcutsEnum.CTRL}+${ShortcutsEnum.SHIFT}+W`,
+      () => {
+        recordingVM.setCurrentRecording(null);
+      },
     ),
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function

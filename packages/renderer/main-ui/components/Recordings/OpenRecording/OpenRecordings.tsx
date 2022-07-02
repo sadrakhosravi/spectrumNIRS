@@ -11,7 +11,7 @@ import { Button, IconOnlyButton } from '../../Elements/Buttons';
 import { RecordingItem } from './RecordingItem';
 
 // Icons
-import { FiRefreshCcw, FiInfo } from 'react-icons/fi';
+import { FiRefreshCcw } from 'react-icons/fi';
 
 // View Models
 import { appRouterVM, recordingVM } from '@store';
@@ -43,7 +43,14 @@ export const OpenRecordings = observer(() => {
       actionButtons={
         <>
           <Button text="Import Recording" disabled={true} />
-          <Button text="Open Recording" disabled={selectedRecording === ''} />
+          <Button
+            text="Open Recording"
+            disabled={selectedRecording === ''}
+            onClick={() => {
+              recordingVM.setCurrentRecording(selectedRecording);
+              setSelectedRecording('');
+            }}
+          />
           <Button
             text="New Recording"
             onClick={() => appRouterVM.navigateTo(AppNavStatesEnum.NEW_RECORDING)}
@@ -65,7 +72,7 @@ export const OpenRecordings = observer(() => {
         />
       }
       noContentMessage={
-        recordingVM.recordings.length === 0
+        recordingVM.searchedRecordings.length === 0
           ? 'No recordings found! Please create a recording or import from a file.'
           : null
       }
@@ -73,25 +80,26 @@ export const OpenRecordings = observer(() => {
       <div className={styles.ContentClickArea} onClick={() => setSelectedRecording('')} />
 
       {/* Show recordings */}
-      {recordingVM.searchedRecordings.map((recording, i) => (
-        <RecordingItem
-          id={recording.id}
-          title={recording.name}
-          isSelected={selectedRecording === recording.id}
-          description={recording.description}
-          lastUpdate={recording.last_update_timestamp}
-          key={recording.id || i}
-          setter={setSelectedRecording}
-        />
-      ))}
-
-      {/* Show a message if no recording exits */}
-      {recordingVM.recordings.length === 0 && (
-        <div className={styles.NoRecordsContainer}>
-          <FiInfo size="102px" opacity={0.6} strokeWidth={1.5} />
-          <span className="text-larger"></span>
-        </div>
-      )}
+      <div className={styles.RecordingsList}>
+        {recordingVM.searchedRecordings.map((recording, i) => (
+          <RecordingItem
+            id={recording.id}
+            title={recording.name}
+            isSelected={selectedRecording === recording.id}
+            isActive={
+              recordingVM.currentRecording
+                ? recordingVM.currentRecording.name === recording.name
+                : false
+            }
+            description={recording.description || ''}
+            lastUpdate={recording.updated_timestamp}
+            key={recording.id || i}
+            onClick={() => recordingVM.setCurrentRecording(recording.id)}
+            onDoubleClick={() => recordingVM.setCurrentRecording(recording.id)}
+            setter={setSelectedRecording}
+          />
+        ))}
+      </div>
     </DialogContainer>
   );
 });

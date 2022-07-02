@@ -21,7 +21,9 @@ import {
   barChartVM,
   initBarChartVM,
   disposeBarChartVM,
+  appRouterVM,
 } from '@store';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 export const ChartView = observer(() => {
   const id = 'main-chart-container';
@@ -40,20 +42,26 @@ export const ChartView = observer(() => {
 
   // On chart bart view, load the bar view chart
   React.useEffect(() => {
-    if (chartVM.currentView === 'bar') {
+    if (chartVM.currentView === 'bar' && appRouterVM.route === AppNavStatesEnum.CALIBRATION) {
       initBarChartVM();
       barChartVM?.init(barChartId);
+    } else {
+      disposeBarChartVM();
     }
 
     return () => {
       disposeBarChartVM();
     };
-  }, [chartVM.currentView]);
+  }, [chartVM.currentView, appRouterVM.route]);
 
   return (
     <>
       <div className={styles.ChartContainer}>
-        {chartVM.currentView === 'bar' && <div className={styles.ChartBarView} id={barChartId} />}
+        {/* Bar chart for intensity calibration */}
+        {chartVM.currentView === 'bar' && appRouterVM.route === AppNavStatesEnum.CALIBRATION && (
+          <div className={styles.ChartBarView} id={barChartId} />
+        )}
+
         <span style={{ visibility: chartVM.currentView === 'line' ? 'visible' : 'hidden' }}>
           <div className={styles.XAxisContainer}>
             {chartVM.charts.length > 0 && (

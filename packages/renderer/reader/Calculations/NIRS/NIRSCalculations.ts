@@ -56,7 +56,7 @@ class NIRSCalculation implements IDeviceCalculation {
    * Stores one sample of all PD channels as one data point.
    * The array format is `[ambient, ch1, ch2, ch3, ch4, ch5]`.
    */
-  private dataPointArr: Float32Array;
+  protected dataPointArr: Float32Array;
   /**
    * The number of ADCs/PD of the device.
    */
@@ -71,8 +71,10 @@ class NIRSCalculation implements IDeviceCalculation {
     this.calcChannelNames = [];
 
     this.NUM_OF_LEDs = 5;
-    this.wavelengths = new Uint16Array([950, 730, 810, 850, 650]);
-    this.c_beta = new Float32Array([-1.2132, -0.0728, 1.8103, 1.1433, -11.5816]);
+    this.wavelengths = new Uint16Array([950, 730, 810, 850, 670]);
+    this.c_beta = new Float32Array([-1.2132, -0.0728, 1.8103, 1.1433, -11.5816]); // Debug
+
+    console.log(this.c_beta);
 
     this.BATCH_SIZE = 10;
     this.PDChannels = 1;
@@ -107,7 +109,7 @@ class NIRSCalculation implements IDeviceCalculation {
   public init(deviceInfo: DeviceInfoType) {
     this.LEDIntensities = new Array(deviceInfo.numOfChannelsPerPD).fill(0);
     this.calcChannelNames = deviceInfo.calculatedChannelNames;
-    this.PDChannels = deviceInfo.PDChannelNames.length;
+    this.PDChannels = 6;
     this.numOfADCs = deviceInfo.numOfADCs;
 
     // Set ADC and DAC resolutions
@@ -170,19 +172,23 @@ class NIRSCalculation implements IDeviceCalculation {
 
     // Create an array to store once data point of the batch
     for (let k = 0; k < this.numOfADCs; k++) {
+      const dataPointArr1 = new Float32Array(6).fill(0);
+
       // For each batch, go through individual data point and calculate the values
       for (let i = 0; i < this.BATCH_SIZE; i += 1) {
         // Put one sample from the hardware into the dataPoint array.
-        for (let j = 0; j < this.PDChannels; j++) {
-          this.dataPointArr[j] = data.ADC1[('ch' + j) as keyof DeviceADCDataType['ADC1']][i];
+        for (let j = 1; j < this.PDChannels; j++) {
+          dataPointArr1[j] = data.ADC1[('ch' + j) as keyof DeviceADCDataType['ADC1']][i];
         }
+        dataPointArr1[0] = data.ADC1['ch0'][i];
+        const dataPointArr2 = new Float32Array([...dataPointArr1]);
 
         // Calculate that sample.
-        this.calcHemodynamics(this.dataPointArr);
+        this.calcHemodynamics(dataPointArr1);
         calcDataRes['ADC' + (k + 1)]['O2Hb'][i] = this.hemodynamicsArr[0];
         calcDataRes['ADC' + (k + 1)]['HHb'][i] = this.hemodynamicsArr[1];
         calcDataRes['ADC' + (k + 1)]['THb'][i] = this.hemodynamicsArr[2];
-        calcDataRes['ADC' + (k + 1)]['TOI'][i] = this.calcTOI(this.dataPointArr);
+        calcDataRes['ADC' + (k + 1)]['TOI'][i] = this.calcTOI(dataPointArr2);
       }
     }
     return calcDataRes;

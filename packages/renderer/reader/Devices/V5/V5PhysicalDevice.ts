@@ -33,7 +33,7 @@ export class V5PhysicalDevice implements INIRSDevice {
       version: this.getVersion(),
       ADCRes: this.getADCResolution(),
       DACRes: this.getDACResolution(),
-      numOfChannelsPerPD: this.getSupportedLEDNum(),
+      numOfChannelsPerPD: this.getSupportedLEDNum() + 1, // +1 for ambient
       numOfADCs: this.getSupportedPDNum(),
       supportedSamplingRate: this.getSupportedSamplingRates(),
       defaultSamplingRate: this.getDefaultSamplingRate(),

@@ -13,7 +13,8 @@ import { Column, Row } from '../Elements/Grid';
 import { FiGrid, FiBarChart2, FiActivity } from 'react-icons/fi';
 
 // View Models
-import { chartVM, deviceManagerVM } from '@store';
+import { appRouterVM, chartVM, deviceManagerVM } from '@store';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 export const ChartViewSwitcher = observer(() => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -27,7 +28,9 @@ export const ChartViewSwitcher = observer(() => {
         dropDownIndicator
         buttonRef={buttonRef}
         onClick={() => setIsOpen(true)}
-        disabled={deviceManagerVM.isRecordingData}
+        disabled={
+          deviceManagerVM.isRecordingData || appRouterVM.route !== AppNavStatesEnum.CALIBRATION
+        }
       />
       {isOpen && (
         <Popover

@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 
 // Styles
 import * as styles from './titleBar.module.scss';
@@ -8,8 +9,9 @@ import Logo from '../../../assets/Logo.png';
 
 // Icons
 import { Menu } from '../Menu';
+import { recordingVM } from '@viewmodels/VMStore';
 
-export const TitleBar = () => {
+export const TitleBar = observer(() => {
   return (
     <header className={`${styles.TitleBar}`}>
       <div className={styles.TitleBarContainer}>
@@ -20,9 +22,9 @@ export const TitleBar = () => {
           <Menu />
         </div>
         <div className={styles.Filename}>
-          <p>Spectrum - Beast</p>
+          <p>Spectrum {recordingVM.currentRecording && '- ' + recordingVM.currentRecording.name}</p>
         </div>
       </div>
     </header>
   );
-};
+});

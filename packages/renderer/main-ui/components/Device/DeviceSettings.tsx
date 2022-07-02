@@ -98,10 +98,11 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
           <RangeSliderWithInput
             id={ledIDBase + i}
             key={ledIDBase + i + 'range-slider'}
-            title={'LED' + ++i}
+            title={'LED' + (i + 1)}
+            defaultValue={device.LEDIntensities[i]}
             min={0}
-            max={127}
-            onBlur={device.sendDeviceSettingsToReader}
+            max={Math.pow(2, device.deviceInfo.DACRes) - 1}
+            onBlur={(value) => device.updateLEDIntensities(value, i)}
           />
         ))}
       </div>
