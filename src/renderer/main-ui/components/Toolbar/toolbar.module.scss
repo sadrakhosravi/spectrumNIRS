@@ -1,0 +1,66 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.Toolbar {
+  height: $size-toolbar;
+  border-bottom: solid $border-primary-width $color-border-primary;
+  position: relative;
+  @include flex-center;
+}
+
+.ToolbarSection {
+  @include flex-center;
+  flex-direction: column;
+  padding: $gap-sm $gap-2xl;
+  height: $size-toolbar;
+
+  &:not(:last-child) {
+    border-right: solid 3px $border-primary-color;
+  }
+}
+
+.ToolbarSectionContent {
+  width: 100%;
+  height: 35px;
+}
+
+.ToolbarSection:hover > .ToolbarSectionText {
+  color: $color-white;
+  opacity: 1;
+}
+
+.ToolbarSectionText {
+  width: 100%;
+  height: 25px;
+  font-size: $size-font-sm;
+  color: $color-text-primary;
+  text-align: center;
+  opacity: 0.7;
+  transition: color, opacity 0.3s ease-in-out;
+}
+
+.ToolbarButton {
+  padding: $gap-xs $gap-sm;
+  border-radius: $border-primary-radius;
+  background: $color-bg-secondary;
+  @include hover-state;
+  @include border-secondary;
+
+  &:not(:last-child) {
+    margin-right: $gap-lg;
+  }
+
+  &:active {
+    @include ring;
+    svg {
+      stroke: $color-primary;
+    }
+  }
+}
+
+.ToolbarButtonActive {
+  @include ring;
+  svg {
+    stroke: $color-primary;
+  }
+}

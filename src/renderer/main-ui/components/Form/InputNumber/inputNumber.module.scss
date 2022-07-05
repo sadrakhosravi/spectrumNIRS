@@ -1,0 +1,10 @@
+@import '../../../styles//variables';
+@import '../../../styles/mixins';
+
+.InputNumber {
+  background: transparent;
+  border-bottom: solid 3px $color-bg-tertiary;
+  padding: $gap-sm $gap-base;
+  width: 100%;
+  text-align: center;
+}

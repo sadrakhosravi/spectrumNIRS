@@ -1,0 +1,24 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.SeriesUnit {
+  position: absolute;
+  right: 0px;
+  height: 100%;
+  width: 20px;
+  top: 0;
+  padding-right: 3px;
+  border-left: $border-primary-width solid $border-primary-color;
+
+  span {
+    position: absolute;
+    width: 100px;
+    top: 50%;
+    left: 0;
+    text-align: center;
+    transform-origin: 0 0;
+    font-size: $size-font-sm;
+    color: rgba(#fff, 0.6);
+    transform: rotate(-90deg) translateX(-50%);
+  }
+}

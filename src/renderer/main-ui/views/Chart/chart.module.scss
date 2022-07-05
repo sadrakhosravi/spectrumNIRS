@@ -1,0 +1,81 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$x-axis-height: 40px;
+$sensor-info-width: 30px;
+$container-size: 40px;
+
+.ChartContainer {
+  position: absolute;
+  top: $size-toolbar;
+  left: 0;
+  width: 100%;
+  height: calc(100% - $size-toolbar);
+  background-color: #0a0a0a;
+}
+
+.XAxisContainer {
+  background: #0a0a0a;
+  width: 100%;
+  height: $container-size;
+  border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
+  display: flex;
+}
+
+.ChartAreaContainer {
+  position: absolute;
+  left: $sensor-info-width;
+  height: calc(100% - $x-axis-height);
+  width: calc(100% - $sensor-info-width);
+  background: #0a0a0a;
+}
+
+.ChartXAxis {
+  height: $x-axis-height;
+}
+
+.Chart {
+  position: absolute;
+  left: 150px;
+  top: 0;
+  width: calc(100% - 150px);
+  height: calc(100% - 35px - $x-axis-height);
+}
+
+.ChartChannels {
+  width: 150px;
+  height: calc(100%);
+  position: relative;
+}
+
+.ChartBarView {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100%);
+  z-index: 100;
+  background-color: #fff;
+}
+
+.EmptyChartMessage {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+
+  span {
+    justify-content: center;
+    gap: $gap-lg;
+    opacity: 0.5;
+    @include absolute-center;
+    @include flex-center;
+
+    p {
+      font-size: $size-font-lg;
+    }
+  }
+}

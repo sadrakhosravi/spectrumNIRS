@@ -1,0 +1,44 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.GainButtonContainer {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: $gap-base;
+
+  button {
+    padding: $gap-sm $gap-base;
+    border-radius: $border-primary-radius;
+
+    justify-content: center;
+    @include flex-center;
+    @include hover-state;
+  }
+}
+
+.GainButtonInput {
+  padding: $gap-sm calc($gap-base);
+  background: transparent;
+  width: 30px;
+  border: none;
+  -webkit-appearance: none;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: transparent;
+    outline: none;
+  }
+}

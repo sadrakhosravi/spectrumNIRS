@@ -1,0 +1,24 @@
+@import './variables';
+
+*::-webkit-scrollbar-thumb {
+  transition: background 0.2s ease-in-out;
+  border: 2px solid transparent;
+  -webkit-background-clip: content-box;
+  background-clip: content-box;
+  background-color: rgba(229, 231, 235, 0.2);
+  border-radius: 0;
+
+  &:hover {
+    background: $border-secondary-color;
+  }
+}
+
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar {
+  background-color: rgba(#000, 0.14);
+  height: 15px;
+  width: 15px;
+}

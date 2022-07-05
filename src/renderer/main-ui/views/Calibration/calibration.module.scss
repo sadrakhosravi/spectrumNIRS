@@ -1,0 +1,15 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.DeviceListButtonContainer {
+  padding: 0 $gap-xl;
+}
+
+.ActionButtonContainer {
+  position: absolute;
+  right: $gap-xl;
+  top: 50%;
+  transform: translateY(-50%);
+  @include flex-center;
+  gap: $gap-lg;
+}

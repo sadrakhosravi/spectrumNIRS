@@ -1,0 +1,58 @@
+@import '@styles/variables.scss';
+@import '@styles/mixins.scss';
+
+$container-size: 40px;
+
+.XAxisLeft {
+  padding: $gap-sm;
+  width: 180px;
+  height: 100%;
+  border-right: solid $border-primary-width rgba(255, 255, 255, 0.2);
+  gap: $gap-sm;
+  @include flex-center;
+
+  span {
+    width: 70%;
+  }
+}
+
+.XAxisRight {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  margin-left: 65px; // The y-axis thickness
+  width: calc(100% - 180px - 65px);
+
+  &::before {
+    left: -65px;
+    width: 65px;
+    content: '';
+    position: absolute;
+    height: 100%;
+    background: #0a0a0a;
+    z-index: 30;
+  }
+}
+
+.TickItem {
+  position: absolute;
+  font-size: $size-font-sm;
+  margin-top: 15px;
+  width: 3px;
+  height: 2px;
+  @include flex-center;
+}
+
+.TickItemValue {
+  transform: translateX(-50%);
+  &::after {
+    content: '';
+    width: 2px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10px;
+  }
+}

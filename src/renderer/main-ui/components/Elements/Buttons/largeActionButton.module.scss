@@ -1,0 +1,41 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.LargeActionButton {
+  @include flex-center;
+  @include border-primary;
+  gap: $gap-xl;
+  background: $color-bg-secondary;
+  padding: $gap-xl $gap-2xl;
+  border-radius: 5px;
+
+  &:not(:last-child) {
+    margin-bottom: $gap-xl;
+  }
+
+  svg {
+    fill: $color-white;
+    fill-opacity: 0.2;
+  }
+
+  div {
+    span {
+      display: block;
+    }
+    span:first-child {
+      font-size: $size-font-lg;
+    }
+    span:last-child {
+      color: $color-text-tertiary;
+    }
+  }
+
+  &:hover {
+    @include hover-state;
+  }
+
+  &:focus,
+  &:active {
+    @include ring;
+  }
+}

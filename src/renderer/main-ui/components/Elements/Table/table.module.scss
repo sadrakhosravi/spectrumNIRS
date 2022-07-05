@@ -1,0 +1,55 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.Table {
+  width: 100%;
+  background: $color-bg-secondary;
+  @include border-primary;
+}
+
+.TableColumn {
+  @include flex-center;
+  width: 100%;
+  font-size: $size-font-baseLg;
+  padding: $gap-lg $gap-xl;
+  background: $color-bg-tertiary;
+  border-bottom: 1px solid $border-secondary-color;
+  span {
+    font-size: inherit;
+  }
+}
+
+.TableItem {
+  position: relative;
+  padding: $gap-lg $gap-xl;
+  gap: $gap-lg;
+  @include hover-state;
+  @include flex-center;
+
+  &:not(:last-child) {
+    border-bottom: solid $border-primary-width $border-primary-color;
+  }
+
+  &:active,
+  &:focus {
+    @include ring;
+  }
+
+  div {
+    span {
+      display: block;
+    }
+  }
+}
+
+.TableItemIcon {
+  width: 40px;
+}
+
+.TableItemText {
+  font-size: $size-font-lg;
+}
+
+.TableItemDescription {
+  color: $color-text-tertiary;
+}

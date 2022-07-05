@@ -1,0 +1,49 @@
+@import '../../styles/variables';
+
+.MenuContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.MenuItem {
+  -webkit-app-region: no-drag;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 $gap-base;
+}
+
+.MenuItem:hover,
+.MenuItemActive {
+  background: $color-bg-tertiary;
+}
+
+.SubMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 280px;
+  z-index: 1000;
+  background: $color-bg-secondary;
+  padding: $gap-lg 0;
+  box-shadow: rgba(0, 0, 0, 0.3) 3px 3px 5px;
+}
+
+.SubMenuItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px $gap-2xl;
+  width: 100%;
+  margin: 2px 0;
+
+  &:hover {
+    background: $color-primary;
+  }
+}
+
+.SubMenuItemSeparator {
+  width: 93%;
+  height: 1px;
+}

@@ -1,0 +1,65 @@
+/// ------------ Colors ------------ ///
+// Font colors
+$color-text-primary: #cccccc;
+$color-text-secondary: #464646;
+$color-text-tertiary: #666666;
+$color-text-white: #ffffff;
+
+// Background colors
+$color-bg-primary: #181818;
+$color-bg-dark1: #181818;
+$color-bg-secondary: #232323;
+$color-bg-tertiary: #333333;
+$color-bg-light: #666666;
+$color-panel-primary: #1e1e1e;
+
+// Border colors
+$color-border-primary: #333333;
+
+// Other colors
+$color-left-nav: #b4b4b4;
+$color-white: #fff;
+$color-primary: #00a8f3;
+$color-red: #c0392b;
+
+/// ------------ Sizes ------------ ///
+
+// Font sizes
+$size-font-xs: 1.1rem;
+$size-font-sm: 1.2rem;
+$size-font-base: 1.3rem;
+$size-font-baseLg: 1.45rem;
+$size-font-lg: 1.6rem;
+$size-font-xl: 2.8rem;
+$size-font-2xl: 3rem;
+$size-font-title: 2rem;
+
+// Component sizes
+$size-title-bar: 35px;
+$size-lef-nav: 65px;
+$size-bottom-bar: 30px;
+$size-toolbar: 60px;
+
+/// ------------ Gaps ------------ ///
+$gap-2xs: 0.1rem;
+$gap-xs: 0.35rem;
+$gap-sm: 0.5rem;
+$gap-base: 0.75rem;
+$gap-lg: 1rem;
+$gap-xl: 1.6rem;
+$gap-2xl: 2.8rem;
+$gap-3xl: 3.2rem;
+$gap-4xl: 4.1rem;
+$gap-5xl: 5rem;
+$gap-6xl: 6rem;
+$gap-7xl: 7rem;
+
+/// ------------ Borders ------------ ///
+$border-primary-width: 1.5px;
+$border-secondary-width: 1px;
+$border-primary-color: #333333;
+$border-secondary-color: #666666;
+$border-primary-radius: 4px;
+
+/// ------------ Inputs ------------ ///
+$input-padding: 1.1rem 2rem;

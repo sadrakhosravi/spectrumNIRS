@@ -1,0 +1,41 @@
+@import './variables';
+
+.text-larger {
+  font-size: $size-font-lg;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.title {
+  font-size: $size-font-lg;
+}
+
+.relative {
+  position: relative;
+}
+
+.block {
+  display: block;
+}
+
+.mb {
+  margin-bottom: $gap-lg;
+}
+
+.mt {
+  margin-top: $gap-lg;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-full {
+  width: 100%;
+}

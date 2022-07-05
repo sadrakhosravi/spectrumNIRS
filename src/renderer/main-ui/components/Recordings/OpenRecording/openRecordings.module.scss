@@ -1,0 +1,14 @@
+@import '../../../styles/variables';
+@import '../../../styles//mixins';
+
+.ContentClickArea {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.RecordingsList {
+  padding: 2px 5px;
+}

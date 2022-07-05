@@ -1,0 +1,23 @@
+@import '../../../styles//variables';
+@import '../../../styles/mixins';
+
+.RangeSliderWithInput {
+  @include flex-center;
+  justify-content: space-between;
+  gap: $gap-lg;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: $gap-base;
+}
+
+.TitleSpan {
+  width: 100%;
+}
+
+.RangeSliderSpan {
+  width: 75%;
+}
+
+.InputSpan {
+  width: 20%;
+}

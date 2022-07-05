@@ -1,0 +1,50 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.DeviceListItem {
+  position: relative;
+  padding: 0.875rem $gap-lg;
+  background-color: $color-bg-tertiary;
+  width: 100%;
+  gap: $gap-lg;
+
+  @include flex-center;
+  @include border-primary-light;
+  @include hover-state-secondary;
+
+  &:not(:last-child) {
+    margin-bottom: $gap-lg;
+  }
+
+  div {
+    margin-left: auto;
+    @include flex-center;
+    gap: $gap-sm;
+  }
+}
+
+.DeviceListContainer {
+  height: calc(100% - 3rem);
+  width: 100%;
+  overflow-y: auto;
+}
+
+.ActionButtons {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 100%;
+  height: 3rem;
+  gap: $gap-base;
+  justify-content: flex-end;
+  @include flex-center;
+}
+
+.DeviceSettingsButton {
+  position: absolute;
+  right: 25%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  border: 1px solid rgba($color: #fff, $alpha: 0.4);
+}

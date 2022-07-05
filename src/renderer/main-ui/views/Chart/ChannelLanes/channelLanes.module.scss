@@ -1,0 +1,183 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+$channel-ui-width: 150px;
+$channel-info-height: 25px;
+$sensor-info-width: 30px;
+
+.ChannelsContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ChannelLanes {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.ChannelLaneItem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 11;
+  pointer-events: none;
+
+  &:not(:last-child) {
+    border-bottom: solid $border-primary-width rgba(255, 255, 255, 0.2);
+  }
+}
+
+.ChannelUI {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $channel-ui-width;
+  height: 100%;
+  border-right: solid $border-primary-width rgba(255, 255, 255, 0.2);
+  pointer-events: all;
+}
+
+.ChannelUIInnerContainer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: $gap-xs $gap-base;
+  @include slide-left;
+}
+
+.ChannelInfo {
+  padding-left: $gap-sm;
+  width: 110px;
+  gap: $gap-xs;
+  margin-top: 3px;
+  border-radius: $border-primary-radius;
+  height: $channel-info-height;
+  @include flex-center;
+  @include hover-state;
+  @include active-focus-state;
+
+  span {
+    display: inline-block;
+  }
+
+  span:first-child {
+    width: 15px;
+    height: 15px;
+    border-radius: 2px;
+    background: $border-secondary-color;
+  }
+}
+
+.ChannelLanesSeparatorButton {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  // cursor: ns-resize;
+  transition: background 0.1s ease;
+  z-index: 5;
+}
+
+.ChannelSeparatorActive {
+  background: $color-primary;
+  height: 6px;
+  bottom: -3px;
+}
+
+.ChannelSettings {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 450px;
+  height: 250px;
+  background: $color-bg-secondary;
+  @include border-primary;
+  z-index: 51;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.8);
+  @include slide-left;
+}
+
+.ChannelActionContainer {
+  width: 100%;
+  @include flex-center;
+  justify-content: center;
+  gap: $gap-sm;
+}
+
+.ChannelActionButton {
+  padding: $gap-sm;
+  border-radius: $border-primary-radius;
+  @include hover-state;
+
+  &:active {
+    @include ring;
+  }
+}
+
+.ChannelActionButtonDisabled {
+  background-color: $color-primary;
+
+  &:hover,
+  &:active {
+    background-color: $color-primary;
+    outline: none;
+  }
+}
+
+.ChannelActionButtonActive {
+  background: $color-primary;
+  @include active-focus-state;
+}
+
+.ChartCursorContainer {
+  position: absolute;
+  left: calc($channel-ui-width + 65px);
+  top: -40px;
+  width: calc(100% - 65px - $channel-ui-width);
+  height: calc(100% + 40px);
+  z-index: 30;
+}
+
+.CursorItem {
+  position: fixed;
+  z-index: -1;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+
+  span {
+    margin-left: 9px;
+    margin-top: 9px;
+    padding: 2px;
+    border-radius: 5px;
+    background: #121212;
+    border: 1px solid rgba(#fff, 0.1);
+  }
+}
+
+.CursorXAxisItem {
+  position: fixed;
+  z-index: -1;
+  padding: $gap-xs $gap-sm;
+  background: #121212;
+  top: 102.5px;
+  border: 1px solid rgba(#fff, 0.1);
+}
+
+.CursorItemSpanReversed {
+  span {
+    position: absolute;
+    transform: translateX(-60px);
+  }
+}

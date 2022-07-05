@@ -1,0 +1,12 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.WidgetView {
+  height: 100%;
+  background: $color-panel-primary;
+  display: flex;
+  flex-direction: column;
+  border-left: solid $border-primary-width $color-border-primary;
+  width: 100%;
+  padding-right: 50px;
+}

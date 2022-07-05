@@ -1,0 +1,89 @@
+@import './variables';
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin absolute-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin default-transition {
+  transition: background 0.15s ease-in-out;
+}
+
+@mixin hover-state {
+  @include default-transition;
+  &:hover {
+    background: $color-bg-tertiary;
+  }
+
+  &:active {
+    background: $color-bg-secondary;
+  }
+}
+
+@mixin hover-state-secondary {
+  &:not(:disabled) {
+    @include default-transition;
+    &:hover {
+      background: rgba(#fff, 0.175);
+    }
+
+    &:active {
+      background: $color-bg-tertiary;
+    }
+  }
+}
+
+@mixin active-state {
+  background: $color-bg-tertiary;
+}
+
+@mixin active-focus-state {
+  &:not(:disabled) {
+    &:focus,
+    &:active {
+      @include ring;
+    }
+  }
+}
+
+@mixin ring {
+  outline: 1.7px solid $color-primary;
+  border-radius: 5px;
+}
+
+@mixin border-primary {
+  border: $border-primary-width solid $border-primary-color;
+  border-radius: 5px;
+}
+
+@mixin border-primary-light {
+  border: $border-primary-width solid rgba(#fff, 0.1);
+  border-radius: 5px;
+}
+
+@mixin border-secondary {
+  border: 1px solid $border-primary-color;
+  border-radius: 3px;
+}
+
+@mixin slide-left {
+  animation: slideLeft 0.15s forwards;
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(12px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,30 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.ChannelInfo {
+  padding: $gap-base $gap-sm;
+  gap: $gap-lg;
+  @include flex-center;
+  span {
+    display: inline-block;
+  }
+
+  span:first-child {
+    width: 25px;
+    height: 25px;
+    border-radius: $border-primary-radius;
+  }
+
+  input {
+    padding: $gap-2xs $gap-base;
+    width: 100%;
+  }
+}
+
+.ChartSettings {
+  margin-top: $gap-lg;
+
+  input {
+    width: 100%;
+  }
+}

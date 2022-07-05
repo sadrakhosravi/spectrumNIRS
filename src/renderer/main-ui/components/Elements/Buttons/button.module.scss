@@ -1,0 +1,49 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.Button {
+  padding: $gap-2xs $gap-lg;
+  background-color: $color-bg-tertiary;
+  @include border-primary-light;
+  @include hover-state-secondary;
+  @include active-focus-state;
+}
+
+.ButtonGreen {
+  background-color: #1bbc9b;
+
+  &:hover {
+    background-color: #0d836b;
+  }
+}
+
+.Button:disabled {
+  background-color: $color-bg-secondary;
+}
+
+.ButtonRed {
+  background-color: #fa5044;
+}
+
+.ButtonPrimary {
+  background-color: $color-primary;
+}
+
+.IconOnlyButton {
+  min-height: 24px;
+  padding: $gap-2xs $gap-xs;
+  background-color: $color-bg-tertiary;
+  @include border-primary-light;
+  @include hover-state-secondary;
+  @include active-focus-state;
+}
+
+.IconOnlyButtonActive {
+  background-color: $color-primary;
+  pointer-events: none;
+}
+
+.IconTextButton {
+  @include flex-center;
+  gap: $gap-xs;
+}

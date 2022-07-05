@@ -1,0 +1,12 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.WidgetsContainer {
+  width: 100%;
+  margin: $gap-base;
+  background: $color-bg-secondary;
+  border: solid 1.5px rgba(#fff, 0.12);
+  border-radius: 7px;
+  position: relative;
+  @include flex-center;
+}

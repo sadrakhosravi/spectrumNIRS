@@ -1,0 +1,1 @@
+export { DeviceQueries } from './DeviceQueries';

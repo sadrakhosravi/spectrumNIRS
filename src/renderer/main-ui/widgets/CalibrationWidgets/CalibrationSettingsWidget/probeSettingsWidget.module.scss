@@ -1,0 +1,12 @@
+@import '@styles/variables';
+@import '@styles/mixins';
+
+.LEDIntensitiesContainer {
+  padding: $gap-sm;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.StatusSpan {
+  transition: all 0.2s ease-in-out;
+}

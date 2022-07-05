@@ -1,0 +1,51 @@
+@import '../../styles/variables';
+
+$widget-width: 350px;
+
+.ScreenView {
+  width: 100%;
+  height: 100%;
+}
+
+.SplitView {
+  position: relative;
+  height: 100%;
+}
+
+.ContentView {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% - $widget-width);
+  height: 100%;
+}
+
+.WidgetView {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: $widget-width;
+  height: 100%;
+  background: $color-bg-tertiary;
+}
+
+.SplitterBar {
+  position: absolute;
+  top: 0;
+  right: $widget-width - 2.5;
+  width: 5px;
+  height: 100%;
+  z-index: 10;
+  transition: background 0.15s ease-in-out;
+  transition-delay: 0.25s;
+
+  &:hover {
+    background: $color-primary;
+    cursor: ew-resize;
+  }
+
+  &:focus,
+  &:active {
+    background: $color-primary;
+  }
+}

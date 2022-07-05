@@ -1,0 +1,11 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.CloseButton {
+  opacity: 0.55;
+  padding: $gap-sm;
+  z-index: 90;
+  &:hover {
+    opacity: 0.9;
+  }
+}

@@ -1,0 +1,36 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+@import '../../styles/screen';
+
+.HomeContainer {
+  width: 100%;
+  height: 100%;
+
+  padding: $gap-5xl calc($gap-7xl * 2);
+  @include screen-lg {
+    padding: $gap-4xl calc($gap-5xl);
+  }
+
+  @include screen-md {
+    padding: $gap-3xl calc($gap-4xl);
+  }
+}
+
+.RecentExperiment {
+  margin-top: $gap-3xl;
+  display: flex;
+  gap: $gap-7xl;
+  min-height: 300px;
+}
+
+.LeftSide {
+  width: 65%;
+}
+
+.LeftSideSearchBar {
+  position: relative;
+}
+
+.RightSide {
+  width: 35%;
+}

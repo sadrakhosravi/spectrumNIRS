@@ -1,0 +1,28 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.ToggleButton {
+  margin-bottom: $gap-base;
+  gap: $gap-base;
+  transition: all 0.2s ease-in-out;
+  @include flex-center;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  label {
+    font-size: $size-font-lg;
+  }
+
+  input {
+    width: $gap-xl;
+    height: $gap-xl;
+    accent-color: $color-primary;
+    color: #fff;
+  }
+}
+
+.DisabledText {
+  opacity: 0.7;
+}

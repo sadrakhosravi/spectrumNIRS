@@ -1,0 +1,1 @@
+export { GlobalFiltersWidget } from './GlobalFiltersWidget';

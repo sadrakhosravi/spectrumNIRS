@@ -1,0 +1,77 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+$button-height: 70px;
+
+.LeftPanel {
+  position: relative;
+  width: $size-lef-nav;
+  height: calc(100vh - $size-title-bar);
+  border-right: solid $border-primary-width $border-primary-color;
+}
+
+.LeftPanelNavContainer {
+  height: 75%;
+}
+
+.LeftPanelSettingsContainer {
+  height: 25%;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+}
+
+.LeftPanelNavButton {
+  width: 100%;
+  height: $button-height;
+  text-align: center;
+  margin: 0 auto;
+  font-size: $size-font-xs;
+  @include hover-state;
+
+  svg {
+    margin: 0 auto $gap-2xs auto;
+  }
+
+  &:hover {
+    color: $color-text-white;
+
+    svg {
+      stroke: $color-white;
+    }
+  }
+
+  &:active,
+  &_Active {
+    @include active-state;
+    color: $color-primary;
+    svg {
+      stroke: $color-primary;
+      fill: $color-primary;
+      fill-opacity: 0.35;
+    }
+
+    &:hover {
+      @include active-state;
+      color: $color-primary;
+      svg {
+        stroke: $color-primary;
+      }
+    }
+  }
+}
+
+.LeftPanelNavButtonDisabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.LeftPanelActiveIndicator {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  height: $button-height;
+  width: 4px;
+  background: $color-primary;
+  transition: top 0.25s ease-in;
+}
