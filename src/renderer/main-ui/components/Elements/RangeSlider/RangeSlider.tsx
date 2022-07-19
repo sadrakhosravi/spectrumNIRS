@@ -9,7 +9,9 @@ type RangeSliderType = {
   step?: number;
   value?: number;
   id?: string;
-  onMouseUp?: React.MouseEventHandler<HTMLInputElement>;
+  onMouseUp?:
+    | React.MouseEventHandler<HTMLInputElement>
+    | React.TouchEventHandler<HTMLInputElement>;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
@@ -24,16 +26,17 @@ export const RangeSlider = ({
 }: RangeSliderType) => {
   return (
     <input
-      type={'range'}
+      type="range"
       id={id}
       className={styles.Slider}
       value={value}
       min={min?.toString() || '0'}
       max={max?.toString() || '0'}
       step={step || 1}
+      onTouchEnd={onMouseUp as React.TouchEventHandler<HTMLInputElement>}
       onChange={onChange}
-      onMouseUp={onMouseUp}
+      onMouseUp={onMouseUp as React.MouseEventHandler<HTMLInputElement>}
       tabIndex={-1}
-    ></input>
+    />
   );
 };

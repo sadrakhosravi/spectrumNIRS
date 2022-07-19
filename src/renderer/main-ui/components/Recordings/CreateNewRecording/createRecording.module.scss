@@ -12,5 +12,6 @@
 
 .AvailableDevices {
   margin: $gap-base 0 $gap-xl 0;
+  gap: $gap-2xl;
   @include flex-center;
 }

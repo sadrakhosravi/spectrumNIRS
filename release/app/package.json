@@ -1,12 +1,10 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "spectrum-beast",
   "version": "4.6.0",
   "description": "A foundation for scalable desktop apps",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Sadra Khosravi"
   },
   "main": "./dist/main/main.js",
   "scripts": {
@@ -17,6 +15,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^7.5.3",
+    "snappy": "^7.1.1",
     "typeorm": "^0.3.7",
     "ws": "^8.8.0"
   },

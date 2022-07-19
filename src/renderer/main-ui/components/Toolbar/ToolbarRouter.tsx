@@ -8,12 +8,16 @@ import { Toolbar } from './Toolbar';
 // Toolbars
 import { CalibrationToolbar } from '/@/views/Calibration';
 import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
+import { ReviewToolbar } from '/@/views/Review/Toolbar/ReviewToolbar';
 
 export const ToolbarRouter = observer(() => {
   return (
     <Toolbar>
       {(appRouterVM.route === AppNavStatesEnum.CALIBRATION ||
-        appRouterVM.route === AppNavStatesEnum.RECORD) && <CalibrationToolbar />}
+        appRouterVM.route === AppNavStatesEnum.RECORD) && (
+        <CalibrationToolbar />
+      )}
+      {appRouterVM.route === AppNavStatesEnum.REVIEW && <ReviewToolbar />}
     </Toolbar>
   );
 });

@@ -12,6 +12,7 @@ import {
   reaction,
   runInAction,
 } from 'mobx';
+import { ipcRenderer } from 'electron';
 
 // Services
 import ServiceManager from '@services/ServiceManager';
@@ -21,7 +22,8 @@ import { RecordingModel } from '@models/Recording/RecordingModel';
 
 // Types
 import type { IReactionDisposer } from 'mobx';
-import type { SavedRecordingType } from '../../../../sharedWorkers/database/Queries/RecordingQueries';
+import type { SavedRecordingParsedType } from '@database/Queries/RecordingQueries';
+import { DialogBoxChannels } from '@utils/channels';
 
 // View models
 import { appRouterVM, recordingVM } from '../VMStore';
@@ -35,15 +37,19 @@ export class RecordingViewModel {
   /**
    * All recordings from the database.
    */
-  @observable private allRecordings: SavedRecordingType[];
+  @observable private allRecordings: SavedRecordingParsedType[];
   /**
    * Searched recordings.
    */
-  @observable protected searchedRec: SavedRecordingType[];
+  @observable protected searchedRec: SavedRecordingParsedType[];
   /**
    * The searched string.
    */
   @observable private searchedStr: string;
+  /**
+   * Delete mode for recordings.
+   */
+  @observable private _deleteMode: boolean;
   private reactions: IReactionDisposer[];
 
   constructor() {
@@ -51,6 +57,7 @@ export class RecordingViewModel {
     this.allRecordings = [];
     this.searchedRec = [];
     this.searchedStr = '';
+    this._deleteMode = false;
 
     this.reactions = [];
 
@@ -59,6 +66,7 @@ export class RecordingViewModel {
     this.handleCurrentRecordingChange();
   }
 
+  //#region getters
   /**
    * The current recording instance or null.
    */
@@ -81,39 +89,79 @@ export class RecordingViewModel {
   }
 
   /**
+   * The delete mode for recordings.
+   */
+  public get deleteMode() {
+    return this._deleteMode;
+  }
+  //#endregion
+
+  //#endregion setters
+
+  public set deleteMode(value: boolean) {
+    runInAction(() => (this._deleteMode = value));
+  }
+
+  /**
    * Sets the current active recording.
    */
-  @action public setCurrentRecording(recordingId: string | null) {
+  @action public async openRecording(recordingId: number | null) {
     if (!recordingId) {
-      this.currRecording?.cleanup();
+      this.currRecording?.dispose();
       this.currRecording = null;
       return;
     }
 
     const recording = this.recordings.find((rec) => rec.id === recordingId);
-
     if (!recording)
       throw new Error('Cannot set the new recording. Recording not found!');
 
-    this.currRecording = new RecordingModel(
-      recording.id,
-      recording.name,
-      recording.description,
-      recording.created_timestamp,
-      recording.updated_timestamp
-    );
-  }
+    // Check for data
+    const recordingData =
+      await ServiceManager.dbConnection.recordingQueries.selectRecordingData(
+        recordingId,
+        1
+      );
 
-  /**
-   * Retrieves a list of all recordings in the from the database.
-   */
-  @action public async loadAllRecordings() {
-    const recordings =
-      await ServiceManager.dbConnection.recordingQueries.selectAllRecordings();
-    runInAction(() => {
-      this.allRecordings = recordings;
-      this.searchedRec = recordings;
-    });
+    // If the recording does not have any data go to the calibration and prepare for recording.
+    if (recordingData.length === 0) {
+      appRouterVM.navigateTo(
+        AppNavStatesEnum.CALIBRATION,
+        true,
+        false,
+        'Loading Recording...',
+        1200
+      );
+
+      this.currRecording = new RecordingModel(
+        recording.id,
+        recording.name,
+        recording.description,
+        recording.created_timestamp,
+        recording.updated_timestamp,
+        recording.sensor
+      );
+    }
+
+    // If the recording has data, load the data and go to the review page.
+    if (recordingData.length !== 0) {
+      appRouterVM.navigateTo(
+        AppNavStatesEnum.REVIEW,
+        true,
+        false,
+        'Loading Recording...',
+        1200
+      );
+      this.currRecording = new RecordingModel(
+        recording.id,
+        recording.name,
+        recording.description,
+        recording.created_timestamp,
+        recording.updated_timestamp,
+        recording.devices[0].sensorType,
+        true
+      );
+    }
   }
 
   /**
@@ -129,6 +177,45 @@ export class RecordingViewModel {
     );
   }
 
+  //#endregion
+
+  /**
+   * Retrieves a list of all recordings in the from the database.
+   */
+  @action public async loadAllRecordings() {
+    const recordings =
+      await ServiceManager.dbConnection.recordingQueries.selectAllRecordings();
+    runInAction(() => {
+      this.allRecordings = recordings;
+      this.searchedRec = recordings;
+    });
+  }
+
+  /**
+   * Deletes the given recording from the database.
+   */
+  public async deleteRecording(recordingId: number) {
+    const msgBoxOptions: Electron.MessageBoxOptions = {
+      title: 'Please confirm your selection',
+      detail: 'This action is not reversible',
+      message: 'Deleting recording and all its data',
+      type: 'warning',
+      buttons: ['Cancel', 'Confirm'],
+      noLink: true,
+    };
+    const confirmation = await ipcRenderer.invoke(
+      DialogBoxChannels.MessageBoxSync,
+      msgBoxOptions
+    );
+    if (confirmation === 0) return;
+
+    await ServiceManager.dbConnection.recordingQueries.deleteRecording(
+      recordingId
+    );
+
+    this.loadAllRecordings();
+  }
+
   /**
    * Removes all the recordings except the active recording from the state.
    */
@@ -139,12 +226,17 @@ export class RecordingViewModel {
   /**
    * Creates a new recording.
    */
-  @action public async createNewRecording(name: string, description?: string) {
+  @action public async createNewRecording(
+    name: string,
+    sensor: 'v5' | 'v6',
+    description?: string
+  ) {
     appRouterVM.setAppLoading(true, true, 'Creating a new recording...', 1200);
 
     const record =
       await ServiceManager.dbConnection.recordingQueries.insertRecording({
         name,
+        sensor,
         description,
         has_data: 0,
       });
@@ -155,7 +247,8 @@ export class RecordingViewModel {
         record.name,
         record.description,
         record.created_timestamp,
-        record.updated_timestamp
+        record.updated_timestamp,
+        sensor
       );
     });
 
@@ -173,18 +266,6 @@ export class RecordingViewModel {
     const currentRecordingChangedReaction = reaction(
       () => this.currentRecording,
       () => {
-        // Navigate to the calibration page on setting the current recording.
-        this.currentRecording &&
-          runInAction(() =>
-            appRouterVM.navigateTo(
-              AppNavStatesEnum.CALIBRATION,
-              true,
-              false,
-              'Loading Recording...',
-              1000
-            )
-          );
-
         // Navigate to the home page on closing the recording.
         !this.currentRecording &&
           runInAction(() => {

@@ -7,3 +7,6 @@ export { ReaderChannels } from './ReaderChannels';
 
 // Message ports
 export { MessagePortChannels } from './MessagePortChannels';
+
+// Dialog box
+export { DialogBoxChannels } from './DialogBoxChannels';

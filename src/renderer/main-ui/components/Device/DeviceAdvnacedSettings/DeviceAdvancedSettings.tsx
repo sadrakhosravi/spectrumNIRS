@@ -11,7 +11,7 @@ import { Column, Row } from '../../Elements/Grid';
 // View Models
 import { appRouterVM } from '@viewmodels/VMStore';
 import { Separator } from '../../Elements/Separator';
-import { DeviceInfoType } from 'reader/api/Types';
+import { DeviceInfoType } from '@models/Device/api/Types';
 
 type DeviceSelectorType = {
   deviceName: string;

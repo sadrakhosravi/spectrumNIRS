@@ -13,6 +13,8 @@ import { ChartViewSwitcher } from '/@/components/Chart';
 
 // View Models
 import { CalibrationToolbarViewModel } from '@viewmodels/index';
+import { recordingVM } from '@store';
+import { observer } from 'mobx-react-lite';
 
 // const iconSize = '18px';
 // const iconStrokeColor = '#ccc';
@@ -20,7 +22,7 @@ import { CalibrationToolbarViewModel } from '@viewmodels/index';
 
 const calibrationToolbarVM = new CalibrationToolbarViewModel();
 
-export const CalibrationToolbar = () => {
+export const CalibrationToolbar = observer(() => {
   return (
     <>
       {/* <ToolbarSection text="Charts">
@@ -69,9 +71,25 @@ export const CalibrationToolbar = () => {
           <ActiveDeviceList />
         </span>
 
-        <Button text="Start" onClick={calibrationToolbarVM.handleDeviceStart} />
-        <Button text="Stop" onClick={calibrationToolbarVM.handleDeviceStop} />
+        <Button
+          text="Start"
+          disabled={
+            recordingVM.currentRecording?.deviceManager.isRecordingData ||
+            recordingVM.currentRecording?.hasData ||
+            !recordingVM.currentRecording?.deviceManager.devices[0]?.isConnected
+          }
+          className={styles.GreenButton}
+          onClick={calibrationToolbarVM.handleDeviceStart}
+        />
+        <Button
+          text="Stop"
+          disabled={
+            !recordingVM.currentRecording?.deviceManager.isRecordingData
+          }
+          className={styles.RedButton}
+          onClick={calibrationToolbarVM.handleDeviceStop}
+        />
       </div>
     </>
   );
-};
+});

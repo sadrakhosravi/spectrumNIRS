@@ -73,7 +73,10 @@ export const DeviceSelector = observer(
           return;
         }
 
-        recordingVM.currentRecording?.deviceManager?.addDevice(deviceName);
+        recordingVM.currentRecording?.deviceManager?.addDevice(
+          deviceName,
+          'v5'
+        );
       },
       []
     );

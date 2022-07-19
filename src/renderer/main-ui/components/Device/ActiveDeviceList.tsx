@@ -37,7 +37,7 @@ export const ActiveDeviceList = observer(() => {
         text="Devices"
         dropDownIndicator
         onClick={() => setIsOpen(true)}
-        disabled={recordingVM.currentRecording?.deviceManager.isRecordingData}
+        disabled
       />
       {isOpen && (
         <Popover
@@ -53,7 +53,7 @@ export const ActiveDeviceList = observer(() => {
                 <DeviceListItem
                   key={device.id}
                   name={device.name}
-                  isConnected={device.isDeviceConnected}
+                  isConnected={device.isConnected}
                   onSettingsClick={() => {
                     appRouterVM.setAppLoading(
                       true,

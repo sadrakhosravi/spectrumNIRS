@@ -5,7 +5,7 @@ import styles from './seriesUnit.module.scss';
 export const SeriesUnit = () => {
   return (
     <div className={styles.SeriesUnit}>
-      <span>mV</span>
+      <span />
     </div>
   );
 };

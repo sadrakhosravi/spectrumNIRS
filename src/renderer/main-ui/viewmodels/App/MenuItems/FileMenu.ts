@@ -34,7 +34,7 @@ export const FileMenu = {
       'Close Recording',
       `${ShortcutsEnum.CTRL}+${ShortcutsEnum.SHIFT}+W`,
       () => {
-        recordingVM.setCurrentRecording(null);
+        recordingVM.openRecording(null);
       }
     ),
 

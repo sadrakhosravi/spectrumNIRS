@@ -9,11 +9,10 @@ import { Listbox } from '/@/components/Elements/Listbox';
 import { ToggleArea } from '/@/components/Elements/ToggleArea';
 
 // View Models
-import { chartVM } from '@store';
-import { FilterSettingsViewModel } from '@viewmodels/index';
 
 // Filter
 import { cutoffFrequencies, orders } from '@models/Filters/Lowpass';
+import { filterSettingsVM } from '@store';
 
 // Prepare filter options for listbox options
 const cutoffFrequenciesOptions = cutoffFrequencies.map((freq) => {
@@ -24,11 +23,6 @@ const ordersOptions = orders.map((order) => {
 });
 
 export const GlobalFiltersWidget = observer(() => {
-  const filterSettingsVM = React.useMemo(
-    () => new FilterSettingsViewModel(chartVM),
-    []
-  );
-
   return (
     <WidgetsContainer>
       <Tabs>

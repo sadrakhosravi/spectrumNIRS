@@ -13,3 +13,11 @@
   @include flex-center;
   gap: $gap-lg;
 }
+
+.GreenButton {
+  background: rgb(0, 165, 88);
+}
+
+.RedButton {
+  background: rgb(97, 1, 1);
+}

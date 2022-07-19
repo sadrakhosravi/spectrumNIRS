@@ -8,6 +8,7 @@ type IconOnlyButtonType = {
   icon: JSX.Element;
   className?: string;
   isActive?: boolean;
+  isInteractiveActive?: boolean;
   tooltipText?: string;
   tooltipPlacement?: 'top' | 'bottom' | 'left' | 'right';
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -18,6 +19,7 @@ export const IconOnlyButton = ({
   isActive,
   tooltipText,
   tooltipPlacement,
+  isInteractiveActive,
   className,
   onClick,
 }: IconOnlyButtonType) => {
@@ -38,6 +40,8 @@ export const IconOnlyButton = ({
         <button
           className={`${styles.IconOnlyButton} ${
             isActive && styles.IconOnlyButtonActive
+          } ${
+            isInteractiveActive && styles.IconOnlyButtonActiveInteractive
           } ${className}`}
           onClick={onClick}
         >

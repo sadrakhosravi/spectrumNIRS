@@ -5,17 +5,24 @@
  *  @version 0.1.0
  *--------------------------------------------------------------------------------------------*/
 
-import { makeObservable, observable, toJS } from 'mobx';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
+import { observable, reaction, toJS } from 'mobx';
+
+// Models
+import { IDisposable } from '../Base/IDisposable';
+import { ObservableModel } from '../Base/ObservableModel';
 import { DashboardChart, ChartSeries } from '../Chart';
 
 // View Models
-import { chartVM } from '/@/viewmodels/VMStore';
+import { appRouterVM, chartVM } from '/@/viewmodels/VMStore';
 
-export class DeviceChartManagerModel {
-  /**
-   * The chart channels of the device.
-   */
-  @observable private readonly channels: string[];
+export class DeviceChartManagerModel
+  extends ObservableModel
+  implements IDisposable
+{
+  private readonly calcChannelNames: string[];
+  private readonly PDChannelNames: string[];
+
   /**
    * Charts channels and series pointer.
    */
@@ -23,22 +30,49 @@ export class DeviceChartManagerModel {
   /**
    * The current sampling rate of the device.
    */
-  @observable private samplingRate: number;
+  @observable private samplingRate!: number;
 
-  constructor(channels: string[], samplingRate: number) {
-    this.channels = channels;
-    this.charts = [];
+  constructor(
+    calcChannelNames: string[],
+    PDChannelNames: string[],
+    samplingRate: number
+  ) {
+    super();
+
+    this.calcChannelNames = calcChannelNames;
+    this.PDChannelNames = PDChannelNames;
     this.samplingRate = samplingRate;
 
-    makeObservable(this);
+    this.charts = [];
+
+    this.handleReactions();
+  }
+
+  /**
+   * Creates chart channels based on the router's current route.
+   */
+  public createDeviceCharts() {
+    // Check if there are any charts and dispose them first.
+    this.disposeChannels();
+
+    setTimeout(() => {
+      if (appRouterVM.route === AppNavStatesEnum.CALIBRATION)
+        this.createChartChannels(this.PDChannelNames);
+
+      if (
+        appRouterVM.route === AppNavStatesEnum.RECORD ||
+        appRouterVM.route === AppNavStatesEnum.REVIEW
+      )
+        this.createChartChannels(this.calcChannelNames);
+    }, 50);
   }
 
   /**
    * Creates chart channels for the device.
    */
-  public createChartChannels() {
+  private createChartChannels(channels: string[]) {
     // Add chart channels
-    this.channels.forEach((channelName) => {
+    channels.forEach((channelName) => {
       const chart = chartVM.addChart();
       const series = chartVM.addSeries(chart.id, channelName);
 
@@ -60,5 +94,29 @@ export class DeviceChartManagerModel {
       chartVM.removeChart(chart.chart.id);
     });
     this.charts.length = 0;
+  }
+
+  public dispose(): boolean {
+    this.reactions.forEach((reaction) => reaction());
+    this.reactions.length = 0;
+
+    this.disposeChannels();
+    this.charts.length = 0;
+
+    return true;
+  }
+
+  /**
+   * Handles the reaction to observable changes.
+   */
+  private handleReactions() {
+    const handleAppRouteChange = reaction(
+      () => appRouterVM.route,
+      () => {
+        this.createDeviceCharts();
+      }
+    );
+
+    this.reactions.push(handleAppRouteChange);
   }
 }

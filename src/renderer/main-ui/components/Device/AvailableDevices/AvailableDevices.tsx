@@ -20,7 +20,12 @@ export const AvailableDevices = observer(() => {
         <div className={styles.AvailableDevices}>
           {recordingVM.currentRecording?.deviceManager.allDevices.map(
             (device, i) => (
-              <SelectableCard key={device.name + i} text={device.name} />
+              <SelectableCard
+                key={device.name + i}
+                text={device.name}
+                value=""
+                setter={() => {}}
+              />
             )
           )}
         </div>

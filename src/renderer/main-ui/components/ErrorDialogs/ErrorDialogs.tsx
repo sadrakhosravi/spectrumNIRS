@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { ipcRenderer } from 'electron';
 import * as React from 'react';
 
@@ -34,7 +36,12 @@ export const ErrorDialogs = () => {
   return (
     <>
       {isDialogOpen && (
-        <DialogBox title="Error" isOpen={isDialogOpen} type="error" closeSetter={setIsDialogOpen}>
+        <DialogBox
+          title="Error"
+          isOpen={isDialogOpen}
+          type="error"
+          closeSetter={setIsDialogOpen}
+        >
           <div>
             <span>{error?.message}</span>
             <span>Cause: {error?.cause?.toString() || 'Unknown'}</span>

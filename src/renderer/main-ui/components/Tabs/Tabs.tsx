@@ -23,7 +23,7 @@ export const Tabs = ({ children }: TabsType) => {
         <div className={styles.TabButtonsContainer}>
           <TabButton
             text={header}
-            isActive={true}
+            isActive
             onClick={() => {}}
             key={header}
             style={{ width: width + '%' }}

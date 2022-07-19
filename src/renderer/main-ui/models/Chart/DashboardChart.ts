@@ -374,7 +374,7 @@ export class DashboardChart {
     axisX.setChartInteractions(false);
 
     // Disable all charts listeners
-    this.chart.setMouseInteractions(false);
+    this.chart.setMouseInteractions(true);
 
     // Disable chart default cursors
     this.chart.setAutoCursorMode(AutoCursorModes.disabled);

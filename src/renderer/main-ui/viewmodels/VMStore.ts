@@ -13,6 +13,7 @@ import { BarChartViewModel } from './Chart/BarChartViewModel';
 // import { XAxisChartViewModel } from './Chart/XAxisChartViewModel';
 
 import { RecordingViewModel } from './Recording/RecordingViewModel';
+import { FilterSettingsViewModel } from './Widgets/FilterSettingsViewModel';
 
 /// ------------------------- App Global ------------------------- ///
 /**
@@ -52,6 +53,9 @@ export const disposeChartVM = () => {
   //@ts-ignore
   chartVM = null;
 };
+
+export const filterSettingsVM: FilterSettingsViewModel =
+  new FilterSettingsViewModel(chartVM);
 
 /**
  * The bar chart view model instance

@@ -15,13 +15,13 @@ import { Listbox } from '../Elements/Listbox';
 import { RangeSliderWithInput } from '../Form/RangeSliderWithInput';
 
 // Types
-import type { DeviceModelProxy } from '@models/Device/DeviceModelProxy';
+import type { DeviceModel } from '/@/models/Device/DeviceModel';
 
 // ID
 const ledIDBase = 'led-intensities-';
 
 type DeviceSettingsType = {
-  device: DeviceModelProxy;
+  device: DeviceModel;
 };
 
 export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
@@ -71,6 +71,9 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
 
             clearSpan();
             break;
+
+          default:
+            break;
         }
       }
     );
@@ -99,21 +102,24 @@ export const DeviceSettings = observer(({ device }: DeviceSettingsType) => {
         {/* Adjust LED intensity */}
       </Row>
       <div className={styles.LEDIntensitiesContainer}>
-        {device.LEDs.map((_, i) => (
-          <RangeSliderWithInput
-            id={ledIDBase + i}
-            key={ledIDBase + i + 'range-slider'}
-            title={'LED' + (i + 1)}
-            defaultValue={device.LEDIntensities[i]}
-            min={0}
-            max={Math.pow(2, device.deviceInfo.DACRes) - 1}
-            onBlur={(value) => device.updateLEDIntensities(value, i)}
-          />
-        ))}
+        {device.LEDs.map(
+          (_, i) =>
+            device.PDChannelNames.includes('LED' + (i + 1)) && (
+              <RangeSliderWithInput
+                id={ledIDBase + i}
+                key={ledIDBase + i + 'range-slider'}
+                title={'LED' + (i + 1)}
+                defaultValue={device.LEDIntensities[i]}
+                min={0}
+                max={Math.pow(2, device.deviceInfo.DACRes) - 1}
+                onBlur={(value) => device.updateLEDIntensities(value, i)}
+              />
+            )
+        )}
       </div>
       <div>
         <span>Status: </span>
-        <span className={styles.StatusSpan} ref={statusRef}></span>
+        <span className={styles.StatusSpan} ref={statusRef} />
       </div>
     </>
   );

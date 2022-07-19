@@ -11,13 +11,13 @@ import { recordingVM } from '@viewmodels/VMStore';
 import { Separator } from '/@/components/Elements/Separator';
 
 // Types
-import type { DeviceModelProxy } from '/@/models/Device/DeviceModelProxy';
+import type { DeviceModel } from '../../../models/Device/DeviceModel';
 
 export const DeviceSettingsTab = observer(() => {
   const devicesWithProbeSettings =
     recordingVM.currentRecording?.deviceManager.activeDevices.filter(
-      (device) => device.hasProbeSettings === true
-    ) as DeviceModelProxy[];
+      (device) => device.hasSettings === true
+    ) as DeviceModel[];
 
   const deviceOptions = devicesWithProbeSettings.map((device) => ({
     name: device.name,

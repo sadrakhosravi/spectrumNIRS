@@ -89,7 +89,7 @@ export class XAxisModel {
    */
   private createXAxisChart(container: string) {
     this.xAxisChart = lcjs().ChartXY({
-      maxFps: 50,
+      maxFps: 30,
       container,
       antialias: true,
       lineAntiAlias: true,
@@ -119,7 +119,7 @@ export class XAxisModel {
     // Remove the title and paddings
     chart.setTitleFillStyle(emptyFill);
     chart.setPadding(0);
-    chart.setMouseInteractions(false);
+    chart.setMouseInteractions(true);
 
     // Dispose the yAxis
     yAxis.dispose();
@@ -140,8 +140,8 @@ export class XAxisModel {
     xAxis
       .setStrokeStyle(emptyLine)
       .setNibLength(0)
-      .setMouseInteractions(false)
-      .setChartInteractions(false);
+      .setMouseInteractions(true)
+      .setChartInteractions(true);
 
     xAxis.restore();
     this.attachedChart?.getDefaultAxisX().release();

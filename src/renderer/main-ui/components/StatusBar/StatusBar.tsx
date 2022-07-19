@@ -8,7 +8,7 @@ import styles from './statusBar.module.scss';
 import { StatusBarItem } from '.';
 
 // Icon
-import { FiXCircle } from 'react-icons/fi';
+import { FiXCircle, FiCheckCircle } from 'react-icons/fi';
 import { recordingVM } from '/@/viewmodels/VMStore';
 
 // View Model
@@ -20,8 +20,16 @@ export const StatusBar = observer(() => {
       <div className={styles.LeftItems} />
       <div className={styles.RightItems}>
         {recordingVM.currentRecording?.deviceManager.activeDevices.map(
-          (device) => (
-            <StatusBarItem icon={FiXCircle} text={device.name} />
+          (device, i) => (
+            <StatusBarItem
+              key={device.id + i}
+              icon={device.isConnected ? FiCheckCircle : FiXCircle}
+              text={device.name}
+              iconColor={device.isConnected ? 'green' : 'red'}
+              tooltip={
+                device.isConnected ? 'Device Connected' : 'Device Not Connected'
+              }
+            />
           )
         )}
       </div>

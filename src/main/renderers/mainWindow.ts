@@ -54,7 +54,8 @@ const createWindow = () => {
   menuBuilder.buildMenu();
 
   // Open dev tools on debug
-  setTimeout(() => mainWindow.webContents.openDevTools(), 1000);
+  if (process.env.NODE_ENV === 'development')
+    setTimeout(() => mainWindow.webContents.openDevTools(), 1000);
 
   return mainWindow;
 };

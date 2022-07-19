@@ -17,7 +17,7 @@ import { MessagePortManager } from './models/MessagePortManager';
 import { createMainWindow } from './renderers/mainWindow';
 // import { createReaderProcess } from './renderers/reader';
 import { startup } from './startup/startup';
-import { createReaderProcess } from './renderers/reader';
+// import { createReaderProcess } from './renderers/reader';
 
 export type RendererWindows = {
   mainWindow: Electron.BrowserWindow | null;
@@ -68,7 +68,10 @@ app.on('window-all-closed', () => {
   // Create the manager models
   new MessagePortManager(renderers);
 
+  // Import IPC events
+  await import('./models/DialogBox');
+
   // Create renderers
-  renderers.reader = createReaderProcess();
+  // renderers.reader = createReaderProcess();
   renderers.mainWindow = createMainWindow();
 })();

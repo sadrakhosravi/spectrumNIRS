@@ -20,6 +20,7 @@ export const Button = ({
 }: ButtonType) => {
   return (
     <button
+      // eslint-disable-next-line react/button-has-type
       type={type || 'button'}
       className={`${styles.Button} ${className || ''}  ${
         disabled ? styles.disabled : ''

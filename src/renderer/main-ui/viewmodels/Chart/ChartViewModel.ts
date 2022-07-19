@@ -396,14 +396,6 @@ export class ChartViewModel {
       }
     );
 
-    // Handle chart view change
-    const chartViewChangeReaction = reaction(
-      () => this.currView,
-      () => {
-        console.log('View Changed');
-      }
-    );
-
     // Handles app router change.
     const handleAppRouteSwitch = reaction(
       () => appRouterVM.route,
@@ -416,7 +408,6 @@ export class ChartViewModel {
     this.reactions.push(
       chartLengthReaction,
       chartMaximizedReaction,
-      chartViewChangeReaction,
       handleAppRouteSwitch
     );
   }

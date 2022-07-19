@@ -13,13 +13,13 @@ export class CalibrationToolbarViewModel {
    * Sends a device start signal to the reader process
    */
   public handleDeviceStart() {
-    recordingVM.currentRecording?.deviceManager.startDevices();
+    recordingVM.currentRecording?.startRecording();
   }
 
   /**
    * Sends a device start signal to the reader process
    */
   public handleDeviceStop() {
-    recordingVM.currentRecording?.deviceManager.stopDevices();
+    recordingVM.currentRecording?.stopRecording();
   }
 }

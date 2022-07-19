@@ -10,6 +10,7 @@
       "@charts/*": ["renderer/main-ui/charts/*"],
       "@widgets/*": ["renderer/main-ui/widgets/*"],
       "@utils/*": ["utils/*"],
+      "@database/*": ["renderer/main-ui/workers/database/*"],
       "@store": ["renderer/main-ui/viewmodels/VMStore.ts"],
       "@dataStore": ["renderer/main-ui/models/DataStore.ts"],
       "reader/*": ["renderer/reader/*"]
@@ -38,7 +39,7 @@
     "outDir": "release/app/dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "isolatedModules": true
+    "isolatedModules": false
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

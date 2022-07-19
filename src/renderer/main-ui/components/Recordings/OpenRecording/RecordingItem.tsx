@@ -8,20 +8,22 @@ import styles from './recordingItem.module.scss';
 // Components
 
 // Icons
-import { FiCornerUpRight, FiFileText } from 'react-icons/fi';
+import { FiCornerUpRight, FiTrash, FiFileText } from 'react-icons/fi';
+import { recordingVM } from '/@/viewmodels/VMStore';
 
 const iconSettings = {
   size: '16px',
 };
 
 type RecordingItemType = {
-  id: string;
+  id: number;
   title: string;
   lastUpdate: number;
   isSelected: boolean;
   isActive: boolean;
   description?: string;
-  setter?: (id: string) => void;
+  enableDelete?: boolean;
+  setter?: (id: number) => void;
   onDoubleClick?: React.MouseEventHandler<HTMLDivElement>;
   onClick?: React.MouseEventHandler<HTMLDivElement | HTMLButtonElement>;
 };
@@ -33,6 +35,7 @@ export const RecordingItem = ({
   lastUpdate,
   isSelected,
   isActive,
+  enableDelete,
   setter,
   onClick,
   onDoubleClick,
@@ -71,6 +74,12 @@ export const RecordingItem = ({
     return date;
   }, []);
 
+  // Handles the record on delete click button
+  const handleRecordDeleteClick = React.useCallback(async () => {
+    await recordingVM.deleteRecording(id);
+    setter && setter(0);
+  }, []);
+
   return (
     <div
       className={`${styles.RecordingItem} ${
@@ -99,6 +108,13 @@ export const RecordingItem = ({
           <Tippy content="Open Recording" placement="bottom">
             <button type="button" onClick={onClick}>
               <FiCornerUpRight {...iconSettings} />
+            </button>
+          </Tippy>
+        )}
+        {enableDelete && (
+          <Tippy content="Delete Recording" placement="bottom">
+            <button type="button" onClick={handleRecordDeleteClick}>
+              <FiTrash {...iconSettings} />
             </button>
           </Tippy>
         )}

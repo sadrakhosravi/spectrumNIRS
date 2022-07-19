@@ -30,18 +30,17 @@ const configuration: webpack.Configuration = {
 
   mode: 'production',
 
-  target: ['web', 'electron-renderer'],
+  target: 'electron-renderer',
 
   entry: {
-    main: [path.join(webpackPaths.srcRendererPath, 'main-ui', 'index.tsx')],
-    reader: [path.join(webpackPaths.srcRendererPath, 'reader', 'index.tsx')],
+    main: [path.join(webpackPaths.srcRendererPath, 'index.tsx')],
   },
 
   output: {
     path: webpackPaths.distRendererPath,
-    publicPath: '/',
-    filename: '[name].js',
-    chunkFilename: '[name].js',
+    publicPath: './',
+    filename: '[name].bundle.js',
+    chunkFilename: '[name].chunk.js',
   },
 
   module: {
@@ -114,8 +113,8 @@ const configuration: webpack.Configuration = {
     }),
 
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.join(webpackPaths.srcRendererPath, 'main-ui', 'index.ejs'),
+      filename: path.join('index.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
       chunks: ['main'],
       minify: {
         collapseWhitespace: true,
@@ -123,19 +122,9 @@ const configuration: webpack.Configuration = {
         removeComments: true,
       },
       isBrowser: false,
+      env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'reader.html',
-      template: path.join(webpackPaths.srcRendererPath, 'reader', 'reader.ejs'),
-      chunks: ['reader'],
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-      },
-      isBrowser: false,
-      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
     }),
   ],
 };

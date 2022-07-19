@@ -8,33 +8,33 @@ import * as Comlink from 'comlink';
 
 // Interfaces
 import type { IServices } from './IServicesInterface';
-import type { DatabaseSharedWorker } from '../sharedWorkers/databaseSharedWorker';
+import type { DatabaseWorker } from '../renderer/main-ui/workers/dbWorker';
 
 export class DatabaseService implements IServices {
   /**
    * The database worker shared worker instance.
    */
-  private dbWorker!: SharedWorker;
+  private dbWorker!: Worker;
 
-  dbConnection!: Comlink.Remote<DatabaseSharedWorker> | DatabaseSharedWorker;
+  dbConnection!: Comlink.Remote<DatabaseWorker> | DatabaseWorker;
 
   constructor() {
-    this.dbWorker = new SharedWorker(
+    this.dbWorker = new Worker(
       //@ts-ignore
-      new URL('../sharedWorkers/databaseSharedWorker.ts', import.meta.url),
+      new URL('../renderer/main-ui/workers/dbWorker.ts', import.meta.url),
       { type: 'module' }
     );
   }
 
   public get connection() {
-    return this.dbConnection as DatabaseSharedWorker;
+    return this.dbConnection as DatabaseWorker;
   }
 
   /**
    * Initialize service.
    */
   public initService = async () => {
-    this.dbConnection = Comlink.wrap(this.dbWorker.port);
+    this.dbConnection = Comlink.wrap(this.dbWorker);
     const isInitialized = await await this.dbConnection.init(); // 2 awaits for comlink and db connection.
     console.log('DB initialized');
     return isInitialized;

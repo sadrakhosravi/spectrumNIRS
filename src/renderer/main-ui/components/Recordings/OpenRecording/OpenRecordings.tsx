@@ -11,14 +11,14 @@ import { Button, IconOnlyButton } from '../../Elements/Buttons';
 import { RecordingItem } from './RecordingItem';
 
 // Icons
-import { FiRefreshCcw } from 'react-icons/fi';
+import { FiRefreshCcw, FiTrash } from 'react-icons/fi';
 
 // View Models
 import { appRouterVM, recordingVM } from '@store';
 import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 export const OpenRecordings = observer(() => {
-  const [selectedRecording, setSelectedRecording] = React.useState('');
+  const [selectedRecording, setSelectedRecording] = React.useState(0);
   const searchInputId = React.useId();
 
   // Load all recordings
@@ -47,10 +47,10 @@ export const OpenRecordings = observer(() => {
           <Button text="Import Recording" disabled />
           <Button
             text="Open Recording"
-            disabled={selectedRecording === ''}
+            disabled={selectedRecording === 0}
             onClick={() => {
-              recordingVM.setCurrentRecording(selectedRecording);
-              setSelectedRecording('');
+              recordingVM.openRecording(selectedRecording);
+              setSelectedRecording(0);
             }}
           />
           <Button
@@ -69,11 +69,18 @@ export const OpenRecordings = observer(() => {
         />
       }
       topBarActionButtons={
-        <IconOnlyButton
-          icon={<FiRefreshCcw size="16px" strokeWidth={2.5} />}
-          tooltipText="Refresh"
-          onClick={() => handleRefreshBtnClick()}
-        />
+        <>
+          <IconOnlyButton
+            icon={<FiRefreshCcw size="16px" strokeWidth={2.5} />}
+            tooltipText="Refresh"
+            onClick={() => handleRefreshBtnClick()}
+          />
+          <IconOnlyButton
+            icon={<FiTrash size="16px" strokeWidth={2.5} />}
+            isInteractiveActive={recordingVM.deleteMode}
+            onClick={() => (recordingVM.deleteMode = !recordingVM.deleteMode)}
+          />
+        </>
       }
       noContentMessage={
         recordingVM.searchedRecordings.length === 0
@@ -83,7 +90,7 @@ export const OpenRecordings = observer(() => {
     >
       <div
         className={styles.ContentClickArea}
-        onClick={() => setSelectedRecording('')}
+        onClick={() => setSelectedRecording(0)}
       />
 
       {/* Show recordings */}
@@ -93,6 +100,7 @@ export const OpenRecordings = observer(() => {
             id={recording.id}
             title={recording.name}
             isSelected={selectedRecording === recording.id}
+            enableDelete={recordingVM.deleteMode}
             isActive={
               recordingVM.currentRecording
                 ? recordingVM.currentRecording.name === recording.name
@@ -104,9 +112,9 @@ export const OpenRecordings = observer(() => {
             onClick={() =>
               recordingVM.currentRecording?.name === recording.name
                 ? appRouterVM.navigateTo(AppNavStatesEnum.CALIBRATION)
-                : recordingVM.setCurrentRecording(recording.id)
+                : recordingVM.openRecording(recording.id)
             }
-            onDoubleClick={() => recordingVM.setCurrentRecording(recording.id)}
+            onDoubleClick={() => recordingVM.openRecording(recording.id)}
             setter={setSelectedRecording}
           />
         ))}

@@ -162,6 +162,30 @@ export class ChartSeries {
   }
 
   /**
+   * Applies the gain value and adds Array of the data to the series.
+   */
+  public addArrayYOnly(data: Float32Array | Int32Array | number[]) {
+    const deviceCalibFactor = 1;
+    const gainVal = this.seriesGainVal;
+
+    let filteredData: Float32Array | Int32Array | number[] = [];
+
+    if (this.lowpassFilter) {
+      //@ts-ignore
+      filteredData = this.lowpassFilter.filtfilt(data);
+    } else {
+      filteredData = data;
+    }
+
+    // For is faster here
+    for (let i = 0; i < data.length; i++) {
+      filteredData[i] *= gainVal * deviceCalibFactor;
+    }
+
+    this.series.addArrayY(filteredData, this.timeDelta);
+  }
+
+  /**
    * Applies the gain value and adds obj array to the series.
    */
   public addArrayXY(_x: number[] | Float32Array, y: number[] | Float32Array) {
@@ -247,7 +271,7 @@ export class ChartSeries {
   /**
    * Sets the series data cleaning threshold.
    */
-  public setSeriesCleaning(numOfPointsToKeep: number) {
+  public setSeriesCleaning(numOfPointsToKeep: number | undefined) {
     this.series.setDataCleaning({ minDataPointCount: numOfPointsToKeep });
   }
 

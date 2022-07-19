@@ -17,7 +17,8 @@ export const WidgetsRouter = observer(() => {
       }}
     >
       {(appRouterVM.route === 'calibration' ||
-        appRouterVM.route === 'record') && <CalibrationWidgets />}
+        appRouterVM.route === 'record' ||
+        appRouterVM.route === 'review') && <CalibrationWidgets />}
     </div>
   );
 });

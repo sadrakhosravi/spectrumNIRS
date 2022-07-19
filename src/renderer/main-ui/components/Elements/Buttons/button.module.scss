@@ -39,8 +39,12 @@
 }
 
 .IconOnlyButtonActive {
-  background-color: $color-primary;
+  background-color: $color-primary !important;
   pointer-events: none;
+}
+
+.IconOnlyButtonActiveInteractive {
+  background-color: $color-primary !important;
 }
 
 .IconTextButton {

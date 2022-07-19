@@ -54,9 +54,11 @@ $bottom-bar-height: 4rem;
 
 .ActionButtons {
   position: absolute;
-  right: 20%;
+  right: 15%;
   top: 50%;
   transform: translateY(-50%);
+  gap: $gap-lg;
+  @include flex-center;
 
   button {
     background-color: $color-text-tertiary;

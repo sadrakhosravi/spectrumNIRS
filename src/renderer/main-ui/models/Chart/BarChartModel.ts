@@ -252,8 +252,8 @@ export class BarChartModel {
     yAxis
       .setMouseInteractions(false)
       .setChartInteractions(false)
-      .setScrollStrategy(AxisScrollStrategies.progressive)
-      .setInterval(0, 5_000);
+      .setScrollStrategy(undefined)
+      .setInterval(0, 30_000);
 
     yAxis.setTickStrategy(AxisTickStrategies.Numeric, (tick) =>
       tick
