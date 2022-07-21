@@ -37,15 +37,15 @@ export class DeviceReader {
     // Start the loop interval
     this.loopInterval = new AccurateTimer(
       this.handleDataAcquisition.bind(this),
-      100
+      30
     );
-    // this.gcInterval = new AccurateTimer(
-    //   this.handleGarbageCollection.bind(this),
-    //   20 * 1000
-    // );
+    this.gcInterval = new AccurateTimer(
+      this.handleGarbageCollection.bind(this),
+      20 * 1000
+    );
 
     this.loopInterval.start();
-    // this.gcInterval.start();
+    this.gcInterval.start();
   }
 
   /**
@@ -54,7 +54,7 @@ export class DeviceReader {
   public stopDataAcquisitionLoop() {
     setImmediate(() => this.loopInterval?.stop);
     this.loopInterval?.stop();
-    // this.gcInterval?.stop();
+    this.gcInterval?.stop();
   }
 
   /**

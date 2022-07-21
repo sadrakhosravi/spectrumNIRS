@@ -12,8 +12,6 @@ import {
   reaction,
   runInAction,
 } from 'mobx';
-import ServiceManager from '@services/ServiceManager';
-import { recordingVM } from '../VMStore';
 
 // Models
 import { DeviceModel } from '../../models/Device/DeviceModel';
@@ -103,12 +101,6 @@ export class DevicesViewModel {
   @action public startDevices() {
     this.isRecording = true;
 
-    // Start the database data saving loop.
-    ServiceManager.dbConnection.deviceDataSaver.start(
-      this.devices.map((device) => device.name),
-      recordingVM.currentRecording?.id as number
-    );
-
     console.log('Start');
     const ts = Date.now();
     this.activeDevices.forEach((device) => device.start(ts));
@@ -124,9 +116,6 @@ export class DevicesViewModel {
     this.deviceReaderLoop.stopDataAcquisitionLoop();
     const ts = Date.now();
     this.activeDevices.forEach((device) => device.stop(ts));
-
-    // Start the database data saving loop.
-    ServiceManager.dbConnection.deviceDataSaver.stop();
   }
 
   /**
@@ -146,7 +135,7 @@ export class DevicesViewModel {
     const deviceModel = new DeviceModel(
       device,
       worker,
-      wrappedWorker,
+      wrappedWorker as any,
       deviceInfo,
       sensorType
     );

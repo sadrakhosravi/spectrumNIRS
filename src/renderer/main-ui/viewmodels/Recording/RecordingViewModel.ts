@@ -149,8 +149,7 @@ export class RecordingViewModel {
         AppNavStatesEnum.REVIEW,
         true,
         false,
-        'Loading Recording...',
-        1200
+        'Loading Recording...'
       );
       this.currRecording = new RecordingModel(
         recording.id,

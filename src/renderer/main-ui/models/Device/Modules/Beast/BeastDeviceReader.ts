@@ -109,8 +109,18 @@ export class BeastDeviceReader implements IDeviceReader {
     return this.device.DefaultConfigs;
   }
 
+  /**
+   * Sets the device config.
+   */
   public setDeviceConfig(deviceConfig: IDeviceConfigParsed): void {
     console.log(deviceConfig);
+  }
+
+  /**
+   * Sets the sensor type for the controller and the calculations.
+   */
+  public setSensorType(type: 'v5' | 'v6') {
+    this.deviceCalculation.setSensorType(type);
   }
 
   /**

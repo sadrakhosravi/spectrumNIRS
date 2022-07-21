@@ -114,13 +114,18 @@ export class RecordingQueries {
   /**
    * @returns the recording data for the given recording Id and limits the queried results.
    */
-  public async selectRecordingData(recordingId: number, limit: number) {
+  public async selectRecordingData(
+    recordingId: number,
+    limit: number,
+    offset?: number
+  ) {
     return (await this.dataSource
       .createQueryBuilder()
       .select('data')
       .from(RecordingDataTable, '')
       .where('recordingId = :id', { id: recordingId })
       .limit(limit)
+      .offset(offset)
       .getRawMany()) as RecordingDataType[];
   }
 

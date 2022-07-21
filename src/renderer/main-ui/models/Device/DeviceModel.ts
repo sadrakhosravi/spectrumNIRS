@@ -28,9 +28,9 @@ import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 // Types & Interfaces
 import type { IDisposable } from '../Base/IDisposable';
-import type { IDeviceReader } from '@models/Device/Interfaces';
 import type { DeviceDataTypeWithMetaData, DeviceInfoType } from './api/Types';
 import type { DeviceConfigSavedType } from './api/device-api';
+import { BeastDeviceReader } from './Modules/Beast/BeastDeviceReader';
 
 export type DeviceSettingsType = {
   numOfPDs: number;
@@ -48,7 +48,7 @@ export class DeviceModel implements IDisposable {
   /**
    * The Comlink wrapped device worker object.
    */
-  private readonly deviceReader: Comlink.Remote<IDeviceReader>;
+  private readonly deviceReader: Comlink.Remote<BeastDeviceReader>;
   /**
    * The type of the sensor used for the Beast device.
    */
@@ -92,7 +92,7 @@ export class DeviceModel implements IDisposable {
   constructor(
     deviceObj: typeof devices[0],
     worker: Worker,
-    wrappedWorker: Comlink.Remote<IDeviceReader>,
+    wrappedWorker: Comlink.Remote<BeastDeviceReader>,
     deviceInfo: DeviceInfoType,
     sensorType: 'v5' | 'v6'
   ) {
@@ -236,13 +236,7 @@ export class DeviceModel implements IDisposable {
 
       if (appRouterVM.route === AppNavStatesEnum.RECORD) {
         // Send the data to be stored in the database.
-        const dbData = data.map((packet) => ({
-          //@ts-ignore
-          data: packet.buffer as Buffer,
-          metadata: packet.metadata,
-        }));
-
-        ServiceManager.dbConnection.deviceDataSaver.addData(this.name, dbData);
+        ServiceManager.dbConnection.deviceDataSaver.addData(data);
       }
 
       this.deviceDataManager.handleData(data);
@@ -295,6 +289,7 @@ export class DeviceModel implements IDisposable {
     console.log(this.deviceReader);
 
     this.deviceCharts.createDeviceCharts();
+    this.deviceReader.setSensorType(this.sensorType);
   }
 
   /**

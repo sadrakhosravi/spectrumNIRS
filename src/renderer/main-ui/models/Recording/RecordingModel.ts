@@ -15,6 +15,8 @@ import type { IDisposable } from '../Base/IDisposable';
 import { DevicesViewModel } from '../../viewmodels/Device/DevicesViewModel';
 import { DeviceInfoSavedType } from '../Device/api/device-api';
 import { RecordingDataModel } from './RecordingDataModel';
+import { appRouterVM, recordingVM } from '/@/viewmodels/VMStore';
+import { AppNavStatesEnum } from '@utils/types/AppStateEnum';
 
 export class RecordingModel implements IDisposable {
   /**
@@ -33,6 +35,10 @@ export class RecordingModel implements IDisposable {
    * The timestamp that the recording was created at.
    */
   public readonly createdTimestamp: number;
+  /**
+   * The type of the sensor to use.
+   */
+  public readonly sensorType: string;
   /**
    * The device manager view model instance.
    */
@@ -62,6 +68,7 @@ export class RecordingModel implements IDisposable {
     this.name = name;
     this.description = description;
     this.createdTimestamp = createdTS;
+    this.sensorType = sensorType;
 
     // Models
     this.deviceManager = new DevicesViewModel();
@@ -127,10 +134,20 @@ export class RecordingModel implements IDisposable {
         sensorType: device.sensor,
         settings: device.currConfigs,
       }));
-    await ServiceManager.dbConnection.recordingQueries.updateRecordingDevices(
-      devicesSettings,
-      this.id
-    );
+
+    if (appRouterVM.route === AppNavStatesEnum.RECORD) {
+      await ServiceManager.dbConnection.recordingQueries.updateRecordingDevices(
+        devicesSettings,
+        this.id
+      );
+
+      // Start the database data saving loop.
+      ServiceManager.dbConnection.deviceDataSaver.start(
+        this.deviceManager.devices.map((device) => device.name),
+        recordingVM.currentRecording?.id as number,
+        this.deviceManager.devices[0].sensor
+      );
+    }
 
     this.deviceManager.startDevices();
   }
@@ -138,8 +155,12 @@ export class RecordingModel implements IDisposable {
   /**
    * Stops the data acquisition.
    */
-  @action public async stopRecording() {
+  public async stopRecording() {
     this.deviceManager.stopDevices();
+    // Start the database data saving loop.
+
+    if (appRouterVM.route === AppNavStatesEnum.RECORD)
+      await ServiceManager.dbConnection.deviceDataSaver.stop();
   }
 
   /**

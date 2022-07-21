@@ -29,7 +29,9 @@ export const ReviewToolbar = observer(() => {
     const beastExporter = new BeastDataExporter(
       savePath,
       recordingVM.currentRecording?.id as number,
-      recordingVM.currentRecording?.data as DataModelType
+      //@ts-ignore
+      recordingVM.currentRecording?.data as DataModelType,
+      recordingVM.currentRecording?.sensorType as 'v5' | 'v6'
     );
 
     beastExporter.exportData();

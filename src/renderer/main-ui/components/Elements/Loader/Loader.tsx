@@ -34,7 +34,7 @@ export const Loader = observer(() => {
   // Listen for changes and update the component
   React.useEffect(() => {
     // Create / remove the portal element
-    if (appRouterVM.isLoading.status) {
+    if (appRouterVM.isLoading.status && !loader.status) {
       createPortalElement(loaderPortalId);
     } else {
       removePortalElement(loaderPortalId);
@@ -52,7 +52,7 @@ export const Loader = observer(() => {
               loader.transparent ? styles.LoaderTransparent : styles.LoaderSolid
             }`}
           >
-            <div className={styles.Loader}></div>
+            <div className={styles.Loader} />
             <span className="text-larger">
               {loader.message || 'Loading...'}
             </span>

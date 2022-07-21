@@ -75,7 +75,7 @@ export class BeastPhysicalDevice implements INIRSDevice {
    * @returns the maximum supported number of PDs
    */
   public getSupportedPDNum() {
-    return 7;
+    return 4;
   }
 
   /**
@@ -110,7 +110,7 @@ export class BeastPhysicalDevice implements INIRSDevice {
    * @returns the default sampling rate of the device.
    */
   public getDefaultSamplingRate() {
-    return 1000;
+    return 250;
   }
 
   /**

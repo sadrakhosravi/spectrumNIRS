@@ -443,6 +443,6 @@ export class BeastParser implements IDeviceParser {
       }
     }
 
-    return { data: res, metadata, buffer: packet };
+    return { data: res, metadata };
   };
 }

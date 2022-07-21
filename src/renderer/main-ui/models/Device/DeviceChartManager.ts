@@ -81,7 +81,9 @@ export class DeviceChartManagerModel
 
     // Set the series sampling rate and data cleaning
     this.charts.forEach((channel) => {
-      channel.series.setSeriesCleaning(1);
+      channel.series.setSeriesCleaning(
+        appRouterVM.route === AppNavStatesEnum.REVIEW ? undefined : 1
+      );
       channel.series.setSeriesSamplingRate(toJS(this.samplingRate));
     });
   }
